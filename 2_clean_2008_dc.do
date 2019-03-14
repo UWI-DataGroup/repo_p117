@@ -44,6 +44,7 @@ use "`datapath'\version01\2-working\2008_cancer_prep_dc.dta", clear
 
 count //
 
+count if slc==2 & dod==.
 
 * ************************************************************************
 * SITE GROUPINGS

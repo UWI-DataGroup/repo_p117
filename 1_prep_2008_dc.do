@@ -73,6 +73,11 @@ rename oth*treat*1 orx1
 rename oth*treat*2 orx2
 rename notreat*1 norx1
 rename notreat*2 norx2
+rename date_rx1 rx1d
+rename date_rx2 rx2d
+rename date_rx3 rx3d
+rename date_rx4 rx4d
+gen rx5d=.
 
 ** Clean and/or Remove variables that did not merge properly
 ** address
@@ -168,7 +173,7 @@ replace deathid=995 if pid==20080104
 replace deathid=1275 if pid==20080105
 replace deathid=2161 if pid==20080106
 replace deathid=1972 if pid==20080107
-replace natergno="410217-0117" if pid==20080107
+replace natregno="410217-0117" if pid==20080107
 replace deathid=1119 if pid==20080108
 replace deathid=2127 if pid==20080109
 replace deathid=1292 if pid==20080110
@@ -212,7 +217,7 @@ replace deathid=3288 if pid==20080247
 replace deathid=2090 if pid==20080259
 replace deathid=9128 if pid==20080265
 replace deathid=1761 if pid==20080266
-replace natergno="310325-0019" if pid==20080266
+replace natregno="310325-0019" if pid==20080266
 replace deathid=1181 if pid==20080267
 replace deathid=8160 if pid==20080268
 replace deathid=4075 if pid==20080271
@@ -221,15 +226,15 @@ replace deathid=9774 if pid==20080297
 replace deathid=8529 if pid==20080298
 replace deathid=4019 if pid==20080299
 replace deathid=1255 if pid==20080300
-replace natergno="400929-0083" if pid==20080300
+replace natregno="400929-0083" if pid==20080300
 replace deathid=2543 if pid==20080302
 replace deathid=3165 if pid==20080304
 replace deathid=3692 if pid==20080307
 replace deathid=1810 if pid==20080309
-replace natergno="211022-0036" if pid==20080309
+replace natregno="211022-0036" if pid==20080309
 replace deathid=7454 if pid==20080354
 replace deathid=3122 if pid==20080355
-replace natergno="290525-9999" if pid==20080355
+replace natregno="290525-9999" if pid==20080355
 replace deathid=7444 if pid==20080359
 replace deathid=10177 if pid==20080364
 replace deathid=4757 if pid==20080378
@@ -240,11 +245,11 @@ replace deathid=9037 if pid==20080411
 replace deathid=2809 if pid==20080441
 replace deathid=12648 if pid==20080445
 replace deathid=7764 if pid==20080463
-replace natergno="500408-8018" if pid==20080463
+replace natregno="500408-8018" if pid==20080463
 replace deathid=20080464 if pid==20080464
-replace natergno="320607-9999" if pid==20080464
+replace natregno="320607-9999" if pid==20080464
 replace deathid=3608 if pid==20080465
-replace natergno="240826-0038" if pid==20080465
+replace natregno="240826-0038" if pid==20080465
 replace deathid=357 if pid==20080478
 replace deathid=7402 if pid==20080480
 replace deathid=5053 if pid==20080489
@@ -253,7 +258,7 @@ replace deathid=4827 if pid==20080507
 replace deathid=2128 if pid==20080515
 replace deathid=5312 if pid==20080516
 replace deathid=4373 if pid==20080519
-replace natergno="300607-0043" if pid==20080519
+replace natregno="300607-0043" if pid==20080519
 replace deathid=2091 if pid==20080524
 replace deathid=2338 if pid==20080525
 replace deathid=1174 if pid==20080526
@@ -266,52 +271,325 @@ replace deathid=670 if pid==20080582
 replace deathid=1217 if pid==20080600
 replace deathid=4802 if pid==20080609
 replace deathid=2551 if pid==20080621
-STOPPED HERE
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
+replace deathid=1583 if pid==20080632
+replace deathid=2376 if pid==20080634
+replace deathid=11342 if pid==20080641
+replace deathid=7905 if pid==20080662
+replace deathid=10630 if pid==20080676
+replace deathid=11789 if pid==20080693
+replace deathid=1254 if pid==20080699
+replace deathid=6823 if pid==20080700
+replace deathid=3937 if pid==20080743
+replace deathid=7607 if pid==20080754
+replace deathid=8412 if pid==20080755
+replace deathid=8330 if pid==20080756
+replace deathid=2730 if pid==20080759
+replace deathid=1969 if pid==20080760
+replace deathid=5335 if pid==20080761
+replace deathid=8162 if pid==20080763
+replace deathid=1031 if pid==20080767
+replace deathid=7813 if pid==20080768
+replace deathid=8926 if pid==20080769
+replace deathid=8373 if pid==20080770
+replace deathid=7719 if pid==20080776
+replace deathid=1386 if pid==20080777
+replace deathid=6837 if pid==20080778
+replace deathid=5071 if pid==20080779
+replace deathid=11570 if pid==20080780
+replace deathid=5215 if pid==20080781
+replace deathid=6464 if pid==20080782
+replace deathid=5653 if pid==20080783
+replace deathid=850 if pid==20080785
+replace deathid=933 if pid==20080786
+replace deathid=653 if pid==20080787
+replace deathid=1220 if pid==20080788
+replace deathid=1518 if pid==20080789
+replace deathid=2465 if pid==20080793
+replace deathid=2119 if pid==20080794
+replace deathid=1212 if pid==20080795
+replace deathid=1440 if pid==20080796
+replace deathid=1795 if pid==20080797
+replace deathid=842 if pid==20080798
+replace deathid=1232 if pid==20080799
+replace deathid=1542 if pid==20080800
+replace deathid=1222 if pid==20080801
+replace deathid=2037 if pid==20080802
+replace deathid=456 if pid==20080803
+replace deathid=1649 if pid==20080804
+replace deathid=975 if pid==20080805
+replace deathid=1226 if pid==20080806
+replace deathid=1483 if pid==20080807
+replace deathid=2291 if pid==20080808
+replace deathid=1910 if pid==20080809
+replace deathid=821 if pid==20080810
+replace deathid=528 if pid==20080811
+replace deathid=879 if pid==20080812
+replace deathid=2209 if pid==20080813
+replace deathid=1877 if pid==20080814
+replace deathid=2176 if pid==20080815
+replace deathid=1092 if pid==20080816
+replace deathid=603 if pid==20080817
+replace deathid=1431 if pid==20080818
+replace deathid=1714 if pid==20080819
+replace deathid=1895 if pid==20080820
+replace deathid=50 if pid==20080821
+replace deathid=1958 if pid==20080822
+replace deathid=1635 if pid==20080823
+replace deathid=207 if pid==20080824
+replace deathid=1529 if pid==20080825
+replace deathid=1701 if pid==20080826
+replace deathid=1852 if pid==20080827
+replace deathid=2313 if pid==20080828
+replace deathid=2235 if pid==20080829
+replace deathid=172 if pid==20080830
+replace deathid=1507 if pid==20080831
+replace deathid=1168 if pid==20080832
+replace deathid=2018 if pid==20080833
+replace deathid=807 if pid==20080834
+replace deathid=262 if pid==20080835
+replace deathid=1121 if pid==20080836
+replace deathid=1603 if pid==20080837
+replace deathid=1159 if pid==20080838
+replace deathid=1399 if pid==20080839
+replace deathid=2181 if pid==20080840
+replace deathid=1919 if pid==20080841
+replace deathid=1825 if pid==20080842
+replace deathid=1033 if pid==20080843
+replace deathid=2113 if pid==20080844
+replace deathid=727 if pid==20080845
+replace deathid=1067 if pid==20080846
+replace deathid=1898 if pid==20080847
+replace deathid=1652 if pid==20080848
+replace deathid=2542 if pid==20080849
+replace deathid=2243 if pid==20080850
+replace deathid=470 if pid==20080851
+replace deathid=1755 if pid==20080852
+replace deathid=1284 if pid==20080855
+replace deathid=204 if pid==20080856
+replace deathid=1441 if pid==20080857
+replace deathid=595 if pid==20080858
+replace deathid=624 if pid==20080859
+replace deathid=1879 if pid==20080860
+replace deathid=854 if pid==20080861
+replace deathid=2386 if pid==20080862
+replace deathid=685 if pid==20080863
+replace deathid=917 if pid==20080864
+replace deathid=9181 if pid==20080865
+replace deathid=1302 if pid==20080866
+replace deathid=4811 if pid==20080867
+replace deathid=3589 if pid==20080868
+replace deathid=2800 if pid==20080869
+replace deathid=2650 if pid==20080870
+replace deathid=2711 if pid==20080871
+replace deathid=8997 if pid==20080872
+replace deathid=4555 if pid==20080873
+replace deathid=3846 if pid==20080874
+replace deathid=4514 if pid==20080875
+replace deathid=4431 if pid==20080876
+replace deathid=4721 if pid==20080878
+replace deathid=2749 if pid==20080879
+replace deathid=4600 if pid==20080880
+replace deathid=487 if pid==20080886
+replace deathid=442 if pid==20080887
+replace deathid=179 if pid==20080888
+replace deathid=604 if pid==20080889
+replace deathid=607 if pid==20080890
+replace deathid=766 if pid==20080891
+replace deathid=776 if pid==20080892
+replace deathid=888 if pid==20080893
+replace deathid=906 if pid==20080894
+replace deathid=977 if pid==20080895
+replace deathid=1021 if pid==20080896
+replace deathid=1027 if pid==20080897
+replace deathid=1044 if pid==20080898
+replace deathid=1152 if pid==20080900
+replace deathid=1190 if pid==20080901
+replace deathid=1249 if pid==20080902
+replace deathid=1298 if pid==20080903
+replace deathid=1288 if pid==20080905
+replace deathid=1388 if pid==20080906
+replace deathid=1394 if pid==20080907
+replace deathid=1626 if pid==20080908
+replace deathid=1633 if pid==20080909
+replace deathid=1640 if pid==20080910
+replace deathid=1645 if pid==20080911
+replace deathid=1765 if pid==20080912
+replace deathid=1816 if pid==20080913
+replace deathid=1884 if pid==20080914
 replace deathid=1964 if pid==20080915
+replace deathid=1987 if pid==20080916
+replace deathid=2036 if pid==20080917
+replace deathid=2050 if pid==20080918
+replace deathid=2048 if pid==20080919
+replace deathid=2103 if pid==20080920
+replace deathid=305 if pid==20080921
+replace deathid=395 if pid==20080922
+replace deathid=399 if pid==20080923
+replace deathid=567 if pid==20080924
+replace deathid=1036 if pid==20080925
+replace deathid=1413 if pid==20080926
+replace deathid=2075 if pid==20080927
+replace deathid=2187 if pid==20080928
+replace deathid=2276 if pid==20080929
+replace deathid=2287 if pid==20080930
+replace deathid=2307 if pid==20080931
+replace deathid=2368 if pid==20080932
+replace deathid=2397 if pid==20080933
+replace deathid=2440 if pid==20080934
+replace deathid=2451 if pid==20080935
+replace deathid=2406 if pid==20080936
+replace deathid=2432 if pid==20080937
 replace deathid=2496 if pid==20080938
+replace deathid=2534 if pid==20080940
+replace deathid=2533 if pid==20080941
+replace deathid=2293 if pid==20080942
+replace deathid=1808 if pid==20080943
+replace deathid=6185 if pid==20080944
+replace deathid=4244 if pid==20080945
+replace deathid=6000 if pid==20080946
+replace deathid=5986 if pid==20080947
+replace deathid=5966 if pid==20080948
+replace deathid=5933 if pid==20080949
+replace deathid=3375 if pid==20080950
+replace deathid=4467 if pid==20080951
+replace deathid=4764 if pid==20080952
+replace deathid=6598 if pid==20080953
+replace deathid=8457 if pid==20080954
+replace deathid=5614 if pid==20080955
+replace deathid=4978 if pid==20080956
+replace deathid=4489 if pid==20080957
+replace deathid=6911 if pid==20080958
+replace deathid=8580 if pid==20080959
+replace deathid=3836 if pid==20080960
+replace deathid=4376 if pid==20080961
+replace deathid=6768 if pid==20080962
+replace deathid=5054 if pid==20080963
+replace deathid=7112 if pid==20080964
+replace deathid=7042 if pid==20080965
+replace natregno="371114-0016" if pid==20080965
+replace deathid=6895 if pid==20080966
+replace natregno="411017-0095" if pid==20080966
 replace deathid=6785 if pid==20080967
+replace deathid=6689 if pid==20080968
+replace deathid=6663 if pid==20080969
+replace deathid=6547 if pid==20080970
+replace deathid=11453 if pid==20080971
+replace deathid=11240 if pid==20080972
+replace deathid=10444 if pid==20080973
+replace deathid=10283 if pid==20080974
+replace deathid=9618 if pid==20080975
+replace deathid=8746 if pid==20080976
+replace natregno="420710-0019" if pid==20080976
+replace deathid=8246 if pid==20080977
+replace deathid=7669 if pid==20080978
+replace natregno="331130-0150" if pid==20080978
+replace deathid=7586 if pid==20080979
+replace deathid=7276 if pid==20080980
+replace deathid=6526 if pid==20080981
+replace deathid=2998 if pid==20080982
+replace deathid=4499 if pid==20080983
+replace deathid=3527 if pid==20080984
+replace deathid=3901 if pid==20080985
+replace deathid=4629 if pid==20080986
+replace deathid=3923 if pid==20080987
+replace deathid=6450 if pid==20080988
+replace deathid=5701 if pid==20080989
+replace deathid=3329 if pid==20080990
+replace deathid=4309 if pid==20080991
+replace deathid=5237 if pid==20080992
+replace deathid=7192 if pid==20080993
+replace natregno="241228-0105" if pid==20080993
+replace deathid=2587 if pid==20080994
+replace deathid=2623 if pid==20080995
+replace deathid=2678 if pid==20080996
+replace deathid=2895 if pid==20080998
+replace deathid=2933 if pid==20080999
+replace deathid=5919 if pid==20081000
+replace deathid=5759 if pid==20081001
+replace deathid=5751 if pid==20081002
+replace deathid=5536 if pid==20081003
+replace deathid=5511 if pid==20081004
+replace deathid=5308 if pid==20081005
+replace deathid=5289 if pid==20081006
+replace deathid=5240 if pid==20081007
+replace deathid=5132 if pid==20081008
+replace deathid=4877 if pid==20081009
+replace deathid=4854 if pid==20081010
+replace deathid=3200 if pid==20081011
+replace deathid=3384 if pid==20081012
+replace deathid=3451 if pid==20081013
+replace deathid=3368 if pid==20081014
+replace deathid=3307 if pid==20081015
+replace deathid=3030 if pid==20081016
+replace deathid=3199 if pid==20081017
+replace deathid=3039 if pid==20081018
+replace deathid=4356 if pid==20081019
+replace deathid=4775 if pid==20081020
+replace deathid=3578 if pid==20081021
+replace deathid=3672 if pid==20081022
+replace deathid=3794 if pid==20081023
+replace deathid=3855 if pid==20081024
+replace deathid=3907 if pid==20081025
+replace deathid=4230 if pid==20081026
+replace deathid=4262 if pid==20081027
+replace deathid=3377 if pid==20081028
+replace deathid=3216 if pid==20081029
+replace deathid=2961 if pid==20081030
+replace deathid=2462 if pid==20081031
+replace deathid=4813 if pid==20081032
+replace deathid=4792 if pid==20081033
 replace deathid=4458 if pid==20081034
+replace deathid=4384 if pid==20081035
+replace deathid=4169 if pid==20081037
+replace deathid=4151 if pid==20081038
+replace deathid=3894 if pid==20081039
 replace deathid=3625 if pid==20081040
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-replace deathid= if pid==
-//no deathid/lineno for pid 20080179, 20080611
+replace deathid=3603 if pid==20081041
+replace deathid=3015 if pid==20081044
+replace deathid=4604 if pid==20081045
+replace deathid=6407 if pid==20081046
+replace deathid=8740 if pid==20081047
+replace deathid=889 if pid==20081048
+replace deathid=1419 if pid==20081049
+replace deathid=347 if pid==20081050
+replace deathid=2903 if pid==20081051
+replace deathid=2716 if pid==20081052
+replace deathid=2118 if pid==20081059
+replace deathid=1294 if pid==20081065
+replace deathid=4573 if pid==20081067
+replace deathid=692 if pid==20081068
+replace deathid=7396 if pid==20081074
+replace deathid=1950 if pid==20081079
+replace deathid=706 if pid==20081095
+replace deathid=1951 if pid==20081100
+replace deathid=950 if pid==20081107
+replace deathid=2046 if pid==20081110
+replace deathid=522 if pid==20081113
+replace deathid=1253 if pid==20081114
+replace deathid=2450 if pid==20081115
+replace deathid=1130 if pid==20081117
+replace deathid=2915 if pid==20081118
+replace deathid=11467 if pid==20081119
+replace deathid=3667 if pid==20081120
+replace deathid=5833 if pid==20081121
+replace deathid=672 if pid==20081125
+replace deathid=2137 if pid==20081126
+replace deathid=1704 if pid==20081128
+replace deathid=1597 if pid==20081129
+replace deathid=193 if pid==20081130
+replace deathid=43 if pid==20081131
+replace natregno="160420-9999" if pid==20081131
+replace deathid=1694 if pid==20081132
+replace deathid=117 if pid==20081133
+replace deathid=683 if pid==20081134
+replace deathid=1515 if pid==20081135
+replace deathid=1481 if pid==20090037
+replace vstatus=. if pid==20090061
+replace slc=. if pid==20090061
+replace deceased=2 if pid==20090061
+//no deathid/lineno for pid 20080179, 20080611, 20080664 (died overseas), 20081066, 20081106
 
+count if deathid==. & slc==2 //5
 
 ** Create unique id for each tumour (cr5id)
 /*
@@ -321,6 +599,204 @@ Note: When records merged in CanReg5, the following can take place:
 2) the first 8 digits in tumourid remains the same as the defunct (i.e. no longer used) pid while the new pid will be the pid into which
    that tumour was merged e.g. 20130303 has 2 tumours with different tumourids - 201303030102 and 201407170101.
 */
+count if eid2=="" //9 - need to change records missing IDs for cr5id variable to be created
+list *id* if eid2==""
+replace pid2=2008112801 if pid==20081128
+replace eid2="200811280101" if pid==20081128
+replace patientidtumourtable=20081128 if pid==20081128
+replace patientrecordidtumourtable=2008112801 if pid==20081128
+replace tumouridsourcetable="200811280101" if pid==20081128
+replace sid2="20081128010101" if pid==20081128
+replace mpseq="1" if pid==20081128
+replace mptot=1 if pid==20081128
+
+replace pid2=2008112901 if pid==20081129
+replace eid2="200811290101" if pid==20081129
+replace patientidtumourtable=20081129 if pid==20081129
+replace patientrecordidtumourtable=2008112901 if pid==20081129
+replace tumouridsourcetable="200811290101" if pid==20081129
+replace sid2="20081129010101" if pid==20081129
+replace mpseq="1" if pid==20081129
+replace mptot=1 if pid==20081129
+
+replace pid2=2008113001 if pid==20081130
+replace eid2="200811300101" if pid==20081130
+replace patientidtumourtable=20081130 if pid==20081130
+replace patientrecordidtumourtable=2008113001 if pid==20081130
+replace tumouridsourcetable="200811300101" if pid==20081130
+replace sid2="20081130010101" if pid==20081130
+replace mpseq="1" if pid==20081130
+replace mptot=1 if pid==20081130
+
+replace pid2=2008113101 if pid==20081131
+replace eid2="200811310101" if pid==20081131
+replace patientidtumourtable=20081131 if pid==20081131
+replace patientrecordidtumourtable=2008113101 if pid==20081131
+replace tumouridsourcetable="200811310101" if pid==20081131
+replace sid2="20081131010101" if pid==20081131
+replace mpseq="1" if pid==20081131
+replace mptot=1 if pid==20081131
+
+replace pid2=2008113201 if pid==20081132
+replace eid2="200811320101" if pid==20081132
+replace patientidtumourtable=20081132 if pid==20081132
+replace patientrecordidtumourtable=2008113201 if pid==20081132
+replace tumouridsourcetable="200811320101" if pid==20081132
+replace sid2="20081132010101" if pid==20081132
+replace mpseq="1" if pid==20081132
+replace mptot=1 if pid==20081132
+
+replace pid2=2008113301 if pid==20081133
+replace eid2="200811330101" if pid==20081133
+replace patientidtumourtable=20081133 if pid==20081133
+replace patientrecordidtumourtable=2008113301 if pid==20081133
+replace tumouridsourcetable="200811330101" if pid==20081133
+replace sid2="20081133010101" if pid==20081133
+replace mpseq="1" if pid==20081133
+replace mptot=1 if pid==20081133
+
+replace pid2=2008113401 if pid==20081134
+replace eid2="200811340101" if pid==20081134
+replace patientidtumourtable=20081134 if pid==20081134
+replace patientrecordidtumourtable=2008113401 if pid==20081134
+replace tumouridsourcetable="200811340101" if pid==20081134
+replace sid2="20081134010101" if pid==20081134
+replace mpseq="1" if pid==20081134
+replace mptot=1 if pid==20081134
+
+replace pid2=2008113501 if pid==20081135
+replace eid2="200811350101" if pid==20081135
+replace patientidtumourtable=20081135 if pid==20081135
+replace patientrecordidtumourtable=2008113501 if pid==20081135
+replace tumouridsourcetable="200811350101" if pid==20081135
+replace sid2="20081135010101" if pid==20081135
+replace mpseq="1" if pid==20081135
+replace mptot=1 if pid==20081135
+
+replace pid2=2009003701 if pid==20090037
+replace eid2="200900370101" if pid==20090037
+replace patientidtumourtable=20090037 if pid==20090037
+replace patientrecordidtumourtable=2009003701 if pid==20090037
+replace tumouridsourcetable="200900370101" if pid==20090037
+replace sid2="20090037010101" if pid==20090037
+replace mpseq="1" if pid==20090037
+replace mptot=1 if pid==20090037
+
+** Abstract 9 DCOs
+list pid natregno cod1a if topography==.
+
+replace dob=d(14nov1934) if pid==20081128
+replace mstatus=1 if pid==20081128
+replace resident=1 if pid==20081128
+replace primarysite="COLON" if pid==20081128
+replace topography=189 if pid==20081128
+replace hx="METASTATIC CARCINOMA" if pid==20081128
+replace morph=8000 if pid==20081128
+replace lat=0 if pid==20081128
+replace grade=9 if pid==20081128
+replace staging=9 if pid==20081128
+replace rx1=9 if pid==20081128
+
+replace dob=d(19aug1937) if pid==20081129
+replace mstatus=2 if pid==20081129
+replace resident=1 if pid==20081129
+replace primarysite="COLON" if pid==20081129
+replace topography=189 if pid==20081129
+replace hx="METASTATIC COLON CANCER" if pid==20081129
+replace morph=8000 if pid==20081129
+replace lat=0 if pid==20081129
+replace grade=9 if pid==20081129
+replace staging=9 if pid==20081129
+replace rx1=9 if pid==20081129
+
+replace dob=d(30aug1924) if pid==20081130
+replace mstatus=2 if pid==20081130
+replace resident=1 if pid==20081130
+replace primarysite="STOMACH" if pid==20081130
+replace topography=169 if pid==20081130
+replace hx="CARCINOMA" if pid==20081130
+replace morph=8000 if pid==20081130
+replace beh=3 if pid==20081130
+replace lat=0 if pid==20081130
+replace grade=9 if pid==20081130
+replace staging=9 if pid==20081130
+replace rx1=9 if pid==20081130
+
+replace dob=d(20apr1926) if pid==20081131
+replace mstatus=1 if pid==20081131
+replace resident=9 if pid==20081131
+replace primarysite="RIGHT BREAST" if pid==20081131
+replace topography=509 if pid==20081131
+replace hx="CANCER" if pid==20081131
+replace morph=8000 if pid==20081131
+replace beh=3 if pid==20081131
+replace lat=1 if pid==20081131
+replace grade=9 if pid==20081131
+replace staging=9 if pid==20081131
+replace rx1=9 if pid==20081131
+
+replace dob=d(22jul1968) if pid==20081132
+replace mstatus=3 if pid==20081132
+replace resident=1 if pid==20081132
+replace primarysite="STOMACH" if pid==20081132
+replace topography=169 if pid==20081132
+replace hx="METASTATIC CARCINOMA" if pid==20081132
+replace morph=8000 if pid==20081132
+replace lat=0 if pid==20081132
+replace grade=9 if pid==20081132
+replace staging=9 if pid==20081132
+replace rx1=9 if pid==20081132
+
+replace dob=d(16mar1956) if pid==20081133
+replace mstatus=1 if pid==20081133
+replace resident=1 if pid==20081133
+replace primarysite="TONSIL" if pid==20081133
+replace topography=99 if pid==20081133
+replace hx="CARCINOMA" if pid==20081133
+replace morph=8000 if pid==20081133
+replace beh=3 if pid==20081133
+replace lat=9 if pid==20081133
+replace grade=9 if pid==20081133
+replace staging=9 if pid==20081133
+replace rx1=9 if pid==20081133
+
+replace dob=d(19nov1916) if pid==20081134
+replace mstatus=2 if pid==20081134
+replace resident=1 if pid==20081134
+replace primarysite="PROSTATE" if pid==20081134
+replace topography=619 if pid==20081134
+replace hx="CARCINOMA OF PROSTATE WITH METASTATIC SPREAD" if pid==20081134
+replace morph=8000 if pid==20081134
+replace lat=0 if pid==20081134
+replace grade=9 if pid==20081134
+replace staging=9 if pid==20081134
+replace rx1=9 if pid==20081134
+
+replace dob=d(06apr1952) if pid==20081135
+replace mstatus=1 if pid==20081135
+replace resident=1 if pid==20081135
+replace primarysite="OVARY" if pid==20081135
+replace topography=569 if pid==20081135
+replace hx="OVARIAN TUMOUR" if pid==20081135
+replace morph=8000 if pid==20081135
+replace lat=9 if pid==20081135
+replace grade=9 if pid==20081135
+replace staging=9 if pid==20081135
+replace rx1=9 if pid==20081135
+
+replace dob=d(10jul1918) if pid==20090037
+replace mstatus=1 if pid==20090037
+replace resident=1 if pid==20090037
+replace primarysite="LEFT BREAST" if pid==20090037
+replace topography=509 if pid==20090037
+replace hx="CANCER" if pid==20090037
+replace morph=8000 if pid==20090037
+replace lat=2 if pid==20090037
+replace grade=9 if pid==20090037
+replace staging=9 if pid==20090037
+replace rx1=9 if pid==20090037
+
+**Format below variables in prep for creation of cr5id variable
 gen top = topography
 destring top, replace
 
@@ -329,11 +805,16 @@ gen sourcetotal = substr(str_sourcerecordid,-1,1)
 destring sourcetot, gen (sourcetot_orig)
 
 gen str_pid2 = pid2
+tostring str_pid2 ,replace
 gen patienttotal = substr(str_pid2,-1,1)
 destring patienttot, gen (patienttot)
 
 gen str_patientidtumourtable=patientidtumourtable
+tostring str_patientidtumourtable ,replace
+list pid mpseq mptot if regexm(mpseq, "-")
+replace mpseq="1" if pid==20080839
 gen mpseq2=mpseq
+destring mpseq2 ,replace
 replace mpseq2=1 if mpseq2==0
 tostring mpseq2, replace
 gen eid = str_patientidtumourtable + "010" + mpseq2
@@ -438,162 +919,62 @@ replace cr5id="T8S8" if tumsourceseq=="010808"
 count if cr5id=="" //0
 list pid if cr5id==""
 
+
 ** Check (using Stata data editor - filter by 'pid' and check cr5id is unique for each pid) for ones where
 ** cases were merged but eid and cr5id not properly assigned (e.g. see 20140855) then
 ** correct the eids and cr5ids not correctly assigned
 gen str_sourcerecordid2 = substr(str_sourcerecordid,1,8)
-count if str_sourcerecordid2!=pid //418 28jun18; 470 08aug18/06sep18
-list pid eid sid str_sourcerecordid str_sourcerecordid2 if str_sourcerecordid2!=pid
+destring str_sourcerecordid2 ,replace
+count if str_sourcerecordid2!=pid //2 14mar2019
+list pid eid sid str_sourcerecordid str_sourcerecordid2 cr5id if str_sourcerecordid2!=pid
 ** Re-checked via previously printed list of 31 below (15feb18) and newly printed list of 33 below (18apr18) - 2 extra is pid 20080622 and pid 20145084 T2.
 gen eidcorrect=""
 ** Mark as correct cases whose eid & cr5id were correctly assigned and do not need replacing
-replace eidcorrect="yes" if pid=="20080200" | pid=="20080233" | pid=="20080482" | pid=="20080539" | pid=="20080553" ///
-							| pid=="20080555" | pid=="20080562" | pid=="20080708" | pid=="20080839" | pid=="20130009" ///
-							| pid=="20130010" | pid=="20130018" | pid=="20130025" | pid=="20130044" | pid=="20130049" ///
-							| pid=="20130056" | pid=="20130070" | pid=="20130080" | pid=="20130101" | pid=="20130151" ///
-							| pid=="20130162" | pid=="20130170" | pid=="20130171" | pid=="20130174" | pid=="20130175" ///
-							| pid=="20130176" | pid=="20130210" | pid=="20130212" | pid=="20130239" | pid=="20130240" ///
-							| pid=="20130241" | pid=="20130242" | pid=="20130247" | pid=="20130248" | pid=="20130249" ///
-							| pid=="20130250" | pid=="20130251" | pid=="20130252" | pid=="20130253" | pid=="20130254" ///
-							| pid=="20130257" | pid=="20130258" | pid=="20130260" | pid=="20130261" | pid=="20130262"
-replace eidcorrect="yes" if pid=="20130264" | pid=="20130270" | pid=="20130275" | pid=="20130276" | pid=="20130285" ///
-							| pid=="20130286" | pid=="20130293" | pid=="20130296" | pid=="20130298" | pid=="20130300" ///
-							| pid=="20130303" | pid=="20130307" | pid=="20130313" | pid=="20130316" | pid=="20130317" ///
-							| pid=="20130327" | pid=="20130328" | pid=="20130338" | pid=="20130341" | pid=="20130352" ///
-							| pid=="20130353" | pid=="20130357" | pid=="20130372" | pid=="20130380" | pid=="20130381" ///
-							| pid=="20130384" | pid=="20130385" | pid=="20130386" | pid=="20130387" | pid=="20130388" ///
-							| pid=="20130389" | pid=="20130406" | pid=="20130412" | pid=="20130417" | pid=="20130508" ///
-							| pid=="20130510" | pid=="20130581" | pid=="20130582" | pid=="20130583" | pid=="20130585" ///
-							| pid=="20130586" | pid=="20130587" | pid=="20130588" | pid=="20130589" | pid=="20130590"
-replace eidcorrect="yes" if pid=="20130594" | pid=="20130596" | pid=="20130597" | pid=="20130603" | pid=="20130612" ///
-							| pid=="20130616" | pid=="20130620" | pid=="20130633" | pid=="20130639" | pid=="20130644" ///
-							| pid=="20130658" | pid=="20130663" | pid=="20130673" | pid=="20130687" | pid=="20130689" ///
-							| pid=="20130692" | pid=="20130702" | pid=="20130703" | pid=="20130712" | pid=="20130728" ///
-							| pid=="20130730" | pid=="20130731" | pid=="20130747" | pid=="20130748" | pid=="20130751" ///
-							| pid=="20130752" | pid=="20130762" | pid=="20130766" | pid=="20130768" | pid=="20130775" ///
-							| pid=="20130778" | pid=="20130779" | pid=="20130780" | pid=="20130798" | pid=="20130809" ///
-							| pid=="20130812" | pid=="20130819" | pid=="20130834" | pid=="20130861" | pid=="20140025" ///
-							| pid=="20140025" | pid=="20140037" | pid=="20140058" | pid=="20140064" | pid=="20140074"
-replace eidcorrect="yes" if pid=="20140077" | pid=="20140091" | pid=="20140093" | pid=="20140125" | pid=="20140138" ///
-							| pid=="20140161" | pid=="20140161" | pid=="20140165" | pid=="20140166" | pid=="20140173" ///
-							| pid=="20140176" | pid=="20140207" | pid=="20140260" | pid=="20140289" | pid=="20140301" ///
-							| pid=="20140323" | pid=="20140349" | pid=="20140360" | pid=="20140371" | pid=="20140373" ///
-							| pid=="20140375" | pid=="20140387" | pid=="20140394" | pid=="20140395" | pid=="20140398" ///
-							| pid=="20140415" | pid=="20140429" | pid=="20140441" | pid=="20140459" | pid=="20140460" ///
-							| pid=="20140463" | pid=="20140519" | pid=="20140525" | pid=="20140575" | pid=="20140592" ///
-							| pid=="20140646" | pid=="20140647" | pid=="20140679" | pid=="20140690" | pid=="20140691" ///
-							| pid=="20140692" | pid=="20140695" | pid=="20140697" | pid=="20140698" | pid=="20140703" ///
-							| pid=="20140705" | pid=="20140707" | pid=="20140712" | pid=="20140716" | pid=="20140730"
-replace eidcorrect="yes" if pid=="20140733" | pid=="20140735" | pid=="20140738" | pid=="20140742" | pid=="20140744" ///
-							| pid=="20140750" | pid=="20140752" | pid=="20140759" | pid=="20140764" | pid=="20140776" ///
-							| pid=="20140789" | pid=="20140802" | pid=="20140803" | pid=="20140804" | pid=="20140805" ///
-							| pid=="20140806" | pid=="20140807" | pid=="20140809" | pid=="20140810" | pid=="20140811" ///
-							| pid=="20140820" | pid=="20140826" | pid=="20140830" | pid=="20140831" | pid=="20140833" ///
-							| pid=="20140836" | pid=="20140838" | pid=="20140839" | pid=="20140841" | pid=="20140845" ///
-							| pid=="20140865" | pid=="20140872" | pid=="20140882" | pid=="20140903" | pid=="20140907" ///
-							| pid=="20140945" | pid=="20140952" | pid=="20140973" | pid=="20140975" | pid=="20140988" ///
-							| pid=="20141018" | pid=="20141021" | pid=="20141027" | pid=="20141029" | pid=="20141040"
-replace eidcorrect="yes" if pid=="20141052" | pid=="20141068" | pid=="20141075" | pid=="20141079" | pid=="20141087" ///
-							| pid=="20141124" | pid=="20141167" | pid=="20141211" | pid=="20141246" | pid=="20141320" ///
-							| pid=="20141501" | pid=="20150026" | pid=="20150154" | pid=="20150155" | pid=="20160018" ///
-							| pid=="20160024" | pid=="20160041" | pid=="20090016" | pid=="20130029" | pid=="20130107" ///
-							| pid=="20130279" | pid=="20130398" | pid=="20140855" | pid=="20140869"
+replace eidcorrect="yes" if pid==20080708 | pid==20080839
 
 ** Now replace eid, sid and cr5id for cases that were incorrectly assigned and need replacing
+** JC 14mar2019 - no needed as all cr5id correctly assgined.
+/*
 replace eidcorrect="no" if pid=="20140739" & str_sourcerecordid2=="20140741"
 replace eid="201407390103" if pid=="20140739" & str_sourcerecordid2=="20140741"
 replace cr5id="T3S1" if pid=="20140739" & str_sourcerecordid2=="20140741"
 replace sid="20140739010301" if pid=="20140739" & str_sourcerecordid2=="20140741"
 replace tumseq="0103" if pid=="20140739" & str_sourcerecordid=="20140741"
 replace tumsourceseq="010301" if pid=="20140739" & str_sourcerecordid=="20140741"
-
+*/
 ** Re-check (using Stata data editor) for ones where cases were merged but eid not properly assigned then
 ** correct the eids not correctly assigned
-count if str_sourcerecordid2!=pid & eidcorrect=="" //114 28jun18; 164 08aug18/06sep18
+count if str_sourcerecordid2!=pid & eidcorrect=="" //0
+/*
 list pid eid sid str_sourcerecordid str_sourcerecordid2 if str_sourcerecordid2!=pid & eidcorrect==""
 replace eidcorrect="yes" if pid=="20140739" & str_sourcerecordid2=="20140740"
-** Mark as correct cases whose eid & cr5id were correctly assigned and do not need replacing
-** Re-checked via previously printed list (15feb18) and newly printed list (18apr18) - added in pid "20080622"
-replace eidcorrect="yes" if pid=="20080403" | pid=="20081036" | pid=="20130361" | pid=="20130591" | pid=="20130661" ///
-							| pid=="20130769" | pid=="20130774" | pid=="20140129" | pid=="20140474" | pid=="20140928" ///
-							| pid=="20140966" | pid=="20141083" | pid=="20141084" | pid=="20141098" | pid=="20141181" ///
-							| pid=="20141273" | pid=="20141373" | pid=="20141411" | pid=="20141477" | pid=="20141489" ///
-							| pid=="20141490" | pid=="20141532" | pid=="20145027" | pid=="20145030" | pid=="20145060" ///
-							| pid=="20145077" | pid=="20145084" | pid=="20150004" | pid=="20080622"
-** Re-check (using Stata data editor) for ones where cases were merged but eid not properly assigned then
-** correct the eids not correctly assigned
-count if str_sourcerecordid2!=pid & eidcorrect=="" //76 28jun18 - only corrected 8 at this time since SAF wants flags pre-2014; 126 08aug18/06sep18
-** Left 46 to be done as these are not dx in 2014 (JC checked main CR5db on 06sep18 for cases where dxyr=2014 but reg.#>2014 and only 3 cases
-** (reg.#s 20150001, 20150175, 20160029) and these do not appear on below list.)
-list pid eid sid str_sourcerecordid str_sourcerecordid2 if str_sourcerecordid2!=pid & eidcorrect==""
-replace eidcorrect="yes" if pid=="" & str_sourcerecordid2==""
-** Mark as correct cases whose eid & cr5id were correctly assigned and do not need replacing
-** Re-checked via previously printed list (15feb18) and newly printed list (18apr18) - added in pid "20080622"
-replace eidcorrect="yes" if pid=="20080022" | pid=="20080184" | pid=="20080208" | pid=="20080242" | pid=="20080340" | pid=="20080365" | pid=="20080401" ///
-							| pid=="20130606" | pid=="20130672" | pid=="20140121" | pid=="20140137" | pid=="20140157" | pid=="20140170" | pid=="20140206" ///
-							| pid=="20140232" | pid=="20140286" | pid=="20140294" | pid=="20140308" | pid=="20140315" | pid=="20140407" | pid=="20140483" ///
-							| pid=="20140540" | pid=="20140553" | pid=="20140555" | pid=="20140693" | pid=="20140694" | pid=="20140822" | pid=="20140843" ///
-							| pid=="20140886" | pid=="20140929" | pid=="20140954" | pid=="20140962" | pid=="20141047" | pid=="20141059" | pid=="20141070" ///
-							| pid=="20141108" | pid=="20141115" | pid=="20141117" | pid=="20141171" | pid=="20141174" | pid=="20141191" | pid=="20141236" ///
-							| pid=="20141321" | pid=="20141335" | pid=="20141404" | pid=="20141409" | pid=="20141481" | pid=="20141544" | pid=="20141548" ///
-							| pid=="20141550" | pid=="20141567" | pid=="20145138" | pid=="20150015" | pid=="20150041" | pid=="20150043" | pid=="20150050"
-
-** Now replace eid, sid and cr5id for cases that were incorrectly assigned and need replacing
-replace eidcorrect="no" if pid=="20081085" & str_sourcerecordid2=="20150340"
-replace eid="200810850102" if pid=="20081085" & str_sourcerecordid2=="20150340"
-replace cr5id="T2S1" if pid=="20081085" & str_sourcerecordid2=="20150340"
-replace sid="20081085010201" if pid=="20081085" & str_sourcerecordid2=="20150340"
-replace tumseq="0102" if pid=="20081085" & str_sourcerecordid=="20150340"
-replace tumsourceseq="010201" if pid=="20081085" & str_sourcerecordid=="20150340"
-
-replace eidcorrect="no" if pid=="20130160" & str_sourcerecordid2=="20130394"
-replace eid="201301600102" if pid=="20130160" & str_sourcerecordid2=="20130394"
-replace cr5id="T2S1" if pid=="20130160" & str_sourcerecordid2=="20130394"
-replace sid="20130160010201" if pid=="20130160" & str_sourcerecordid2=="20130394"
-replace tumseq="0102" if pid=="20130160" & str_sourcerecordid=="20130394"
-replace tumsourceseq="010201" if pid=="20130160" & str_sourcerecordid=="20130394"
-
-replace eidcorrect="no" if pid=="20150039" & str_sourcerecordid2=="20150197"
-replace eid="201500390102" if pid=="20150039" & str_sourcerecordid2=="20150197"
-replace cr5id="T2S1" if pid=="20150039" & str_sourcerecordid2=="20150197"
-replace sid="20150039010201" if pid=="20150039" & str_sourcerecordid2=="20150197"
-replace tumseq="0102" if pid=="20150039" & str_sourcerecordid=="20150197"
-replace tumsourceseq="010201" if pid=="20150039" & str_sourcerecordid=="20150197"
-
-** Re-check (using Stata data editor) for ones where cases were merged but eid not properly assigned then
-** correct the eids not correctly assigned
-count if str_sourcerecordid2!=pid & eidcorrect=="" //76 28jun18; 118 08aug2018; 46 06esp18 - left to be done when cleaning 2015 data
-list pid eid sid str_sourcerecordid str_sourcerecordid2 if str_sourcerecordid2!=pid & eidcorrect==""
-
-
+*/
 ** Create variable to count # of tumour and source records per patient record using cr5id
 gen tumourtot=.
 gen sourcetot=.
-replace tumourtot=1 if regexm(cr5id, "T1") //4586 changes made 18apr18
-replace tumourtot=2 if regexm(cr5id, "T2") //442 changes made 18apr18
-replace tumourtot=3 if regexm(cr5id, "T3") //75 changes made 18apr18
-replace tumourtot=4 if regexm(cr5id, "T4") //26 changes made 18apr18
-replace tumourtot=5 if regexm(cr5id, "T5") //13 changes made 18apr18
-replace tumourtot=6 if regexm(cr5id, "T6") //11 changes made 18apr18
-replace tumourtot=7 if regexm(cr5id, "T7") //4 changes made 18apr18
-replace tumourtot=8 if regexm(cr5id, "T8") //1 changes made 18apr18
-replace sourcetot=1 if regexm(cr5id, "S1") //4262 changes made 18apr18
-replace sourcetot=2 if regexm(cr5id, "S2") //700 changes made 18apr18
-replace sourcetot=3 if regexm(cr5id, "S3") //163 changes made 18apr18
-replace sourcetot=4 if regexm(cr5id, "S4") //27 changes made 18apr18
-replace sourcetot=5 if regexm(cr5id, "S5") //5 changes made 18apr18
-replace sourcetot=6 if regexm(cr5id, "S6") //1 changes made 18apr18
-replace sourcetot=7 if regexm(cr5id, "S7") //0 changes made 18apr18
-replace sourcetot=8 if regexm(cr5id, "S8") //0 changes made 18apr18
+replace tumourtot=1 if regexm(cr5id, "T1") //1,110 changes 14mar2019
+replace tumourtot=2 if regexm(cr5id, "T2") //56 changes 14mar2019
+replace tumourtot=3 if regexm(cr5id, "T3") //21 changes 14mar2019
+replace tumourtot=4 if regexm(cr5id, "T4") //12 changes 14mar2019
+replace tumourtot=5 if regexm(cr5id, "T5") //3 changes 14mar2019
+replace tumourtot=6 if regexm(cr5id, "T6") //2 changes 14mar2019
+replace tumourtot=7 if regexm(cr5id, "T7") //0 changes 14mar2019
+replace tumourtot=8 if regexm(cr5id, "T8") //0 changes 14mar2019
+replace sourcetot=1 if regexm(cr5id, "S1") //1,204 changes 14mar2019
+replace sourcetot=2 if regexm(cr5id, "S2") //0 changes 14mar2019
+replace sourcetot=3 if regexm(cr5id, "S3") //0 changes 14mar2019
+replace sourcetot=4 if regexm(cr5id, "S4") //0 changes 14mar2019
+replace sourcetot=5 if regexm(cr5id, "S5") //0 changes 14mar2019
+replace sourcetot=6 if regexm(cr5id, "S6") //0 changes 14mar2019
+replace sourcetot=7 if regexm(cr5id, "S7") //0 changes 14mar2019
+replace sourcetot=8 if regexm(cr5id, "S8") //0 changes 14mar2019
 ** Check for missing cr5ids that were not replaced above
 count if tumourtot==. //0
 count if sourcetot==. //0
 list pid cr5id tumourtot sourcetot if tumourtot==. | sourcetot==.
 
-
-
 ** Create categories for topography according to groupings in ICD-O-3 book
-gen topcat=. //5150 01mar18
+gen topcat=.
 replace topcat=1 if topography>-1 & topography<19
 replace topcat=2 if topography==19
 replace topcat=3 if topography>19 & topography<30
@@ -675,6 +1056,7 @@ label define topcat_lab 1 "Lip" 2 "Tongue-Base" 3 "Tongue-Other" 4 "Gum" 5 "Mout
 						57 "Renal Pelvis" 58 "Ureter" 59 "Bladder" 60 "Urinary-Other" 61 "Eye" 62 "Meninges" 63 "Brain" 64 "Spinal Cord/CNS" 65 "Thyroid" 66 "Adrenal Gland" ///
 						67 "Endocrine-Other" 68 "Other/Ill defined" 69 "LNs" 70 "PSU" ,modify
 label values topcat topcat_lab
+count if topcat==. //0
 
 ** Create category for primarysite/topography check
 gen topcheckcat=.
@@ -828,7 +1210,7 @@ label define topcheckcat_lab 	1 "Check 1: Lip" 2 "Check 2: Lip-Overlap" 3 "Check
 label values topcheckcat topcheckcat_lab
 
 ** Create category for morphology according to groupings in ICD-O-3 book
-gen morphcat=. //5150 01mar18
+gen morphcat=.
 replace morphcat=1 if morph>7999 & morph<8006
 replace morphcat=2 if morph>8009 & morph<8050
 replace morphcat=3 if morph>8049 & morph<8090
@@ -898,6 +1280,7 @@ label define morphcat_lab 1 "Neoplasms,NOS" 2 "Epithelial Neo.,NOS" 3 "Squamous 
 						  50 "Leukemias" 51 "Lymphoid Leukemias" 52 "Myeloid Leukemias" 53 "Leukemias-Other" 54 "Chronic Myeloproliferative Dis." 55 "Heme. Dis.-Other" ///
 						  56 "Myelodysplastic Syndromes" ,modify
 label values morphcat morphcat_lab
+count if morphcat==. //0
 
 ** Create category for histology/morphology check
 gen morphcheckcat=.
@@ -1119,7 +1502,7 @@ label define agecheckcat_lab 1 "Check 1: Age<3 & Hx=Hodgkin Lymphoma" 2 "Check 2
 label values agecheckcat agecheckcat_lab
 
 ** Create category for histological family groups according to family number in IARCcrgTools Check Program Appendix 1 pgs 11-31
-gen hxfamcat=. //5150 26mar18
+gen hxfamcat=.
 ** Group 1 - Tumours with non-specific site-profile
 replace hxfamcat=1 if (morph>7999 & morph<8005) | (morphcat==41 & morph!=9597) | morphcat==42 | (morphcat==43 & morph!=9679 & morph!=9689) ///
 					   | (morphcat==44 & morph!=9700 & morph!=9708 & morph!=9709 & morph!=9717 & morph!=9718 & morph!=9726) | morphcat==45 ///
@@ -1216,6 +1599,7 @@ label define hxfamcat_lab 1 "Tumours accepted with any site code" 2 "Salivary Gl
 						  71 "NOT Bone-Plasmacytomas, extramedullary" ///
 						  ,modify
 label values hxfamcat hxfamcat_lab
+count if hxfamcat==. //583
 
 ** Create category for sex/histology check: IARCcrgTools pg 7
 gen sexcheckcat=.
@@ -1243,16 +1627,16 @@ label values sexcheckcat sexcheckcat_lab
 
 ** Create category for CODs as needed in LATERALITY category so non-cancer CODs with the terms 'left' & 'right' are not flagged
 gen codcat=.
-replace codcat=1 if cr5cod!="99" & cr5cod!="" & cr5cod!="NIL." & cr5cod!="Not Stated." & !strmatch(strupper(cr5cod), "*CANCER*") & !strmatch(strupper(cr5cod), "*OMA*") ///
-		 & !strmatch(strupper(cr5cod), "*MALIG*") & !strmatch(strupper(cr5cod), "*TUM*") & !strmatch(strupper(cr5cod), "*LYMPH*") ///
-		 & !strmatch(strupper(cr5cod), "*LEU*") & !strmatch(strupper(cr5cod), "*MYELO*") & !strmatch(strupper(cr5cod), "*METASTA*")
+replace codcat=1 if cod1a!="99" & cod1a!="" & cod1a!="NIL." & cod1a!="Not Stated." & !strmatch(strupper(cod1a), "*CANCER*") & !strmatch(strupper(cod1a), "*OMA*") ///
+		 & !strmatch(strupper(cod1a), "*MALIG*") & !strmatch(strupper(cod1a), "*TUM*") & !strmatch(strupper(cod1a), "*LYMPH*") ///
+		 & !strmatch(strupper(cod1a), "*LEU*") & !strmatch(strupper(cod1a), "*MYELO*") & !strmatch(strupper(cod1a), "*METASTA*")
 label var codcat "Laterality Category"
 label define codcat_lab 1 "Non-cancer COD" ,modify
 label values codcat codcat_lab
 
 ** Create category for laterality so can perform checks on this category
 ** Category determined using SEER Program Coding Staging Manual 2016 pgs 82-84
-gen latcat=. //5150 04apr18
+gen latcat=.
 replace latcat=0 if latcat==.
 replace latcat=1 if topography==79
 replace latcat=2 if topography==80
@@ -1319,15 +1703,15 @@ label define latcat_lab   0 "No lat cat" 1 "Lat-Parotid gland" 2 "Lat-Submandibu
 						  41 "Lat-Cerebral meninges" 42 "Lat-Cerebrum" 43 "Lat-Frontal lobe" 44 "Lat-Temporal lobe" 45 "Lat-Parietal lobe" 46 "Lat-Occipital lobe" ///
 						  47 "Lat-Olfactory nerve" 48 "Lat-Optic nerve" 49 "Lat-Acoustic nerve" 50 "Lat-Cranial nerve" 51 "Lat-Adrenal gland" 52 "Lat-Carotid body" ,modify
 label values latcat latcat_lab
-
+count if latcat==. //0
 
 ** Create category for laterality checks
 ** Checks 5-10 are taken from SEER Program Coding Staging manual pgs 82-84
 gen latcheckcat=.
-replace latcheckcat=1 if (regexm(cr5cod, "LEFT")|regexm(cr5cod, "left")) & codcat!=1 & latcat>0 & (lat!=. & lat!=2)
-replace latcheckcat=2 if (regexm(cr5cod, "RIGHT")|regexm(cr5cod, "right")) & codcat!=1 & latcat>0 & (lat!=. & lat!=1)
-replace latcheckcat=3 if (regexm(cfdx, "LEFT")|regexm(cfdx, "left")) & latcat>0 & (lat!=. & lat!=2)
-replace latcheckcat=4 if (regexm(cfdx, "RIGHT")|regexm(cfdx, "right")) & latcat>0 & (lat!=. & lat!=1)
+replace latcheckcat=1 if (regexm(cod1a, "LEFT")|regexm(cod1a, "left")) & codcat!=1 & latcat>0 & (lat!=. & lat!=2)
+replace latcheckcat=2 if (regexm(cod1a, "RIGHT")|regexm(cod1a, "right")) & codcat!=1 & latcat>0 & (lat!=. & lat!=1)
+replace latcheckcat=3 if (regexm(primarysite, "LEFT")|regexm(primarysite, "left")) & latcat>0 & (lat!=. & lat!=2)
+replace latcheckcat=4 if (regexm(primarysite, "RIGHT")|regexm(primarysite, "right")) & latcat>0 & (lat!=. & lat!=1)
 replace latcheckcat=5 if topography==809 & (lat!=. & lat!=0)
 replace latcheckcat=6 if latcat>0 & (lat==0|lat==8)
 replace latcheckcat=7 if (latcat!=13 & latcat!=32 & latcat!=37 & latcat!=40) & lat==4
@@ -1397,10 +1781,9 @@ replace gradecheckcat=9 if grade!=1 & (morph==8331 | morph==8851 | morph==9187 |
 replace gradecheckcat=10 if grade!=2 & (morph==8249 | morph==8332 | morph==8858 | morph==9083 | morph==9243 | morph==9372) & dxyr>2013
 replace gradecheckcat=11 if grade!=3 & (morph==8631|morph==8634) & dxyr>2013
 replace gradecheckcat=12 if grade!=4 & (morph==8020|morph==8021|morph==8805|morph==9062|morph==9082|morph==9392|morph==9401|morph==9451|morph==9505|morph==9512) & dxyr>2013
-replace gradecheckcat=13 if grade==9 & (regexm(cfdx, "GLEASON")|regexm(cfdx, "Gleason")|regexm(md, "GLEASON")|regexm(md, "Gleason")|regexm(consrpt, "GLEASON")|regexm(consrpt, "Gleason")) & dxyr>2013
-replace gradecheckcat=14 if grade==9 & (regexm(cfdx, "NOTTINGHAM")|regexm(cfdx, "Nottingham")|regexm(md, "NOTTINGHAM")|regexm(md, "Nottingham")|regexm(consrpt, "NOTTINGHAM")|regexm(consrpt, "Nottingham") ///
-							|regexm(cfdx, "BLOOM")|regexm(cfdx, "Bloom")|regexm(md, "BLOOM")|regexm(md, "Bloom")|regexm(consrpt, "BLOOM")|regexm(consrpt, "Bloom")) & dxyr>2013
-replace gradecheckcat=15 if grade==9 & (regexm(cfdx, "FUHRMAN")|regexm(cfdx, "Fuhrman")|regexm(md, "FUHRMAN")|regexm(md, "Fuhrman")|regexm(consrpt, "FUHRMAN")|regexm(consrpt, "Fuhrman")) & dxyr>2013
+replace gradecheckcat=13 if grade==9 & (regexm(hx, "GLEASON")|regexm(hx, "Gleason")) & dxyr>2013
+replace gradecheckcat=14 if grade==9 & (regexm(hx, "NOTTINGHAM")|regexm(hx, "Nottingham")|regexm(hx, "BLOOM")|regexm(hx, "Bloom")) & dxyr>2013
+replace gradecheckcat=15 if grade==9 & (regexm(hx, "FUHRMAN")|regexm(hx, "Fuhrman")) & dxyr>2013
 replace gradecheckcat=16 if grade!=6 & morph==9732 & dxyr>2013
 label var gradecheckcat "Grade/Hx Check Category"
 label define gradecheckcat_lab 	 1 "Check 1: Beh<3 & Grade<9 & DxYr>2013" 2 "Check 2: Grade>=5 & <=8 & Hx<9590 & DxYr>2013" ///
@@ -1451,36 +1834,19 @@ gen dotcheckcat=.
 replace dotcheckcat=1 if dot!=. & dob!=. & dot<dob
 replace dotcheckcat=2 if dot!=. & dlc!=. & dot>dlc
 replace dotcheckcat=3 if dot!=. & dlc!=. & basis==0 & dot!=dlc
-replace dotcheckcat=4 if dot!=. & dxyr>2013 & dfc!=d(01jan2000) & admdate!=d(01jan2000) & rtdate!=d(01jan2000) & sampledate!=d(01jan2000) & recvdate!=d(01jan2000) & rptdate!=d(01jan2000) & (dot!=dfc & dot!=admdate & dot!=rtdate & dot!=sampledate & dot!=recvdate & dot!=rptdate & dot!=dlc) & regexm(cr5id, "S1")
-replace dotcheckcat=5 if dot!=. & dxyr>2013 & admdate!=d(01jan2000) & rtdate!=d(01jan2000) & sampledate!=d(01jan2000) & recvdate!=d(01jan2000) & rptdate!=d(01jan2000) & dot==dfc & (dfc>admdate|dfc>rtdate|dfc>sampledate|dfc>recvdate|dfc>rptdate)
-replace dotcheckcat=6 if dot!=. & dxyr>2013 & dfc!=d(01jan2000) & rtdate!=d(01jan2000) & sampledate!=d(01jan2000) & recvdate!=d(01jan2000) & rptdate!=d(01jan2000) & dot==admdate & (admdate>dfc|admdate>rtdate|admdate>sampledate|admdate>recvdate|admdate>rptdate)
-replace dotcheckcat=7 if dot!=. & dxyr>2013 & dfc!=d(01jan2000) & admdate!=d(01jan2000) & sampledate!=d(01jan2000) & recvdate!=d(01jan2000) & rptdate!=d(01jan2000) & dot==rtdate & (rtdate>dfc|rtdate>admdate|rtdate>sampledate|rtdate>recvdate|rtdate>rptdate)
-replace dotcheckcat=8 if dot!=. & dxyr>2013 & dfc!=d(01jan2000) & admdate!=d(01jan2000) & rtdate!=d(01jan2000) & recvdate!=d(01jan2000) & rptdate!=d(01jan2000) & dot==sampledate & (sampledate>dfc|sampledate>admdate|sampledate>rtdate|sampledate>recvdate|sampledate>rptdate)
-replace dotcheckcat=9 if dot!=. & dxyr>2013 & dfc!=d(01jan2000) & admdate!=d(01jan2000) & rtdate!=d(01jan2000) & sampledate!=d(01jan2000) & rptdate!=d(01jan2000) & dot==recvdate & (recvdate>dfc|recvdate>admdate|recvdate>rtdate|recvdate>sampledate|recvdate>rptdate)
-replace dotcheckcat=10 if dot!=. & dxyr>2013 & dfc!=d(01jan2000) & admdate!=d(01jan2000) & rtdate!=d(01jan2000) & sampledate!=d(01jan2000) & recvdate!=d(01jan2000) & dot==rptdate & (rptdate>dfc|rptdate>admdate|rptdate>rtdate|rptdate>sampledate|rptdate>recvdate)
+replace dotcheckcat=4 if dot!=. & dod!=. & basis==0 & dot!=dod
 label var dotcheckcat "InciDate Check Category"
 label define dotcheckcat_lab 1 "Check 1: InciDate before DOB" ///
-							 2 "Check 2: InciDate after DLC" 3 "Check 3: Basis=DCO & InciDate!=DLC" ///
-							 4 "Check 4: InciDate<>DFC/AdmDate/RTdate/SampleDate/ReceiveDate/RptDate/DLC(2014 onwards)" ///
-							 5 "Check 5: InciDate=DFC; DFC after AdmDate/RTdate/SampleDate/ReceiveDate/RptDate(2014 onwards)" ///
-							 6 "Check 6: InciDate=AdmDate; AdmDate after DFC/RTdate/SampleDate/ReceiveDate/RptDate(2014 onwards)" ///
-							 7 "Check 7: InciDate=RTdate; RTdate after DFC/AdmDate/SampleDate/ReceiveDate/RptDate(2014 onwards)" ///
-							 8 "Check 8: InciDate=SampleDate; SampleDate after DFC/AdmDate/RTdate/ReceiveDate/RptDate(2014 onwards)" ///
-							 9 "Check 9: InciDate=ReceiveDate; ReceiveDate after DFC/AdmDate/RTdate/SampleDate/RptDate(2014 onwards)" ///
-							 10 "Check 10: InciDate=RptDate; RptDate after DFC/AdmDate/RTdate/SampleDate/ReceiveDate(2014 onwards)" ///
-							 ,modify
+							 2 "Check 2: InciDate after DLC" ///
+							 3 "Check 3: Basis=DCO & InciDate!=DLC" ///
+							 4 "Check 4: Basis=DCO & InciDate!=DateOfDeath" ,modify
 label values dotcheckcat dotcheckcat_lab
 
 ** Create category for DxYr check
 gen dxyrcheckcat=.
-replace dxyrcheckcat=1 if dotyear!=. & dxyr!=. & dotyear!=dxyr
-replace dxyrcheckcat=2 if (admyear!=. & admyear!=2000) & dxyr!=. & dxyr>2013 & admyear!=dxyr
-replace dxyrcheckcat=3 if (dfcyear!=. & dfcyear!=2000) & dxyr!=. & dxyr>2013 & dfcyear!=dxyr
-replace dxyrcheckcat=4 if (rtyear!=. & rtyear!=2000) & dxyr!=. & dxyr>2013 & rtyear!=dxyr
+replace dxyrcheckcat=1 if dxyr==.
 label var dxyrcheckcat "DxYr Check Category"
-label define dxyrcheckcat_lab 1 "Check 1: dotyear!=dxyr" 2 "Check 2: admyear!=dxyr & dxyr>2013" 3 "Check 3: dfcyear!=dxyr & dxyr>2013" ///
-							  4 "Check 4: rtyear!=dxyr & dxyr>2013" ///
-							 ,modify
+label define dxyrcheckcat_lab 1 "Check 1: DiagnosisYear is missing" ,modify
 label values dxyrcheckcat dxyrcheckcat_lab
 
 ** Create category for Treatments 1-5 check
@@ -1590,91 +1956,11 @@ label define norxcheckcat_lab 1 "Check 1: NoRx 1 missing" 2 "Check 2: rx1-5!=0 &
 							  5 "Check 5: NoRx2 invalid length" ,modify
 label values norxcheckcat norxcheckcat_lab
 
-** Create category for Source Name check
-** Need to create string variable for sourcename
-** Need to change all sname=="." to sname==""
-gen sname=sourcename
-tostring sname, replace
-replace sname="" if sname=="." //45 24apr18
-gen sourcecheckcat=.
-replace sourcecheckcat=1 if sname!="" & length(sname)!=1
-replace sourcecheckcat=2 if (sourcename!=1 & sourcename!=2) & nftype==1 & dxyr>2013
-replace sourcecheckcat=3 if sourcename==4 & nftype!=3 & dxyr>2013
-replace sourcecheckcat=4 if sourcename==5 & nftype!=8 & dxyr>2013
-replace sourcecheckcat=5 if sourcename!=1 & (nftype==9|nftype==10) & dxyr>2013
-replace sourcecheckcat=6 if sourcename!=2 & nftype==12 & dxyr>2013
-replace sourcecheckcat=7 if sourcename!=6 & nftype==2 & dxyr>2013
-replace sourcecheckcat=8 if sourcename==8
-label var sourcecheckcat "SourceName Check Category"
-label define sourcecheckcat_lab 1 "Check 1: SourceName invalid length" 2 "Check 2: SourceName!=QEH/BVH; NFType=Hospital; dxyr>2013" ///
-								3 "Check 3: SourceName=IPS-ARS; NFType!=Pathology; dxyr>2013" 4 "Check 4: SourceName=DeathRegistry; NFType!=Death Certif/PM; dxyr>2013" ///
-								5 "Check 5: SourceName!=QEH; NFType=QEH Death Rec/RT bk; dxyr>2013" 6 "Check 6: SourceName!=BVH; NFType=BVH bk; dxyr>2013" ///
-								7 "Check 7: SourceName!=Polyclinic; NFType=Poly/Dist.Hosp; dxyr>2013" 8 "Check 8: SourceName=Other(possibly invalid)" ///
-								,modify
-label values sourcecheckcat sourcecheckcat_lab
-
-** Create category for Doctor check
-gen doccheckcat=.
-replace doccheckcat=1 if doctor=="Not Stated"
-label var doccheckcat "Doctor Check Category"
-label define doccheckcat_lab 1 "Check 1: Doctor invalid entry" ///
-								,modify
-label values doccheckcat doccheckcat_lab
-
-** Create category for Doctor's Address check
-gen docaddrcheckcat=.
-replace docaddrcheckcat=1 if docaddr=="Not Stated"|docaddr=="NONE"
-label var docaddrcheckcat "Doc Address Check Category"
-label define docaddrcheckcat_lab 1 "Check 1: Doc Address invalid entry" ///
-								,modify
-label values docaddrcheckcat docaddrcheckcat_lab
-
-** Create category for Sample Taken, Received and Report Dates check
-gen rptcheckcat=.
-replace rptcheckcat=1 if sampledate==. & (nftype>2 & nftype<6)
-replace rptcheckcat=2 if recvdate==. & (nftype>2 & nftype<6)
-replace rptcheckcat=3 if rptdate==. & (nftype>2 & nftype<6)
-replace rptcheckcat=4 if (recvdate!=. & recvdate!=d(01jan2000)) & sampledate > recvdate
-replace rptcheckcat=5 if (rptdate!=. & rptdate!=d(01jan2000)) & sampledate > rptdate
-replace rptcheckcat=6 if (rptdate!=. & rptdate!=d(01jan2000)) & recvdate > rptdate
-replace rptcheckcat=7 if dot!=. & sampledate!=. & sampledate!=d(01jan2000) & sampledate<dot
-replace rptcheckcat=8 if dot!=. & recvdate!=. & recvdate!=d(01jan2000) & recvdate<dot
-replace rptcheckcat=9 if dot!=. & rptdate!=. & rptdate!=d(01jan2000) & rptdate<dot
-replace rptcheckcat=10 if dlc!=. & sampledate!=. & sampledate!=d(01jan2000) & sampledate>dlc
-replace rptcheckcat=11 if sampledate!=. & sampledate!=d(01jan2000) & (nftype!=3 & nftype!=4 & nftype!=5) & (labnum==""|labnum=="99")
-replace rptcheckcat=12 if recvdate!=. & recvdate!=d(01jan2000) & (nftype!=3 & nftype!=4 & nftype!=5) & (labnum==""|labnum=="99")
-replace rptcheckcat=13 if rptdate!=. & rptdate!=d(01jan2000) & (nftype!=3 & nftype!=4 & nftype!=5) & (labnum==""|labnum=="99")
-label var rptcheckcat "Rpt Dates Check Category"
-label define rptcheckcat_lab 1 "Check 1: Sample Date missing" 2 "Check 2: Received Date missing" 3 "Check 3: Report Date missing" 4 "Check 4: sampledate after recvdate" ///
-							 5 "Check 5: sampledate after rptdate" 6 "Check 6: recvdate after rptdate" 7 "Check 7: sampledate before InciD" ///
-							 8 "Check 8: recvdate before InciD" 9 "Check 9: rptdate before InciD" 10 "Check 10: sampledate after DLC" ///
-							 11 "Check 11: sampledate!=. & nftype!=lab~" 12 "Check 12: recvdate!=. & nftype!=lab~" 13 "Check 13: rptdate!=. & nftype!=lab~" ///
-							 ,modify
-label values rptcheckcat rptcheckcat_lab
-
-** Create category for Admission, DFC and RT Dates check
-gen datescheckcat=.
-replace datescheckcat=1 if admdate==. & sourcename<3
-replace datescheckcat=2 if dfc==. & (sourcename==3|sourcename==4)
-replace datescheckcat=3 if rtdate==. & nftype==10
-replace datescheckcat=4 if ((admdate!=. & admdate!=d(01jan2000)) & (dfc!=. & dfc!=d(01jan2000)) & (rtdate!=. & rtdate!=d(01jan2000))) & (dot!=.) & (admdate<dot|dfc<dot|rtdate<dot)
-replace datescheckcat=5 if ((admdate!=. & admdate!=d(01jan2000)) & (dfc!=. & dfc!=d(01jan2000)) & (rtdate!=. & rtdate!=d(01jan2000))) & (dlc!=.) & (admdate>dlc|dfc>dlc|rtdate>dlc)
-replace datescheckcat=6 if (admdate!=. & admdate!=d(01jan2000)) & (sourcename!=1 & sourcename!=2)
-replace datescheckcat=7 if (dfc!=. & dfc!=d(01jan2000)) & (sourcename!=3 & sourcename!=4)
-replace datescheckcat=8 if (rtdate!=. & rtdate!=d(01jan2000)) & nftype!=10
-label var datescheckcat "Rpt Dates Check Category"
-label define datescheckcat_lab 1 "Check 1: Admission Date missing" 2 "Check 2: DFC missing" 3 "Check 3: RT Date missing" 4 "Check 4: admdate/dfc/rtdate BEFORE InciD" ///
-							 5 "Check 5: admdate/dfc/rtdate after DLC" 6 "Check 6: admdate!=. & sourcename!=hosp" 7 "Check 7: dfc!=. & sourcename!=PrivPhys/IPS" ///
-							 8 "Check 8: rtdate!=. & nftype!=RT" ///
-							 ,modify
-label values datescheckcat datescheckcat_lab
-
-
 ** Put variables in order they are to appear
 order pid fname lname init age sex dob natregno resident slc dlc ///
-	    parish cr5cod primarysite morph top lat beh hx
+	    parish cod1a primarysite morph top lat beh hx
 
-count //
+count //1,204
 
 save "`datapath'\version01\2-working\2008_cancer_prep_dc.dta" ,replace
 label data "BNR-Cancer prepared 2008 data"
