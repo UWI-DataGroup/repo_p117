@@ -973,6 +973,7 @@ count if tumourtot==. //0
 count if sourcetot==. //0
 list pid cr5id tumourtot sourcetot if tumourtot==. | sourcetot==.
 
+
 ** Create categories for topography according to groupings in ICD-O-3 book
 gen topcat=.
 replace topcat=1 if topography>-1 & topography<19
@@ -1955,6 +1956,66 @@ label var norxcheckcat "NoRx1&2 Check Category"
 label define norxcheckcat_lab 1 "Check 1: NoRx 1 missing" 2 "Check 2: rx1-5!=0 & norx1!=." 3 "Check 3: norx1==. & norx2!=." 4 "Check 4: NoRx1 invalid length" ///
 							  5 "Check 5: NoRx2 invalid length" ,modify
 label values norxcheckcat norxcheckcat_lab
+
+
+** Label varaibles
+** Unique TumourID
+label var eid "TumourID"
+
+** Person Search
+label var persearch "Person Search"
+label define persearch_lab 0 "Not done" 1 "Done: OK" 2 "Done: MP" 3 "Done: Duplicate" 4 "Done: Non-IARC MP", modify
+label values persearch persearch_lab
+
+** Resident Status
+label var resident "ResidentStatus"
+label define resident_lab 1 "Yes" 2 "No" 9 "Unknown", modify
+label values resident resident_lab
+
+** TT Check Status
+label var checkstatus "CheckStatus"
+label define checkstatus_lab 0 "Not done" 1 "Done: OK" 2 "Done: Rare" 3 "Done: Invalid" , modify
+label values checkstatus checkstatus_lab
+
+** TT Data Abstractor
+label var ttda "TTDataAbstractor"
+label define ttda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
+					  13 "KWG" 14 "TH" 22 "MC" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
+label values ttda ttda_lab
+
+** Parish
+destring parish, replace
+label var parish "Parish"
+label define parish_lab 1 "Christ Church" 2 "St. Andrew" 3 "St. George" 4 "St. James" 5 "St. John" 6 "St. Joseph" ///
+						7 "St. Lucy" 8 "St. Michael" 9 "St. Peter" 10 "St. Philip" 11 "St. Thomas" 99 "Unknown", modify
+label values parish parish_lab
+
+** Laterality
+label var lat "Laterality"
+label define lat_lab 0 "Not a paired site" 1 "Right" 2 "Left" 3 "Only one side, origin unspecified" 4 "Bilateral" ///
+					 5 "Midline tumour" 8 "NA" 9 "Unknown", modify
+label values lat lat_lab
+
+** Grade
+label var grade "Grade"
+label define grade_lab 1 "(well) differentiated" 2 "(mod.) differentiated" 3 "(poor.) differentiated" ///
+					   4 "undifferentiated" 5 "T-cell" 6 "B-cell" 7 "Null cell (non-T/B)" 8 "NK cell" ///
+					   9 "Undetermined; NA; Not stated", modify
+label values grade grade_lab
+
+** Summary Staging
+label var staging "Staging"
+label define staging_lab 0 "In situ" 1 "Localised only" 2 "Regional: direct ext." 3 "Regional: LNs only" ///
+						 4 "Regional: both dir. ext & LNs" 5 "Regional: NOS" 7 "Distant site(s)/LNs" ///
+						 8 "NA" 9 "Unknown; DCO case", modify
+label values staging staging_lab
+
+** Diagnosis Year
+label var dxyr "DiagnosisYear"
+
+** Unique SourceID
+label var sid "SourceRecordID"
+
 
 ** Put variables in order they are to appear
 order pid fname lname init age sex dob natregno resident slc dlc ///
