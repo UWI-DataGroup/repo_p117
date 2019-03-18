@@ -5,9 +5,9 @@
     //  analysts:				       	Jacqueline CAMPBELL
     //  date first created      12-MAR-2019
     // 	date last modified	    12-MAR-2019
-    //  algorithm task			    Cleaning 2008 cancer dataset, Creating site groupings
+    //  algorithm task			    Cleaning 2008 & 2013 cancer datasets, Creating site groupings
     //  status                  Completed
-    //  objectve               To have one dataset with cleaned and grouped 2008 data for inclusion in 2014 cancer report.
+    //  objectve                To have one dataset with cleaned and grouped 2008 data for inclusion in 2014 cancer report.
 
 
     ** General algorithm set-up
@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\2_clean_2008_dc.smcl", replace
+    log using "`logpath'\2_clean_2008_2013_dc.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ************************************************************************
@@ -40,9 +40,9 @@
 **************************************************************************
 
 ** Load the dataset with recently matched death data
-use "`datapath'\version01\2-working\2008_cancer_prep_dc.dta", clear
+use "`datapath'\version01\2-working\2008_2013_cancer_prep_dc.dta", clear
 
-count //1,204
+count //2,608
 
 *************************************************
 ** BLANK & INCONSISTENCY CHECKS - PATIENT TABLE
