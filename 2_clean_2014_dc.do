@@ -44,6 +44,10 @@ use "`datapath'\version01\1-input\2014_cancer_merge_dc.dta", clear
 
 count //
 
+
+** Re-assign deathid values to match BNR-DeathDataALL redcap database
+list pid deathid fname lname if slc==2
+
 ** Cleaning cod field based on death data & CR5db
 count if cod1a=="" & (cr5cod!="99" & cr5cod!="") //4
 replace cod1a=cr5cod if cod1a=="" & (cr5cod!="99" & cr5cod!="") //4 changes
