@@ -34,18 +34,22 @@
     log using "`logpath'\3_clean_2008_2013_dc.smcl", replace
 ** HEADER -----------------------------------------------------
 
-* ************************************************************************
-* CLEANING
-* Using version02 dofiles created in 2014 data review folder (Sync)
-**************************************************************************
+* ***************************************************************************************************************
+* MERGING
+* Using cancer dataset and death dataset
+* (1) merge using deathid already found when doing cleaning for NAACCR-IACR
+* (2) merge using nrn - all the deathid from above merged when this was done so disabled code for merge (1) above
+*****************************************************************************************************************
 
 ** Load the dataset with recently matched death data
 use "`datapath'\version01\2-working\2008_2013_cancer_prep_dc.dta", clear
 
 count //2,608
 
-** Create date of death (dod) variable
-**gen dod=dlc if slc==2
+
+/*
+** Create NRN variable in prep for merge with death data
+gen nrn=natregno
 
 ** Assign deathid previously found when cleaning NAACCR-IACR datasets, in prep for merge with death data
 gen deathid=.
@@ -159,7 +163,7 @@ replace deathid=15493 if pid=="20080576" //previous deathid==18444
 replace deathid=16473 if pid=="20080553" //previous deathid==9000
 replace deathid=18974 if pid=="20080292" //previous deathid==15476
 replace deathid=12122 if pid=="20080156" //previous deathid==20707
-
+*/
 replace natregno="210620-0062" if pid=="20080497"
 replace natregno="201130-0080" if pid=="20080730"
 replace natregno="260722-7002" if pid=="20080457"
@@ -188,6 +192,7 @@ replace natregno="220929-0051" if pid=="20080775"
 replace natregno="270112-0038" if pid=="20080576"
 
 //2014_cancer_deaths_dc.dta - 2013
+/*
 replace deathid=17631 if pid=="20130053" //previous deathid==5099
 replace deathid=20470 if pid=="20130154" //previous deathid==11801
 replace deathid=22696 if pid=="20130135" //previous deathid==17703
@@ -255,7 +260,7 @@ replace deathid=21145 if pid=="20130362" //previous deathid==7764
 replace deathid=20111 if pid=="20130674" //previous deathid==21844
 replace deathid=21495 if pid=="20130426" //previous deathid==12948
 replace deathid=22445 if pid=="20130874" //previous deathid==19340
-
+*/
 replace natregno="441219-0078" if pid=="20130772"
 replace natregno="430916-0127" if pid=="20130361"
 replace natregno="290210-0134" if pid=="20130396"
@@ -273,8 +278,10 @@ replace natregno="370126-0030" if pid=="20130426"
 replace natregno="490110-0091" if pid=="20130813"
 replace natregno="450902-0022" if pid=="20130374"
 replace natregno="440214-0018" if pid=="20130874"
+replace natregno="280214-0042" if pid=="20130319"
 
 //redcap deathdataALL - 2008
+/*
 replace deathid=6496 if pid=="20080586"
 replace deathid=9574 if pid=="20080421"
 replace deathid=11650 if pid=="20080011"
@@ -327,7 +334,7 @@ replace deathid=10696 if pid=="20080123"
 replace deathid=5489 if pid=="20080479"
 replace deathid=9863 if pid=="20080203"
 replace deathid=8534 if pid=="20080740"
-
+*/
 replace natregno="190923-0052" if pid=="20080421"
 replace natregno="590829-9999" if pid=="20080177"
 replace natregno="291003-0077" if pid=="20080344"
@@ -348,10 +355,15 @@ replace natregno="220708-9999" if pid=="20080205"
 replace natregno="360722-7034" if pid=="20080720"
 replace natregno="300818-7001" if pid=="20080740"
 
-count //2,608
+replace natregno="321016-0069" if pid=="20080494"
+replace natregno="331130-0150" if pid=="20080978"
+replace natregno="371114-0016" if pid=="20080965"
+replace natregno="570327-0065" if pid=="20080001"
 
+count //2,608 (227 replaces for deathid above)
+/*
 ** Merge (redcap) death data with cancer data
-merge m:1 deathid using "`datapath'\version01\2-working\2008-2017_deaths_dc.dta"
+merge m:1 deathid using "`datapath'\version01\2-working\2008-2017_redcap_deaths_dc.dta"
 
 /*
     Result                           # of obs.
@@ -368,15 +380,103 @@ count //26,569
 
 ** Check merged correctly
 **list pid deathid fname lname pname if _merge==3 //2 incorrect - corrected above and re-ran above code
+/*
+** Check for cases listed as dead in cancer dataset but no corresponding national death data i.e. cases that did not merge
+count if deathid==. & slc==2 //1,071
+count if natregno!="" & natregno!="999999-9999" & nrn!="" & nrn!="999999-9999" & natregno==nrn & _merge!=3
+list pid deathid fname lname pname natregno nrn _merge if natregno!="" & natregno!="999999-9999" & nrn!="" & nrn!="999999-9999" & natregno==nrn & _merge!=3
 
+replace slc=2 if slc==. & deathid!=. & pid=="" //23,961 changes
+gen pnameextra=fname+" "+lname
+sort pname pnameextra
+count if _merge!=3 & slc==2
+list pid deathid pname* natregno nrn if _merge!=3 & slc==2 ,notrim
+
+replace pname=pnameextra if pname=="" //2,304 changes
+sort pname
+quietly by pname:  gen dup = cond(_N==1,0,_n)
+sort pname
+count if dup>0 & _merge!=3 & slc==2 & ddnamematch!=1 //1,544
+list pid deathid pname natregno nrn ddnamematch if dup>0 & _merge!=3 & slc==2 & ddnamematch!=1 ,notrim
+drop dup 
+*/
 
 ** Remove unmatched deaths (didn't merge)
 count if pid=="" //23,961
 drop if pid=="" //23,961 deleted
-
+rename _merge _merge1
 count //2,608
 
+** In prep for merge, remove nrn variable as this a repeat of natregno
+replace natregno=nrn if natregno==""|natregno=="999999-9999"
+drop nrn regnum pname dod deathid recap_event_name dddoa ddda odda certtype district address ddparish ddsex ddage ddagetxt mstatus occu cod1a pod deathparish regdate ddcertifier ddnamematch dcstatus duprec
+*/
+rename natregno nrn
+
+merge m:1 nrn using "`datapath'\version01\2-working\2008-2017_redcap_deaths_nrn_dc.dta"
+/*
+POST-CORRECTIONS
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                        22,199
+        from master                     1,339  (_merge==1)
+        from using                     20,860  (_merge==2)
+
+    matched                             1,269  (_merge==3)
+    -----------------------------------------
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                        22,182
+        from master                     1,318  (_merge==1)
+        from using                     20,864  (_merge==2)
+
+    matched                             1,290  (_merge==3)
+    -----------------------------------------
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                        21,510
+        from master                     1,373  (_merge==1)
+        from using                     20,137  (_merge==2)
+
+    matched                             1,235  (_merge==3)
+    -----------------------------------------
+
+PRE-CORRECTIONS
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                        23,205
+        from master                     2,328  (_merge==1)
+        from using                     20,877  (_merge==2)
+
+    matched                               280  (_merge==3)
+    -----------------------------------------
+*/
+/*
+** Check for ones that didn't merge by nrn but merged by deathid - NRNs in death dataset need updating
+count if _merge1==3 & _merge!=3 //32 - natregno corrected above in cancer dataset but not in death dataset so done now and redcap db updated.
+list pid deathid pname nrn _merge if _merge1==3 & _merge!=3
+*/
+** Check all merges are correct by comparing patient name in cancer dataset with patient name in death dataset
+count if _merge==3 //1,290
+list pid deathid fname lname pname if _merge==3 ,notrim
+
+gen pnameextra=fname+" "+lname
+count if _merge==3 & pname!=pnameextra //408 - corrected in dofiles 2 and 3 and redcap db so now count==385 which are correct
+list pid deathid pname* if _merge==3 & pname!=pnameextra
+
+** Remove unmatched deaths (didn't merge)
+count if pid=="" //20,860
+drop if pid=="" //20,860 deleted
+
+count //2,608
 STOPPED HERE
+
+* ************************************************************************
+* CLEANING
+* Using version02 dofiles created in 2014 data review folder (Sync)
+**************************************************************************
 
 *************************************************
 ** BLANK & INCONSISTENCY CHECKS - PATIENT TABLE
@@ -459,7 +559,8 @@ count if sex==. //0
 
 **
 
-
+** slc
+replace slc=2 if slc==. & deathid!=. & pid=="" //merged deaths
 
 ** Check for dod
 count if slc==2 & dod==.
