@@ -37,8 +37,7 @@
 * ***************************************************************************************************************
 * MERGING
 * Using cancer dataset and death dataset
-* (1) merge using deathid already found when doing cleaning for NAACCR-IACR
-* (2) merge using nrn - all the deathid from above merged when this was done so disabled code for merge (1) above
+* (1) merge using nrn
 *****************************************************************************************************************
 
 ** Load the dataset with recently matched death data
@@ -47,123 +46,8 @@ use "`datapath'\version01\2-working\2008_2013_cancer_prep_dc.dta", clear
 count //2,608
 
 
-/*
-** Create NRN variable in prep for merge with death data
-gen nrn=natregno
-
-** Assign deathid previously found when cleaning NAACCR-IACR datasets, in prep for merge with death data
-gen deathid=.
-
-//2014_cancer_deaths_dc.dta - 2008
-replace deathid=20818 if pid=="20080497" //previous deathid==11744
-replace deathid=21244 if pid=="20080320" //previous deathid==19308
-replace deathid=14656 if pid=="20080022" //previous deathid==21675
-replace deathid=19593 if pid=="20080019" //previous deathid==22730
-replace deathid=23102 if pid=="20080013" //previous deathid==21088
-replace deathid=15697 if pid=="20080730" //previous deathid==18140
-replace deathid=22326 if pid=="20080252" //previous deathid==817
-replace deathid=16608 if pid=="20080166" //previous deathid==19225
-replace deathid=13521 if pid=="20080668" //previous deathid==3173
-replace deathid=22454 if pid=="20080230" //previous deathid==22895
-replace deathid=12638 if pid=="20080017" //previous deathid==21696
-replace deathid=14323 if pid=="20080689" //previous deathid==1091
-replace deathid=21281 if pid=="20080154" //previous deathid==14185
-replace deathid=16466 if pid=="20080677" //previous deathid==23941
-replace deathid=13038 if pid=="20080337" //previous deathid==18167
-replace deathid=13018 if pid=="20080714" //previous deathid==7768
-replace deathid=13836 if pid=="20080620" //previous deathid==23518
-replace deathid=13242 if pid=="20080216" //previous deathid==1099
-replace deathid=16724 if pid=="20080684" //previous deathid==852
-replace deathid=22999 if pid=="20080539" //previous deathid==4308
-replace deathid=15773 if pid=="20080306" //previous deathid==8358
-replace deathid=17239 if pid=="20080023" //previous deathid==14600
-replace deathid=17684 if pid=="20080365" //previous deathid==16703
-replace deathid=14724 if pid=="20080345" //previous deathid==5059
-replace deathid=18266 if pid=="20080305" //previous deathid==9778
-replace deathid=12296 if pid=="20080276" //previous deathid==11344
-replace deathid=23772 if pid=="20080738" //previous deathid==12603
-replace deathid=21462 if pid=="20080540" //previous deathid==10939
-replace deathid=23482 if pid=="20080044" //previous deathid==7950
-replace deathid=20557 if pid=="20080041" //previous deathid==11345
-replace deathid=11915 if pid=="20080628" //previous deathid==19688
-replace deathid=11917 if pid=="20080034" //previous deathid==20438
-replace deathid=15789 if pid=="20080233" //previous deathid==10116
-replace deathid=16015 if pid=="20080200" //previous deathid==1247
-replace deathid=15645 if pid=="20080211" //previous deathid==19796
-replace deathid=21308 if pid=="20080373" //previous deathid==17456
-replace deathid=24105 if pid=="20080316" //previous deathid==21980
-replace deathid=21053 if pid=="20080751" //previous deathid==12522
-replace deathid=13789 if pid=="20080488" //previous deathid==19740
-replace deathid=19016 if pid=="20080686" //previous deathid==15824
-replace deathid=13720 if pid=="20080570" //previous deathid==1137
-replace deathid=17176 if pid=="20080487" //previous deathid==13509
-replace deathid=17012 if pid=="20080045" //previous deathid==21853
-replace deathid=18242 if pid=="20080027" //previous deathid==20512
-replace deathid=18460 if pid=="20080353" //previous deathid==4030
-replace deathid=12719 if pid=="20080531" //previous deathid==494
-replace deathid=14622 if pid=="20080416" //previous deathid==8462
-replace deathid=23317 if pid=="20080026" //previous deathid==19258
-replace deathid=11928 if pid=="20080031" //previous deathid==7816
-replace deathid=12859 if pid=="20080325" //previous deathid==6020
-replace deathid=13778 if pid=="20080253" //previous deathid==3019
-replace deathid=18154 if pid=="20080043" //previous deathid==1692
-replace deathid=14013 if pid=="20080290" //previous deathid==7026
-replace deathid=22809 if pid=="20080517" //previous deathid==15461
-replace deathid=15099 if pid=="20080680" //previous deathid==16251
-replace deathid=12790 if pid=="20080181" //previous deathid==19266
-replace deathid=19012 if pid=="20080509" //previous deathid==10543
-replace deathid=23098 if pid=="20080434" //previous deathid==12648
-replace deathid=14872 if pid=="20080508" //previous deathid==3642
-replace deathid=16789 if pid=="20081064" //previous deathid==13711
-replace deathid=22601 if pid=="20080594" //previous deathid==5413
-replace deathid=13056 if pid=="20080238" //previous deathid==5989
-replace deathid=17981 if pid=="20080054" //previous deathid==2837
-replace deathid=20432 if pid=="20080349" //previous deathid==22950
-replace deathid=15325 if pid=="20080059" //previous deathid==21487
-replace deathid=21539 if pid=="20080243" //previous deathid==11065
-replace deathid=18813 if pid=="20080150" //previous deathid==11405
-replace deathid=12735 if pid=="20080642" //previous deathid==7979
-replace deathid=20158 if pid=="20080505" //previous deathid==3761
-replace deathid=13523 if pid=="20080472" //previous deathid==13535
-replace deathid=12784 if pid=="20080435" //previous deathid==15856
-replace deathid=15373 if pid=="20080137" //previous deathid==23893
-replace deathid=18416 if pid=="20080543" //previous deathid==10676
-replace deathid=22209 if pid=="20080221" //previous deathid==12670
-replace deathid=16267 if pid=="20080410" //previous deathid==9275
-replace deathid=14765 if pid=="20080565" //previous deathid==21177
-replace deathid=18952 if pid=="20080883" //previous deathid==2388
-replace deathid=20863 if pid=="20080065" //previous deathid==1665
-replace deathid=22395 if pid=="20080348" //previous deathid==8798
-replace deathid=13333 if pid=="20080484" //previous deathid==3243
-replace deathid=20214 if pid=="20080330" //previous deathid==3421
-replace deathid=20319 if pid=="20080234" //previous deathid==17723
-replace deathid=18195 if pid=="20080578" //previous deathid==9374
-replace deathid=13899 if pid=="20080636" //previous deathid==4454
-replace deathid=14690 if pid=="20080208" //previous deathid==5256
-replace deathid=20525 if pid=="20080341" //previous deathid==19048
-replace deathid=20561 if pid=="20080327" //previous deathid==14174
-replace deathid=12204 if pid=="20080412" //previous deathid==13162
-replace deathid=14613 if pid=="20080562" //previous deathid==21086
-replace deathid=20444 if pid=="20080213" //previous deathid==4317
-replace deathid=18290 if pid=="20080601" //previous deathid==2167
-replace deathid=22921 if pid=="20080155" //previous deathid==2424
-replace deathid=13787 if pid=="20080574" //previous deathid==12086
-replace deathid=16039 if pid=="20080622" //previous deathid==5187
-replace deathid=18543 if pid=="20080257" //previous deathid==11162
-replace deathid=14450 if pid=="20080063" //previous deathid==4644
-replace deathid=17577 if pid=="20080544" //previous deathid==10577
-replace deathid=15486 if pid=="20080775" //previous deathid==16789
-replace deathid=13068 if pid=="20080174" //previous deathid==17010
-replace deathid=21263 if pid=="20080360" //previous deathid==18710
-replace deathid=17954 if pid=="20080169" //previous deathid==13263
-replace deathid=21380 if pid=="20080250" //previous deathid==8339
-replace deathid=21371 if pid=="20080661" //previous deathid==12001
-replace deathid=20226 if pid=="20080212" //previous deathid==3321
-replace deathid=15493 if pid=="20080576" //previous deathid==18444
-replace deathid=16473 if pid=="20080553" //previous deathid==9000
-replace deathid=18974 if pid=="20080292" //previous deathid==15476
-replace deathid=12122 if pid=="20080156" //previous deathid==20707
-*/
+** Corrections based on updates already found when doing cleaning for NAACCR-IACR 
+** (some may already be corrected as using different dataset than the one originally used that found these errors)
 replace natregno="210620-0062" if pid=="20080497"
 replace natregno="201130-0080" if pid=="20080730"
 replace natregno="260722-7002" if pid=="20080457"
@@ -191,76 +75,6 @@ replace natregno="321017-0076" if pid=="20080327"
 replace natregno="220929-0051" if pid=="20080775"
 replace natregno="270112-0038" if pid=="20080576"
 
-//2014_cancer_deaths_dc.dta - 2013
-/*
-replace deathid=17631 if pid=="20130053" //previous deathid==5099
-replace deathid=20470 if pid=="20130154" //previous deathid==11801
-replace deathid=22696 if pid=="20130135" //previous deathid==17703
-replace deathid=17132 if pid=="20130161" //previous deathid==19202
-replace deathid=18870 if pid=="20130072" //previous deathid==22104
-replace deathid=19735 if pid=="20130409" //previous deathid==5406
-replace deathid=20361 if pid=="20130672" //previous deathid==19421
-replace deathid=19491 if pid=="20130153" //previous deathid==17921
-replace deathid=23051 if pid=="20130055" //previous deathid==3728
-replace deathid=18608 if pid=="20130091" //previous deathid==6714
-replace deathid=21860 if pid=="20130131" //previous deathid==16735
-replace deathid=18649 if pid=="20130274" //previous deathid==21945
-replace deathid=19520 if pid=="20130114" //previous deathid==14116
-replace deathid=20652 if pid=="20130173" //previous deathid==21211
-replace deathid=18758 if pid=="20130104" //previous deathid==24169
-replace deathid=21443 if pid=="20130345" //previous deathid==12550
-replace deathid=20885 if pid=="20130145" //previous deathid==21464
-replace deathid=18967 if pid=="20130677" //previous deathid==10007
-replace deathid=19506 if pid=="20130139" //previous deathid==13287
-replace deathid=24029 if pid=="20130082" //previous deathid==8318
-replace deathid=18686 if pid=="20130631" //previous deathid==3391
-replace deathid=18821 if pid=="20130625" //previous deathid==1023
-replace deathid=21117 if pid=="20130813" //previous deathid==18599
-replace deathid=15359 if pid=="20131003" //previous deathid==20328
-replace deathid=21573 if pid=="20130374" //previous deathid==4710
-replace deathid=21136 if pid=="20130128" //previous deathid==4397
-replace deathid=23268 if pid=="20130102" //previous deathid==8005
-replace deathid=21885 if pid=="20130156" //previous deathid==20168
-replace deathid=22551 if pid=="20130037" //previous deathid==9702
-replace deathid=18760 if pid=="20130163" //previous deathid==2664
-replace deathid=20532 if pid=="20130032" //previous deathid==18937
-replace deathid=20313 if pid=="20130606" //previous deathid==17734
-replace deathid=19766 if pid=="20130504" //previous deathid==23091
-replace deathid=20676 if pid=="20130063" //previous deathid==22892
-replace deathid=17695 if pid=="20130313" //previous deathid==13982
-replace deathid=21977 if pid=="20130150" //previous deathid==4545
-replace deathid=19201 if pid=="20130814" //previous deathid==23540
-replace deathid=18896 if pid=="20130818" //previous deathid==13141
-replace deathid=20460 if pid=="20130141" //previous deathid==24166
-replace deathid=21172 if pid=="20130103" //previous deathid==16675
-replace deathid=23428 if pid=="20130038" //previous deathid==13142
-replace deathid=19548 if pid=="20130096" //previous deathid==10089
-replace deathid=21106 if pid=="20130027" //previous deathid==15892
-replace deathid=23276 if pid=="20130119" //previous deathid==2401
-replace deathid=23185 if pid=="20130073" //previous deathid==22526
-replace deathid=20005 if pid=="20130130" //previous deathid==744
-replace deathid=21564 if pid=="20130768" //previous deathid==20744
-replace deathid=22534 if pid=="20130044" //previous deathid==12503
-replace deathid=18684 if pid=="20130648" //previous deathid==17611
-replace deathid=19840 if pid=="20130127" //previous deathid==10403
-replace deathid=22959 if pid=="20130031" //previous deathid==12632
-replace deathid=19345 if pid=="20130885" //previous deathid==4218
-replace deathid=22722 if pid=="20130079" //previous deathid==4675
-replace deathid=17648 if pid=="20130319" //previous deathid==20859
-replace deathid=21279 if pid=="20130361" //previous deathid==8255
-replace deathid=19938 if pid=="20130396" //previous deathid==7677
-replace deathid=18669 if pid=="20130067" //previous deathid==10712
-replace deathid=19928 if pid=="20130886" //previous deathid==14134
-replace deathid=22730 if pid=="20130022" //previous deathid==1089
-replace deathid=16495 if pid=="20130661" //previous deathid==2759
-replace deathid=21141 if pid=="20130769" //previous deathid==18762
-replace deathid=20804 if pid=="20130696" //previous deathid==21663
-replace deathid=19681 if pid=="20130830" //previous deathid==1409
-replace deathid=21145 if pid=="20130362" //previous deathid==7764
-replace deathid=20111 if pid=="20130674" //previous deathid==21844
-replace deathid=21495 if pid=="20130426" //previous deathid==12948
-replace deathid=22445 if pid=="20130874" //previous deathid==19340
-*/
 replace natregno="441219-0078" if pid=="20130772"
 replace natregno="430916-0127" if pid=="20130361"
 replace natregno="290210-0134" if pid=="20130396"
@@ -280,61 +94,6 @@ replace natregno="450902-0022" if pid=="20130374"
 replace natregno="440214-0018" if pid=="20130874"
 replace natregno="280214-0042" if pid=="20130319"
 
-//redcap deathdataALL - 2008
-/*
-replace deathid=6496 if pid=="20080586"
-replace deathid=9574 if pid=="20080421"
-replace deathid=11650 if pid=="20080011"
-replace deathid=9763 if pid=="20080161"
-replace deathid=11208 if pid=="20080177"
-replace deathid=10974 if pid=="20080269"
-replace deathid=8483 if pid=="20080347"
-replace deathid=4404 if pid=="20080344"
-replace deathid=6057 if pid=="20080346"
-replace deathid=3608 if pid=="20080465"
-replace deathid=9794 if pid=="20080182"
-replace deathid=7939 if pid=="20080301"
-replace deathid=8917 if pid=="20080377"
-replace deathid=7522 if pid=="20080631"
-replace deathid=3161 if pid=="20080654"
-replace deathid=4878 if pid=="20080461"
-replace deathid=4374 if pid=="20080387"
-replace deathid=3314 if pid=="20080535"
-replace deathid=9462 if pid=="20080616"
-replace deathid=10333 if pid=="20080533"
-replace deathid=8890 if pid=="20080324"
-replace deathid=11204 if pid=="20080029"
-replace deathid=11206 if pid=="20080042"
-replace deathid=5393 if pid=="20080608"
-replace deathid=2206 if pid=="20080597"
-replace deathid=6484 if pid=="20080367"
-replace deathid=4055 if pid=="20080545"
-replace deathid=1762 if pid=="20080047"
-replace deathid=9263 if pid=="20080323"
-replace deathid=6533 if pid=="20080321"
-replace deathid=11523 if pid=="20080057"
-replace deathid=4282 if pid=="20080504"
-replace deathid=11245 if pid=="20080286"
-replace deathid=6776 if pid=="20080476"
-replace deathid=4117 if pid=="20080381"
-replace deathid=5862 if pid=="20080279"
-replace deathid=10655 if pid=="20080328"
-replace deathid=10735 if pid=="20080385"
-replace deathid=3519 if pid=="20080296"
-replace deathid=9566 if pid=="20080561"
-replace deathid=3637 if pid=="20080581"
-replace deathid=10298 if pid=="20080136"
-replace deathid=7199 if pid=="20080205"
-replace deathid=10148 if pid=="20080187"
-replace deathid=9385 if pid=="20080278"
-replace deathid=1828 if pid=="20080720"
-replace deathid=4783 if pid=="20080580"
-replace deathid=7239 if pid=="20080469"
-replace deathid=10696 if pid=="20080123"
-replace deathid=5489 if pid=="20080479"
-replace deathid=9863 if pid=="20080203"
-replace deathid=8534 if pid=="20080740"
-*/
 replace natregno="190923-0052" if pid=="20080421"
 replace natregno="590829-9999" if pid=="20080177"
 replace natregno="291003-0077" if pid=="20080344"
@@ -360,57 +119,9 @@ replace natregno="331130-0150" if pid=="20080978"
 replace natregno="371114-0016" if pid=="20080965"
 replace natregno="570327-0065" if pid=="20080001"
 
-count //2,608 (227 replaces for deathid above)
-/*
-** Merge (redcap) death data with cancer data
-merge m:1 deathid using "`datapath'\version01\2-working\2008-2017_redcap_deaths_dc.dta"
-
-/*
-    Result                           # of obs.
-    -----------------------------------------
-    not matched                        26,265
-        from master                     2,304  (_merge==1)
-        from using                     23,961  (_merge==2)
-
-    matched                               304  (_merge==3)
-    -----------------------------------------
-
-*/
-count //26,569
-
-** Check merged correctly
-**list pid deathid fname lname pname if _merge==3 //2 incorrect - corrected above and re-ran above code
-/*
-** Check for cases listed as dead in cancer dataset but no corresponding national death data i.e. cases that did not merge
-count if deathid==. & slc==2 //1,071
-count if natregno!="" & natregno!="999999-9999" & nrn!="" & nrn!="999999-9999" & natregno==nrn & _merge!=3
-list pid deathid fname lname pname natregno nrn _merge if natregno!="" & natregno!="999999-9999" & nrn!="" & nrn!="999999-9999" & natregno==nrn & _merge!=3
-
-replace slc=2 if slc==. & deathid!=. & pid=="" //23,961 changes
-gen pnameextra=fname+" "+lname
-sort pname pnameextra
-count if _merge!=3 & slc==2
-list pid deathid pname* natregno nrn if _merge!=3 & slc==2 ,notrim
-
-replace pname=pnameextra if pname=="" //2,304 changes
-sort pname
-quietly by pname:  gen dup = cond(_N==1,0,_n)
-sort pname
-count if dup>0 & _merge!=3 & slc==2 & ddnamematch!=1 //1,544
-list pid deathid pname natregno nrn ddnamematch if dup>0 & _merge!=3 & slc==2 & ddnamematch!=1 ,notrim
-drop dup 
-*/
-
-** Remove unmatched deaths (didn't merge)
-count if pid=="" //23,961
-drop if pid=="" //23,961 deleted
-rename _merge _merge1
 count //2,608
 
 ** In prep for merge, remove nrn variable as this a repeat of natregno
-replace natregno=nrn if natregno==""|natregno=="999999-9999"
-drop nrn regnum pname dod deathid recap_event_name dddoa ddda odda certtype district address ddparish ddsex ddage ddagetxt mstatus occu cod1a pod deathparish regdate ddcertifier ddnamematch dcstatus duprec
-*/
 rename natregno nrn
 
 merge m:1 nrn using "`datapath'\version01\2-working\2008-2017_redcap_deaths_nrn_dc.dta"
@@ -424,58 +135,38 @@ POST-CORRECTIONS
 
     matched                             1,269  (_merge==3)
     -----------------------------------------
-
-    Result                           # of obs.
-    -----------------------------------------
-    not matched                        22,182
-        from master                     1,318  (_merge==1)
-        from using                     20,864  (_merge==2)
-
-    matched                             1,290  (_merge==3)
-    -----------------------------------------
-
-    Result                           # of obs.
-    -----------------------------------------
-    not matched                        21,510
-        from master                     1,373  (_merge==1)
-        from using                     20,137  (_merge==2)
-
-    matched                             1,235  (_merge==3)
-    -----------------------------------------
-
-PRE-CORRECTIONS
-    Result                           # of obs.
-    -----------------------------------------
-    not matched                        23,205
-        from master                     2,328  (_merge==1)
-        from using                     20,877  (_merge==2)
-
-    matched                               280  (_merge==3)
-    -----------------------------------------
 */
-/*
-** Check for ones that didn't merge by nrn but merged by deathid - NRNs in death dataset need updating
-count if _merge1==3 & _merge!=3 //32 - natregno corrected above in cancer dataset but not in death dataset so done now and redcap db updated.
-list pid deathid pname nrn _merge if _merge1==3 & _merge!=3
-*/
+
 ** Check all merges are correct by comparing patient name in cancer dataset with patient name in death dataset
 count if _merge==3 //1,290
-list pid deathid fname lname pname if _merge==3 ,notrim
+//list pid deathid fname lname pname if _merge==3 ,notrim
 
 gen pnameextra=fname+" "+lname
 count if _merge==3 & pname!=pnameextra //408 - corrected in dofiles 2 and 3 and redcap db so now count==385 which are correct
-list pid deathid pname* if _merge==3 & pname!=pnameextra
+//list pid deathid pname* if _merge==3 & pname!=pnameextra
 
 ** Remove unmatched deaths (didn't merge)
 count if pid=="" //20,860
 drop if pid=="" //20,860 deleted
 
+rename nrn natregno
+
 count //2,608
-STOPPED HERE
+
+** Checking if any 2014 cancers didn't merge with deaths when cleaning done (see 2014 cleaning dofile '5_merge_cancer_dc.do' and BNR-CLEAN CanReg5 db)
+count if slc!=2 & dod!=. //300
+//list pid deathid slc dod if slc!=2 & dod!=.
+replace slc=2 if slc!=2 & dod!=. //300 changes
+sort pid
+//list pid fname lname dod dxyr recstatus cr5id if slc==2
+//list pid fname lname dod dxyr recstatus cr5id if slc==2 & (dxyr==2014|dxyr==.) //all 2014 cases were merged in previous dofile 5 above
+
 
 * ************************************************************************
 * CLEANING
-* Using version02 dofiles created in 2014 data review folder (Sync)
+* Using version02 dofiles created in 2014 data review folder (Sync) as 
+* this previously flagged (not corrected) errors in 2008 & 2013 data that
+* were then updated in BNR-CLEAN CanReg5 db by Shelly Forde.
 **************************************************************************
 
 *************************************************
@@ -485,21 +176,84 @@ STOPPED HERE
 ** (2) EXPORT FOR CANREG5 DATABASE (CLEAN)
 *************************************************
 
-** Check 1 (ID)
+** CHECK 1 (PatientID)
 count if pid=="" //0
 
-** Check 2 (Names)
+** No checks for below as not applicable for pre-2014 DATA
+/*
+ Person Search
+ Patient record updated by
+ Date patient record updated
+ PT Data Abstractor
+ Casefinding Date
+ Case Status
+ Retrieval Source
+ Notes Seen
+ Notes Seen Date
+ Further Retrieval Source
+ Hospital Number
+*/
+
+** CHECK 2 (Case Status)
+count if cstatus==. //0
+//missing
+count if cstatus==4
+//possibly invalid - checking if it is a true duplicate (i.e. source info applies to same tumour vs multiple primary)
+count if cstatus==2 //0
+//possibly invalid - pt record=deleted
+count if cstatus==3 & recstatus<3 //0
+//possibly invalid as pt record=ineligible/duplicate but tumour record not ineligible
+count if cstatus==1 & recstatus==4 //162
+**list pid deathid cstatus dxyr cr5id if cstatus==1 & recstatus==4
+replace recstatus=3 if pid=="20080622" & cr5id=="T2S1" //1 change
+STOPPED HERE
+//checking tumour records=duplicate that it is a true duplicate (i.e. source info applies to same tumour vs multiple primary)
+
+
+
+** CHECK 3 (Names)
 count if fname=="" //0
-count if init=="" //25
-replace init="99" if init=="" //25 changes
+count if init=="" //0
+**replace init="99" if init=="" //0 changes
 count if lname=="" //0
 
-** Check 3 (DOB, NRN)
-count if dob==. //40
-count if dob==. & natregno!="" & natregno!="99" & natregno!="999999-9999" //2
+
+** CHECK 4 (DOB, NRN)
+count if dob==. //189
+count if dob==. & natregno!="" & natregno!="99" & natregno!="999999-9999"  & !(strmatch(natregno), "*99-*") //15
+sort pid
+//list pid deathid pnameex* natregno if dob==. & natregno!="" & natregno!="99" & natregno!="999999-9999"  & !(strmatch(natregno), "*99-*")
 replace dob=d(28dec1935) if pid=="20080885" //1 change
-replace natregno="999999-9999" if pid=="20081071" //1 change
+replace dob=d(16sep1943) if pid=="20130361" //1 change
+replace dob=d(08jun1930) if pid=="20130362" //1 change
+replace dob=d(02sep1945) if pid=="20130374" //1 change
+replace dob=d(10feb1929) if pid=="20130396" //1 change
+replace dob=d(30jun1961) if pid=="20130631" //1 change
+replace dob=d(16oct1984) if pid=="20130674" //1 change
+replace dob=d(25jul1956) if pid=="20130696" //1 change
+replace dob=d(19dec1944) if pid=="20130772" //1 change
+replace dob=d(10jan1949) if pid=="20130813" //1 change
+replace dob=d(28sep1946) if pid=="20130814" //1 change
+replace dob=d(23nov1946) if pid=="20130818" //1 change
+replace dob=d(24nov1947) if pid=="20130830" //1 change
+replace dob=d(14feb1944) if pid=="20130874" //1 change
+replace dob=d(31aug1947) if pid=="20130886" //1 change
+**replace natregno="999999-9999" if pid=="20081071" //1 change
 count if natregno=="" & dob!=. //0
+count if (natregno=="999999-9999"|regexm(natregno,"99-")) & dob!=. //91
+//list pid deathid dob pnameex* if natregno=="999999-9999" & dob!=.
+drop dobday dobmonth dobyear
+gen dobday=day(dob)
+gen dobmonth=month(dob)
+gen dobyear=year(dob)
+tostring dobday ,replace
+tostring dobmonth ,replace
+tostring dobyear ,replace
+replace dobday="0"+dobday if length(dobday)<2 & dobday!=""
+replace dobmonth="0"+dobmonth if length(dobmonth)<2 & dobmonth!=""
+gen dobnrn=substr(dobyear,-2,2)+dobmonth+dobday
+replace natregno=dobnrn+"-9999" if (natregno=="999999-9999"|regexm(natregno,"99-")) & dob!=. //91 changes
+drop dobday dobmonth dobyear dobnrn
 //missing
 gen currentd=c(current_date)
 gen double currentdatedob=date(currentd, "DMY", 2017)
@@ -509,18 +263,7 @@ label var currentdate "Current date DOB"
 count if dob!=. & dob>currentdatedob //0
 drop currentdatedob
 //future date
-count if length(natregno)<11 & natregno!="" //12
-replace natregno="999999-9999" if pid=="20080670" //1 change
-replace natregno="999999-9999" if pid=="20080685" //1 change
-replace natregno="999999-9999" if pid=="20080790" //2 changes
-replace natregno="999999-9999" if pid=="20080791" //1 change
-replace natregno="999999-9999" if pid=="20080792" //1 change
-replace natregno="999999-9999" if pid=="20080829" //1 change
-replace natregno="999999-9999" if pid=="20081112" //1 change
-replace natregno="430823-0038" if pid=="20080225" //1 change
-replace natregno="460115-0065" if pid=="20080277" //1 change
-replace natregno="430121-0045" if pid=="20080287" //1 change
-replace natregno="470331-0112" if pid=="20080297" //1 change
+count if length(natregno)<11 & natregno!="" //0
 //length error
 gen nrnday = substr(natregno,5,2)
 count if dob==. & natregno!="" & natregno!="9999999999" & natregno!="999999-9999" & nrnday!="99" //0
@@ -531,7 +274,7 @@ replace yr1 = 20 if dob_year>1999
 replace yr1 = 19 if dob_year<2000
 replace yr1 = 19 if dob_year==.
 replace yr1 = 99 if natregno=="99"
-list pid dob_year dob natregno yr yr1 if dob_year!=. & dob_year > 1999
+**list pid dob_year dob natregno yr yr1 if dob_year!=. & dob_year > 1999
 gen str nrn = substr(natregno,1,6) if natregno!="" & natregno!="9999999999" & natregno!="999999-9999" & nrnday!="99" & length(natregno)==11
 **gen nrnlen=length(nrn)
 **drop if nrnlen!=6
@@ -546,16 +289,57 @@ destring nrnyr, replace
 sort nrn
 gen dobchk=mdy(month, day, nrnyr)
 format dobchk %dD_m_CY
-count if dob!=dobchk & dobchk!=. //1
-list pid age natregno nrn dob dobchk dob_year if dob!=dobchk & dobchk!=.
-replace dob=dobchk if dob!=dobchk & dobchk!=. //1 change
+count if dob!=dobchk & dobchk!=. //2
+**list pid age natregno nrn dob dobchk dob_year if dob!=dobchk & dobchk!=.
+replace dob=dobchk if dob!=dobchk & dobchk!=. //2 changes
 drop dob_year day month year nrnday nrnyr year2 yr yr1 nrn dobchk
 //dob does not match nrn
 
-** Check 4 (sex)
+
+** CHECK 5 (sex)
 count if sex==. //0
+count if deathid!=. & ddsex==. //0
+//missing
+count if sex!=ddsex & sex!=. & ddsex!=. //4
+**list pid deathid pname* *sex natregno cod1a if sex!=ddsex & sex!=. & ddsex!=.
+replace sex=2 if pid=="20081131" //1 change
+replace sex=1 if pid=="20080022" //2 changes
+replace ddsex=2 if deathid==975 //1 change
+//not matching
+gen nrnid=substr(natregno, -4,4)
+count if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //1 - checked electoral list sex is correct but fname is incorrect
+**list pid deathid fname lname sex natregno primarysite cr5id if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]")
+replace fname="AGNES" if pid=="20090060" //1 change
+replace init="VICTORIA" if pid=="20090060" //1 change
+replace natregno="4203158003" if pid=="20090060" //1 change - pt has 2 NRNs in electoral list 4203158011
+//possibly invalid (fname, nrn=MALE)
+count if sex==1 & nrnid!="9999" & regex(substr(natregno,-2,1), "[0,2,4,6,8]") //2 - correct sex
+//possibly invalid (fname, nrn=FEMALE)
+count if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50")) //8 - all correct
+//possibly invalid (site=breast, sex=MALE)
+count if cr5id=="T1S1" & sex==1 & topcat>43 & topcat<52	& (regexm(cr5cod, "VULVA") | regexm(cr5cod, "VAGINA") | regexm(cr5cod, "CERVIX") | regexm(cr5cod, "CERVICAL") ///
+								| regexm(cr5cod, "UTER") | regexm(cr5cod, "OVAR") | regexm(cr5cod, "PLACENTA")) //0
+//possibly invalid (site=female, sex=MALE)
+count if sex==2 & topcat>51 & topcat<56 & (regexm(cr5cod, "PENIS")|regexm(cr5cod, "PROSTAT")|regexm(cr5cod, "TESTIS")|regexm(cr5cod, "TESTIC")) //0
+//possibly invalid (site=male, sex=FEMALE)
 
 
+** Resident Status
+
+** Status Last Contact
+
+** Date Last Contact
+
+** Comments
+
+** PT Reviewer
+
+
+
+
+
+** Death data variables - to clean
+regnum pname dod deathid recap_event_name dddoa ddda odda certtype district address ddparish ddage ddagetxt mstatus occu cod1a pod deathparish regdate ddcertifier ddnamematch dcstatus duprec
 
 **
 
@@ -587,7 +371,16 @@ replace topography=168 if pid=="20080634"
 count if icd10==""
 
 
+** DROP all cases dx in 2014 onwards as 2014 cases already cleaned
+** pre-2014 cases are to be cleaned
+count if dxyr==. //0
+drop if dxyr>2013 //42 deleted
+
 count //
+
+** Put variables in order you want them to appear
+order pid fname lname init age sex dob natregno resident slc dlc ///
+	    parish cr5cod primarysite morph top lat beh hx
 
 save "`datapath'\version01\2-working\2008_2013_cancer_clean_dc.dta" ,replace
 label data "BNR-Cancer prepared 2008 & 2013 data"

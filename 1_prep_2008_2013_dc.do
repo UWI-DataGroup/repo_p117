@@ -1941,11 +1941,6 @@ label define datescheckcat_lab 1 "Check 1: Admission Date missing" 2 "Check 2: D
 							 ,modify
 label values datescheckcat datescheckcat_lab
 
-
-** Put variables in order they are to appear
-order pid fname lname init age sex dob natregno resident slc dlc ///
-	    parish cr5cod primarysite morph top lat beh hx
-
 count //2,608
 
 save "`datapath'\version01\2-working\2008_2013_cancer_prep_dc.dta" ,replace
