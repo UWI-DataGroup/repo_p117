@@ -206,6 +206,30 @@ count if cstatus==3 & recstatus<3 //0
 count if cstatus==1 & recstatus==4 //162
 **list pid deathid cstatus dxyr cr5id if cstatus==1 & recstatus==4
 replace recstatus=3 if pid=="20080622" & cr5id=="T2S1" //1 change
+replace recstatus=3 if pid=="20130239" & cr5id=="T2S1" //1 change
+
+replace primarysite="SKIN-RT GROIN" if pid=="20130253" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+
+replace hx="FOCALLY INVASIVE ADENOCARCINOMA ARISING FROM VILLOUS ADENOMA" if pid=="20130275" & regexm(cr5id, "T3") //1 change - found incidentally when checking casestatus
+replace morph=8261 if pid=="20130275" & regexm(cr5id, "T3") //1 change - found incidentally when checking casestatus
+replace morphcat=6 if pid=="20130275" & regexm(cr5id, "T3") //0 changes - found incidentally when checking casestatus
+
+replace hx="NON HODGKINS LYMPHOMA, SMALL LYMPHOCYTIC VARIANT" if pid=="20130303" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace morph=9670 if pid=="20130303" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace morphcat=43 if pid=="20130303" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace staging=1 if pid=="20130303" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+
+replace primarysite="STOMACH-ANTRUM/PYLORUS" if pid=="20130307" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace top="168" if pid=="20130307" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace topography=168 if pid=="20130307" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace topcat=17 if pid=="20130307" & regexm(cr5id, "T1") //0 changes - found incidentally when checking casestatus
+replace hx="ADENOCARCINOMA, DIFFUSE TYPE" if pid=="20130307" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace morph=8145 if pid=="20130307" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace morphcat=6 if pid=="20130307" & regexm(cr5id, "T1") //0 changes - found incidentally when checking casestatus
+replace staging=3 if pid=="20130307" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+
+
+
 STOPPED HERE
 //checking tumour records=duplicate that it is a true duplicate (i.e. source info applies to same tumour vs multiple primary)
 
