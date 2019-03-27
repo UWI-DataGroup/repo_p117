@@ -1,13 +1,13 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			    2_clean_2014.do
-    //  project:				        BNR
-    //  analysts:				       	Jacqueline CAMPBELL
+    //  algorithm name			3_clean_2014.do
+    //  project:				BNR
+    //  analysts:				Jacqueline CAMPBELL
     //  date first created      12-MAR-2019
     // 	date last modified	    12-MAR-2019
-    //  algorithm task			    Cleaning 2014 cancer dataset, Creating site groupings
+    //  algorithm task			Cleaning 2014 cancer dataset, Creating site groupings
     //  status                  Completed
-    //  objectve               To have one dataset with cleaned and grouped 2014 data for 2014 cancer report.
+    //  objectve                To have one dataset with cleaned and grouped 2014 data for 2014 cancer report.
 
 
     ** General algorithm set-up
@@ -31,12 +31,12 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\2_clean_2014_dc.smcl", replace
+    log using "`logpath'\3_clean_2014_dc.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ************************************************************************
 * CLEANING
-* Using NAACCR-IACR_1b_cancer_Deaths_2014 dofile
+* Using Sync 2014 data cleaning dofile (version02\5_merge_cancer_dc.do)
 **************************************************************************
 
 ** Load the dataset with recently matched death data
@@ -46,7 +46,8 @@ count //
 
 
 ** Re-assign deathid values to match BNR-DeathDataALL redcap database
-list pid deathid fname lname if slc==2
+count if deathid==. & slc==2 //4 - checked and not found in redcap death data
+**list pid deathid fname lname dob natregno nrn if deathid==. & slc==2
 
 ** Cleaning cod field based on death data & CR5db
 count if cod1a=="" & (cr5cod!="99" & cr5cod!="") //4
@@ -67,6 +68,16 @@ count if dlc==. //3
 list pid fname lname deceased dod if dlc==.
 replace dlc=dod if dlc==. //3 changes
 
+** Check for missing ICD-10 codes
+count if icd10=="" //0
+
 count //927
 
-count if icd10==""
+
+** Put variables in order you want them to appear
+order pid fname lname init age sex dob natregno resident slc dlc ///
+	    parish cr5cod primarysite morph top lat beh hx
+
+save "`datapath'\version01\2-working\2014_cancer_clean_dc.dta" ,replace
+label data "BNR-Cancer prepared 2014 data"
+notes _dta :These data prepared for 2014 cancer report
