@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			2_prep_all_deaths_dc.do
+    //  algorithm name			2_all_deaths_dp.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      19-MAR-2019
@@ -30,7 +30,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\2_prep_all_deaths_dc.smcl", replace
+    log using "`logpath'\2_all_deaths_dp.smcl", replace
 ** HEADER -----------------------------------------------------
 
 **************************************
@@ -47,7 +47,7 @@ tostring nrn, replace
 **format dod %tdCCYY-NN-DD
 **format regdate %tdCCYY-NN-DD //importing as string as regdate for deathid 19520 is incorrect - corrected in excel raw data.
 
-save "`datapath'\version01\2-working\2008-2017_import_deaths_dc.dta" ,replace
+save "`datapath'\version01\2-working\2008-2017_import_deaths_dp" ,replace
 
 ** LOAD the national registry deaths 2008-2017 dataset (prior to REDCap)
 import excel using "`datapath'\version01\1-input\Cleaned_DeathData_2008-2017_JC_20190319_excel.xlsx" , firstrow case(lower) clear
@@ -100,7 +100,7 @@ rename death_certificate_complete death_certificate_completeextra
 
 
 ** MERGE the national registry deaths 2008-2017 dataset (exported from REDCap: BNR-DeathDataALL)
-merge 1:1 pname regnum dod using "`datapath'\version01\2-working\2008-2017_import_deaths_dc.dta"
+merge 1:1 pname regnum dod using "`datapath'\version01\2-working\2008-2017_import_deaths_dp"
 /*
 Before raw data corrections
 
@@ -279,7 +279,7 @@ label define dcstatus_lab 0 "Incomplete" 1 "Unverified" 2 "Complete", modify
 label values dcstatus dcstatus_lab
 
 
-save "`datapath'\version01\2-working\2008-2017_redcap_deaths_dc.dta" ,replace
+save "`datapath'\version01\2-working\2008-2017_redcap_deaths_dp" ,replace
 label data "BNR-DeathDataALL (redcap) prepared 2008-2017 national death data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
 
@@ -297,6 +297,6 @@ list deathid pname nrn ddnamematch if dup>0
 drop if dup>0 //41 deleted
 drop dup
 
-save "`datapath'\version01\2-working\2008-2017_redcap_deaths_nrn_dc.dta" ,replace
+save "`datapath'\version01\2-working\2008-2017_redcap_deaths_nrn_dp" ,replace
 label data "BNR-DeathDataALL (redcap) prepared 2008-2017 national death data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report

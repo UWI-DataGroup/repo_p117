@@ -46,7 +46,7 @@
 **************************************************************************
  
 ** LOAD cancer incidence dataset INCLUDING DCOs
-use "`datapath'\version01\2-working\2014_cancer_clean_dc.dta" ,clear
+use "`datapath'\version01\2-working\2014_cancer_dc" ,clear
 
 
 ** CASE variable
@@ -267,6 +267,6 @@ tab parish sex , col
 
 
 ** Save this new dataset without population data
-label data "2014 BNR_data-Cancer cleaned data ready for analysis for Ann Rpt"
+label data "2014 BNR-Cancer analysed data - Numbers"
 note: TS This dataset does NOT include population data 
-save "`datapath'\version01\2-working\2014_cancer_numbers_da.dta", replace
+save "`datapath'\version01\2-working\2014_cancer_numbers_da", replace

@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			3_clean_2014.do
+    //  algorithm name			4_2014_dc.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      12-MAR-2019
@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\3_clean_2014_dc.smcl", replace
+    log using "`logpath'\4_2014_dc.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ************************************************************************
@@ -40,7 +40,7 @@
 **************************************************************************
 
 ** Load the dataset with recently matched death data
-use "`datapath'\version01\1-input\2014_cancer_merge_dc.dta", clear
+use "`datapath'\version01\1-input\2014_cancer_merge_dc", clear
 
 count //
 
@@ -78,6 +78,6 @@ count //927
 order pid fname lname init age sex dob natregno resident slc dlc ///
 	    parish cr5cod primarysite morph top lat beh hx
 
-save "`datapath'\version01\2-working\2014_cancer_clean_dc.dta" ,replace
+save "`datapath'\version01\2-working\2014_cancer_dc" ,replace
 label data "BNR-Cancer prepared 2014 data"
 notes _dta :These data prepared for 2014 cancer report

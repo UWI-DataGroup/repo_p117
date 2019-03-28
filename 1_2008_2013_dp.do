@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			    1_prep_2008_2013_dc.do
+    //  algorithm name			    1_2008_2013_dp.do
     //  project:				        BNR
     //  analysts:				       	Jacqueline CAMPBELL
     //  date first created      18-MAR-2019
@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\1_prep_2008_2013_dc.smcl", replace
+    log using "`logpath'\1_2008_2013_dp.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ************************************************************************
@@ -62,7 +62,7 @@
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
 import excel using "`datapath'\version01\1-input\2019-03-18_Exported MAIN Source+Tumour+Patient_BNR-CLEAN_excel_JC.xlsx", firstrow
-save "`datapath'\version01\2-working\2008_2013_cancer_import_dc.dta" ,replace
+save "`datapath'\version01\2-working\2008_2013_cancer_import_dp" ,replace
 
 count
 
@@ -1943,6 +1943,6 @@ label values datescheckcat datescheckcat_lab
 
 count //2,608
 
-save "`datapath'\version01\2-working\2008_2013_cancer_prep_dc.dta" ,replace
+save "`datapath'\version01\2-working\2008_2013_cancer_dp" ,replace
 label data "BNR-Cancer prepared 2008 & 2013 data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report

@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			6_clean_mort_2014_dc.do
+    //  algorithm name			6_mort_2014_dc.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      27-MAR-2019
@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\6_clean_mort_2014_dc.smcl", replace
+    log using "`logpath'\6_mort_2014_dc.smcl", replace
 ** HEADER -----------------------------------------------------
 
 
@@ -140,7 +140,7 @@ order deathid cod1a
 		Data Editor in browse mode-copy and paste deathid below from here
 */
 sort deathid
-//list cod1a if ///
+/*list cod1a if ///
 deathid==16285 |deathid==1292  |deathid==15458 |deathid==11987 |deathid==1552| ///
 deathid==23771 |deathid==19815 |deathid==11910 |deathid==23750 |deathid==8118| ///
 deathid==3725  |deathid==932   |deathid==3419  |deathid==23473 |deathid==19097| ///
@@ -154,7 +154,7 @@ deathid==17077 |deathid==11945 |deathid==19303 |deathid==1429  |deathid==17327| 
 deathid==7925  |deathid==23413 |deathid==5189  |deathid==12137 |deathid==16726| ///
 deathid==19979 |deathid==21864 |deathid==2477  |deathid==19620 |deathid==5741| ///
 deathid==183
-
+*/
 replace mrcancer=2 if ///
 deathid==16285 |deathid==1292  |deathid==15458 |deathid==11987 |deathid==1552| ///
 deathid==23771 |deathid==19815 |deathid==11910 |deathid==8118| ///
@@ -837,10 +837,10 @@ gen noexcelimp=1
 
 ** Create Stata dataset to merge icd10 codes with current dataset
 preserve
-save "data\clean\2014_deaths_preicd10_dc.dta" ,replace
+save "`datapath'\version01\2-working\2014_deaths_preicd10_dc" ,replace
 clear
 
-import excel using "L:\BNR_data\DM\data_cleaning\2014\cancer\versions\version02\data\clean\2018-12-05_deaths_icd10.xlsx", firstrow
+import excel using "`datapath'\version01\1-input\2018-12-05_deaths_icd10.xlsx", firstrow
 count //1,040
 drop if deathid==. //431 obs deleted
 drop if dodyear!=2014 //187 obs deleted
@@ -892,7 +892,7 @@ drop if deathid==1146|deathid==6700|deathid==9699|deathid==11945|deathid==13009 
 ** 12 obs deleted
 count //421; 409
 
-save "data\clean\2014_deaths_icd10_dc.dta" ,replace
+save "`datapath'\version01\2-working\2014_deaths_icd10_dc" ,replace
 restore
 
 ** Merge IARC ICD-10 coded dataset with this one using deathid
@@ -900,7 +900,7 @@ restore
 //list cod1a if deathid==8621|deathid==8711|deathid==6944
 ** kidney(1), prostate(2)
 count //648; 651
-merge m:m deathid did using "data\clean\2014_deaths_icd10_dc.dta"
+merge m:m deathid did using "`datapath'\version01\2-working\2014_deaths_icd10_dc"
 /* 
 1st merge attempt
     Result                           # of obs.
@@ -1488,6 +1488,6 @@ order deathid did fname lname age age5 age_10 sex dob nrn parish dod dodyear mrc
 
 count // 651
 
-save "`datapath'\version01\2-working\2014_cancer_mort_dc.dta" ,replace
+save "`datapath'\version01\2-working\2014_mort_dc" ,replace
 label data "National deaths prepared 2014 data"
 notes _dta :These data prepared for 2014 cancer report

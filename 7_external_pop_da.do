@@ -41,7 +41,7 @@
 ** April 2007
 
 ** Load the dataset: note first we use 2000 census data then change to 2010
-use "`datapath'\version01\1-input\barbados_adjusted_population_2000.dta", clear
+use "`datapath'\version01\1-input\barbados_adjusted_population_2000", clear
 
 ** rename variable atotal to pop_bb
 rename atotal pop_bb
@@ -298,24 +298,24 @@ label values age60 age60
 sort age5
 label data "WHO world standard million: 5-year age bands"
 
-save "`datapath'\version01\2-working\who2000_5.dta", replace
+save "`datapath'\version01\2-working\who2000_5", replace
 
 preserve
 collapse (sum) pop , by(age10 age60 intdn)
 	label data "WHO world standard million: 10-year age bands1"
 	sort age10
-save "`datapath'\version01\2-working\who2000_10-1.dta", replace
+save "`datapath'\version01\2-working\who2000_10-1", replace
 
 collapse (sum) pop , by(age60 intdn)
 	label data "WHO world standard million: 2 age groups. <60 and 60+"
 	sort age60
-save "`datapath'\version01\2-working\who2000_60.dta", replace
+save "`datapath'\version01\2-working\who2000_60", replace
 restore
 
 collapse (sum) pop , by(age_10 age45 age55 intdn)
 	label data "WHO world standard million: 10-year age bands2"
 	sort age_10
-save "`datapath'\version01\2-working\who2000_10-2.dta", replace
+save "`datapath'\version01\2-working\who2000_10-2", replace
 
 ** JC: created the below pop dataset to be used in 4_section3.do
 ** as it was missing here
@@ -324,18 +324,18 @@ save "`datapath'\version01\2-working\who2000_10-2.dta", replace
 	label data "WHO world standard million: 10-year age bands2"
 	sort age_10
 	drop if age_10>7
-save "data\population\who2000_10-2_PC.dta", replace
+save "data\population\who2000_10-2_PC", replace
 */
 
 collapse (sum) pop , by(age45 age55 intdn)
 	label data "WHO world standard million: 2 age groups. <45 and 45 & over"
 	sort age45
-save "`datapath'\version01\2-working\who2000_45.dta", replace
+save "`datapath'\version01\2-working\who2000_45", replace
 
 collapse (sum) pop , by(age55 intdn)
 	label data "WHO world standard million: 2 age groups. <55 and 55 & over"
 	sort age55
-save "`datapath'\version01\2-working\who2000_55.dta", replace
+save "`datapath'\version01\2-working\who2000_55", replace
 
 
 
@@ -424,31 +424,31 @@ label values age60 age60
 sort age5
 label data "US standard population: 5-year age bands"
 
-save "`datapath'\version01\2-working\us2000_5.dta", replace
+save "`datapath'\version01\2-working\us2000_5", replace
 
 preserve
 collapse (sum) pop , by(age10 age60 intdn)
 	label data "US standard population: 10-year age bands1"
 	sort age10
-save "`datapath'\version01\2-working\us2000_10-1.dta", replace
+save "`datapath'\version01\2-working\us2000_10-1", replace
 
 collapse (sum) pop , by(age60 intdn)
 	label data "US standard population: 2 age groups. <60 and 60+"
 	sort age60
-save "`datapath'\version01\2-working\us2000_60.dta", replace
+save "`datapath'\version01\2-working\us2000_60", replace
 restore
 
 collapse (sum) pop , by(age_10 age45 age55 intdn)
 	label data "US standard population: 10-year age bands2"
 	sort age_10
-save "`datapath'\version01\2-working\us2000_10-2.dta", replace
+save "`datapath'\version01\2-working\us2000_10-2", replace
 
 collapse (sum) pop , by(age45 age55 intdn)
 	label data "US standard population: 2 age groups. <45 and 45 & over"
 	sort age45
-save "`datapath'\version01\2-working\us2000_45.dta", replace
+save "`datapath'\version01\2-working\us2000_45", replace
 
 collapse (sum) pop , by(age55 intdn)
 	label data "US standard population: 2 age groups. <55 and 55 & over"
 	sort age55
-save "`datapath'\version01\2-working\us2000_55.dta", replace
+save "`datapath'\version01\2-working\us2000_55", replace

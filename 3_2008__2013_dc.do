@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			2_clean_2008_2013_dc.do
+    //  algorithm name			3_2008_2013_dc.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      19-MAR-2019
@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\3_clean_2008_2013_dc.smcl", replace
+    log using "`logpath'\3_2008_2013_dc.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ***************************************************************************************************************
@@ -41,7 +41,7 @@
 *****************************************************************************************************************
 
 ** Load the dataset with recently matched death data
-use "`datapath'\version01\2-working\2008_2013_cancer_prep_dc.dta", clear
+use "`datapath'\version01\2-working\2008_2013_cancer_dp", clear
 
 count //2,608
 
@@ -124,7 +124,7 @@ count //2,608
 ** In prep for merge, remove nrn variable as this a repeat of natregno
 rename natregno nrn
 
-merge m:1 nrn using "`datapath'\version01\2-working\2008-2017_redcap_deaths_nrn_dc.dta"
+merge m:1 nrn using "`datapath'\version01\2-working\2008-2017_redcap_deaths_nrn_dp"
 /*
 POST-CORRECTIONS
     Result                           # of obs.
@@ -406,6 +406,6 @@ count //
 order pid fname lname init age sex dob natregno resident slc dlc ///
 	    parish cr5cod primarysite morph top lat beh hx
 
-save "`datapath'\version01\2-working\2008_2013_cancer_clean_dc.dta" ,replace
+save "`datapath'\version01\2-working\2008_2013_cancer_dc" ,replace
 label data "BNR-Cancer prepared 2008 & 2013 data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
