@@ -1,11 +1,12 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			3_2008_2013_dc.do
+    //  algorithm name			3_2008_2013_dc_v2.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      19-MAR-2019
     // 	date last modified	    19-MAR-2019
     //  algorithm task			Cleaning 2008 & 2013 cancer datasets, Creating site groupings
+    //  release version         v02: ????using CanReg5 BNR-CLEAN 18-Mar-2019 dataset
     //  status                  Completed
     //  objectve                To have one dataset with cleaned and grouped 2008 data for inclusion in 2014 cancer report.
 
@@ -228,7 +229,40 @@ replace morph=8145 if pid=="20130307" & regexm(cr5id, "T1") //1 change - found i
 replace morphcat=6 if pid=="20130307" & regexm(cr5id, "T1") //0 changes - found incidentally when checking casestatus
 replace staging=3 if pid=="20130307" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
 
+replace hx="MIXED CARCINOMA-ENDOMETRIOID & CLEAR CELL" if pid=="20130313" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace morph=8380 if pid=="20130313" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace morphcat=6 if pid=="20130313" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace staging=1 if pid=="20130313" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace rx1=1 if pid=="20130313" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace rx1d=d(19feb2014) if pid=="20130313" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
 
+replace staging=2 if pid=="20130317" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+
+replace staging=8 if pid=="20130338" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+
+replace staging=7 if pid=="20130338" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace dot=d(31dec2013) if pid=="20130338" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace dxyr=2013 if pid=="20130338" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace sampledate=d(31dec2013) if pid=="20130338" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace recvdate=d(02jan2014) if pid=="20130338" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+
+replace primarysite="LYMPH NODE-MESENTERIC" if pid=="20130341" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace top="772" if pid=="20130341" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace topography=772 if pid=="20130341" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace topcat=69 if pid=="20130341" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace staging=1 if pid=="20130341" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+replace rx1=3 if pid=="20130341" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+
+replace primarysite="OVERLAP BREAST-3 O'CLOCK" if pid=="20130361" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+
+replace hx="UNDIFFERENTIATED CARCINOMA - METASTATIC" if pid=="20130389" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace morph=8020 if pid=="20130389" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace morphcat=2 if pid=="20130389" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+replace staging=7 if pid=="20130389" & regexm(cr5id, "T1") //2 changes - found incidentally when checking casestatus
+
+replace staging=4 if pid=="20130606" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
+
+replace primarysite="BREAST-UOQ" if pid=="20130620" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
 
 STOPPED HERE
 //checking tumour records=duplicate that it is a true duplicate (i.e. source info applies to same tumour vs multiple primary)
