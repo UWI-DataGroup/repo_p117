@@ -169,21 +169,171 @@ sort pid
 * this previously flagged (not corrected) errors in 2008 & 2013 data that
 * were then updated in BNR-CLEAN CanReg5 db by Shelly Forde.
 **************************************************************************
+/* 
+Remove duplicates - first identify & label duplicate tumour and sources
+
+Each multiple sources from CR5 dataset is imported into Stata as 
+a separate observation and some tumour records are multiple sources for the abstracted tumour
+so need to differentiate between 
+multiple (duplicate) sources (MSs) for same pt vs multiple (primary) tumours (MPs) for same pt:
+(1) The MSs will assessed for data quality index then dropped before death merge;
+(2) The MPs will be kept throughout datasets.
+*/
+gen dupsource=0 //2,608
+label var dupsource "Multiple Sources"
+label define dupsource_lab  1 "MS-Conf Tumour Rec" 2 "MS-Conf Source Rec" ///
+							3 "MS-Dup Tumour Rec" 4 "MS-Dup Tumour & Source Rec" ///
+							5 "MS-Ineligible Tumour 1 Rec" 6 "MS-Ineligible Tumour 2~ & Source Rec" , modify
+label values dupsource dupsource_lab
+
+replace dupsource=1 if recstatus==1 & regexm(cr5id,"S1") //2,040 - this is the # eligible non-duplicate tumours
+replace dupsource=2 if recstatus==1 & !strmatch(strupper(cr5id), "*S1") //136
+replace dupsource=3 if recstatus==4 & regexm(cr5id,"S1") //160
+replace dupsource=4 if recstatus==4 & !strmatch(strupper(cr5id), "*S1") //3
+replace dupsource=5 if recstatus==3 & cr5id=="T1S1" //126
+replace dupsource=6 if recstatus==3 & cr5id!="T1S1" //134
+
+** Now identify MPs (multiple tumours for same pt) among eligible non-duplicate tumours (921; 955)
+tab pid if dupsource==1
+
+sort pid
+bysort pid: gen duppid = _n if dupsource==1 //568 missing values so 2,040 changes
+
+sort pid
+bysort pid: gen duppid_all = _n
+
+tab duppid_all ,m
+sort lname fname pid
+
+** Based on cr5id and dupsource, create variable to identify MPs
+gen eidmp=1 if regexm(cr5id, "T1") & dupsource==1 //699 missing values - 1,909 changes
+replace eidmp=2 if !strmatch(strupper(cr5id), "T1*") & dupsource==1 //131 changes
+label var eidmp "CR5 tumour events"
+label define eidmp_lab 1 "single tumour" 2 "multiple tumour" ,modify
+label values eidmp eidmp_lab
+
+** Check eidmp properly assigned
+count if eidmp==1 & recstatus!=1 //0
+count if eidmp==2 & recstatus!=1 //0
+count if eidmp==. //568
+count if eidmp==. & recstatus==1 //136
+sort pid
+list pid cr5id dupsource if eidmp==. & recstatus==1
+
+** Create variable to identify patient records
+gen ptrectot=. //2,608 missing values
+replace ptrectot=1 if eidmp==1 //1,909 changes
+replace ptrectot=3 if eidmp==2 //131 changes
+label define ptrectot_lab 1 "CR5 pt with single event" 2 "DCO with single event" 3 "CR5 pt with multiple events" ///
+						  4 "DCO with multiple events" 5 "CR5 pt: single event but multiple DC events" , modify
+label values ptrectot ptrectot_lab
+/*
+Now check:
+	eidmp and ptrectot are correctly assigned as patient records with 2 separate tumours may have both tumours (or only 1 confirmed/eligible tumour) listed as MP
+    use Stata browse/edit and filter by pid in below list
+*/
+count if eidmp==2 & dupsource==1 //131
+order pid cr5id dupsource eidmp ptrectot recstatus fname lname
+//list pid ptrectot cr5id fname lname if eidmp==2 & dupsource==1
+
+replace ptrectot=1 if pid=="20080310" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20080310" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20080384" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20080384" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20080387" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20080387" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20080438" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20080438" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20080477" & cr5id=="T3S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20080477" & cr5id=="T3S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20080690" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20080690" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20090016" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20090016" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20090045" & cr5id=="T3S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20090045" & cr5id=="T3S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20130169" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20130169" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20130172" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20130172" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20130727" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20130727" & cr5id=="T2S1" & eidmp!=. //1 change
+replace ptrectot=1 if pid=="20130798" & cr5id=="T2S1" & ptrectot!=. //1 change
+replace eidmp=1 if pid=="20130798" & cr5id=="T2S1" & eidmp!=. //1 change
+
+
+** Count # of patients with eligible non-dup tumours
+count if ptrectot==1 //1,921
+
+** Count # of eligible non-dup tumours
+count if eidmp==1 //1,921
+
+** Count # of eligible non-dup MPs
+count if eidmp==2 //119
+
+** Count # of patients with eligible non-dup tumours (2008)
+count if ptrectot==1 & dxyr==2008 //1,113
+
+** Count # of eligible non-dup tumours (2008)
+count if eidmp==1 & dxyr==2008 //1,113
+
+** Count # of eligible non-dup MPs (2008)
+count if eidmp==2 & dxyr==2008 //96
+
+** Count # of patients with eligible non-dup tumours (2013)
+count if ptrectot==1 & dxyr==2013 //804
+
+** Count # of eligible non-dup tumours (2013)
+count if eidmp==1 & dxyr==2013 //804
+
+** Count # of eligible non-dup MPs (2013)
+count if eidmp==2 & dxyr==2013 //14
+
+
+** Check for cases where T1 is not the abstraction
+count if primarysite=="" & cr5id=="T1S1" //already corrected above
+
+** Need to remove duplicate records
+drop if eidmp==. //568 deleted
+
+count //2,040
+count if dxyr==2008 //1,209
+count if dxyr==2008 & eidmp==2 //96
+count if dxyr==2013 //818
+count if dxyr==2013 & eidmp==2 //14
+
+** Check for no missing icd10 values as need this for site groupings later
+rename ICD10 icd10
+rename ICCCcode iccc
+count if icd10=="" //0
+
+** Label non-reportable skin cancers
+count if regexm(icd10,"C44") //304
+gen skin=1 if regexm(icd10,"C44") //1,736 missing so 304 changes
+
+
+** Add 'missed' 2013 cases found while cleaning 2014 data
+** Ensure these are 'true' missed cases by checking dataset with 30 missed cases against this dataset
+append using "`datapath'\version01\1-input\2013_cancer_clean_nodups_dc"
+drop if pid=="20130338" & cr5id=="T1S1" & deathid=="14987"
+replace deathid=20582 if pid=="20130338"
+
 
 CHECK missed 2013 cases against this dataset then APPEND 2013 missed cases, next site groupings, then mortality, then onto analysis
+
+** DROP all cases dx in 2014 onwards as 2014 cases already cleaned
+** pre-2014 cases are to be cleaned
+count if dxyr==. //0
+count if dxyr!=2008 & dxyr!=2013 //13
+drop if dxyr>2013 //13 deleted
 
 
 * ************************************************************************
 * SITE GROUPINGS
 * Using ...?
 **************************************************************************
-count if icd10==""
 
 
-** DROP all cases dx in 2014 onwards as 2014 cases already cleaned
-** pre-2014 cases are to be cleaned
-count if dxyr==. //0
-drop if dxyr>2013 //42 deleted
 
 count //
 
