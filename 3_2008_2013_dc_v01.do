@@ -311,12 +311,193 @@ count if icd10=="" //0
 count if regexm(icd10,"C44") //304
 gen skin=1 if regexm(icd10,"C44") //1,736 missing so 304 changes
 
+STOPPED HERE
+** Create variable to identify potential cancers in CODs
+gen cancer=.
+label define cancer_lab 1 "2014 cancer" 2 "not cancer/not 2014", modify
+label values cancer cancer_lab
+label var cancer "cancer diagnoses"
+label var deathid "Event identifier for registry deaths"
+
+** searching cod1a for these terms
+replace cancer=1 if regexm(cod1a, "CANCER") //1,524 changes
+replace cancer=1 if regexm(cod1a, "TUMOUR") &  cancer==. //82 changes
+replace cancer=1 if regexm(cod1a, "TUMOR") &  cancer==. //35 changes
+replace cancer=1 if regexm(cod1a, "MALIGNANT") &  cancer==. //31 changes
+replace cancer=1 if regexm(cod1a, "MALIGNANCY") &  cancer==. //138 changes
+replace cancer=1 if regexm(cod1a, "NEOPLASM") &  cancer==. //9 changes
+replace cancer=1 if regexm(cod1a, "CARCINOMA") &  cancer==. //961 changes
+replace cancer=1 if regexm(cod1a, "CARCIMONA") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a, "CARINOMA") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a, "MYELOMA") &  cancer==. //107 changes
+replace cancer=1 if regexm(cod1a, "LYMPHOMA") &  cancer==. //85 changes
+replace cancer=1 if regexm(cod1a, "LYMPHOMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "LYMPHONA") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a, "SARCOMA") &  cancer==. //33 changes
+replace cancer=1 if regexm(cod1a, "TERATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "LEUKEMIA") &  cancer==. //40 changes
+replace cancer=1 if regexm(cod1a, "LEUKAEMIA") &  cancer==. //31 changes
+replace cancer=1 if regexm(cod1a, "HEPATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "CARANOMA PROSTATE") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "MENINGIOMA") &  cancer==. //11 changes
+replace cancer=1 if regexm(cod1a, "MYELOSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "MYELOFIBROSIS") &  cancer==. //4 changes
+replace cancer=1 if regexm(cod1a, "CYTHEMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "CYTOSIS") &  cancer==. //2 changes
+replace cancer=1 if regexm(cod1a, "BLASTOMA") &  cancer==. //9 changes
+replace cancer=1 if regexm(cod1a, "METASTATIC") &  cancer==. //26 changes
+replace cancer=1 if regexm(cod1a, "MASS") &  cancer==. //97 changes
+replace cancer=1 if regexm(cod1a, "METASTASES") &  cancer==. //5 changes
+replace cancer=1 if regexm(cod1a, "METASTASIS") &  cancer==. //3 changes
+replace cancer=1 if regexm(cod1a, "REFRACTORY") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "FUNGOIDES") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a, "HODGKIN") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "MELANOMA") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a,"MYELODYS") &  cancer==. //8 changes
+
+** Strip possible leading/trailing blanks in cod1a
+replace cod1a = rtrim(ltrim(itrim(cod1a))) //0 changes
+
+tab cancer, missing
+/*
+     cancer |
+  diagnoses |      Freq.     Percent        Cum.
+------------+-----------------------------------
+     cancer |      3,245       26.41       26.41
+          . |      9,041       73.59      100.00
+------------+-----------------------------------
+      Total |     12,286      100.00
+*/
+tab deathyear cancer,m
+/*
+           |   cancer diagnoses
+ deathyear |    cancer          . |     Total
+-----------+----------------------+----------
+      2013 |       614      1,796 |     2,410 
+      2014 |       692      1,804 |     2,496 
+      2015 |       629      1,853 |     2,482 
+      2016 |       668      1,820 |     2,488 
+      2017 |       642      1,768 |     2,410 
+-----------+----------------------+----------
+     Total |     3,245      9,041 |    12,286
+*/
+
+** Check that all cancer CODs for 2014 are eligible
+sort cod1a deathid
+order deathid cod1a
+list cod1a if cancer==1 & deathyear==2014 //692
+
+** Replace 2014 cases that are not cancer according to eligibility SOP:
+/*
+	(1) After merge with CR5 data then may need to reassign some of below 
+		deaths as CR5 data may indicate eligibility while COD may exclude
+		(e.g. see deathid==15458)
+	(2) use obsid to check for CODs that incomplete in Results window with 
+		Data Editor in browse mode-copy and paste deathid below from here
+*/
+replace cancer=2 if ///
+deathid==16285 |deathid==1292  |deathid==15458 |deathid==11987 |deathid==1552| ///
+deathid==23771 |deathid==19815 |deathid==11910 |deathid==23750 |deathid==8118| ///
+deathid==3725  |deathid==932   |deathid==3419  |deathid==23473 |deathid==19097| ///
+deathid==16546 |deathid==20819 |deathid==20241 |deathid==13572 |deathid==6444| ///
+deathid==4644  |deathid==14413 |deathid==16702 |deathid==14249 |deathid==14688| ///
+deathid==5469  |deathid==15378 |deathid==2231  |deathid==22807 |deathid==12102| ///
+deathid==22127 |deathid==23906 |deathid==6243  |deathid==22248 |deathid==18365| ///
+deathid==17054 |deathid==13194 |deathid==19770 |deathid==2742  |deathid==20031| ///
+deathid==8574  |deathid==10793 |deathid==20504 |deathid==20634 |deathid==5531| ///
+deathid==17077 |deathid==11945 |deathid==19303 |deathid==1429  |deathid==17327| ///
+deathid==7925  |deathid==23413 |deathid==5189  |deathid==12137 |deathid==16726| ///
+deathid==19979 |deathid==21864 |deathid==2477  |deathid==19620 |deathid==5741| ///
+deathid==183
+//61 changes
+
+** Check that all 2014 CODs that are not cancer for eligibility
+tab deathyear cancer,m
+/*
+           |         cancer diagnoses
+ deathyear |    cancer  not cancer         . |     Total
+-----------+---------------------------------+----------
+      2013 |       614          0      1,796 |     2,410 
+      2014 |       631         61      1,804 |     2,496 
+      2015 |       629          0      1,853 |     2,482 
+      2016 |       668          0      1,820 |     2,488 
+      2017 |       642          0      1,768 |     2,410 
+-----------+---------------------------------+----------
+     Total |     3,184         61      9,041 |    12,286
+*/
+count if cancer==. & deathyear==2014 & (deathid>0 & deathid<5000) //376
+count if cancer==. & deathyear==2014 & (deathid>5000 & deathid<10000) //374
+count if cancer==. & deathyear==2014 & (deathid>10000 & deathid<15000) //368
+count if cancer==. & deathyear==2014 & (deathid>15000 & deathid<20000) //374
+count if cancer==. & deathyear==2014 & (deathid>20000 & deathid<25000) //311
+count if cancer==. & deathyear==2014 & (deathid>25000 & deathid<30000) //0
+
+list cod1a if cancer==. & deathyear==2014 & (deathid>0 & deathid<5000)
+list cod1a if cancer==. & deathyear==2014 & (deathid>5000 & deathid<10000)
+list cod1a if cancer==. & deathyear==2014 & (deathid>10000 & deathid<15000)
+list cod1a if cancer==. & deathyear==2014 & (deathid>15000 & deathid<20000)
+list cod1a if cancer==. & deathyear==2014 & (deathid>20000 & deathid<25000)
+list cod1a if cancer==. & deathyear==2014 & (deathid>25000 & deathid<30000)
+
+** No updates needed from above list
+/*
+replace cancer=1 if ///
+deathid==|deathid==|deathid==|deathid==|deathid==| ///
+*/
+
+replace cancer=2 if cancer==. //9,041 changes
+
+** Create cod variable 
+gen cod=.
+label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known" 4 "NA", modify
+label values cod cod_lab
+label var cod "COD categories"
+replace cod=1 if cancer==1 //3,184 changes
+replace cod=2 if cancer==2 //9,102 changes
+** one unknown causes of death in 2014 data - deathid 12323
+replace cod=3 if regexm(cod1a,"INDETERMINATE")|regexm(cod1a,"UNDETERMINED") //56 changes
+
+
+** Create variable called "deceased" - same as 2008 dofile called '3_merge_cancer_deaths.do'
+tab slc ,m
+count if slc!=2 & dod!=. //0
+gen deceased=1 if slc!=1 //645 changes
+label var deceased "whether patient is deceased"
+label define deceased_lab 1 "dead" 2 "alive at last contact" , modify
+label values deceased deceased_lab
+replace deceased=2 if slc==1 //430 changes
+
+tab deceased ,m
+/*
+   whether patient is |
+             deceased |      Freq.     Percent        Cum.
+----------------------+-----------------------------------
+                 dead |        645       60.00       60.00
+alive at last contact |        430       40.00      100.00
+----------------------+-----------------------------------
+                Total |      1,075      100.00
+*/
+
+** Create the "patient" variable - same as 2008 dofile called '3_merge_cancer_deaths.do'
+gen patient=.  
+label var patient "cancer patient"
+label define pt_lab 1 "patient" 2 "separate event",modify
+label values patient pt_lab
+replace patient=1 if eidmp==1 //1,056 changes
+replace patient=2 if eidmp==2 //19 changes
+tab patient ,miss
+
 
 ** Add 'missed' 2013 cases found while cleaning 2014 data
 ** Ensure these are 'true' missed cases by checking dataset with 30 missed cases against this dataset
 append using "`datapath'\version01\1-input\2013_cancer_clean_nodups_dc"
-drop if pid=="20130338" & cr5id=="T1S1" & deathid=="14987"
-replace deathid=20582 if pid=="20130338"
+count //
+
+drop if pid=="20130338" & cr5id=="T1S1" & deathid=="20582"
+
+count //
+replace dot=d(31dec2013) if pid=="20130338"
+replace dxyr=2013 if pid=="20130338"
 
 
 CHECK missed 2013 cases against this dataset then APPEND 2013 missed cases, next site groupings, then mortality, then onto analysis
