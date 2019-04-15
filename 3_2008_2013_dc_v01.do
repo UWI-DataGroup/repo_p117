@@ -311,49 +311,185 @@ count if icd10=="" //0
 count if regexm(icd10,"C44") //304
 gen skin=1 if regexm(icd10,"C44") //1,736 missing so 304 changes
 
+
+** Check all deceased have been merged with national death data
+count if slc==2 & cod1a=="" //129
+sort pid
+list pid fname lname natregno dod cr5id if slc==2 & cod1a=="" //Check these names against redcap death data
+replace deathid=349 if pid=="20080081"
+replace deathid=970 if pid=="20080086"
+replace deathid=809 if pid=="20080089"
+replace deathid=1967 if pid=="20080091"
+replace deathid=1119 if pid=="20080108"
+replace deathid=2378 if pid=="20080113"
+replace deathid=263 if pid=="20080115"
+replace deathid=1928 if pid=="20080118"
+replace deathid=626 if pid=="20080122"
+replace deathid=1651 if pid=="20080126"
+replace deathid=4612 if pid=="20080127"
+replace deathid=6277 if pid=="20080131"
+replace deathid=1211 if pid=="20080138"
+replace deathid=4393 if pid=="20080210"
+replace deathid=4075 if pid=="20080271"
+replace deathid=9774 if pid=="20080297"
+replace deathid=4019 if pid=="20080299"
+replace deathid=1810 if pid=="20080309"
+replace deathid=3122 if pid=="20080355"
+replace deathid=7444 if pid=="20080359"
+replace deathid=9037 if pid=="20080411"
+replace deathid=5676 if pid=="20080464" //2 changes
+replace deathid=357 if pid=="20080478"
+replace deathid=1254 if pid=="20080699"
+replace deathid=2730 if pid=="20080759"
+replace deathid=5653 if pid=="20080783"
+replace deathid=1220 if pid=="20080788"
+replace deathid=842 if pid=="20080798"
+replace deathid=456 if pid=="20080803"
+replace deathid=1226 if pid=="20080806"
+replace deathid=1483 if pid=="20080807"
+replace deathid=2291 if pid=="20080808"
+replace deathid=1910 if pid=="20080809"
+replace deathid=1529 if pid=="20080825"
+replace deathid=2235 if pid=="20080829"
+replace deathid=2181 if pid=="20080840"
+replace deathid=1825 if pid=="20080842"
+replace deathid=2113 if pid=="20080844"
+replace deathid=470 if pid=="20080851" //2 changes
+replace deathid=1755 if pid=="20080852"
+replace deathid=9181 if pid=="20080865"
+replace deathid=1633 if pid=="20080909"
+replace deathid=1884 if pid=="20080914"
+replace deathid=2451 if pid=="20080935"
+replace deathid=5933 if pid=="20080949"
+replace deathid=6895 if pid=="20080966" //2 changes
+replace deathid=11240 if pid=="20080972"
+replace deathid=8746 if pid=="20080976"
+replace deathid=8246 if pid=="20080977"
+replace deathid=7192 if pid=="20080993"
+replace deathid=2895 if pid=="20080998"
+replace deathid=3894 if pid=="20081039"
+replace deathid=522 if pid=="20081113"
+replace deathid=2450 if pid=="20081115"
+replace deathid=5833 if pid=="20081121"
+replace deathid=12646 if pid=="20130100"
+replace deathid=12182 if pid=="20130177"
+replace deathid=13121 if pid=="20130182"
+replace deathid=13373 if pid=="20130193"
+replace deathid=13379 if pid=="20130199"
+replace deathid=13617 if pid=="20130220"
+replace deathid=13968 if pid=="20130230"
+replace deathid=13832 if pid=="20130231"
+replace deathid=13939 if pid=="20130232"
+replace deathid=14557 if pid=="20130247"
+replace deathid=14379 if pid=="20130251"
+replace deathid=14269 if pid=="20130256"
+replace deathid=14837 if pid=="20130260"
+replace deathid=13989 if pid=="20130265"
+replace deathid=13586 if pid=="20130282"
+replace deathid=16287 if pid=="20130286"
+replace deathid=14025 if pid=="20130301"
+replace deathid=15242 if pid=="20130316"
+replace deathid=16320 if pid=="20130341"
+replace deathid=13917 if pid=="20130370"
+replace deathid=14947 if pid=="20130387"
+replace deathid=14308 if pid=="20130389"
+replace deathid=12191 if pid=="20130397"
+replace deathid=12383 if pid=="20130399"
+replace deathid=12393 if pid=="20130516"
+replace deathid=12231 if pid=="20130518"
+replace deathid=12194 if pid=="20130521"
+replace deathid=12766 if pid=="20130535"
+replace deathid=12955 if pid=="20130542"
+replace deathid=13478 if pid=="20130571"
+replace deathid=13838 if pid=="20130577"
+replace deathid=13870 if pid=="20130578"
+replace deathid=15424 if pid=="20130582"
+replace deathid=14105 if pid=="20130598"
+replace deathid=14097 if pid=="20130601"
+replace deathid=12197 if pid=="20130624"
+replace deathid=16153 if pid=="20130644"
+replace deathid=16495 if pid=="20130661"
+replace deathid=15067 if pid=="20130687"
+replace deathid=11960 if pid=="20130688"
+replace deathid=13966 if pid=="20130691"
+replace deathid=14118 if pid=="20130708"
+replace deathid=16370 if pid=="20130712"
+replace deathid=13697 if pid=="20130721"
+replace deathid=13957 if pid=="20130724"
+replace deathid=16391 if pid=="20130727"
+replace deathid=14226 if pid=="20130735"
+replace deathid=14236 if pid=="20130736"
+replace deathid=14386 if pid=="20130747"
+replace deathid=12465 if pid=="20130755"
+replace deathid=14517 if pid=="20130766"
+replace deathid=12431 if pid=="20130777"
+replace deathid=13913 if pid=="20130794"
+replace deathid=16450 if pid=="20130800"
+//died overseas so no death data - 20080179, 20080611, 20080664
+//died but no national death data - 20081066, 20081106, 20130167, 20130245, 20130351, 20130549, 20130690, 20130773
+//below were listed as dead but no indication in CR5/MasterDb they died
+replace slc=1 if pid=="20080877"
+replace slc=1 if pid=="20080881"
+replace slc=1 if pid=="20080882"
+replace slc=1 if pid=="20080884"
+replace slc=1 if pid=="20080885"
 STOPPED HERE
-** Create variable to identify potential cancers in CODs
+
+** Change dod so these will merge
+rename dod dodcr5
+
+** Create (manually) national death file with only the '129' above that don't have death data and add these to this dataset
+merge m:1 deathid using "`datapath'\version01\1-input\BNRDeathDataALL_DATA_2019-04-15_unmerged.xlsx"
+/*
+
+*/
+
+** Check merge is correct
+count if dod==. & slc==2
+count if slc==2 & cod1a==""
+
+** Create variable to identify potential cancers in CODs (to be used later in analysis dofiles)
 gen cancer=.
-label define cancer_lab 1 "2014 cancer" 2 "not cancer/not 2014", modify
+label define cancer_lab 1 "cancer" 2 "not cancer", modify
 label values cancer cancer_lab
 label var cancer "cancer diagnoses"
 label var deathid "Event identifier for registry deaths"
 
 ** searching cod1a for these terms
-replace cancer=1 if regexm(cod1a, "CANCER") //1,524 changes
-replace cancer=1 if regexm(cod1a, "TUMOUR") &  cancer==. //82 changes
-replace cancer=1 if regexm(cod1a, "TUMOR") &  cancer==. //35 changes
-replace cancer=1 if regexm(cod1a, "MALIGNANT") &  cancer==. //31 changes
-replace cancer=1 if regexm(cod1a, "MALIGNANCY") &  cancer==. //138 changes
-replace cancer=1 if regexm(cod1a, "NEOPLASM") &  cancer==. //9 changes
-replace cancer=1 if regexm(cod1a, "CARCINOMA") &  cancer==. //961 changes
+replace cancer=1 if regexm(cod1a, "CANCER") //291 changes
+replace cancer=1 if regexm(cod1a, "TUMOUR") &  cancer==. //20 changes
+replace cancer=1 if regexm(cod1a, "TUMOR") &  cancer==. //9 changes
+replace cancer=1 if regexm(cod1a, "MALIGNANT") &  cancer==. //6 changes
+replace cancer=1 if regexm(cod1a, "MALIGNANCY") &  cancer==. //26 changes
+replace cancer=1 if regexm(cod1a, "NEOPLASM") &  cancer==. //4 changes
+replace cancer=1 if regexm(cod1a, "CARCINOMA") &  cancer==. //350 changes
 replace cancer=1 if regexm(cod1a, "CARCIMONA") &  cancer==. //1 change
-replace cancer=1 if regexm(cod1a, "CARINOMA") &  cancer==. //1 change
-replace cancer=1 if regexm(cod1a, "MYELOMA") &  cancer==. //107 changes
-replace cancer=1 if regexm(cod1a, "LYMPHOMA") &  cancer==. //85 changes
+replace cancer=1 if regexm(cod1a, "CARINOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "MYELOMA") &  cancer==. //21 changes
+replace cancer=1 if regexm(cod1a, "LYMPHOMA") &  cancer==. //24 changes
 replace cancer=1 if regexm(cod1a, "LYMPHOMIA") &  cancer==. //0 changes
 replace cancer=1 if regexm(cod1a, "LYMPHONA") &  cancer==. //1 change
-replace cancer=1 if regexm(cod1a, "SARCOMA") &  cancer==. //33 changes
-replace cancer=1 if regexm(cod1a, "TERATOMA") &  cancer==. //0 changes
-replace cancer=1 if regexm(cod1a, "LEUKEMIA") &  cancer==. //40 changes
-replace cancer=1 if regexm(cod1a, "LEUKAEMIA") &  cancer==. //31 changes
-replace cancer=1 if regexm(cod1a, "HEPATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "SARCOMA") &  cancer==. //8 changes
+replace cancer=1 if regexm(cod1a, "TERATOMA") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a, "LEUKEMIA") &  cancer==. //7 changes
+replace cancer=1 if regexm(cod1a, "LEUKAEMIA") &  cancer==. //11 changes
+replace cancer=1 if regexm(cod1a, "HEPATOMA") &  cancer==. //2 changes
 replace cancer=1 if regexm(cod1a, "CARANOMA PROSTATE") &  cancer==. //0 changes
-replace cancer=1 if regexm(cod1a, "MENINGIOMA") &  cancer==. //11 changes
+replace cancer=1 if regexm(cod1a, "MENINGIOMA") &  cancer==. //0 changes
 replace cancer=1 if regexm(cod1a, "MYELOSIS") &  cancer==. //0 changes
-replace cancer=1 if regexm(cod1a, "MYELOFIBROSIS") &  cancer==. //4 changes
+replace cancer=1 if regexm(cod1a, "MYELOFIBROSIS") &  cancer==. //0 changes
 replace cancer=1 if regexm(cod1a, "CYTHEMIA") &  cancer==. //0 changes
-replace cancer=1 if regexm(cod1a, "CYTOSIS") &  cancer==. //2 changes
-replace cancer=1 if regexm(cod1a, "BLASTOMA") &  cancer==. //9 changes
-replace cancer=1 if regexm(cod1a, "METASTATIC") &  cancer==. //26 changes
-replace cancer=1 if regexm(cod1a, "MASS") &  cancer==. //97 changes
-replace cancer=1 if regexm(cod1a, "METASTASES") &  cancer==. //5 changes
-replace cancer=1 if regexm(cod1a, "METASTASIS") &  cancer==. //3 changes
+replace cancer=1 if regexm(cod1a, "CYTOSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "BLASTOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(cod1a, "METASTATIC") &  cancer==. //4 changes
+replace cancer=1 if regexm(cod1a, "MASS") &  cancer==. //4 changes
+replace cancer=1 if regexm(cod1a, "METASTASES") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a, "METASTASIS") &  cancer==. //1 change
 replace cancer=1 if regexm(cod1a, "REFRACTORY") &  cancer==. //0 changes
-replace cancer=1 if regexm(cod1a, "FUNGOIDES") &  cancer==. //1 change
+replace cancer=1 if regexm(cod1a, "FUNGOIDES") &  cancer==. //0 changes
 replace cancer=1 if regexm(cod1a, "HODGKIN") &  cancer==. //0 changes
 replace cancer=1 if regexm(cod1a, "MELANOMA") &  cancer==. //1 change
-replace cancer=1 if regexm(cod1a,"MYELODYS") &  cancer==. //8 changes
+replace cancer=1 if regexm(cod1a,"MYELODYS") &  cancer==. //0 changes
 
 ** Strip possible leading/trailing blanks in cod1a
 replace cod1a = rtrim(ltrim(itrim(cod1a))) //0 changes
@@ -363,30 +499,43 @@ tab cancer, missing
      cancer |
   diagnoses |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-     cancer |      3,245       26.41       26.41
-          . |      9,041       73.59      100.00
+     cancer |        793       38.87       38.87
+          . |      1,247       61.13      100.00
 ------------+-----------------------------------
-      Total |     12,286      100.00
+      Total |      2,040      100.00
 */
+
+** Update dod with dlc if slc=deceased
+replace dod=dlc if slc==2 & dod==. //129 changes
+gen deathyear=year(dod) //1,098 changes
 tab deathyear cancer,m
 /*
            |   cancer diagnoses
  deathyear |    cancer          . |     Total
 -----------+----------------------+----------
-      2013 |       614      1,796 |     2,410 
-      2014 |       692      1,804 |     2,496 
-      2015 |       629      1,853 |     2,482 
-      2016 |       668      1,820 |     2,488 
-      2017 |       642      1,768 |     2,410 
+      2008 |       175         78 |       253 
+      2009 |        81         38 |       119 
+      2010 |        46         20 |        66 
+      2011 |        40         13 |        53 
+      2012 |        16         15 |        31 
+      2013 |       194         55 |       249 
+      2014 |       104         33 |       137 
+      2015 |        69         18 |        87 
+      2016 |        48         15 |        63 
+      2017 |        20         20 |        40 
+         . |         0        942 |       942 
 -----------+----------------------+----------
-     Total |     3,245      9,041 |    12,286
+     Total |       793      1,247 |     2,040
+
 */
 
-** Check that all cancer CODs for 2014 are eligible
+** Check that all cancer CODs are eligible
 sort cod1a deathid
-order deathid cod1a
-list cod1a if cancer==1 & deathyear==2014 //692
-
+order pid deathid cod1a cancer
+count if cancer==1 & (dxyr==2008|dxyr==2013) //785
+list cod1a if cancer==1 & (dxyr==2008|dxyr==2013)
+count if cancer!=1 & slc==2 & (dxyr==2008|dxyr==2013) //305
+list cod1a if cancer!=1 & (dxyr==2008|dxyr==2013)
 ** Replace 2014 cases that are not cancer according to eligibility SOP:
 /*
 	(1) After merge with CR5 data then may need to reassign some of below 
