@@ -4,7 +4,7 @@
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      19-MAR-2019
-    // 	date last modified	    19-MAR-2019
+    // 	date last modified	    16-APR-2019
     //  algorithm task			Cleaning 2008 & 2013 cancer datasets, Creating site groupings
     //  release version         v01: using CanReg5 BNR-CLEAN 18-Mar-2019 dataset
     //  status                  Completed
@@ -32,7 +32,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\3_2008_2013_dc.smcl", replace
+    log using "`logpath'\3_2008_2013_dc_v01.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ***************************************************************************************************************
@@ -433,20 +433,141 @@ replace slc=1 if pid=="20080881"
 replace slc=1 if pid=="20080882"
 replace slc=1 if pid=="20080884"
 replace slc=1 if pid=="20080885"
-STOPPED HERE
 
-** Change dod so these will merge
+
+** Change death variables as these will not copy into current death variables when merging 112/129 cases
+rename regnum regnumcr5
+rename pname pnamecr5
 rename dod dodcr5
+rename redcap_event_name redcap_event_namecr5
+rename dddoa dddoacr5
+rename ddda dddacr5
+rename odda oddacr5
+rename certtype certtypecr5
+rename district districtcr5
+rename address addresscr5
+rename ddparish ddparishcr5
+rename ddsex ddsexcr5
+rename ddage ddagecr5
+rename ddagetxt ddagetxtcr5
+**rename nrn nrncr5
+rename mstatus mstatuscr5
+rename occu occucr5
+rename cod1a cod1acr5
+rename pod podcr5
+rename deathparish deathparishcr5
+rename regdate regdatecr5
+rename ddcertifier ddcertifiercr5
+rename ddnamematch ddnamematchcr5
+rename dcstatus dcstatuscr5
+rename duprec dupreccr5
 
-** Create (manually) national death file with only the '129' above that don't have death data and add these to this dataset
-merge m:1 deathid using "`datapath'\version01\1-input\BNRDeathDataALL_DATA_2019-04-15_unmerged.xlsx"
+
+** Create (in dofile '2_all_deaths_dp') national death file with only the '129' above that don't have death data and add these to this dataset
+** Note: 112/129 matched; 3/129 no match-died overseas; 9/129 no match but died on island; 5/129 not deceased
+drop _merge
+merge m:1 deathid using "`datapath'\version01\2-working\unmerged_missed_redcap_deaths", force
 /*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         1,928
+        from master                     1,928  (_merge==1)
+        from using                          0  (_merge==2)
 
+    matched                               112  (_merge==3)
+    -----------------------------------------
 */
 
+** Re-join death dataset variables
+count if regnumcr5==. & regnum!=. //112
+replace regnumcr5=regnum if regnumcr5==. & regnum!=. //112 changes
+count if pnamecr5=="" & pname!="" //112
+replace pnamecr5=pname if pnamecr5=="" & pname!="" //112 changes
+count if dodcr5==. & dod!=. //112
+replace dodcr5=dod if dodcr5==. & dod!=. //112 changes
+count if redcap_event_namecr5=="" & redcap_event_name!="" //112
+replace redcap_event_namecr5=redcap_event_name if redcap_event_namecr5=="" & redcap_event_name!="" //112 changes
+count if dddoacr5==. & dddoa!=. //112
+replace dddoacr5=dddoa if dddoacr5==. & dddoa!=. //112 changes
+count if dddacr5==. & ddda!=. //112
+replace dddacr5=ddda if dddacr5==. & ddda!=. //112 changes
+count if oddacr5=="" & odda!="" //112
+replace oddacr5=odda if oddacr5=="" & odda!="" //112 changes
+count if certtypecr5==. & certtype!=. //112
+replace certtypecr5=certtype if certtypecr5==. & certtype!=. //112 changes
+count if districtcr5==. & district!=. //112
+replace districtcr5=district if districtcr5==. & district!=. //112 changes
+count if addresscr5=="" & address!="" //111
+replace addresscr5=address if addresscr5=="" & address!="" //111 changes
+count if ddparishcr5==. & ddparish!=. //112
+replace ddparishcr5=ddparish if ddparishcr5==. & ddparish!=. //112 changes
+count if ddsexcr5==. & ddsex!=. //112
+replace ddsexcr5=ddsex if ddsexcr5==. & ddsex!=. //112 changes
+count if ddagecr5==. & ddage!=. //112
+replace ddagecr5=ddage if ddagecr5==. & ddage!=. //112 changes
+count if ddagetxtcr5==. & ddagetxt!=. //110
+replace ddagetxtcr5=ddagetxt if ddagetxtcr5==. & ddagetxt!=. //110 changes
+count if natregno=="" & nrn!="" //0 - keep natregno instead of nrn as many of the nrn from death dataset were incorrect when cross-checked with electoral list
+count if mstatuscr5==. & mstatus!=. //112
+replace mstatuscr5=mstatus if mstatuscr5==. & mstatus!=. //112 changes
+count if occucr5=="" & occu!="" //112
+replace occucr5=occu if occucr5=="" & occu!="" //112 changes
+count if cod1acr5=="" & cod1a!="" //112
+replace cod1acr5=cod1a if cod1acr5=="" & cod1a!="" //112 changes
+count if podcr5=="" & pod!="" //112
+replace podcr5=pod if podcr5=="" & pod!="" //112 changes
+count if deathparishcr5==. & deathparish!=. //112
+replace deathparishcr5=deathparish if deathparishcr5==. & deathparish!=. //112 changes
+count if regdatecr5==. & regdate!=. //112
+replace regdatecr5=regdate if regdatecr5==. & regdate!=. //112 changes
+count if ddcertifiercr5=="" & ddcertifier!="" //112
+replace ddcertifiercr5=ddcertifier if ddcertifiercr5=="" & ddcertifier!="" //112 changes
+count if ddnamematchcr5==. & ddnamematch!=. //112
+replace ddnamematchcr5=ddnamematch if ddnamematchcr5==. & ddnamematch!=. //112 changes
+count if dcstatuscr5==. & dcstatus!=. //112
+replace dcstatuscr5=dcstatus if dcstatuscr5==. & dcstatus!=. //112 changes
+count if dupreccr5==. & duprec!=. //0
+
+
+** Remove 112/129 death variables and change back to original name
+drop regnum pname dod redcap_event_name dddoa ddda odda certtype district address ///
+     ddparish ddsex ddage ddagetxt nrn mstatus occu cod1a pod deathparish regdate ddcertifier ///
+     ddnamematch dcstatus duprec
+rename regnumcr5 regnum
+rename pnamecr5 pname
+rename dodcr5 dod
+rename redcap_event_namecr5 redcap_event_name
+rename dddoacr5 dddoa
+rename dddacr5 ddda
+rename oddacr5 odda
+rename certtypecr5 certtype
+rename districtcr5 district
+rename addresscr5 address
+rename ddparishcr5 ddparish
+rename ddsexcr5 ddsex
+rename ddagecr5 ddage
+rename ddagetxtcr5 ddagetxt
+rename mstatuscr5 mstatus
+rename occucr5 occu
+rename cod1acr5 cod1a
+rename podcr5 pod
+rename deathparishcr5 deathparish
+rename regdatecr5 regdate
+rename ddcertifiercr5 ddcertifier
+rename ddnamematchcr5 ddnamematch
+rename dcstatuscr5 dcstatus
+rename dupreccr5 duprec
+
+
 ** Check merge is correct
-count if dod==. & slc==2
-count if slc==2 & cod1a==""
+count if deathid==. & slc==2 //12 - correct; these 12/129 that didn't match
+sort pid
+//list pid fname lname if deathid==. & slc==2
+count if dod==. & slc==2 //12
+//list pid fname lname if dod==. & slc==2
+count if slc==2 & cod1a=="" //12
+//list pid fname lname if slc==2 & cod1a==""
+
 
 ** Create variable to identify potential cancers in CODs (to be used later in analysis dofiles)
 gen cancer=.
@@ -499,178 +620,373 @@ tab cancer, missing
      cancer |
   diagnoses |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-     cancer |        793       38.87       38.87
-          . |      1,247       61.13      100.00
+     cancer |        891       43.68       43.68
+          . |      1,149       56.32      100.00
 ------------+-----------------------------------
       Total |      2,040      100.00
 */
 
 ** Update dod with dlc if slc=deceased
-replace dod=dlc if slc==2 & dod==. //129 changes
-gen deathyear=year(dod) //1,098 changes
+tab slc ,m
+/*
+StatusLastC |
+     ontact |      Freq.     Percent        Cum.
+------------+-----------------------------------
+      Alive |        947       46.42       46.42
+   Deceased |      1,093       53.58      100.00
+------------+-----------------------------------
+      Total |      2,040      100.00
+*/
+count if dod==. & slc==2 //12/129 that didn't match
+//list pid if dod==. & slc==2
+replace dod=dlc if slc==2 & dod==. //12 changes
+gen deathyear=year(dod) //1,093 changes
 tab deathyear cancer,m
 /*
            |   cancer diagnoses
  deathyear |    cancer          . |     Total
 -----------+----------------------+----------
-      2008 |       175         78 |       253 
-      2009 |        81         38 |       119 
-      2010 |        46         20 |        66 
-      2011 |        40         13 |        53 
-      2012 |        16         15 |        31 
-      2013 |       194         55 |       249 
-      2014 |       104         33 |       137 
+      2008 |       202         45 |       247 
+      2009 |        86         33 |       119 
+      2010 |        53         13 |        66 
+      2011 |        46          8 |        54 
+      2012 |        18         13 |        31 
+      2013 |       228         21 |       249 
+      2014 |       121         16 |       137 
       2015 |        69         18 |        87 
       2016 |        48         15 |        63 
       2017 |        20         20 |        40 
-         . |         0        942 |       942 
+         . |         0        947 |       947 
 -----------+----------------------+----------
-     Total |       793      1,247 |     2,040
-
+     Total |       891      1,149 |     2,040 
 */
+//202 (1,093-891) whose cod not listed as cancer
 
 ** Check that all cancer CODs are eligible
 sort cod1a deathid
 order pid deathid cod1a cancer
-count if cancer==1 & (dxyr==2008|dxyr==2013) //785
-list cod1a if cancer==1 & (dxyr==2008|dxyr==2013)
-count if cancer!=1 & slc==2 & (dxyr==2008|dxyr==2013) //305
-list cod1a if cancer!=1 & (dxyr==2008|dxyr==2013)
-** Replace 2014 cases that are not cancer according to eligibility SOP:
-/*
-	(1) After merge with CR5 data then may need to reassign some of below 
-		deaths as CR5 data may indicate eligibility while COD may exclude
-		(e.g. see deathid==15458)
-	(2) use obsid to check for CODs that incomplete in Results window with 
-		Data Editor in browse mode-copy and paste deathid below from here
-*/
-replace cancer=2 if ///
-deathid==16285 |deathid==1292  |deathid==15458 |deathid==11987 |deathid==1552| ///
-deathid==23771 |deathid==19815 |deathid==11910 |deathid==23750 |deathid==8118| ///
-deathid==3725  |deathid==932   |deathid==3419  |deathid==23473 |deathid==19097| ///
-deathid==16546 |deathid==20819 |deathid==20241 |deathid==13572 |deathid==6444| ///
-deathid==4644  |deathid==14413 |deathid==16702 |deathid==14249 |deathid==14688| ///
-deathid==5469  |deathid==15378 |deathid==2231  |deathid==22807 |deathid==12102| ///
-deathid==22127 |deathid==23906 |deathid==6243  |deathid==22248 |deathid==18365| ///
-deathid==17054 |deathid==13194 |deathid==19770 |deathid==2742  |deathid==20031| ///
-deathid==8574  |deathid==10793 |deathid==20504 |deathid==20634 |deathid==5531| ///
-deathid==17077 |deathid==11945 |deathid==19303 |deathid==1429  |deathid==17327| ///
-deathid==7925  |deathid==23413 |deathid==5189  |deathid==12137 |deathid==16726| ///
-deathid==19979 |deathid==21864 |deathid==2477  |deathid==19620 |deathid==5741| ///
-deathid==183
-//61 changes
+count if cancer==1 & (dxyr==2008|dxyr==2013) //883
+//list cod1a if cancer==1 & (dxyr==2008|dxyr==2013)
+count if cancer!=1 & slc==2 & (dxyr==2008|dxyr==2013) //202
+//list cod1a if cancer!=1 & slc==2 & (dxyr==2008|dxyr==2013) //12 are missing cod as these are 12/129 that didn't match
 
-** Check that all 2014 CODs that are not cancer for eligibility
-tab deathyear cancer,m
-/*
-           |         cancer diagnoses
- deathyear |    cancer  not cancer         . |     Total
------------+---------------------------------+----------
-      2013 |       614          0      1,796 |     2,410 
-      2014 |       631         61      1,804 |     2,496 
-      2015 |       629          0      1,853 |     2,482 
-      2016 |       668          0      1,820 |     2,488 
-      2017 |       642          0      1,768 |     2,410 
------------+---------------------------------+----------
-     Total |     3,184         61      9,041 |    12,286
-*/
-count if cancer==. & deathyear==2014 & (deathid>0 & deathid<5000) //376
-count if cancer==. & deathyear==2014 & (deathid>5000 & deathid<10000) //374
-count if cancer==. & deathyear==2014 & (deathid>10000 & deathid<15000) //368
-count if cancer==. & deathyear==2014 & (deathid>15000 & deathid<20000) //374
-count if cancer==. & deathyear==2014 & (deathid>20000 & deathid<25000) //311
-count if cancer==. & deathyear==2014 & (deathid>25000 & deathid<30000) //0
+tab dxyr cancer,m
+//883+202=1,085 but total deaths=1,093 - checked and 8 are not 2008/2013
 
-list cod1a if cancer==. & deathyear==2014 & (deathid>0 & deathid<5000)
-list cod1a if cancer==. & deathyear==2014 & (deathid>5000 & deathid<10000)
-list cod1a if cancer==. & deathyear==2014 & (deathid>10000 & deathid<15000)
-list cod1a if cancer==. & deathyear==2014 & (deathid>15000 & deathid<20000)
-list cod1a if cancer==. & deathyear==2014 & (deathid>20000 & deathid<25000)
-list cod1a if cancer==. & deathyear==2014 & (deathid>25000 & deathid<30000)
+** Update cases where COD=cancer but not captured in above due to spelling errors in COD, e.g.
+** LYNPHOMA, MUTLIPLE MELOMA, CA COLON, LUKAEMIA, 
+list cod1a if cancer!=1 & slc==2 & cod1a!="" //190
+replace cancer=1 if deathid==18075|deathid==17895|deathid==16652|deathid==3589 ///
+        |deathid==14097|deathid==18198|deathid==22959
+//7 changes
 
-** No updates needed from above list
-/*
-replace cancer=1 if ///
-deathid==|deathid==|deathid==|deathid==|deathid==| ///
-*/
+replace cancer=2 if slc==2 & cancer!=1 & cod1a!="" //183 changes
 
-replace cancer=2 if cancer==. //9,041 changes
-
-** Create cod variable 
+** Create cod variable to be used in analysis dofiles
 gen cod=.
-label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known" 4 "NA", modify
+label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known", modify
 label values cod cod_lab
 label var cod "COD categories"
-replace cod=1 if cancer==1 //3,184 changes
-replace cod=2 if cancer==2 //9,102 changes
-** one unknown causes of death in 2014 data - deathid 12323
-replace cod=3 if regexm(cod1a,"INDETERMINATE")|regexm(cod1a,"UNDETERMINED") //56 changes
+replace cod=1 if cancer==1 //898 changes
+replace cod=2 if cancer==2 //183 changes
+replace cod=3 if slc==2 & cancer==. & cod1a=="" //12 changes
 
 
 ** Create variable called "deceased" - same as 2008 dofile called '3_merge_cancer_deaths.do'
 tab slc ,m
+/*
+StatusLastC |
+     ontact |      Freq.     Percent        Cum.
+------------+-----------------------------------
+      Alive |        947       46.42       46.42
+   Deceased |      1,093       53.58      100.00
+------------+-----------------------------------
+      Total |      2,040      100.00
+*/
 count if slc!=2 & dod!=. //0
-gen deceased=1 if slc!=1 //645 changes
+gen deceased=1 if slc==2 //1,093 changes
 label var deceased "whether patient is deceased"
 label define deceased_lab 1 "dead" 2 "alive at last contact" , modify
 label values deceased deceased_lab
-replace deceased=2 if slc==1 //430 changes
+replace deceased=2 if slc==1 //947 changes
 
 tab deceased ,m
 /*
    whether patient is |
              deceased |      Freq.     Percent        Cum.
 ----------------------+-----------------------------------
-                 dead |        645       60.00       60.00
-alive at last contact |        430       40.00      100.00
+                 dead |      1,093       53.58       53.58
+alive at last contact |        947       46.42      100.00
 ----------------------+-----------------------------------
-                Total |      1,075      100.00
+                Total |      2,040      100.00
 */
 
 ** Create the "patient" variable - same as 2008 dofile called '3_merge_cancer_deaths.do'
+tab eidmp ,m
+/*
+
+     CR5 tumour |
+         events |      Freq.     Percent        Cum.
+----------------+-----------------------------------
+  single tumour |      1,921       94.17       94.17
+multiple tumour |        119        5.83      100.00
+----------------+-----------------------------------
+          Total |      2,040      100.00
+*/
 gen patient=.  
 label var patient "cancer patient"
 label define pt_lab 1 "patient" 2 "separate event",modify
 label values patient pt_lab
 replace patient=1 if eidmp==1 //1,056 changes
 replace patient=2 if eidmp==2 //19 changes
-tab patient ,miss
+tab patient ,m
+/*
+cancer patient |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+       patient |      1,921       94.17       94.17
+separate event |        119        5.83      100.00
+---------------+-----------------------------------
+         Total |      2,040      100.00
+*/
 
+count //2,040
 
 ** Add 'missed' 2013 cases found while cleaning 2014 data
 ** Ensure these are 'true' missed cases by checking dataset with 30 missed cases against this dataset
-append using "`datapath'\version01\1-input\2013_cancer_clean_nodups_dc"
-count //
+append using "`datapath'\version01\2-working\missed2013_cancer_toappend"
+count //2,070
 
-drop if pid=="20130338" & cr5id=="T1S1" & deathid=="20582"
+** Check for missing deathyear
+count if deathyear==. & slc==2 //1 - died in CR5 comments but not in death data
+replace dod=dlc if pid=="20141542"
+replace deathyear=2014 if pid=="20141542"
 
-count //
-replace dot=d(31dec2013) if pid=="20130338"
-replace dxyr=2013 if pid=="20130338"
+** Check for missing natregno
+count if natregno=="" & nrn!="" //0
+count if nrn!="" //21
+//list pid deathid natregno nrn if nrn!="" - nrn match natregno
+drop nrn
 
+** Remove below case as was already in dataset but missed2013 dataset has more accurate info
+** First, copy blank info from below case
+drop if pid=="20130338" & deathidold==. //1 deleted
+drop deathidold
 
-CHECK missed 2013 cases against this dataset then APPEND 2013 missed cases, next site groupings, then mortality, then onto analysis
+count //2,069
 
-** DROP all cases dx in 2014 onwards as 2014 cases already cleaned
-** pre-2014 cases are to be cleaned
-count if dxyr==. //0
-count if dxyr!=2008 & dxyr!=2013 //13
-drop if dxyr>2013 //13 deleted
+** Check icd10, top, morph not missing
+count if icd10=="" //14
+sort pid
+//list pid deathid top morph if icd10==""
+count if topography==. //0
+count if morph==. //0
 
+** Export 9 missing icd10 to run data in IARCcrg Tools (Conversion Programme)
+** Convert ICD-O-3 to ICD-10(v2010)
+preserve
+drop if icd10!="" //2,055 deleted
+export_excel pid sex topography morph beh grade ///
+using "`datapath'\version01\2-working\2019-04-16_iarccrg_icd10missing.xlsx", firstrow(varlabels) nolabel replace
+restore
+/*
+Steps how to convert from ICD-O-3 to ICD-10 using IARCcrg Tools
+(1) Save excel export to Tab(text delimited)
+(2) Format file using File transfer feature in IARCcrg Tools - save formatted file as 'yyyy-mm-dd_ICDO3-ICD10 format'
+(3) Using formatted .prn file above, open Conversions feature and select ICD-O-3 -> ICD-10
+(4) Save above converted file as 'yyyy-mm-dd_ICDO3-ICD10 conversion'
+(5) To view converted file, click open folder icon in IARCcrg Tools
+*/
+replace icd10="C539" if pid=="20140015"
+replace icd10="C765" if pid=="20140048"
+replace icd10="C168" if pid=="20140062"
+replace icd10="C73" if pid=="20140148"
+replace icd10="C64" if pid=="20140151"
+replace icd10="C61" if pid=="20140178"
+replace icd10="C259" if pid=="20140204"
+replace icd10="C508" if pid=="20140207"
+replace icd10="C509" if pid=="20140211"
+replace icd10="C840" if pid=="20140687"
+replace icd10="C73" if pid=="20140723"
+replace icd10="C64" if pid=="20141542"
+replace icd10="C20" if pid=="20145009"
+replace icd10="C508" if pid=="20145010"
+
+count if icd10=="" //0
 
 * ************************************************************************
 * SITE GROUPINGS
-* Using ...?
+* Using siteiarc as decided by NS
 **************************************************************************
 
+** Create new site variable with CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
+display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
+
+gen siteiarc=.
+label define siteiarc_lab ///
+1 "Lip (C00)" 2 "Tongue (C01-02)" 3 "Mouth (C03-06)" ///
+4 "Salivary gland (C07-08)" 5 "Tonsil (C09)" 6 "Other oropharynx (C10)" ///
+7 "Nasopharynx (C11)" 8 "Hypopharynx (C12-13)" 9 "Pharynx unspecified (C14)" ///
+10 "Oesophagus (C15)" 11 "Stomach (C16)" 12 "Small intestine (C17)" ///
+13 "Colon (C18)" 14 "Rectum (C19-20)" 15 "Anus (C21)" ///
+16 "Liver (C22)" 17 "Gallbladder etc. (C23-24)" 18 "Pancreas (C25)" ///
+19 "Nose, sinuses etc. (C30-31)" 20 "Larynx (C32)" ///
+21 "Lung (incl. trachea and bronchus) (C33-34)" 22 "Other thoracic organs (C37-38)" ///
+23 "Bone (C40-41)" 24 "Melanoma of skin (C43)" 25 "Other skin (C44)" ///
+26 "Mesothelioma (C45)" 27 "Kaposi sarcoma (C46)" 28 "Connective and soft tissue (C47+C49)" ///
+29 "Breast (C50)" 30 "Vulva (C51)" 31 "Vagina (C52)" 32 "Cervix uteri (C53)" ///
+33 "Corpus uteri (C54)" 34 "Uterus unspecified (C55)" 35 "Ovary (C56)" ///
+36 "Other female genital organs (C57)" 37 "Placenta (C58)" ///
+38 "Penis (C60)" 39 "Prostate (C61)" 40 "Testis (C62)" 41 "Other male genital organs (C63)" ///
+42 "Kidney (C64)" 43 "Renal pelvis (C65)" 44 "Ureter (C66)" 45 "Bladder (C67)" ///
+46 "Other urinary organs (C68)" 47 "Eye (C69)" 48 "Brain, nervous system (C70-72)" ///
+49 "Thyroid (C73)" 50 "Adrenal gland (C74)" 51 "Other endocrine (C75)" ///
+52 "Hodgkin lymphoma (C81)" 53 "Non-Hodgkin lymphoma (C82-86,C96)" ///
+54 "Immunoproliferative diseases (C88)" 55 "Multiple myeloma (C90)" ///
+56 "Lymphoid leukaemia (C91)" 57 "Myeloid leukaemia (C92-94)" 58 "Leukaemia unspecified (C95)" ///
+59 "Myeloproliferative disorders (MPD)" 60 "Myelodysplastic syndromes (MDS)" ///
+61 "Other and unspecified (O&U)" ///
+62 "All sites(ALL)" 63 "All sites but skin (ALLbC44)" ///
+64 "D069: CIN 3" ///
+65 "All in-situ but CIN3" ///
+66 "All uncertain behaviour" ///
+67 "All benign"
+label var siteiarc "IARC CI5-XI sites"
+label values siteiarc siteiarc_lab
+
+replace siteiarc=1 if regexm(icd10,"C00") //0 changes
+replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //9 changes
+replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //11 changes
+replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //2 changes
+replace siteiarc=5 if regexm(icd10,"C09") //4 changes
+replace siteiarc=6 if regexm(icd10,"C10") //3 changes
+replace siteiarc=7 if regexm(icd10,"C11") //5 changes
+replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //4 changes
+replace siteiarc=9 if regexm(icd10,"C14") //3 changes
+replace siteiarc=10 if regexm(icd10,"C15") //14 changes
+replace siteiarc=11 if regexm(icd10,"C16") //49 changes
+replace siteiarc=12 if regexm(icd10,"C17") //5 changes
+replace siteiarc=13 if regexm(icd10,"C18") //203 changes
+replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //73 changes
+replace siteiarc=15 if regexm(icd10,"C21") //13 changes
+replace siteiarc=16 if regexm(icd10,"C22") //12 changes
+replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //13 changes
+replace siteiarc=18 if regexm(icd10,"C25") //37 changes
+replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //6 changes
+replace siteiarc=20 if regexm(icd10,"C32") //9 changes
+replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //56 changes
+replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //2 changes
+replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //5 changes
+replace siteiarc=24 if regexm(icd10,"C43") //8 changes
+replace siteiarc=25 if regexm(icd10,"C44") //304 changes
+replace siteiarc=26 if regexm(icd10,"C45") //1 change
+replace siteiarc=27 if regexm(icd10,"C46") //0 changes
+replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //8 changes
+replace siteiarc=29 if regexm(icd10,"C50") //272 changes
+replace siteiarc=30 if regexm(icd10,"C51") //2 changes
+replace siteiarc=31 if regexm(icd10,"C52") //3 changes
+replace siteiarc=32 if regexm(icd10,"C53") //54 changes
+replace siteiarc=33 if regexm(icd10,"C54") //71 changes
+replace siteiarc=34 if regexm(icd10,"C55") //6 changes
+replace siteiarc=35 if regexm(icd10,"C56") //22 changes
+replace siteiarc=36 if regexm(icd10,"C57") //4 changes
+replace siteiarc=37 if regexm(icd10,"C58") //2 changes
+replace siteiarc=38 if regexm(icd10,"C60") //4 changes
+replace siteiarc=39 if regexm(icd10,"C61") //376 changes
+replace siteiarc=40 if regexm(icd10,"C62") //1 change
+replace siteiarc=41 if regexm(icd10,"C63") //0 changes
+replace siteiarc=42 if regexm(icd10,"C64") //35 changes
+replace siteiarc=43 if regexm(icd10,"C65") //0 changes
+replace siteiarc=44 if regexm(icd10,"C66") //0 changes
+replace siteiarc=45 if regexm(icd10,"C67") //19 changes
+replace siteiarc=46 if regexm(icd10,"C68") //1 change
+replace siteiarc=47 if regexm(icd10,"C69") //4 changes
+replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //7 changes
+replace siteiarc=49 if regexm(icd10,"C73") //25 changes
+replace siteiarc=50 if regexm(icd10,"C74") //0 changes
+replace siteiarc=51 if regexm(icd10,"C75") //2 changes
+replace siteiarc=52 if regexm(icd10,"C81") //8 changes
+replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //37 changes
+replace siteiarc=54 if regexm(icd10,"C88") //1 change
+replace siteiarc=55 if regexm(icd10,"C90") //32 changes
+replace siteiarc=56 if regexm(icd10,"C91") //8 changes
+replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //21 changes
+replace siteiarc=58 if regexm(icd10,"C95") //4 changes
+replace siteiarc=59 if morphcat==54|morphcat==55 //7 changes
+replace siteiarc=60 if morphcat==56 //2 changes
+replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //67changes
+**replace siteiarc=62 if siteiarc<62
+**replace siteiarc=63 if siteiarc<62 & siteiarc!=25
+replace siteiarc=64 if morph==8077 //43 changes
+replace siteiarc=65 if beh==2 & siteiarc==. //50 changes
+replace siteiarc=66 if beh==1 //12 changes
+replace siteiarc=67 if beh==0 //8 changes
+
+tab siteiarc ,m //70 missing - benign, uncertain and in-situ excl.CIN 3
+//list pid top morph icd10 beh if siteiarc==.
 
 
-count //
+** Create site variable for lymphoid and haematopoietic diseases for conversion of these from ICD-O-3 1st edition (M9590-M9992)
+** (see chapter 3 Table 3.2 of CI5-XI)
+gen siteiarchaem=.
+label define siteiarchaem_lab ///
+1 "Malignant lymphomas,NOS or diffuse" ///
+2 "Hodgkin lymphoma" ///
+3 "Mature B-cell lymphomas" ///
+4 "Mature T- and NK-cell lymphomas" ///
+5 "Precursor cell lymphoblastic lymphoma" ///
+6 "Plasma cell tumours" ///
+7 "Mast cell tumours" ///
+8 "Neoplasms of histiocytes and accessory lymphoid cells" ///
+9 "Immunoproliferative diseases" ///
+10 "Leukemias, NOS" ///
+11 "Lymphoid leukemias" ///
+12 "Myeloid leukemias" ///
+13 "Other leukemias" ///
+14 "Chronic myeloproliferative disorders" ///
+15 "Other hematologic disorders" ///
+16 "Myelodysplastic syndromes"
+label var siteiarchaem "IARC CI5-XI lymphoid & haem diseases"
+label values siteiarchaem siteiarchaem_lab
+
+** Note that morphcat is based on ICD-O-3 edition 3.1. so e.g. morphcat54
+replace siteiarchaem=1 if morphcat==41 //19 changes
+replace siteiarchaem=2 if morphcat==42 //8 changes
+replace siteiarchaem=3 if morphcat==43 //13 changes
+replace siteiarchaem=4 if morphcat==44 //6 changes
+replace siteiarchaem=5 if morphcat==45 //0 changes
+replace siteiarchaem=6 if morphcat==46 //32 changes
+replace siteiarchaem=7 if morphcat==47 //0 changes
+replace siteiarchaem=8 if morphcat==48 //0 changes
+replace siteiarchaem=9 if morphcat==49 //0 changes
+replace siteiarchaem=10 if morphcat==50 //4 changes
+replace siteiarchaem=11 if morphcat==51 //8 changes
+replace siteiarchaem=12 if morphcat==52 //18 changes
+replace siteiarchaem=13 if morphcat==53 //3 changes
+replace siteiarchaem=14 if morphcat==54 //7 changes
+replace siteiarchaem=15 if morphcat==55 //0 changes
+replace siteiarchaem=16 if morphcat==56 //2 changes
+
+tab siteiarchaem ,m //967 missing - correct!
+count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //0
+
+count //2,069
+
+** Remove all ineligible cases and cases dx in 2014 onwards as 2014 cases already cleaned
+** pre-2014 cases are to be cleaned
+count if recstatus==3 //0
+//list pid deathid dot top morph if recstatus==3
+
+count if dxyr==. //0
+count if dxyr!=2008 & dxyr!=2013 //12
+//list pid deathid dot dxyr if dxyr!=2008 & dxyr!=2013
+drop if dxyr!=2008 & dxyr!=2013 //12 deleted
+
+count //2,057
 
 ** Put variables in order you want them to appear
 order pid fname lname init age sex dob natregno resident slc dlc ///
 	    parish cr5cod primarysite morph top lat beh hx
 
-save "`datapath'\version01\2-working\2008_2013_cancer_dc" ,replace
+save "`datapath'\version01\2-working\2008_2013_cancer_dc_v01" ,replace
 label data "BNR-Cancer prepared 2008 & 2013 data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report

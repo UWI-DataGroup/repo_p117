@@ -4,7 +4,7 @@
     //  project:				        BNR
     //  analysts:				       	Jacqueline CAMPBELL
     //  date first created      18-MAR-2019
-    // 	date last modified	    18-MAR-2019
+    // 	date last modified	    16-APR-2019
     //  algorithm task			    Preparing 2008 & 2013 cancer dataset for cleaning
     //  status                  Completed
     //  objectve                To have one dataset with cleaned and grouped 2008 & 2013 data for inclusion in 2014 cancer report.
@@ -1946,3 +1946,75 @@ count //2,608
 save "`datapath'\version01\2-working\2008_2013_cancer_dp" ,replace
 label data "BNR-Cancer prepared 2008 & 2013 data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
+
+** Prep missed 2013 dataset to join to dataset in dofile 3 '2008_2013_dc_v01'
+clear
+** Load the dataset
+use "`datapath'\version01\1-input\2013_cancer_clean_nodups_dc", clear
+
+count //30
+
+drop pidobsid pidobstot dcostatus regnum pname address dod mname name6 certtype district nrnnd mstatus occu durationnum durationtxt ///
+		 onset* cod1b cod1c cod1d cod2a cod2b deathparish regdate certifieraddr death_certificate dupname dupdod _merge dup_pt ///
+		 cod1a_orig dupobs* dod nm sourcetot_orig non_numeric_ptda currentdatept countvar sampleyr recvyr rptyr admyr dfcyr rtyr ///
+		 yr2013id txt2013id	currentdatett checkage laterality behaviour str_grade bas diagyr currentdatest notiftype eidmptxt dup_pid ///
+		 morphology cr5cod_orig nrnday dob_yr dob_year year2 dobchk nrnid checkage2 dodyear
+
+
+** Update deathid with current redcap record_id as this dataset has 'old' deathid
+rename deathid deathidold
+rename ICD10 icd10
+rename ICCCcode iccc
+gen deathid=.
+replace deathid=14987 if pid=="20130338"
+replace deathid=14303 if pid=="20140002"
+replace deathid=14325 if pid=="20140015"
+replace deathid=14545 if pid=="20140048"
+replace deathid=14543 if pid=="20140062"
+replace deathid=14735 if pid=="20140140"
+replace deathid=14797 if pid=="20140148"
+replace deathid=14911 if pid=="20140151"
+replace deathid=14715 if pid=="20140157"
+replace deathid=14979 if pid=="20140178"
+replace deathid=15015 if pid=="20140204"
+replace deathid=15005 if pid=="20140207"
+replace deathid=14916 if pid=="20140210"
+replace deathid=15064 if pid=="20140211"
+replace deathid=15517 if pid=="20140381"
+replace deathid=15514 if pid=="20140395"
+replace deathid=15788 if pid=="20140427"
+replace deathid=16235 if pid=="20140534"
+replace deathid=18106 if pid=="20141130"
+replace deathid=18008 if pid=="20141553"
+replace deathid=18540 if pid=="20145009"
+
+** Update name variables to match other dataset
+replace fname=upper(fname)
+replace lname=upper(lname)
+replace init=upper(init)
+
+** Since 9/30 cases are not deceased, will need to merge the other 21 then join back on the 9
+preserve
+drop if deathid!=. //21 deleted
+save "`datapath'\version01\2-working\missed2013_cancer_9alive" ,replace
+restore
+
+drop if deathid==. //9 deleted
+
+merge 1:1 deathid using "`datapath'\version01\2-working\missed2013_redcap_deaths", force
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                                21  (_merge==3)
+    -----------------------------------------
+*/
+append using "`datapath'\version01\2-working\missed2013_cancer_9alive"
+
+count //30
+
+save "`datapath'\version01\2-working\missed2013_cancer_toappend" ,replace
+label data "BNR-Cancer missed 2013 cases prepared for merge with 2008/2013 data"
+notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
+
+

@@ -4,7 +4,7 @@
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      19-MAR-2019
-    // 	date last modified	    19-MAR-2019
+    // 	date last modified	    16-APR-2019
     //  algorithm task			Merging death datasets, Creating one death dataset
     //  status                  Completed
     //  objectve                To have one dataset with 2008-2017 death data with redcap (BNR-DeathDataALL) record_id = deathid
@@ -283,6 +283,55 @@ save "`datapath'\version01\2-working\2008-2017_redcap_deaths_dp" ,replace
 label data "BNR-DeathDataALL (redcap) prepared 2008-2017 national death data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
 
+
+count //
+
+** CREATE the national registry deaths "129" dataset (these are the cases found in dofile 3 that didn't merge)
+preserve
+drop if deathid!=349 & deathid!=970 & deathid!=809 & deathid!=1967 & deathid!=1119 ///
+        & deathid!=2378 & deathid!=263 & deathid!=1928 & deathid!=626 & deathid!=1651 ///
+        & deathid!=4612 & deathid!=6277 & deathid!=1211 & deathid!=4393 & deathid!=4075 ///
+        & deathid!=9774 & deathid!=4019 & deathid!=1810 & deathid!=3122 & deathid!=7444 ///
+        & deathid!=9037 & deathid!=5676 & deathid!=357 & deathid!=1254 & deathid!=2730 ///
+        & deathid!=5653 & deathid!=1220 & deathid!=842 & deathid!=456 & deathid!=1226 ///
+        & deathid!=1483 & deathid!=2291 & deathid!=1910 & deathid!=1529 & deathid!=2235 ///
+        & deathid!=2181 & deathid!=1825 & deathid!=2113 & deathid!=470 & deathid!=1755 ///
+        & deathid!=9181 & deathid!=1633 & deathid!=1884 & deathid!=2451 & deathid!=5933 ///
+        & deathid!=6895 & deathid!=11240 & deathid!=8746 & deathid!=8246 & deathid!=7192 ///
+        & deathid!=2895 & deathid!=3894 & deathid!=522 & deathid!=2450 & deathid!=5833 ///
+        & deathid!=12646 & deathid!=12182 & deathid!=13121 & deathid!=13373 & deathid!=13379 ///
+        & deathid!=13617 & deathid!=13968 & deathid!=13832 & deathid!=13939 & deathid!=14557 ///
+        & deathid!=14379 & deathid!=14269 & deathid!=14837 & deathid!=13989 & deathid!=13586 ///
+        & deathid!=16287 & deathid!=14025 & deathid!=15242 & deathid!=16320 & deathid!=13917 ///
+        & deathid!=14947 & deathid!=14308 & deathid!=12191 & deathid!=12383 & deathid!=12393 ///
+        & deathid!=12231 & deathid!=12194 & deathid!=12766 & deathid!=12955 & deathid!=13478 ///
+        & deathid!=13838 & deathid!=13870 & deathid!=15424 & deathid!=14105 & deathid!=14097 ///
+        & deathid!=12197 & deathid!=16153 & deathid!=16495 & deathid!=15067 & deathid!=11960 ///
+        & deathid!=13966 & deathid!=14118 & deathid!=16370 & deathid!=13697 & deathid!=13957 ///
+        & deathid!=16391 & deathid!=14226 & deathid!=14236 & deathid!=14386 & deathid!=12465 ///
+        & deathid!=14517 & deathid!=12431 & deathid!=13913 & deathid!=16450
+
+count //109
+
+save "`datapath'\version01\2-working\unmerged_missed_redcap_deaths" ,replace
+label data "BNR-DeathDataALL (redcap) prepared for merge with CR5 data - missed unmerged cases"
+notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
+restore
+
+** CREATE the national registry deaths "missed2013" dataset (these are the cases found in 2014 cleaning)
+preserve
+drop if deathid!=14303 & deathid!=14325 & deathid!=14543 & deathid!=14545 & deathid!=14715 ///
+        & deathid!=14735 & deathid!=14797 & deathid!=14911 & deathid!=14916 & deathid!=14979 ///
+        & deathid!=14987 & deathid!=15005 & deathid!=15015 & deathid!=15064 & deathid!=15514 ///
+        & deathid!=15517 & deathid!=15788 & deathid!=16235 & deathid!=18008 & deathid!=18106 & deathid!=18540
+
+count //21
+
+save "`datapath'\version01\2-working\missed2013_redcap_deaths" ,replace
+label data "BNR-DeathDataALL (redcap) prepared for merge with missed 2013 CR5 data"
+notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
+restore
+
 ** Need 2nd death dataset for merging cases not previously identified
 drop if nrn==""
 drop if deathid==18039|deathid==18490 //duplicates found below
@@ -297,6 +346,9 @@ list deathid pname nrn ddnamematch if dup>0
 drop if dup>0 //41 deleted
 drop dup
 
+count //21,845
+
 save "`datapath'\version01\2-working\2008-2017_redcap_deaths_nrn_dp" ,replace
 label data "BNR-DeathDataALL (redcap) prepared 2008-2017 national death data"
 notes _dta :These data prepared for 2008 & 2013 inclusion in 2014 cancer report
+
