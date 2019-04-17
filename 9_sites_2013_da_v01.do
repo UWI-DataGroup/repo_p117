@@ -1,13 +1,14 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name					9_sites_2014_da.do
-    //  project:								BNR
-    //  analysts:								Jacqueline CAMPBELL
-    //  date first created      27-MAR-2019
-    // 	date last modified	    27-MAR-2019
-    //  algorithm task					Generate Incidence Rates by (IARC) site: (1) identification of top sites (2) crude: by sex (3) crude: by site (4) ASR(ASIR): all sites, world & US(2000) pop (5) ASR(ASIR): all sites, by sex (world & US)
+    //  algorithm name          9_sites_2013_da_v01.do
+    //  project:                BNR
+    //  analysts:               Jacqueline CAMPBELL
+    //  date first created      17-APR-2019
+    // 	date last modified      17-APR-2019
+    //  algorithm task          Generate Incidence Rates by (IARC) site: (1) identification of top sites (2) crude: by sex (3) crude: by site (4) ASR(ASIR): all sites, world & US(2000) pop (5) ASR(ASIR): all sites, by sex (world & US)
     //  status                  Completed
-    //  objectve                To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
+    //  objectve                To have one dataset with cleaned, grouped and analysed 2013 data for 2014 cancer report.
+
 
     ** DO FILE BASED ON
     * AMC Rose code for BNR Cancer 2008 annual report
@@ -33,7 +34,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\9_sites_2014_da.smcl", replace
+    log using "`logpath'\9_sites_2013_da_v01.smcl", replace
 ** HEADER -----------------------------------------------------
 
 
@@ -47,7 +48,7 @@
 ** Above note by AR from 2008 dofile
 
 ** Load the dataset
-use "`datapath'\version01\2-working\2014_cancer_numbers_da", replace
+use "`datapath'\version01\2-working\2013_cancer_numbers_da_v01", replace
 
 ***********************
 ** 3.1 CANCERS BY SITE
@@ -58,28 +59,30 @@ tab icd10 ,m //0 missing
 
 tab siteiarc ,m //0 missing
 
-** top 10 sites are: prostate (172), colon & rectum (107+18+37=162), breast (132) lymphoid/haem (68) cervix (43)
-** uterus (35) respiratory (34) urinary (32) other digestive (27) pancreas (21)- look at top sites by sex
 
 ** Below top 10 code added by JC for 2014 DQIs and instead of visually 
 ** determining top ten as done for 2008 & 2013
 ** Note NMSCs (non-reportable skin cancers) and in-situ tumours excluded from top ten analysis
-tab siteiarc if siteiarc!=25 & siteiarc!=64
-tab siteiarc ,m //927 - 24 insitu; 45 O&U
+tab siteiarc if siteiarc!=25 & siteiarc<62
+tab siteiarc ,m //
+/*
+
+*/
 tab siteiarc patient
 
 ** NS decided on 18march2019 to use IARC site groupings so variable siteiarc will be used instead of sitear
 ** IARC site variable created based on CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
 display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
 
-
-** For annual report - Section 1: Incidence - Table 2a
+STOPPED HERE - UPDATE ANN RPT TABLES DOC WHEN RUN BELOW
+** For annual report - Section 1: Incidence - Table 2a (NOT USING IN TABLE AS USING 2014 TOP 10)
 ** Below top 10 code added by JC for 2014
 ** All sites excl. O&U, non-reportable skin cancers - using IARC CI5's site groupings COMBINE cervix & CIN 3
 ** THIS USED IN ANNUAL REPORT TABLE 1
 preserve
-drop if siteiarc==25|siteiarc==61 //45 obs deleted
-replace siteiarc=32 if siteiarc==32|siteiarc==64 //24 changes
+drop if (siteiarc==25|siteiarc>60) & siteiarc!=64 //36 deleted
+tab siteiarc ,m
+replace siteiarc=32 if siteiarc==32|siteiarc==64 //9 changes
 tab siteiarc ,m
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag=(_n==1)
@@ -95,26 +98,30 @@ describe
 gsort -count
 drop top10
 /*
-siteiarc																	count	percentage
-Prostate (C61)															198	28.09
-Breast (C50)																159	22.55
-Colon (C18)																	114	16.17
-Cervix uteri (C53)													41	5.82
-Corpus uteri (C54)													39	5.53
-Lung (incl. trachea and bronchus) (C33-34)	32	4.54
-Rectum (C19-20)															28	3.97
-Multiple myeloma (C90)											28	3.97
-Bladder (C67)																24	3.40
-Pancreas (C25)															21	2.98
-Stomach (C16)																21	2.98
-(NS TO CHOOSE BETWEEN PANCREAS AND STOMACH AS THIS IS TOP 11)
+
 */
-total count //705
+total count //
 restore
 
-** All sites excl. O&U, insitu, non-reportable skin cancers - using IARC CI5's site groupings
+** All sites excl. O&U, non-reportable skin cancers - using IARC CI5's site groupings COMBINE cervix & CIN 3
+** THIS USED IN ANNUAL REPORT TABLE 1 - CHECKING WHERE IN LIST 2014 TOP 10 APPEARS IN LIST FOR 2008
+** This list requested by NS in similar format to CMO's report for top 10 comparisons with current & previous years
+** Screenshot this data from Stata data editor into annual report tables document.
 preserve
-drop if siteiarc==25|siteiarc==61|siteiarc==64 //69 obs deleted
+drop if (siteiarc==25|siteiarc>60) & siteiarc!=64 //
+replace siteiarc=32 if siteiarc==32|siteiarc==64 // changes
+tab siteiarc ,m
+contract siteiarc, freq(count) percent(percentage)
+gsort -count
+/*
+
+*/
+total count //
+restore
+
+** All sites excl. O&U, non-reportable (skin) cancers - using IARC CI5's site groupings
+preserve
+drop if (siteiarc==25|siteiarc>60) & siteiarc!=64 // deleted
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag=(_n==1)
 replace tag = sum(tag)
@@ -129,70 +136,37 @@ describe
 gsort -count
 drop top10
 /*
-siteiarc	                                	count		percentage
-Prostate (C61)	                            198	    29.82
-Breast (C50)	                            	159	    23.95
-Colon (C18)	                                114	    17.17
-Corpus uteri (C54)	                        39	    5.87
-Lung (incl. trachea and bronchus) (C33-34)	32	    4.82
-Rectum (C19-20)	                            28	    4.22
-Multiple myeloma (C90)	                    28	    4.22
-Bladder (C67)	                            	24	    3.61
-Pancreas (C25)	                            21	    3.16
-Stomach (C16)	                            	21	    3.16
+
 */
-total count //664
+total count //
 restore
 
-** All sites excl. O&U, non-reportable skin cancers - using IARC CI5's site groupings
-preserve
-drop if siteiarc==25|siteiarc==61 //45 obs deleted
-bysort siteiarc: gen n=_N
-bysort n siteiarc: gen tag=(_n==1)
-replace tag = sum(tag)
-sum tag , meanonly
-gen top10 = (tag>=(`r(max)'-9))
-sum n if tag==(`r(max)'-9), meanonly
-replace top10 = 1 if n==`r(max)'
-tab siteiarc top10 if top10!=0
-contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
-summ
-describe
-gsort -count
-drop top10
-/*
-siteiarc																		count	percentage
-Prostate (C61)															198		28.78
-Breast (C50)																159		23.11
-Colon (C18)																	114		16.57
-Corpus uteri (C54)													39		5.67
-Lung (incl. trachea and bronchus) (C33-34)	32		4.65
-Multiple myeloma (C90)											28		4.07
-Rectum (C19-20)															28		4.07
-D069: CIN 3																	24		3.49
-Bladder (C67)																24		3.49
-Pancreas (C25)															21		3.05
-Stomach (C16)																21		3.05
-*/
-total count //688
-restore
-
-** proportions for Table 1 using IARC's site groupings
+** proportions for Table 1 using IARC's site groupings (NOT USING IN TABLE AS USING 2014)
 tab siteiarc sex ,m
 tab siteiarc , m
 tab siteiarc if sex==2 ,m // female
-tab siteiarc if sex==1 ,m // male							  
+/*
+
+*/
+tab siteiarc if sex==1 ,m // male
+/*
+
+*/
 ** sites by behaviour
 tab siteiarc beh ,m
 tab beh ,m
+tab sex ,m
+/*
 
-** For annual report - Section 1: Incidence - Table 1
+*/
+
+** For annual report - Section 1: Incidence - Table 1 (NOT USING IN TABLE AS USING 2014 TOP 5)
 ** FEMALE - using IARC's site groupings (excl. in-situ) COMBINE cervix & CIN 3
-** THIS USED IN ANNUAL REPORT TABLE 1
+** Not used IN ANNUAL REPORT TABLE 1
 preserve
-drop if sex==1 //465 obs deleted
-drop if siteiarc==25|siteiarc==61 //22 obs deleted
-replace siteiarc=32 if siteiarc==32|siteiarc==64 //24 changes
+drop if sex==1 // deleted
+drop if (siteiarc==25|siteiarc>60) & siteiarc!=64 // deleted
+replace siteiarc=32 if siteiarc==32|siteiarc==64 // changes
 tab siteiarc ,m
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag5=(_n==1)
@@ -207,24 +181,18 @@ contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
 gsort -count
 drop top5
 
-gen totpercent=(count/462)*100 //all cancers excl. male(465)
+gen totpercent=(count/462)*100 //all cancers excl. male(...)
 gen alltotpercent=(count/927)*100 //all cancers
 /*
-siteiarc						count	percentage	totpercent	alltotpercent
-Breast (C50)				155		49.21				33.54978		16.7206
-Colon (C18)					65		20.63				14.06926		7.011866
-Cervix uteri (C53)	41		13.02				8.874459		4.42287
-Corpus uteri (C54)	39		12.38				8.441559		4.20712
-Rectum (C19-20)			15		4.76				3.246753		1.618123
+
 */
-total count //315
+total count //
 restore
 
-** For annual report - Section 1: Incidence - Table 1
 ** FEMALE - using IARC's site groupings (excl. in-situ)
 preserve
-drop if sex==1 //465 obs deleted
-drop if siteiarc==61|siteiarc==64 //46 obs deleted
+drop if sex==1 // deleted
+drop if siteiarc==25|siteiarc>60 // deleted
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag5=(_n==1)
 replace tag5 = sum(tag5)
@@ -238,24 +206,18 @@ contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
 gsort -count
 drop top5
 
-gen totpercent=(count/462)*100 //all cancers excl. male(465)
-gen alltotpercent=(count/927)*100 //all cancers
+gen totpercent=(count/585)*100 //all cancers excl. male(...)
+gen alltotpercent=(count/1209)*100 //all cancers
 /*
-siteiarc	        	count	percentage	totpercent	alltotpercent
-Breast (C50)	    	155	  53.26	    	33.54978		16.7206
-Colon (C18)	        65	  22.34	    	14.06926		7.011866
-Corpus uteri (C54)	39	  13.40	    	8.441559		4.20712
-Cervix uteri (C53)	17	  5.84	    	3.679654		1.833873
-Rectum (C19-20)	    15	  5.15	    	3.246753		1.618123
 
 */
-total count //291
+total count //
 restore
 
 ** FEMALE - using IARC's site groupings (incl. in-situ)
 preserve
-drop if sex==1 //465 obs deleted
-drop if siteiarc==61 //22 obs deleted
+drop if sex==1 // deleted
+drop if (siteiarc==25|siteiarc>60) & siteiarc!=64 // deleted
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag5=(_n==1)
 replace tag5 = sum(tag5)
@@ -269,25 +231,20 @@ contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
 gsort -count
 drop top5
 
-gen totpercent=(count/462)*100 //all cancers excl. male(465)
-gen alltotpercent=(count/927)*100 //all cancers
+gen totpercent=(count/585)*100 //all cancers excl. male(...)
+gen alltotpercent=(count/1209)*100 //all cancers
 /*
-siteiarc						count	percentage	totpercent	alltotpercent
-Breast (C50)				155		51.67				33.54978		16.7206
-Colon (C18)					65		21.67				14.06926		7.011866
-Corpus uteri (C54)	39		13.00				8.441559		4.20712
-D069: CIN 3					24		8.00				5.194805		2.588997
-Cervix uteri (C53)	17		5.67				3.679654		1.833873
+
 */
-total count //300
+total count //
 restore
 
-** For annual report - Section 1: Incidence - Table 1
+** For annual report - Section 1: Incidence - Table 1 (NOT USING IN TABLE AS USING 2014 TOP 5)
 ** Below top 5 code added by JC for 2014
 ** MALE - using IARC's site groupings
 preserve
-drop if sex==2 //462 obs deleted
-drop if siteiarc==61|siteiarc==64 //23 obs deleted
+drop if sex==2 // deleted
+drop if siteiarc==25|siteiarc>60 // deleted
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag5=(_n==1)
 replace tag5 = sum(tag5)
@@ -301,17 +258,12 @@ contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
 gsort -count
 drop top5
 
-gen totpercent=(count/465)*100 //all cancers excl. female(462)
-gen alltotpercent=(count/927)*100 //all cancers
+gen totpercent=(count/624)*100 //all cancers excl. female(...)
+gen alltotpercent=(count/1209)*100 //all cancers
 /*
-siteiarc	                                	count	percentage	totpercent	alltotpercent
-Prostate (C61)	                            198	  66.89	    	42.58065		21.35922
-Colon (C18)	                                49	  16.55	    	10.53763		5.285868
-Lung (incl. trachea and bronchus) (C33-34)	19	  6.42	    	4.086021		2.049623
-Multiple myeloma (C90)	                    15	  5.07	    	3.225806		1.618123
-Bladder (C67)	                            	15	  5.07	    	3.225806		1.618123
+
 */
-total count //296
+total count //
 restore
 
 
@@ -331,6 +283,7 @@ label define sex_lab 1 "female" 2 "male"
 label values sex sex_lab
 tab sex ,m
 
+
 ********************************************************************
 * (2.4c) IR age-standardised to WHO world popn - ALL TUMOURS
 ********************************************************************
@@ -339,19 +292,46 @@ tab siteiarc ,m
 
 drop _merge
 merge m:m sex age_10 using "`datapath'\version01\2-working\bb2010_10-2"
-drop if _merge==2
-** There are 2 unmatched records (_merge==2) since 2013 data doesn't have any cases of males with age range 0-14 or 15-24
-**	age_10	site  dup	sex	 pfu	age45	age55	pop_bb	_merge
-**  0-14	  .     .	male   .	0-44	0-54	28005	using only (2)
-** 15-24	  .     .	male   .	0-44	0-54	18510	using only (2)
+/*
+
+*/
+** No unmatched records
 
 tab pop age_10  if sex==1 //female
 tab pop age_10  if sex==2 //male
 
 
+** Next, IRs for all tumours excl. non-reportable skin cancers but include CIN 3 to match 2014 case definition
+** THIS USED FOR 2014 ANNUAL REPORT TABLE ES1.
+preserve
+	drop if age_10==.
+	drop if beh!=3 & siteiarc!=64 // deleted
+    drop if siteiarc==25 // deleted
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** No missing age groups
+		
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bb
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) saving(ASR63,replace) format(%8.2f)
+** THIS IS FOR ALL SITES (INVASIVE TUMOURS ONLY) - STD TO WHO WORLD POPN 
+/*
+
+*/
+restore
+
+
 ** Next, IRs for all tumours
+** Not used for 2014 ANNUAL REPORT TABLE ES1.
 tab pop age_10
 tab age_10 ,m //none missing
+
 preserve
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
 	sort age sex
@@ -366,30 +346,20 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR ALL TUMOURS - STD TO WHO WORLD POPN 
 /*
-  +-------------------------------------------------------------+
-  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
-  |-------------------------------------------------------------|
-  |  927   277814   333.68    236.74   221.29   253.03     8.02 |
-  +-------------------------------------------------------------+
+
 */
 restore
 
+
 ** Next, IRs for invasive tumours only
+** Not used for 2014 ANNUAL REPORT TABLE ES1.
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 // deleted
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
 	sort age sex
-	** now we have to add in the cases and popns for the missings: F 15-24
-	** JC: I had to change the obsID so that the replacements could take place as the
-	** dataset stopped at obsID when the above code was run
-	expand 2 in 1
-	replace sex=1 in 18
-	replace age_10=2 in 18
-	replace case=0 in 18
-	replace pop_bb=(18530) in 18
-	sort age_10	
+	** No missing age groups/cases
 		
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
@@ -401,20 +371,20 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
 		         stand(age_10) popstand(pop) mult(100000) saving(ASR63,replace) format(%8.2f)
 ** THIS IS FOR ALL SITES (INVASIVE TUMOURS ONLY) - STD TO WHO WORLD POPN 
 /*
-  +-------------------------------------------------------------+
-  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
-  |-------------------------------------------------------------|
-  |  903   277814   325.04    228.51   213.42   244.44     7.84 |
-  +-------------------------------------------------------------+
+
 */
 restore
 
-** Next, IRs by sex
+** Next, IRs by sex excl. non-reportable skin cancers but include CIN 3 to match 2014 case definition
+** Not used for 2014 ANNUAL REPORT TABLE ES1.
 ** for all women
 tab pop age_10
 tab pop age_10 if sex==1 //female
 preserve
 	drop if age_10==.
+    drop if beh!=3 & siteiarc!=64 // deleted
+    drop if siteiarc==25 // deleted
+    tab sex ,m
 	keep if (sex==1) // women only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -429,19 +399,20 @@ total pop_bb
 distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR ALL TUMOURS (WOMEN) - STD TO WHO WORLD POPN 
-/*  +-------------------------------------------------------------+
-  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
-  |-------------------------------------------------------------|
-  |  462   144803   319.05    218.45   198.06   240.45    10.67 |
-  +-------------------------------------------------------------+
+/*
+
 */
 restore
 
-** for all men
+** for all men excl. non-reportable skin cancers but include CIN 3 to match 2014 case definition
+** Not used for 2014 ANNUAL REPORT TABLE ES1.
 tab pop age_10
 tab pop age_10 if sex==2 //male
 preserve
 	drop if age_10==.
+    drop if beh!=3 & siteiarc!=64 // deleted
+    drop if siteiarc==25 // deleted
+    tab sex ,m
 	keep if (sex==2) // men only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -457,11 +428,7 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR ALL TUMOURS (MEN) - STD TO WHO WORLD POPN 
 /*
-  +-------------------------------------------------------------+
-  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
-  |-------------------------------------------------------------|
-  |  465   133011   349.60    265.72   241.81   291.44    12.50 |
-  +-------------------------------------------------------------+
+
 */
 restore
 
@@ -474,7 +441,7 @@ tab pop_bb age_10 if siteiarc==39 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==39 // prostate only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -516,7 +483,7 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
   +-------------------------------------------------------------+
   | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
   |-------------------------------------------------------------|
-  |  198   133011   148.86    111.54    96.42   128.48     8.03 |
+  |  204   133011   153.37    113.22    98.08   130.15     8.03 |
   +-------------------------------------------------------------+
 */
 restore
@@ -528,7 +495,7 @@ tab pop age_10  if siteiarc==29 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==29 // breast only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -625,7 +592,7 @@ restore
 ** BREAST - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==29 // breast only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -717,7 +684,7 @@ restore
 ** BREAST - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==29 // breast only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -816,7 +783,7 @@ tab pop age_10  if siteiarc==13 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==13
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -872,7 +839,7 @@ restore
 ** COLON - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==13
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -929,7 +896,7 @@ restore
 ** COLON - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==13
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -989,7 +956,7 @@ tab pop_bb age_10 if siteiarc==33 //female
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==33 // corpus uteri only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1042,7 +1009,7 @@ tab pop age_10 if siteiarc==21 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==21
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1141,7 +1108,7 @@ restore
 ** LUNG - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==21
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1241,7 +1208,7 @@ restore
 ** LUNG - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==21
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1339,13 +1306,13 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
 restore
 
 
-** CERVIX UTERI - excl. CIN 3
+** CERVIX UTERI
 tab pop_bb age_10 if siteiarc==32 //female
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
-	keep if siteiarc==32 // corpus uteri only
+	drop if beh!=3 //102 deleted
+	keep if siteiarc==32 // cervix uteri only
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
 	sort age sex
@@ -1426,7 +1393,7 @@ tab pop age_10  if siteiarc==14 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==14
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1512,7 +1479,7 @@ restore
 ** RECTUM - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==14
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1600,7 +1567,7 @@ restore
 ** RECTUM - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==14
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1691,7 +1658,7 @@ tab pop age_10 if siteiarc==55 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==55
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1778,7 +1745,7 @@ restore
 ** MULTIPLE MYELOMA - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==55
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1867,7 +1834,7 @@ restore
 ** MULTIPLE MYELOMA - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==55
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -1960,7 +1927,7 @@ tab pop age_10  if siteiarc==45 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==45
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2053,7 +2020,7 @@ restore
 ** BLADDER - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==45
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2148,7 +2115,7 @@ restore
 ** BLADDER - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==45
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2246,7 +2213,7 @@ tab pop age_10  if siteiarc==18 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==18
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2354,7 +2321,7 @@ restore
 ** PANCREAS - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==18
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2464,7 +2431,7 @@ restore
 ** PANCREAS - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==18
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2577,7 +2544,7 @@ tab pop age_10  if siteiarc==11 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==11
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2670,7 +2637,7 @@ restore
 ** STOMACH - female only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==11
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2765,7 +2732,7 @@ restore
 ** STOMACH - male only
 preserve
 	drop if age_10==.
-	drop if beh!=3 //24 obs deleted
+	drop if beh!=3 //102 deleted
 	keep if siteiarc==11
 	
 	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
@@ -2911,7 +2878,7 @@ tab beh if patient==1 ,m
 count if siteiarc>12 & siteiarc<16 //144
 
 
-** Save this new dataset without population data
-label data "2014 BNR-Cancer analysed data - Sites"
-note: TS This dataset does NOT include population data 
-save "`datapath'\version01\2-working\2014_cancer_sites_da", replace
+** Save this new dataset without population data 
+save "`datapath'\version01\2-working\2008_cancer_sites_da_v01", replace
+label data "2008 BNR-Cancer analysed data - Sites"
+note: TS This dataset does NOT include population data

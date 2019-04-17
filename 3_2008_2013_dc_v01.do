@@ -772,6 +772,21 @@ drop nrn
 drop if pid=="20130338" & deathidold==. //1 deleted
 drop deathidold
 
+** Check for unknown age/sex
+tab sex ,m
+/*
+        Sex |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       Male |      1,051       50.80       50.80
+     Female |      1,017       49.15       99.95
+    Unknown |          1        0.05      100.00
+------------+-----------------------------------
+      Total |      2,069      100.00
+*/
+//list pid deaithid fname lname natregno primarysite if sex==9
+replace sex=2 if pid=="20081131" //1 change
+count if age==.|age==999 //0
+
 count //2,069
 
 ** Check icd10, top, morph not missing
@@ -973,15 +988,23 @@ count //2,069
 
 ** Remove all ineligible cases and cases dx in 2014 onwards as 2014 cases already cleaned
 ** pre-2014 cases are to be cleaned
-count if recstatus==3 //0
+count if siteiarc==25 & recstatus!=3 & dxyr!=2008 //1
+//list pid fname lname if siteiarc==25 & recstatus!=3 & dxyr!=2008
+replace recstatus=3 if pid=="20130253" //1 change
+count if beh!=2 & beh!=3 //2
+//list pid fname lname if beh!=2 & beh!=3
+replace recstatus=3 if pid=="20130526" //1 change
+replace recstatus=3 if pid=="20130224" //1 change
+count if recstatus==3 //3
 //list pid deathid dot top morph if recstatus==3
+drop if recstatus==3 //3 deleted
 
 count if dxyr==. //0
 count if dxyr!=2008 & dxyr!=2013 //12
 //list pid deathid dot dxyr if dxyr!=2008 & dxyr!=2013
 drop if dxyr!=2008 & dxyr!=2013 //12 deleted
 
-count //2,057
+count //2,054
 
 ** Put variables in order you want them to appear
 order pid fname lname init age sex dob natregno resident slc dlc ///
