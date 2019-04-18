@@ -37,7 +37,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\10_rx_outcomes_2014_da.smcl", replace
+    log using "`logpath'\11_mort_2014_da.smcl", replace
 ** HEADER -----------------------------------------------------
 
 ** Load the dataset

@@ -112,6 +112,69 @@ Stomach (C16)																21	2.98
 total count //705
 restore
 
+** All sites excl. O&U, non-reportable skin cancers - using IARC CI5's site groupings COMBINE cervix & CIN 3
+** THIS USED IN ANNUAL REPORT TABLE 1 - CHECKING WHERE IN LIST 2014 TOP 10 APPEARS IN LIST FOR 2008
+** This list requested by NS in similar format to CMO's report for top 10 comparisons with current & previous years
+** Screenshot this data from Stata data editor into annual report tables document.
+preserve
+drop if (siteiarc==25|siteiarc>60) & siteiarc!=64 //45 deleted
+replace siteiarc=32 if siteiarc==32|siteiarc==64 //24 changes
+tab siteiarc ,m
+contract siteiarc, freq(count) percent(percentage)
+gsort -count
+/*
+siteiarc	count	percentage
+Prostate (C61)	198	22.45
+Breast (C50)	159	18.03
+Colon (C18)	114	12.93
+Cervix uteri (C53)	41	4.65
+Corpus uteri (C54)	39	4.42
+Lung (incl. trachea and bronchus) (C33-34)	32	3.63
+Rectum (C19-20)	28	3.17
+Multiple myeloma (C90)	28	3.17
+Bladder (C67)	24	2.72
+Stomach (C16)	21	2.38
+Pancreas (C25)	21	2.38
+Non-Hodgkin lymphoma (C82-86,C96)	16	1.81
+Liver (C22)	13	1.47
+Thyroid (C73)	11	1.25
+Kidney (C64)	11	1.25
+Oesophagus (C15)	9	1.02
+Larynx (C32)	9	1.02
+Gallbladder etc. (C23-24)	9	1.02
+Ovary (C56)	8	0.91
+Melanoma of skin (C43)	7	0.79
+Connective and soft tissue (C47+C49)	7	0.79
+Lymphoid leukaemia (C91)	7	0.79
+Brain, nervous system (C70-72)	6	0.68
+Tonsil (C09)	5	0.57
+Small intestine (C17)	5	0.57
+Nose, sinuses etc. (C30-31)	5	0.57
+Myeloid leukaemia (C92-94)	5	0.57
+Tongue (C01-02)	4	0.45
+Hypopharynx (C12-13)	4	0.45
+Myeloproliferative disorders (MPD)	3	0.34
+Nasopharynx (C11)	3	0.34
+Leukaemia unspecified (C95)	3	0.34
+Penis (C60)	3	0.34
+Other oropharynx (C10)	3	0.34
+Anus (C21)	2	0.23
+Testis (C62)	2	0.23
+Mouth (C03-06)	2	0.23
+Vagina (C52)	2	0.23
+Vulva (C51)	2	0.23
+Hodgkin lymphoma (C81)	2	0.23
+Bone (C40-41)	2	0.23
+Mesothelioma (C45)	2	0.23
+Myelodysplastic syndromes (MDS)	1	0.11
+Salivary gland (C07-08)	1	0.11
+Other endocrine (C75)	1	0.11
+Uterus unspecified (C55)	1	0.11
+Immunoproliferative diseases (C88)	1	0.11
+*/
+total count //882
+restore
+
 ** All sites excl. O&U, insitu, non-reportable skin cancers - using IARC CI5's site groupings
 preserve
 drop if siteiarc==25|siteiarc==61|siteiarc==64 //69 obs deleted
@@ -535,7 +598,7 @@ preserve
 	sort age sex
 	** now we have to add in the cases and popns for the missings: 
 	** M&F 0-14, 15-24
-	** M 25-34, 35-44, 55-74, 75-84, 85+
+	** M 25-34, 35-44, 55-64, 75-84, 85+
 	expand 2 in 1
 	replace sex=1 in 10
 	replace age_10=1 in 10
@@ -1383,7 +1446,7 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
 restore
 
 
-** CERVIX UTERI - incl. CIN 3
+** CERVIX UTERI - incl. CIN 3 (THIS USED IN ANN RPT TABLE 2b)
 tab pop_bb age_10 if siteiarc==32|siteiarc==64 //female
 
 preserve
@@ -2853,6 +2916,207 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
   |   13   133011    9.77      6.89     3.62    12.11     2.06 |
+  +------------------------------------------------------------+
+*/
+restore
+
+** NON-HODGKIN LYMPHOMA 
+tab pop age_10  if siteiarc==53 & sex==1 //female
+tab pop age_10  if siteiarc==53 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //24 obs deleted
+	keep if siteiarc==53
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,25-34
+	** F 	 15-24,45-54,55-64,65-74
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=1 in 11
+	replace case=0 in 11
+	replace pop_bb=(26755) in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age_10=1 in 12
+	replace case=0 in 12
+	replace pop_bb=(28005) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=2 in 13
+	replace case=0 in 13
+	replace pop_bb=(18530) in 13
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=3 in 14
+	replace case=0 in 14
+	replace pop_bb=(19410) in 14
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=3 in 15
+	replace case=0 in 15
+	replace pop_bb=(18465) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=5 in 16
+	replace case=0 in 16
+	replace pop_bb=(21945) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=6 in 17
+	replace case=0 in 17
+	replace pop_bb=(15940) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age_10=7 in 18
+	replace case=0 in 18
+	replace pop_bb=(10515) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bb
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR NHL (M&F)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   16   277814    5.76      4.11     2.28     6.88     1.12 |
+  +------------------------------------------------------------+
+*/
+restore
+
+** KIDNEY 
+tab pop age_10  if siteiarc==42 & sex==1 //female
+tab pop age_10  if siteiarc==42 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //24 obs deleted
+	keep if siteiarc==42
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24,25-34,35-44
+	** F 	 45-54
+	** M	 75-84,85+
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=1 in 8
+	replace case=0 in 8
+	replace pop_bb=(26755) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 9
+	replace age_10=1 in 9
+	replace case=0 in 9
+	replace pop_bb=(28005) in 9
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 10
+	replace age_10=2 in 10
+	replace case=0 in 10
+	replace pop_bb=(18530) in 10
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 11
+	replace age_10=2 in 11
+	replace case=0 in 11
+	replace pop_bb=(18510)  in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 12
+	replace age_10=3 in 12
+	replace case=0 in 12
+	replace pop_bb=(19410) in 12
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 13
+	replace age_10=3 in 13
+	replace case=0 in 13
+	replace pop_bb=(18465) in 13
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=4 in 14
+	replace case=0 in 14
+	replace pop_bb=(21080) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=4 in 15
+	replace case=0 in 15
+	replace pop_bb=(19550) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=5 in 16
+	replace case=0 in 16
+	replace pop_bb=(21945) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=8 in 17
+	replace case=0 in 17
+	replace pop_bb=(4835) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=9 in 18
+	replace case=0 in 18
+	replace pop_bb=(1666) in 18
+	sort age_10
+	
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bb
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR KIDNEY CANCER (M&F)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   11   277814    3.96      2.80     1.38     5.16     0.92 |
   +------------------------------------------------------------+
 */
 restore

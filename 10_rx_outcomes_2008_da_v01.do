@@ -1,19 +1,19 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			10_rx_outcomes_2014_da.do
+    //  algorithm name			10_rx_outcomes_2008_da_v01.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
-    //  date first created         28-MAR-2019
-    // 	date last modified	     28-MAR-2019
+    //  date first created         18-APR-2019
+    // 	date last modified	     18-APR-2019
     //  algorithm task			Generate stats for:
     //                             Routine medication (not applicable to 2014 data)
-    //						Outcomes
+    //						    Outcomes
     //							  - % deaths - overall deaths as % and by year
     // 							  - Survival analysis to 3 years
     //								(correct survival in dofile 8)
     //							  - % deaths by main sites & cancer vs non-cancer deaths
-    //  status                  Completed
-    //  objectve                To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
+    //  status                     Completed
+    //  objectve                   To have one dataset with cleaned, grouped and analysed 2008 data for 2014 cancer report.
 
     ** DO FILE BASED ON
     * AMC Rose code for BNR Cancer 2008 annual report
@@ -39,11 +39,11 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\10_rx_outcomes_2014_da.smcl", replace
+    log using "`logpath'\10_rx_outcomes_2008_da_v01.smcl", replace
 ** HEADER -----------------------------------------------------
 
 ** Load the dataset
-use "`datapath'\version01\2-working\2014_cancer_numbers_da", replace
+use "`datapath'\version01\2-working\2008_cancer_numbers_da_v01", replace
 
 ************************************************
 ** 4.2 overall deaths as % and by year
@@ -53,48 +53,54 @@ use "`datapath'\version01\2-working\2014_cancer_numbers_da", replace
 ** so if we did an MR or ASMR it would be an underestimate; that will come after
 ** several years of the registry
 
+count //1,209
+
+** Remove non-reportable skin cancers but include CIN 3 to match 2014 case definition
+drop if beh!=3 & siteiarc!=64 //68 deleted
+drop if siteiarc==25 //303 deleted
+
+count //838
+
 tab slc ,m
 /*
 StatusLastC |
      ontact |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-      Alive |        422       45.52       45.52
-   Deceased |        500       53.94       99.46
-    Unknown |          5        0.54      100.00
+      Alive |        281       33.53       33.53
+   Deceased |        557       66.47      100.00
 ------------+-----------------------------------
-      Total |        927      100.00
+      Total |        838      100.00
 */
 tab deceased ,m
 /*
    whether patient is |
              deceased |      Freq.     Percent        Cum.
 ----------------------+-----------------------------------
-                 dead |        500       53.94       53.94
-alive at last contact |        427       46.06      100.00
+                 dead |        557       66.47       66.47
+alive at last contact |        281       33.53      100.00
 ----------------------+-----------------------------------
-                Total |        927      100.00
+                Total |        838      100.00
 */
 
 ** Now we restrict to patients only (as we are dealing with deaths)
-drop if patient==2 //15 obs deleted
-count //912
+drop if patient==2 //9 deleted
+count //829
 
 sort dot dod
-list dot dod basis
-tab dod ,m //424 missing
-count if dod!=. //488
+//list dot dod basis
+tab dod ,m // missing
+count if dod!=. //552
 
 tab deceased ,m
 /*
-   whether patient is |
+  whether patient is |
              deceased |      Freq.     Percent        Cum.
 ----------------------+-----------------------------------
-                 dead |        488       53.51       53.51
-alive at last contact |        424       46.49      100.00
+                 dead |        552       66.59       66.59
+alive at last contact |        277       33.41      100.00
 ----------------------+-----------------------------------
-                Total |        912      100.00
+                Total |        829      100.00
 */
-
 
 tab beh  deceased  ,m
 /*
@@ -102,55 +108,68 @@ tab beh  deceased  ,m
            |       deceased
  Behaviour |      dead  alive at  |     Total
 -----------+----------------------+----------
-   In situ |         0         23 |        23 
- Malignant |       488        401 |       889 
+   In situ |         2         32 |        34 
+ Malignant |       550        245 |       795 
 -----------+----------------------+----------
-     Total |       488        424 |       912 
+     Total |       552        277 |       829
 */
 
+rename deathyear dodyear
 tab dodyear ,m
 
 tab dodyear beh ,m
 /*
-   Year of |       Behaviour
-     death |   In situ  Malignant |     Total
+           |       Behaviour
+   dodyear |   In situ  Malignant |     Total
 -----------+----------------------+----------
-      2014 |         0        303 |       303 
-      2015 |         0        101 |       101 
-      2016 |         0         54 |        54 
-      2017 |         0         30 |        30 
-         . |        23        401 |       424 
+      2008 |         0        232 |       232 
+      2009 |         0        104 |       104 
+      2010 |         0         54 |        54 
+      2011 |         1         37 |        38 
+      2012 |         0         27 |        27 
+      2013 |         0         26 |        26 
+      2014 |         0         20 |        20 
+      2015 |         1         19 |        20 
+      2016 |         0         17 |        17 
+      2017 |         0         14 |        14 
+         . |        32        245 |       277 
 -----------+----------------------+----------
-     Total |        23        889 |       912 
+     Total |        34        795 |       829
 */
 
 tab dodyear deceased ,m
 tab dodyear deceased if siteiarc!=25 ,m
 /*
            |  whether patient is
-   Year of |       deceased
-     death |      dead  alive at  |     Total
+           |       deceased
+   dodyear |      dead  alive at  |     Total
 -----------+----------------------+----------
-      2014 |       303          0 |       303 
-      2015 |       101          0 |       101 
-      2016 |        54          0 |        54 
-      2017 |        30          0 |        30 
-         . |         0        424 |       424 
+      2008 |       232          0 |       232 
+      2009 |       104          0 |       104 
+      2010 |        54          0 |        54 
+      2011 |        38          0 |        38 
+      2012 |        27          0 |        27 
+      2013 |        26          0 |        26 
+      2014 |        20          0 |        20 
+      2015 |        20          0 |        20 
+      2016 |        17          0 |        17 
+      2017 |        14          0 |        14 
+         . |         0        277 |       277 
 -----------+----------------------+----------
-     Total |       488        424 |       912 
+     Total |       552        277 |       829
 */
 
 
-** 303 died in 2014 - JC: only do 2014-2017 as 2018 was incomplete
-cii proportions 921 303
-dis 912-(488+1) // by 3yrs from dx (i.e. up to 31dec2017) 488 had died
-cii proportions 912 101
-cii proportions 912 54
-cii proportions 912 30
+** 232 died in 2008 - JC: only do 2014-2017 as 2018 was incomplete
+cii proportions 829 232
+dis 829-(428+1) // by 3yrs from dx (i.e. up to 31dec2011) 428 had died
+cii proportions 829 104
+cii proportions 829 54
+cii proportions 829 38
 
-count if dodyear!=. //488
-list dod slc pid if dodyear==. & deceased!=. & slc==2
-** none missing dod.
+count if dodyear!=. //552
+//list dod slc pid if dodyear==. & deceased!=. & slc==2
+** none missing dod
  
 tab siteiarc deceased ,m
 
@@ -160,38 +179,9 @@ tab siteiarc deceased ,m
 *********************************************
 
 ** Check for top 10 deaths by IARC site
-** include O&U; exclude in-situ
-preserve
-drop if siteiarc==64|deceased!=1 //424 obs deleted
-bysort siteiarc: gen n=_N
-bysort n siteiarc: gen tag=(_n==1)
-replace tag = sum(tag)
-sum tag , meanonly
-gen top10 = (tag>=(`r(max)'-9))
-sum n if tag==(`r(max)'-9), meanonly
-replace top10 = 1 if n==`r(max)'
-tab siteiarc top10 if top10!=0
-contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
-gsort -count
-drop top10 percentage
-/*
-siteiarc									count
-Colon (C18)									67
-Prostate (C61)								67
-Breast (C50)								53
-Other and unspecified (O&U)					44
-Lung (incl. trachea and bronchus) (C33-34)	28
-Corpus uteri (C54)							23
-Multiple myeloma (C90)						20
-Pancreas (C25)								20
-Rectum (C19-20)								20
-Stomach (C16)								17
-*/
-restore
-
 ** exclude O&U and in-situ
 preserve
-drop if siteiarc==61|siteiarc==64|deceased!=1 //468 obs deleted
+drop if (siteiarc==25|siteiarc>60)|deceased!=1 //311 deleted
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag=(_n==1)
 replace tag = sum(tag)
@@ -204,272 +194,177 @@ contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
 gsort -count
 drop top10 percentage
 /*
-siteiarc									count
-Prostate (C61)								67
-Colon (C18)									67
-Breast (C50)								53
-Lung (incl. trachea and bronchus) (C33-34)	28
-Corpus uteri (C54)							23
-Pancreas (C25)								20
-Multiple myeloma (C90)						20
-Rectum (C19-20)								20
-Stomach (C16)								17
-Non-Hodgkin lymphoma (C82-86,C96)			14
+siteiarc	count
+Prostate (C61)	117
+Colon (C18)	76
+Breast (C50)	67
+Lung (incl. trachea and bronchus) (C33-34)	29
+Stomach (C16)	27
+Corpus uteri (C54)	25
+Rectum (C19-20)	19
+Multiple myeloma (C90)	16
+Pancreas (C25)	15
+Cervix uteri (C53)	13
 */
+total count //404
 restore
 
 
-** DEATHS OF THOSE WITH COLON CANCER - #1
-tab deceased if siteiarc==13 ,m
-sort dod
-tab dod if deceased==1 & siteiarc==13 ,m
-cii proportions 111 67
+** include O&U; exclude in-situ
+preserve
+drop if siteiarc==64|deceased!=1 //279 deleted
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag=(_n==1)
+replace tag = sum(tag)
+sum tag , meanonly
+gen top10 = (tag>=(`r(max)'-9))
+sum n if tag==(`r(max)'-9), meanonly
+replace top10 = 1 if n==`r(max)'
+tab siteiarc top10 if top10!=0
+contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
+gsort -count
+drop top10 percentage
+/*
+siteiarc	count
+Prostate (C61)	117
+Colon (C18)	76
+Breast (C50)	67
+Other and unspecified (O&U)	32
+Lung (incl. trachea and bronchus) (C33-34)	29
+Stomach (C16)	27
+Corpus uteri (C54)	25
+Rectum (C19-20)	19
+Multiple myeloma (C90)	16
+Pancreas (C25)	15
+*/
+total count //423
+restore
 		
 		
-** DEATHS OF THOSE WITH PROSTATE CANCER - #2
+** DEATHS OF THOSE WITH PROSTATE CANCER - #1
 tab deceased if siteiarc==39 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==39 ,m
-cii proportions 195 67
+//tab dod if deceased==1 & siteiarc==39 ,m
+cii proportions 203 117
 
+
+** DEATHS OF THOSE WITH COLON CANCER - #2
+tab deceased if siteiarc==13 ,m
+sort dod
+//tab dod if deceased==1 & siteiarc==13 ,m
+cii proportions 94 76
 
 ** DEATHS OF THOSE WITH BREAST CANCER - #3
 tab deceased if siteiarc==29 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==29 ,m
-cii proportions 157 53
+//tab dod if deceased==1 & siteiarc==29 ,m
+cii proportions 132 67
+
+
+** DEATHS OF THOSE WITH LUNG CANCER - #4
+tab deceased if siteiarc==21 ,m
+sort dod
+//tab dod if deceased==1 & siteiarc==21 ,m
+cii proportions 29 29
 
 
 ** DEATHS OF THOSE WITH O&U (ill-defined;unk siteiarc) - #4
 tab deceased if siteiarc==61 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==61 ,m
-cii proportions 45 44
+//tab dod if deceased==1 & siteiarc==61 ,m
+cii proportions 33 32
 
 
-** DEATHS OF THOSE WITH LUNG CANCER - #5
-tab deceased if siteiarc==21 ,m
+** DEATHS OF THOSE WITH STOMACH CANCER - #5
+tab deceased if siteiarc==11 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==21 ,m
-cii proportions 32 28
+//tab dod if deceased==1 & siteiarc==11 ,m
+cii proportions 32 27
 
 
 ** DEATHS OF THOSE WITH CORPUS UTERI CANCER - #6
 tab deceased if siteiarc==33 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==33 ,m
-cii proportions 39 23
+//tab dod if deceased==1 & siteiarc==33 ,m
+cii proportions 38 25
 
 
-** DEATHS OF THOSE WITH MULTIPLE MYELOMA - #7
-tab deceased if siteiarc==55 ,m
-sort dod
-tab dod if deceased==1 & siteiarc==55 ,m
-cii proportions 28 20
-
-			 
-** DEATHS OF THOSE WITH PANCREATIC CANCER - #8
-tab deceased if siteiarc==18 ,m
-sort dod
-tab dod if deceased==1 & siteiarc==18 ,m
-cii proportions 21 20
-
-
-** DEATHS OF THOSE WITH RECTAL CANCER - #9
+** DEATHS OF THOSE WITH RECTAL CANCER - #7
 tab deceased if siteiarc==14 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==14 ,m
-cii proportions 28 20
+//tab dod if deceased==1 & siteiarc==14 ,m
+cii proportions 28 19
 
 
-** DEATHS OF THOSE WITH STOMACH CANCER - #10
-tab deceased if siteiarc==11 ,m
+** DEATHS OF THOSE WITH MULTIPLE MYELOMA - #8
+tab deceased if siteiarc==55 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==11 ,m
-cii proportions 20 17
+//tab dod if deceased==1 & siteiarc==55 ,m
+cii proportions 17 16
 
-
-** DEATHS OF THOSE WITH NON-HODGKIN LYMPHOMA - #11
-tab deceased if siteiarc==53 ,m
+			 
+** DEATHS OF THOSE WITH PANCREATIC CANCER - #9
+tab deceased if siteiarc==18 ,m
 sort dod
-tab dod if deceased==1 & siteiarc==53 ,m
-cii proportions 16 14
+//tab dod if deceased==1 & siteiarc==18 ,m
+cii proportions 15 15
+
+
+** DEATHS OF THOSE WITH CERVIX UTERI CANCER - #10
+tab deceased if siteiarc==32 ,m
+sort dod
+//tab dod if deceased==1 & siteiarc==32 ,m
+cii proportions 19 13
+
+
+********************************************************************************
+** 4.4 Deaths - numbers and % by site and whether CoD cancer or not
+********************************************************************************
+tab cod ,m
+/*
+     COD categories |      Freq.     Percent        Cum.
+--------------------+-----------------------------------
+     Dead of cancer |        440       53.08       53.08
+Dead of other cause |        107       12.91       65.98
+          Not known |          5        0.60       66.59
+                  . |        277       33.41      100.00
+--------------------+-----------------------------------
+              Total |        829      100.00
+*/
+tab cod if deceased==1 & patient==1 ,m
+/*
+     COD categories |      Freq.     Percent        Cum.
+--------------------+-----------------------------------
+     Dead of cancer |        440       79.71       79.71
+Dead of other cause |        107       19.38       99.09
+          Not known |          5        0.91      100.00
+--------------------+-----------------------------------
+              Total |        552      100.00
+*/
+sort cod1a
+tab cod1a if deceased==1 & cod==. ,m
+tab cod if deceased==1,m
+
+tab cod if deceased==1 & patient==1 & dodyear<2009 ,m
+/*
+     COD categories |      Freq.     Percent        Cum.
+--------------------+-----------------------------------
+     Dead of cancer |        194       83.62       83.62
+Dead of other cause |         36       15.52       99.14
+          Not known |          2        0.86      100.00
+--------------------+-----------------------------------
+              Total |        232      100.00
+*/
+tab siteiarc if deceased==1 & patient==1 & dodyear<2009 & cod==1 ,m
+
+
+** Save this new dataset for graphs in dofile 12 
+save "`datapath'\version01\2-working\2008_cancer_rx_outcomes_da_v01", replace
+label data "2008 BNR-Cancer analysed data - Rx and Outcomes"
+note: TS This dataset does NOT include population data
 	
 
-
-****************************************************
-** Death Info for Top Deaths - Totals by site GROUPS
-****************************************************
-** Using CR5db groupings found in CI5 editorial tables
-gen sitecr5=.
-label define sitecr5_lab ///
-1 "Lip, oral cavity & pharynx (C00-14)" ///
-2 "Digestive organs (C15-26)" ///
-3 "Respiratory organs (C30-39)" ///
-4 "Bone, cartilage, melanoma (C40-43,45,47,49)" ///
-5 "Breast (C50)" ///
-6 "Female genital (C51-58)" ///
-7 "Male genital (C60-63)" ///
-8 "Urinary organs (C64-68)" ///
-9 "Eye, brain, thyroid etc (C69-75)" ///
-10 "Haematopoietic (C81-96)" ///
-11 "Other & unspecified (O&U)" ///
-12 "All sites but C44" ///
-13 "In-situ/CIN3 (D069)"
-label var sitecr5 "CR5 sites"
-label values sitecr5 sitecr5_lab
-
-replace sitecr5=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
-					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
-					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
-					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //22 changes
-replace sitecr5=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
-					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
-					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
-					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) //219 changes
-replace sitecr5=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32") ///
-					 |regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C35") ///
-					 |regexm(icd10,"C36")|regexm(icd10,"C37")|regexm(icd10,"C38") ///
-					 |regexm(icd10,"C39")) //46 changes
-replace sitecr5=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C42") ///
-					 |regexm(icd10,"C43")|regexm(icd10,"C45")|regexm(icd10,"C47") ///
-					 |regexm(icd10,"C49")) //17 changes
-replace sitecr5=5 if regexm(icd10,"C50") //157 changes
-replace sitecr5=6 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53") ///
-					 |regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56") ///
-					 |regexm(icd10,"C57")|regexm(icd10,"C58")) //68 changes
-replace sitecr5=7 if (regexm(icd10,"C60")|regexm(icd10,"C61")|regexm(icd10,"C62")|regexm(icd10,"C63")) //200 changes
-replace sitecr5=8 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66") ///
-					 |regexm(icd10,"C67")|regexm(icd10,"C68")) //33 changes
-replace sitecr5=9 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71") ///
-					 |regexm(icd10,"C72")|regexm(icd10,"C73")|regexm(icd10,"C74") ///
-					 |regexm(icd10,"C75")) //18 changes
-replace sitecr5=10 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
-					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
-					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
-					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
-					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95") ///
-					 |regexm(icd10,"C96")|siteiarc==59|siteiarc==60) //66 changes
-replace sitecr5=11 if siteiarc==61 //45 changes
-replace sitecr5=13 if siteiarc==64 //23 changes
-
-tab sitecr5 ,m
-list pid siteiarc if sitecr5==.
-
-tab siteiarchaem if sitecr5==10 ,m
-tab siteiarc if sitecr5==10 ,m
-
-** Check for top 10 deaths by CR5 site
-** include O&U; exclude in-situ
-preserve
-drop if sitecr5==13|deceased!=1 //424 obs deleted
-bysort sitecr5: gen n=_N
-bysort n sitecr5: gen tag=(_n==1)
-replace tag = sum(tag)
-sum tag , meanonly
-gen top10 = (tag>=(`r(max)'-9))
-sum n if tag==(`r(max)'-10), meanonly
-replace top10 = 1 if n==`r(max)'
-tab sitecr5 top10 if top10!=0
-contract sitecr5 top10 if top10!=0, freq(count) percent(percentage)
-gsort -count
-drop top10 percentage
 /*
-sitecr5											count
-Digestive organs (C15-26)						155
-Male genital (C60-63)							69
-Breast (C50)									53
-Haematopoietic (C81-96)							50
-Other & unspecified (O&U)						44
-Female genital (C51-58)							38
-Respiratory organs (C30-39)						36
-Urinary organs (C64-68)							15
-Lip, oral cavity & pharynx (C00-14)				13
-Bone, cartilage, melanoma (C40-43,45,47,49)		8
-Eye, brain, thyroid etc (C69-75)				7
-*/
-restore
-
-
-** DEATHS OF THOSE WITH ALL DIGESTIVE CANCERS - #1
-tab deceased if sitecr5==2 ,m
-sort dod
-tab dod if sitecr5==2 ,m
-cii proportions 217 155
-
-
-** DEATHS OF THOSE WITH ALL MALE-RELATED CANCERS - #2
-tab deceased if sitecr5==7 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==7 ,m
-cii proportions 200 69
-
-
-** DEATHS OF THOSE WITH BREAST CANCERS - #3
-tab deceased if sitecr5==5 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==5 ,m
-cii proportions 157 53
-
-
-** DEATHS OF THOSE WITH ALL LYMPH. & HAEM. CANCERS - #4
-tab deceased if sitecr5==10 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==10 ,m
-cii proportions 66 50
-
-
-** DEATHS OF THOSE WITH ALL O&U CANCERS - #5
-tab deceased if sitecr5==11 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==11 ,m
-cii proportions 45 44
-
-
-** DEATHS OF THOSE WITH ALL FEMALE-RELATED CANCERS - #6
-tab deceased if sitecr5==6 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==6 ,m
-cii proportions 68 38
-
-
-** DEATHS OF THOSE WITH ALL RESPIRATORY CANCERS - #7
-tab deceased if sitecr5==3 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==3 ,m
-cii proportions 46 36
-
-
-** DEATHS OF THOSE WITH ALL URINARY CANCERS - #8
-tab deceased if sitecr5==8 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==8 ,m
-cii proportions 33 15
-
-
-** DEATHS OF THOSE WITH ALL LIP/ORAL CAVITY/PHARYNGEAL CANCERS - #9
-tab deceased if sitecr5==1 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==1 ,m
-cii proportions 22 13
-
-
-** DEATHS OF THOSE WITH ALL BONE/CARTILAGE/MELANOMA CANCERS - #10
-tab deceased if sitecr5==4 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==4 ,m
-cii proportions 17 8
-
-
-** DEATHS OF THOSE WITH ALL EYE/BRAIN/THYROID CANCERS - #11
-tab deceased if sitecr5==9 ,m
-sort dod
-tab dod if deceased==1 & sitecr5==9 ,m
-cii proportions 18 7
-
-
-
 ********************************************************************************
 ** 4.3 Survival analysis - using the DIRECT METHOD
 ********************************************************************************
@@ -562,56 +457,13 @@ list fname lname dot dod deceased if deceased==1 & ((dod-dot)>((365)+1))
 ** For 2014, 404/912=44.3% died within 1yr of cancer dx
 restore
 
-
-********************************************************************************
-** 4.4 Deaths - numbers and % by site and whether CoD cancer or not
-********************************************************************************
-tab cod ,m
-/*
-     COD categories |      Freq.     Percent        Cum.
---------------------+-----------------------------------
-     Dead of cancer |        476       52.19       52.19
-Dead of other cause |         12        1.32       53.51
-                 NA |        424       46.49      100.00
---------------------+-----------------------------------
-              Total |        912      100.00
 */
-tab cod if deceased==1 & patient==1 ,m
-/*
-     COD categories |      Freq.     Percent        Cum.
---------------------+-----------------------------------
-     Dead of cancer |        476       97.54       97.54
-Dead of other cause |         12        2.46      100.00
---------------------+-----------------------------------
-              Total |        488      100.00
-*/
-sort cod1a
-tab cod1a if deceased==1 & cod==. ,m
-tab cod if deceased==1,m
-
-tab cod if deceased==1 & patient==1 & dodyear<2015 ,m
-/*
-     COD categories |      Freq.     Percent        Cum.
---------------------+-----------------------------------
-     Dead of cancer |        298       98.35       98.35
-Dead of other cause |          5        1.65      100.00
---------------------+-----------------------------------
-              Total |        303      100.00
-*/
-tab siteiarc if deceased==1 & patient==1 & dodyear<2015 & cod==1 ,m
-
-
-** Save this new dataset for graphs in dofile 12
-label data "2014 BNR-Cancer analysed data - Rx and Outcomes"
-note: TS This dataset does NOT include population data 
-save "`datapath'\version01\2-working\2014_cancer_rx_outcomes_da", replace
-
-
 
 **************************************
 ** 4.1 Treatment (all types)
 **************************************
-** JC 20dec2018: below treatment code disused for 2014 data as rx was not collected.
+** JC 20dec2018: below treatment code disused for 2014 data as rx was not collected and 
+** since this 2008 info for inclusion 2014 annual report - treatment not done.
 
 /*
 save "data\2013_updated_cancer_dataset_site", replace
