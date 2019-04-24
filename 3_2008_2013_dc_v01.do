@@ -1004,6 +1004,13 @@ count if dxyr!=2008 & dxyr!=2013 //12
 //list pid deathid dot dxyr if dxyr!=2008 & dxyr!=2013
 drop if dxyr!=2008 & dxyr!=2013 //12 deleted
 
+
+** Export deathid icd10 to use in dofile 6 for iarcsite variable as national deaths are not icd10 coded
+rename deathyear dodyear
+export_excel deathid topography morph ptrectot dodyear siteiarc siteiarchaem cr5id icd10 ///
+using "`datapath'\version01\2-working\2019-04-23_deaths_icd10.xlsx", firstrow(variables) nolabel replace
+
+
 count //2,054
 
 ** Put variables in order you want them to appear

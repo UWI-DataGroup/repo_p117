@@ -106,7 +106,6 @@ tab beh  deceased  ,m
      Total |       449        382 |       831 
 */
 
-rename deathyear dodyear
 tab dodyear ,m
 
 tab dodyear beh ,m

@@ -265,6 +265,7 @@ replace staging=4 if pid=="20130606" & regexm(cr5id, "T1") //1 change - found in
 replace primarysite="BREAST-UOQ" if pid=="20130620" & regexm(cr5id, "T1") //1 change - found incidentally when checking casestatus
 
 STOPPED HERE
+NB: 20080139 - change hx=HEPATOMA LIVER, morph=8170 (beh still=3)
 //checking tumour records=duplicate that it is a true duplicate (i.e. source info applies to same tumour vs multiple primary)
 
 
