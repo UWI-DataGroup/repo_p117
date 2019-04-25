@@ -787,6 +787,7 @@ replace site=25 if deathid==14295
 replace site=17 if deathid==1731
 //list deathid cod1a if site==17
 replace site=16 if deathid==12843
+replace site=18 if deathid==1593
 //list deathid cod1a if site==18
 //list deathid cod1a if site==19
 //list deathid cod1a if site==20
@@ -1007,7 +1008,7 @@ replace did="T2" if did=="" //6 changes
 replace did="T2" if deathid==1669 & icd10=="C341" //1 change
 replace did="T2" if deathid==13395 & icd10=="C160" //1 change
 replace did="T1" if deathid==13899 & icd10=="C340" //1 change
-replace did="T2" if deathid==13899 & icd10=="D473" //1 change
+replace did="T2" if deathid==13899 & icd10=="C946" //1 change
 
 
 tab did ,m
@@ -1047,68 +1048,31 @@ merge m:m deathid did using "`datapath'\version01\2-working\2008_2013_deaths_icd
 /* 
     Result                           # of obs.
     -----------------------------------------
-    not matched                           717
-        from master                       648  (_merge==1)
+    not matched                           718
+        from master                       649  (_merge==1)
         from using                         69  (_merge==2)
 
     matched                               420  (_merge==3)
     -----------------------------------------
 */
-count //1,137
+count //1,13
 
 ** Check 69 from using that did not merge - none to check after 2nd attempt
 //list deathid topography morph dodyear siteiarc1 siteiarchaem1 cr5id did icd10 if _merge==2
 //list cod1a if _merge==2
 
+count if cod1a=="" //69
+count if site==. //69
+//list deathid cod1a site icd10 if _merge==2
+drop if _merge==2 //69 deleted
+
 duplicates tag deathid, gen(unmatched)
 sort deathid did cr5id
 
-** Assign topography and icd10 codes to unmatched/unmerged deaths that are MPs
-** Assign morphology and icd10 codes to haem & lymph. cancers for unmatched deaths that are MPs 
-**(use excel '2018-12-05_iarccrg_icd10_conversion code.xlsx' in raw data to filter by top to assign icd10)
-//list deathid did topography morph cr5id site icd10 if unmatched>0 & icd10=="" ,sepby(deathid)
-//list cod1a if unmatched>0 & icd10==""
+** deathid 13899 duplicated T1 when merged so drop cr5id=T2S1
+list deathid did cr5id if unmatched>0 ,sepby(deathid)
+drop if deathid==13899 & cr5id=="T2S1" //1 deleted
 
-replace icd10="C539" if deathid==956 & did=="T1" //1 change
-replace icd10="C679" if deathid==956 & did=="T2" //1 change
-
-replace icd10="C509" if deathid==1669 & did=="T1" //1 change
-replace icd10="C341" if deathid==1669 & did=="T2" //0 changes
-
-replace icd10="C099" if deathid==1675 & did=="T1" //1 change
-replace icd10="C051" if deathid==1675 & did=="T2" //1 change
-
-replace icd10="C051" if deathid==2358 & did=="T1" //1 change
-replace icd10="C320" if deathid==2358 & did=="T2" //1 change
-
-replace icd10="C509" if deathid==12474 & did=="T1" //1 change
-replace icd10="C541" if deathid==12474 & did=="T2" //1 change
-
-replace icd10="C921" if deathid==13018 & did=="T1" //0 changes
-replace icd10="C61" if deathid==13018 & did=="T2" //1 change
-
-replace icd10="C61" if deathid==13395 & did=="T1" //1 change
-replace icd10="C160" if deathid==13395 & did=="T2" //0 changes
-
-replace icd10="C61" if deathid==13476 & did=="T1" //1 change
-replace icd10="C189" if deathid==13476 & did=="T2" //1 change
-
-replace icd10="C259" if deathid==13633 & did=="T1" //0 changes
-replace icd10="C900" if deathid==13633 & did=="T2" //1 change
-
-replace icd10="C55" if deathid==13793 & did=="T1" //1 change
-replace icd10="C509" if deathid==13793 & did=="T2" //1 change
-
-replace icd10="C220" if deathid==13920 & did=="T1" //0 changes
-replace icd10="C61" if deathid==13920 & did=="T2" //1 change
-
-replace icd10="C23" if deathid==14269 & did=="T1" //0 changes
-replace icd10="C259" if deathid==14269 & did=="T2" //1 change
-
-replace icd10="C859" if deathid==14288 & did=="T1" //1 change
-replace icd10="C61" if deathid==14288 & did=="T2" //1 change
-
-STOPPED HERE
 ** Now check how many missing topography codes 
 tab topography ,m
 tab morph ,m
@@ -1118,225 +1082,349 @@ tab icd10 ,m
 
 ** Assign topography codes unmatched/unmerged deaths
 sort deathid did
-count if icd10=="" //229
+count if icd10=="" //649
+count if topography==. //649
+count if morph==. //649
 //list deathid did site if icd10==""
 //list cod1a if icd10==""
+count if topography==. & icd!="" //0
+//list deathid did icd10 site if topography==. & icd!=""
+
 
 replace topography=29 if (regexm(cod1a,"TONGUE") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"TONGUE") & regexm(cod1a,"CANCER") & icd10=="")
-** 1 change
-replace topography=119 if (regexm(cod1a,"NASOPHARYNX") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"NASOPHARYNX") & regexm(cod1a,"CANCER") & icd10=="")
-** 1 change
-replace topography=169 if (regexm(cod1a,"CANCER STOMATCH")|regexm(cod1a,"OMA OF STOMACH")|regexm(cod1a,"OMA OF THE STOMACH")|regexm(cod1a,"GASTRIC CARCIN")|regexm(cod1a,"GASTRIC CANCER")) & icd10==""
-** 2 changes
+//2 changes
+replace topography=79 if (regexm(cod1a,"PAROTID") & regexm(cod1a,"GLAND") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"PAROTID") & regexm(cod1a,"GLAND") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"PAROTIS") & regexm(cod1a,"GLAND") & regexm(cod1a,"CANCER") & icd10=="")
+//2 changes
+replace topography=99 if (regexm(cod1a,"TONSIL") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"TONSIL") & regexm(cod1a,"CANCER") & icd10=="")
+//4 changes
+replace topography=119 if (regexm(cod1a,"NASOPHARYNX") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"NASOPHARYNX") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"OMA OF THE NASOPHARNYX") & icd10=="")
+//1 change
+replace topography=139 if (regexm(cod1a,"HYPOPHARYNX") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"HYPOPHARYNX") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"OMA OF THE HYPOPHARNYX") & icd10=="")
+//2 changes
+replace topography=140 if (regexm(cod1a,"THROAT") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"THROAT") & regexm(cod1a,"CANCER") & icd10=="")
+//1 change
+replace topography=159 if (regexm(cod1a,"CANCER OESOPHAGUS")|regexm(cod1a,"CANCER OF THE OESOPHAGUS")|regexm(cod1a,"OMA OF OESOPHAGUS")|regexm(cod1a,"OMA OF THE OESOPHAGUS")|regexm(cod1a,"ESOPHAGEAL CARCIN")|regexm(cod1a,"ESOPHAGEAL CANCER")|regexm(cod1a,"ESOPHAGAL CANCER")) & icd10==""
+//3 changes
+replace topography=160 if (regexm(cod1a,"OMA OF GASTRO") & regexm(cod1a,"JUNCTION") & regexm(cod1a,"PHAGEAL")  & icd10=="")
+//1 change
+replace topography=169 if (regexm(cod1a,"CANCER STOMACH")|regexm(cod1a,"CANCER OF STOMACH")|regexm(cod1a,"CANCER OF THE STOMACH")|regexm(cod1a,"OMA OF STOMACH")|regexm(cod1a,"OMA OF THE STOMACH")|regexm(cod1a,"GASTRIC CARCIN")|regexm(cod1a,"GASTRIC ADENOCARCIN")|regexm(cod1a,"GASTRIC CANCER")) & icd10==""
+//20 changes
+replace topography=171 if (regexm(cod1a,"OMA OF") & regexm(cod1a,"JEJUNUM")& icd10=="")|(regexm(cod1a,"JEJUNUM") & regexm(cod1a,"CARCIN") & icd10=="")
+//1 change
+replace topography=179 if (regexm(cod1a,"SMALL BOWEL") & regexm(cod1a,"CANCER")& icd10=="")|(regexm(cod1a,"SMALL BOWEL") & regexm(cod1a,"CARCIN") & icd10=="")
+//6 changes
 replace topography=180 if (regexm(cod1a,"CAECUM") & regexm(cod1a,"CANCER")& icd10=="")|(regexm(cod1a,"CAECUM") & regexm(cod1a,"CARCIN") & icd10=="")
-** 1 change
-replace topography=189 if (regexm(cod1a,"COLON") & regexm(cod1a,"CANCER")& icd10=="")|(regexm(cod1a,"COLON") & regexm(cod1a,"CARCIN") & icd10=="")
-** 17 changes
-replace topography=209 if (regexm(cod1a,"CANCER RECTUM")|regexm(cod1a,"OMA OF RECTUM")|regexm(cod1a,"OMA OF THE RECTUM")|regexm(cod1a,"RECTAL CARCIN")) & icd10==""
-** 5 changes
+//1 change
+replace topography=181 if (regexm(cod1a,"APPENDIX") & regexm(cod1a,"CANCER")& icd10=="")|(regexm(cod1a,"APPENDIX") & regexm(cod1a,"CARCIN") & icd10=="")
+//2 changes
+replace topography=189 if (regexm(cod1a,"COLON") & regexm(cod1a,"CANCER")& icd10=="")|(regexm(cod1a,"COLON") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"OMA OF THE BOWEL") & icd10=="")
+//64 changes
+replace topography=199 if (regexm(cod1a,"COLORECTAL") & regexm(cod1a,"CANCER")& icd10=="")|(regexm(cod1a,"COLORECTAL") & regexm(cod1a,"CARCIN") & icd10=="")
+//4 changes
+replace topography=209 if (regexm(cod1a,"CANCER RECTUM")|regexm(cod1a,"OMA OF RECTUM")|regexm(cod1a,"OMA OF THE RECTUM")|regexm(cod1a,"RECTAL CARCIN")|regexm(cod1a,"RECTAL CANCER")|regexm(cod1a,"RECTAL MASS")|regexm(cod1a,"CANCER OF THE RECTUM")|regexm(cod1a,"CANCER OF RECTUM")) & icd10==""
+//15 changes
+replace topography=210 if (regexm(cod1a,"CANCER OF ANUS")|regexm(cod1a,"OMA OF ANUS")|regexm(cod1a,"OMA OF THE ANUS")) & icd10==""
+//1 change
+replace topography=218 if regexm(cod1a,"CANCER OF ANORECTUM") & icd10==""
+//1 change
+replace topography=220 if (regexm(cod1a,"HEPATIC CARCINOMA")|regexm(cod1a,"HEPATOCELLULAR CARCINOMA")|regexm(cod1a,"CANCER OF THE LIVER")|regexm(cod1a,"OMA OF LIVER")|regexm(cod1a,"LIVER CARCIN")) & icd10==""
+//7 changes
 replace topography=239 if (regexm(cod1a,"GALL") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"GALL") & regexm(cod1a,"CANCER") & icd10=="")
-** 1 change
-replace topography=249 if regexm(cod1a,"CHOLANGIO-CARCINOMA") & icd10==""
-** 1 change
-replace topography=259 if (regexm(cod1a,"PANCREA") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"PANCREA") & regexm(cod1a,"CANCER") & icd10=="")
-** 8 changes
+//4 changes
+replace topography=249 if (regexm(cod1a,"CHOLANGIO-CARCINOMA")|regexm(cod1a,"CHOLANGIOCARCINOMA")) & icd10==""
+//5 changes
+replace topography=259 if (regexm(cod1a,"PANCREA") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"PANCREA") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"PANCREA") & regexm(cod1a,"METASTA") & icd10=="")
+//24 changes
 replace topography=269 if regexm(cod1a,"GASTROINTESTINAL CARCIN") & icd10==""
-** 1 change
-replace topography=349 if (regexm(cod1a,"LUNG CANCER")|regexm(cod1a,"CANCER OF THE RIGHT LUNG")|regexm(cod1a,"CANCER OF THE LUNG")) & icd10==""
-** 5 changes
+//0 changes
+replace topography=329 if (regexm(cod1a,"LARYNGEAL CANCER")|regexm(cod1a,"LARYNGEAL CARCIN")|regexm(cod1a,"OMA OF THE LARYNX")|regexm(cod1a,"OMA OF LARYNX")|regexm(cod1a,"CANCER OF THE LARYNX")) & icd10==""
+//7 changes
+replace topography=349 if (regexm(cod1a,"LUNG CANCER")|regexm(cod1a,"CANCER OF THE RIGHT LUNG")|regexm(cod1a,"OMA OF LEFT LUNG")|regexm(cod1a,"OMA OF RIGHT LUNG")|regexm(cod1a,"CANCER OF THE LUNG")|regexm(cod1a,"BRONCHOGENIC CARCIN")|regexm(cod1a,"CANCER OF THE LUNG")|regexm(cod1a,"OMA OF LUNG")|regexm(cod1a,"OMA OF LUNGS")|regexm(cod1a,"OMA OF THE LUNG")|regexm(cod1a,"OMA LUNG")|regexm(cod1a,"PULMONARY CARCIN")|cod1a=="CARCINOMA OF LUNG") & icd10==""
+//26 changes
+replace topography=449 if regexm(cod1a,"SQUAMOUS SKIN CANCERS") & icd10==""
+//1 change
 replace topography=509 if (regexm(cod1a,"BREAST") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"BREAST") & regexm(cod1a,"CANCER") & icd10=="")
-** 37 changes
-replace topography=539 if (regexm(cod1a,"CERVI") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"CERVI") & regexm(cod1a,"CANCER") & icd10=="")
-** 5 changes
+//96 changes
+replace topography=519 if (regexm(cod1a,"VULVA") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"VULVA") & regexm(cod1a,"CANCER") & icd10=="")
+//3 changes
+replace topography=529 if (regexm(cod1a,"VAGINA") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"VAGINA") & regexm(cod1a,"CANCER") & icd10=="")
+//2 changes
+replace topography=539 if (regexm(cod1a,"CERVI") & regexm(cod1a,"CARCIN")& icd10=="")|(regexm(cod1a,"CERVI") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"OMA CERVIX") & icd10=="")
+//37 changes
 replace topography=541 if (regexm(cod1a,"ENDOMETRI") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"ENDOMETRI") & regexm(cod1a,"CANCER") & icd10=="")
-** 3 changes
-replace topography=619 if (regexm(cod1a,"PROSTAT") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"PROSTAT") & regexm(cod1a,"CANCER") & icd10=="")
-** 81 changes
-replace topography=649 if (regexm(cod1a,"RENAL CELL") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"RENAL CELL") & regexm(cod1a,"CANCER") & icd10=="")
-** 2 changes
-replace topography=679 if (regexm(cod1a,"BLADDER") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"BLADDER") & regexm(cod1a,"CANCER") & icd10=="")
-** 4 changes
-replace topography=739 if (regexm(cod1a,"CANCER THYROID")|regexm(cod1a,"THYROID CANCER")) & icd10==""
-** 2 changes
+//18 changes
+replace topography=549 if (regexm(cod1a,"OMA OF THE UTERUS") & icd10=="")|(regexm(cod1a,"UTERINE") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"OMA OF UTERUS") & icd10=="")
+//7 changes
+replace topography=569 if (regexm(cod1a,"OMA OF THE OVARY") & icd10=="")|(regexm(cod1a,"OMA OVARY") & icd10=="")|(regexm(cod1a,"OMA OF OVARY") & icd10=="")|(regexm(cod1a,"OVARIAN") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"OVARIAN") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"OVARIAN") & regexm(cod1a,"TUMOUR") & icd10=="")|(regexm(cod1a,"OVARIAN") & regexm(cod1a,"TUMOR") & icd10=="")
+//12 changes
+replace topography=609 if (regexm(cod1a,"PENILE") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"PENILE") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"PENIS") & regexm(cod1a,"CARCIN") & icd10=="")
+//2 changes
+replace topography=619 if (regexm(cod1a,"PROSTAT") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"PROSTAT") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"PROSTAT") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"OMA OF PROSTATE") & icd10=="")|(regexm(cod1a,"OMA PROSTATE") & icd10=="")|(regexm(cod1a,"CA PROSTATE") & icd10=="")
+//162 changes
+replace topography=629 if (regexm(cod1a,"GERM CELL") & regexm(cod1a,"CARCINOMA") & ddsex==2 & icd10=="")
+//1 change
+replace topography=649 if (regexm(cod1a,"RENAL CELL") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"RENAL CELL") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"OMA OF THE KIDNEY") & icd10=="")|(regexm(cod1a,"WILMS TUMOUR") & icd10=="")|(regexm(cod1a,"CANCER LEFT KIDNEY") & icd10=="")|(regexm(cod1a,"OMA OF THE RIGHT KIDNEY") & icd10=="")
+//6 changes
+replace topography=679 if (regexm(cod1a,"BLADDER") & regexm(cod1a,"CARCINOMA")& icd10=="")|(regexm(cod1a,"BLADDER") & regexm(cod1a,"CANCER") & icd10=="")|(regexm(cod1a,"BLADDER CANCER") & icd10=="")|(regexm(cod1a,"TRANSITIONAL CELL") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"RENAL") & regexm(cod1a,"CARCIN") & icd10=="")|(regexm(cod1a,"BLADDER MASS") & icd10=="")
+//26 changes
+replace topography=719 if (regexm(cod1a,"ASTROCYTOMA")|regexm(cod1a,"BRAIN CANCER")|regexm(cod1a,"GLIOSARCOMA")|regexm(cod1a,"GLIOBLASTOMA")) & icd10==""
+//6 changes
+replace topography=739 if (regexm(cod1a,"CANCER THYROID")|regexm(cod1a,"THYROID CANCER")|regexm(cod1a,"OMA OF THE THYROID")) & icd10==""
+//6 changes
 replace topography=809 if regexm(cod1a,"OCCULT") & icd10==""
-** 3 changes
-** 180 changes in total so 49 still missing
+//9 changes
 
-replace icd10="C029" if topography==29 & icd10=="" & site!=10 //1 change
+
+** (non-reportable) Skin cancers
+replace topography=447 if deathid==13711 & did=="T1" //1 change
+** Epiglottis (anterior surface)
+replace topography=101 if deathid==13594 & did=="T1" //1 change
+** GI tract
+replace topography=269 if deathid==13867 & did=="T1" //1 change
+** Intraabdominal
+replace topography=762 if deathid==30 & did=="T1" //1 change
+replace topography=762 if deathid==11968 & did=="T1" //1 change
+** Bone
+replace topography=419 if deathid==929 & did=="T1" //1 change
+** Mouth (floor)
+replace topography=49 if deathid==12278 & did=="T1" //1 change
+** Neuroblastoma
+replace topography=809 if deathid==12696 & did=="T1" //1 change
+replace site=25 if deathid==12696 & did=="T1" //1 change
+** Chest wall
+replace topography=761 if deathid==13401 & did=="T1" //1 change
+** Bladder
+replace topography=679 if deathid==734 & did=="T1" //0 changes
+replace icd10="C679" if deathid==734 & did=="T1" //1 change
+
+
+replace icd10="C029" if topography==29 & icd10=="" & site!=10 //2 changes
+replace icd10="C049" if topography==49 & icd10=="" & site!=10 //1 change
+replace icd10="C07" if topography==79 & icd10=="" & site!=10 //2 changes
+replace icd10="C099" if topography==99 & icd10=="" & site!=10 //4 changes
+replace icd10="C101" if topography==101 & icd10=="" & site!=10 //1 change
 replace icd10="C119" if topography==119 & icd10=="" & site!=10 //1 change
-replace icd10="C159" if topography==159 & icd10=="" & site!=10 //0 changes
-replace icd10="C169" if topography==169 & icd10=="" & site!=10 //2 changes
+replace icd10="C139" if topography==139 & icd10=="" & site!=10 //2 changes
+replace icd10="C140" if topography==140 & icd10=="" & site!=10 //1 change
+replace icd10="C159" if topography==159 & icd10=="" & site!=10 //3 changes
+replace icd10="C160" if topography==160 & icd10=="" & site!=10 //1 change
+replace icd10="C169" if topography==169 & icd10=="" & site!=10 //19 changes
+replace icd10="C171" if topography==171 & icd10=="" & site!=10 //1 change
+replace icd10="C179" if topography==179 & icd10=="" & site!=10 //3 changes
 replace icd10="C180" if topography==180 & icd10=="" & site!=10 //1 change
-replace icd10="C189" if topography==189 & icd10=="" & site!=10 //17 changes
-replace icd10="C20" if topography==209 & icd10=="" & site!=10 //4 changes
-replace icd10="C210" if topography==210 & icd10=="" & site!=10 //0 changes
+replace icd10="C181" if topography==181 & icd10=="" & site!=10 //1 change
+replace icd10="C189" if topography==189 & icd10=="" & site!=10 //61 changes
+replace icd10="C19" if topography==199 & icd10=="" & site!=10 //0 changes
+replace icd10="C20" if topography==209 & icd10=="" & site!=10 //14 changes
+replace icd10="C210" if topography==210 & icd10=="" & site!=10 //1 change
+replace icd10="C218" if topography==218 & icd10=="" & site!=10 //1 change
+replace icd10="C220" if topography==220 & icd10=="" & site!=10 //5 changes
 replace icd10="C23" if topography==239 & icd10=="" & site!=10 //0 changes
-replace icd10="C249" if topography==249 & icd10=="" & site!=10 //1 change
-replace icd10="C259" if topography==259 & icd10=="" & site!=10 //8 changes
+replace icd10="C249" if topography==249 & icd10=="" & site!=10 //5 changes
+replace icd10="C259" if topography==259 & icd10=="" & site!=10 //22 changes
 replace icd10="C269" if topography==269 & icd10=="" & site!=10 //1 change
-replace icd10="C349" if topography==259 & icd10=="" & site!=10 //0 changes
-replace icd10="C449" if topography==449 & icd10=="" & site!=10 //0 changes
-replace icd10="C509" if topography==509 & icd10=="" & site!=10 //38 changes
-replace icd10="C539" if topography==539 & icd10=="" & site!=10 //5 changes
-replace icd10="C541" if topography==541 & icd10=="" & site!=10 //3 changes
-replace icd10="C61" if topography==619 & icd10=="" & site!=10 //80 changes
-replace icd10="C64" if topography==649 & icd10=="" & site!=10 //2 changes
-replace icd10="C679" if topography==679 & icd10=="" & site!=10 //4 changes
-replace icd10="C73" if topography==739 & icd10=="" & site!=10 //2 changes
-replace icd10="C800" if topography==809 & icd10=="" & site!=10 //3 changes
-** 170 changes in total so 59 still missing
+replace icd10="C329" if topography==329 & icd10=="" & site!=10 //7 changes
+replace icd10="C349" if topography==349 & icd10=="" & site!=10 //23 changes
+replace icd10="C419" if topography==419 & icd10=="" & site!=10 //1 change
+replace icd10="C447" if topography==447 & icd10=="" & site!=10 //1 change
+replace icd10="C449" if topography==449 & icd10=="" & site!=10 //1 change
+replace icd10="C509" if topography==509 & icd10=="" & site!=10 //91 changes
+replace icd10="C519" if topography==519 & icd10=="" & site!=10 //3 changes
+replace icd10="C52" if topography==529 & icd10=="" & site!=10 //1 change
+replace icd10="C539" if topography==539 & icd10=="" & site!=10 //34 changes
+replace icd10="C541" if topography==541 & icd10=="" & site!=10 //18 changes
+replace icd10="C549" if topography==549 & icd10=="" & site!=10 //7 changes
+replace icd10="C56" if topography==569 & icd10=="" & site!=10 //12 changes
+replace icd10="C609" if topography==609 & icd10=="" & site!=10 //2 changes
+replace icd10="C61" if site==19 & icd10=="" //160 changes
+replace icd10="C61" if topography==619 & icd10=="" & site!=10 //2 changes
+replace icd10="C629" if topography==629 & icd10=="" & site!=10 //1 change
+replace icd10="C64" if topography==649 & icd10=="" & site!=10 //4 changes
+replace icd10="C679" if topography==679 & icd10=="" & site!=10 //21 changes
+replace icd10="C719" if topography==719 & icd10=="" & site!=10 //6 changes
+replace icd10="C73" if topography==739 & icd10=="" & site!=10 //6 changes
+replace icd10="C761" if topography==761 & icd10=="" & site!=10 //1 change
+replace icd10="C762" if topography==762 & icd10=="" & site!=10 //2 changes
+replace icd10="C800" if site==25 & icd10=="" //28 changes
+replace icd10="C800" if topography==809 & icd10=="" & site!=10 //0 changes
 
-count if icd10=="" //59; 56
+
+** melanoma
+replace topography=449 if deathid==13713 & did=="T1" //1 change
+replace morph=8720 if deathid==13713 & did=="T1" //1 change
+replace icd10="C439" if deathid==13713 & did=="T1" //1 change
+
+
+** Assign topography and icd10 codes to unmatched/unmerged deaths that are MPs
+** Assign morphology and icd10 codes to haem & lymph. cancers for unmatched deaths that are MPs 
+**(use excel '2018-12-05_iarccrg_icd10_conversion code.xlsx' in raw data to filter by top to assign icd10)
+//list deathid did topography morph cr5id site icd10 if unmatched>0 & icd10=="" ,sepby(deathid)
+//list cod1a if unmatched>0 & icd10==""
+replace icd10="C539" if deathid==956 & did=="T1" //1 change
+replace icd10="C679" if deathid==956 & did=="T2" //0 changes
+
+replace icd10="C509" if deathid==1669 & did=="T1" //0 changes
+replace icd10="C341" if deathid==1669 & did=="T2" //0 changes
+
+replace icd10="C099" if deathid==1675 & did=="T1" //0 changes
+replace icd10="C051" if deathid==1675 & did=="T2" //1 change
+
+replace icd10="C051" if deathid==2358 & did=="T1" //1 change
+replace icd10="C320" if deathid==2358 & did=="T2" //1 change
+
+replace icd10="C509" if deathid==12474 & did=="T1" //1 change
+replace icd10="C541" if deathid==12474 & did=="T2" //0 changes
+
+replace icd10="C921" if deathid==13018 & did=="T1" //0 changes
+replace icd10="C61" if deathid==13018 & did=="T2" //0 changes
+
+replace icd10="C61" if deathid==13395 & did=="T1" //0 changes
+replace icd10="C160" if deathid==13395 & did=="T2" //0 changes
+
+replace icd10="C61" if deathid==13476 & did=="T1" //0 changes
+replace icd10="C189" if deathid==13476 & did=="T2" //1 change
+
+replace icd10="C259" if deathid==13633 & did=="T1" //0 changes
+replace icd10="C900" if deathid==13633 & did=="T2" //1 change
+
+replace icd10="C55" if deathid==13793 & did=="T1" //1 change
+replace icd10="C509" if deathid==13793 & did=="T2" //1 change
+
+replace icd10="C340" if deathid==13899 & did=="T1" //1 change
+replace icd10="C946" if deathid==13899 & did=="T2" //1 change
+
+replace icd10="C220" if deathid==13920 & did=="T1" //0 changes
+replace icd10="C61" if deathid==13920 & did=="T2" //0 changes
+
+replace icd10="C23" if deathid==14269 & did=="T1" //0 changes
+replace icd10="C259" if deathid==14269 & did=="T2" //1 change
+
+replace icd10="C859" if deathid==14288 & did=="T1" //1 change
+replace icd10="C61" if deathid==14288 & did=="T2" //0 changes
+
+** Check MPs
+list deathid did site topography morph icd10 if deathid==956|deathid==1669|deathid==1675|deathid==2358|deathid==12474|deathid==13018|deathid==13395|deathid==13476|deathid==13633|deathid==13793|deathid==13899|deathid==13920|deathid==14269|deathid==14288 , sepby(deathid)
+
+count if topography==.|icd10=="" //78
+count if icd10=="" //57
+
 //list deathid did site if icd10==""
 //list cod1a if icd10==""
+
 ** Assign top & morph for lymphomas
 //list deathid cod1a if icd10=="" & regexm(cod1a,"LYMPHOMA")
+** HL
+replace topography=779 if (deathid==298|deathid==111|deathid==1589) & icd10=="" //3 changes
+replace morph=9650 if (deathid==298|deathid==111|deathid==1589) & icd10=="" //3 changes
+** NHL
+replace topography=779 if (deathid==237|deathid==1367|deathid==1434|deathid==12172|deathid==12633) & icd10=="" //5 changes
+replace morph=9591 if (deathid==237|deathid==1367|deathid==1434|deathid==12172|deathid==12633) & icd10=="" //5 changes
+** Lymphoma, NOS
+replace topography=779 if (deathid==12748|deathid==14044) & icd10=="" //2 changes
+replace morph=9590 if (deathid==12748|deathid==14044) & icd10=="" //2 changes
+** T-Cell Lymphoma
+replace topography=779 if deathid==684 & icd10=="" //1 change
+replace morph=9702 if deathid==684 & icd10=="" //1 change
+** Follicular Lymphoma, NOS
+replace topography=779 if (deathid==12984|deathid==14075) & icd10=="" //2 changes
+replace morph=9690 if (deathid==12984|deathid==14075) & icd10=="" //2 changes
 
-replace topography=779 if deathid==516 & icd10=="" //1 change
-replace morph=9650 if deathid==516 & icd10=="" //1 change
-
-replace topography=779 if deathid==678 & icd10=="" //1 change
-replace morph=9591 if deathid==678 & icd10=="" //1 change
-
-replace topography=779 if deathid==5475 & icd10=="" //1 change
-replace morph=9591 if deathid==5475 & icd10=="" //1 change
-
-replace topography=779 if deathid==5643 & icd10=="" //1 change
-replace morph=9650 if deathid==5643 & icd10=="" //1 change
-
-replace topography=779 if deathid==7947 & icd10=="" //1 change
-replace morph=9591 if deathid==7947 & icd10=="" //1 change
-
-replace topography=779 if deathid==16653 & icd10=="" //1 change
-replace morph=9591 if deathid==16653 & icd10=="" //1 change
-
-replace topography=779 if deathid==20760 & icd10=="" //1 change
-replace morph=9591 if deathid==20760 & icd10=="" //1 change
-
-replace topography=779 if deathid==21858 & icd10=="" //1 change
-replace morph=9827 if deathid==21858 & icd10=="" //1 change
-
-replace topography=779 if deathid==22371 & icd10=="" //1 change
-replace morph=9591 if deathid==22371 & icd10=="" //1 change
-
-replace topography=779 if deathid==23966 & icd10=="" //1 change
-replace morph=9591 if deathid==23966 & icd10=="" //1 change
 
 ** Assign top & morph for myelomas
 //list deathid cod1a if icd10=="" & regexm(cod1a,"MYELOMA")
-
-replace topography=421 if deathid==6905 & icd10=="" //1 change
-replace morph=9732 if deathid==6905 & icd10=="" //1 change
-
-replace topography=421 if deathid==15349 & icd10=="" //1 change
-replace morph=9732 if deathid==15349 & icd10=="" //1 change
-
-replace topography=421 if deathid==15507 & icd10=="" //1 change
-replace morph=9732 if deathid==15507 & icd10=="" //1 change
-
-replace topography=421 if deathid==20823 & icd10=="" //1 change
-replace morph=9732 if deathid==20823 & icd10=="" //1 change
-
-replace topography=421 if deathid==22354 & icd10=="" //1 change
-replace morph=9732 if deathid==22354 & icd10=="" //1 change
+** MM
+replace topography=421 if (deathid==230|deathid==393|deathid==498|deathid==793|deathid==827 ///
+						 |deathid==1114|deathid==1789|deathid==2017|deathid==11930|deathid==11950 ///
+						 |deathid==12010|deathid==12025|deathid==12036|deathid==12819|deathid==13047 ///
+						 |deathid==13162|deathid==13285|deathid==13890|deathid==13904|deathid==13942|deathid==14222) & icd10=="" //1 change
+//21 changes
+replace morph=9732 if (deathid==230|deathid==393|deathid==498|deathid==793|deathid==827 ///
+					  |deathid==1114|deathid==1789|deathid==2017|deathid==11930|deathid==11950 ///
+					  |deathid==12010|deathid==12025|deathid==12036|deathid==12819|deathid==13047 ///
+					  |deathid==13162|deathid==13285|deathid==13890|deathid==13904|deathid==13942|deathid==14222) & icd10=="" //1 change
+//21 changes
 
 ** Assign top & morph for myelomas
 //list deathid cod1a if icd10=="" & regexm(cod1a,"LEUK")
+** chronic myelocytic/myeloid leukaemia
+replace topography=421 if (deathid==61|deathid==13848|deathid==13914|deathid==14291) & icd10=="" //4 changes
+replace morph=9863 if (deathid==61|deathid==13848|deathid==13914|deathid==14291) & icd10=="" //4 changes
+** acute myeloid leukaemia
+replace topography=421 if (deathid==705|deathid==1248|deathid==11894|deathid==12795|deathid==12998|deathid==13109) & icd10=="" //6 changes
+replace morph=9861 if (deathid==705|deathid==1248|deathid==11894|deathid==12795|deathid==12998|deathid==13109) & icd10=="" //6 changes
+** myelomonocytic leukaemia
+replace topography=421 if deathid==860 & icd10=="" //1 change
+replace morph=9867 if deathid==860 & icd10=="" //1 change
+** chronic lymphocytic leukaemia
+replace topography=421 if (deathid==2416|deathid==12675|deathid==12863|deathid==13796) & icd10=="" //4 changes
+replace morph=9823 if (deathid==2416|deathid==12675|deathid==12863|deathid==13796) & icd10=="" //4 changes
+** AML trisomy 21
+replace topography=421 if deathid==1290 & icd10=="" //1 change
+replace morph=9898 if deathid==1290 & icd10=="" //1 change
+** leukaemia, NOS
+replace topography=421 if (deathid==12583|deathid==12100|deathid==13710) & icd10=="" //3 changes
+replace morph=9800 if (deathid==12583|deathid==12100|deathid==13710) & icd10=="" //3 changes
+** acute T-cell leukaemia
+replace topography=421 if deathid==14201 & icd10=="" //1 change
+replace morph=9827 if deathid==14201 & icd10=="" //1 change
+** myelofibrosis
+replace topography=421 if (deathid==390|deathid==11934|deathid==14263) & icd10=="" //3 changes
+replace morph=9931 if (deathid==390|deathid==11934|deathid==14263) & icd10=="" //3 changes
 
-replace topography=421 if deathid==3208 & icd10=="" //1 change
-replace morph=9823 if deathid==3208 & icd10=="" //1 change
-
-replace topography=421 if deathid==4714 & icd10=="" //1 change
-replace morph=9823 if deathid==4714 & icd10=="" //1 change
-
-replace topography=421 if deathid==19903 & icd10=="" //1 change
-replace morph=9863 if deathid==19903 & icd10=="" //1 change
-
-replace topography=421 if deathid==21209 & icd10=="" //1 change
-replace morph=9863 if deathid==21209 & icd10=="" //1 change
 
 ** Assign icd10 codes to haem & lymph. cancers
-replace icd10="C819" if morph==9650 & icd10=="" //2 changes
+replace icd10="C819" if morph==9650 & icd10=="" //3 changes
+replace icd10="C829" if morph==9690 & icd10=="" //2 changes
 replace icd10="C859" if (morph==9590|morph==9591) & icd10=="" //7 changes
-replace icd10="C900" if morph==9732 & icd10=="" //5 changes
-replace icd10="C911" if morph==9823 & icd10=="" //2 changes
+replace icd10="C844" if morph==9702 & icd10=="" //1 change
+replace icd10="C900" if morph==9732 & icd10=="" //21 changes
+replace icd10="C959" if morph==9800 & icd10=="" //3 changes
+replace icd10="C911" if morph==9823 & icd10=="" //4 changes
 replace icd10="C915" if morph==9827 & icd10=="" //1 changes
-replace icd10="C921" if morph==9863 & icd10=="" //2 changes
+replace icd10="C920" if morph==9861 & icd10=="" //6 changes
+replace icd10="C921" if morph==9863 & icd10=="" //4 changes
+replace icd10="C925" if morph==9867 & icd10=="" //1 change
+replace icd10="C927" if morph==9898 & icd10=="" //1 change
+replace icd10="C944" if morph==9931 & icd10=="" //3 changes
 
 ** Assign remaining missing icd10 cases
-count if icd10=="" //37
+count if icd10=="" //0
 //list deathid cod1a if icd10==""
 
-replace topography=159 if deathid==4007 & icd10=="" //1 change
-replace icd10="C159" if deathid==4007 & icd10=="" //1 change
-
-replace topography=160 if deathid==22928 & icd10=="" //1 change
-replace icd10="C160" if deathid==22928 & icd10=="" //1 change
-
-replace topography=169 if deathid==10423 & icd10=="" //1 change
-replace icd10="C169" if deathid==10423 & icd10=="" //1 change
-
-replace topography=181 if deathid==19926 & icd10=="" //1 change
-replace icd10="C181" if deathid==19926 & icd10=="" //1 change
-
-replace topography=209 if (deathid==10371|deathid==18867) & icd10=="" //2 changes
-replace icd10="C20" if (deathid==10371|deathid==18867) & icd10=="" //2 changes
-
-replace topography=220 if deathid==21909 & icd10=="" //1 change
-replace icd10="C227" if deathid==21909 & icd10=="" //1 change
-
-replace topography=269 if deathid==3964 & icd10=="" //1 change
-replace icd10="C269" if deathid==3964 & icd10=="" //1 change
-
-replace topography=311 if deathid==10809 & icd10=="" //1 change
-replace icd10="C311" if deathid==10809 & icd10=="" //1 change
-
-replace topography=349 if (deathid==1955|deathid==4926|deathid==4946|deathid==5478|deathid==14378|deathid==16656) & icd10=="" //2 changes
-replace icd10="C349" if (deathid==1955|deathid==4926|deathid==4946|deathid==5478|deathid==14378|deathid==16656) & icd10=="" //6 changes
-
-replace topography=410 if deathid==8061 & icd10=="" //1 change
-replace icd10="C410" if deathid==8061 & icd10=="" //1 change
-
-replace topography=441 if deathid==5807 & icd10=="" //1 change
-replace icd10="C441" if deathid==5807 & icd10=="" //1 change
-
-replace topography=443 if deathid==8574 & icd10=="" //1 change
-replace icd10="C443" if deathid==8574 & icd10=="" //1 change
-
-replace topography=444 if (deathid==3849|deathid==23750) & icd10=="" //2 changes
-replace icd10="C444" if (deathid==3849|deathid==23750) & icd10=="" //2 changes
-
-replace topography=445 if deathid==7726 & icd10=="" //1 change
-replace icd10="C445" if deathid==7726 & icd10=="" //1 change
-
-replace topography=449 if deathid==20031 & icd10=="" //1 change
-replace icd10="C449" if deathid==20031 & icd10=="" //1 change
-
-replace topography=559 if deathid==12150 & icd10=="" //1 change
-replace icd10="C55" if deathid==12150 & icd10=="" //1 change
-
-replace topography=619 if (deathid==8401|deathid==6313) & icd10=="" //1 change
-replace icd10="C61" if (deathid==8401|deathid==6313) & icd10=="" //2 changes
-
-replace topography=649 if deathid==11614 & icd10=="" //1 change
-replace icd10="C64" if deathid==11614 & icd10=="" //1 change
-
-replace topography=765 if deathid==16127 & icd10=="" //1 change
-replace icd10="C765" if deathid==16127 & icd10=="" //1 change
-
-replace topography=809 if (deathid==1690|deathid==5543|deathid==8665|deathid==9950|deathid==10565|deathid==14778|deathid==16076|deathid==16544|deathid==13062) & icd10=="" //9 changes
-replace icd10="C800" if (deathid==1690|deathid==5543|deathid==8665|deathid==9950|deathid==10565|deathid==14778|deathid==16076|deathid==16544|deathid==13062) & icd10=="" //9 changes
-
-replace topography=421 if deathid==12478 & icd10=="" //1 change
-replace morph=9961 if deathid==12478 & icd10=="" //1 change
-replace icd10="D474" if deathid==12478 & icd10=="" //1 change
-
+//list deathid did cr5id icd10 if topography==.|morph==.
+//list deathid did cod1a if topography==.|morph==.
+/*
+export_excel deathid did icd10 site cod1a if icd10=="" ///
+using "`datapath'\version01\2-working\2019-04-24_missing_icd10.xlsx", firstrow(variables) replace
+*/
 tab icd10 ,m
 
+** Check icd10 correctly assigned for main metastatic sites
+** LUNG
+count if site==8 & !strmatch(strupper(icd10),"C34*") //15
+//list deathid did icd10 cod1a if site==8 & !strmatch(strupper(icd10),"C34*")
+replace icd10="C349" if deathid==12751 & did=="T1" //1 change
+replace icd10="C349" if deathid==12032 & did=="T1" //1 change
+** LIVER
+count if site==7 & !strmatch(strupper(icd10),"C22*") //46 - all correct
+//list deathid did icd10 cod1a if site==7 & !strmatch(strupper(icd10),"C22*")
+** BRAIN
+count if site==21 & !strmatch(strupper(icd10),"C71*") //0
+//list deathid did icd10 cod1a if site==21 & !strmatch(strupper(icd10),"C71*")
+
+
 ** Check for duplicate pid identified above using ptrectot to ensure icd10 codes not swapped
-count if ptrectot==2 //16 - all correct
+count if ptrectot==2 //14 - all correct
 //list deathid did icd10 top morph if ptrectot==2
 
+tab icd10,m
+count //1,068
+
+
+STOPPED HERE
+**********************
+** Create IARC site **
+**********************
 
 ** Create new site variable with CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
 display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
@@ -1487,83 +1575,31 @@ replace siteiarchaem=16 if morph>9979 & morph<9999 //1 change
 tab siteiarchaem ,m //593 missing - correct!
 count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //0
 
-** Create ICD-10 groups according to analysis tables in CR5 db (added after analysis dofiles 4,6)
-gen sitecr5db=.
-label define sitecr5db_lab ///
-1 "Mouth & pharynx (C00-14)" ///
-2 "Oesophagus (C15)" ///
-3 "Stomach (C16)" ///
-4 "Colon, rectum, anus (C18-21)" ///
-5 "Liver (C22)" ///
-6 "Pancreas (C25)" ///
-7 "Larynx (C32)" ///
-8 "Lung, trachea, bronchus (C33-34)" ///
-9 "Melanoma of skin (C43)" ///
-10 "Breast (C50)" ///
-11 "Cervix (C53)" ///
-12 "Corpus & Uterus NOS (C54-55)" ///
-13 "Ovary & adnexa (C56)" ///
-14 "Prostate (C61)" ///
-15 "Testis (C62)" ///
-16 "Kidney & urinary NOS (C64-66,68)" ///
-17 "Bladder (C67)" ///
-18 "Brain, nervous system (C70-72)" ///
-19 "Thyroid (C73)" ///
-20 "O&U (C26,39,48,76,80)" ///
-21 "Lymphoma (C81-85,88,90,96)" ///
-22 "Leukaemia (C91-95)" ///
-23 "Other digestive (C17,23-24)" ///
-24 "Nose, sinuses (C30-31)" ///
-25 "Bone, cartilage, etc (C40-41,45,47,49)" ///
-26 "Other skin (C44)" ///
-27 "Other female organs (C51-52,57-58)" ///
-28 "Other male organs (C60,63)" ///
-29 "Other endocrine (C74-75)" ///
-30 "Myeloproliferative disorders (MPD)" ///
-31 "Myselodysplastic syndromes (MDS)" ///
-32 "D069: CIN 3" ///
-33 "All sites but C44"
-label var sitecr5db "CR5db sites"
-label values sitecr5db sitecr5db_lab
-
-replace sitecr5db=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
-					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
-					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
-					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //21 changes
-replace sitecr5db=2 if regexm(icd10,"C15") //10 changes
-replace sitecr5db=3 if regexm(icd10,"C16") //20 changes
-replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //92 changes
-replace sitecr5db=5 if regexm(icd10,"C22") //9 changes
-replace sitecr5db=6 if regexm(icd10,"C25") //29 changes
-replace sitecr5db=7 if regexm(icd10,"C32") //1 change
-replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //41 changes
-replace sitecr5db=9 if regexm(icd10,"C43") //1 change
-replace sitecr5db=10 if regexm(icd10,"C50") //72 changes
-replace sitecr5db=11 if regexm(icd10,"C53") //12 changes
-replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //24 changes
-replace sitecr5db=13 if regexm(icd10,"C56") //1 change
-replace sitecr5db=14 if regexm(icd10,"C61") //150 changes
-replace sitecr5db=15 if regexm(icd10,"C62") //0 changes
-replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //11 changes
-replace sitecr5db=17 if regexm(icd10,"C67") //13 changes
-replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //0 changes
-replace sitecr5db=19 if regexm(icd10,"C73") //3 changes
-replace sitecr5db=20 if siteiarc==61 //57 changes
-replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //43 changes
-replace sitecr5db=22 if (regexm(icd10,"C91")|regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")) //12 changes
-replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //11 changes
-replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //1 change
-replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //3 changes
-replace sitecr5db=26 if siteiarc==25 //7 changes
-replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //2 changes
-replace sitecr5db=28 if (regexm(icd10,"C60")|regexm(icd10,"C63")) //2 changes
-replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //0 changes
-replace sitecr5db=30 if siteiarc==59 //2 changes
-replace sitecr5db=31 if siteiarc==60 //1 change
-replace sitecr5db=32 if siteiarc==64 //0 changes
-
-tab sitecr5db ,m
+STOPPED HERE
+***********************
+** Create ICD10 site **
+***********************
+** Create variable based on ICD-10 2010 version to use in graphs (dofile 12) - may not use
+gen siteicd10=1 if regexm(icd10,""
+label define siteicd10_lab ///
+1 "C00-C14: lip,oral cavity & pharynx" ///
+2 "C15-C26: digestive organs" ///
+3 "C30-C39: respiratory & intrathoracic organs" ///
+4 "C40-C41: bone & articular cartilage" ///
+5 "C43: melanoma" ///
+6 "C44: other skin" ///
+7 "C45-C49: mesothelial & soft tissue" ///
+8 "C50: breast" ///
+9 "C51-C58: female genital organs" ///
+10 "C60-C63: male genital organs" ///
+11 "C64-C68: urinary tract" ///
+12 "C69-C72: eye,brain,other CNS" ///
+13 "C73-C75: thyroid & other endocrine glands" ///
+14 "C76-C79: ill-defined sites" ///
+15 "C80: primary site unknown" ///
+16 "C81-C96: lymphoid & haem"
+label var siteicd10 "ICD-10 site of tumour"
+label values siteicd10 siteicd10_lab
 
 
 ** Create ICD-10 groups according to Angie's previous site labels but more standardized site assignment based on all ICD-10 not mixtured of ICD-10 & ICD-O-3 (added after analysis dofiles 4,6)
