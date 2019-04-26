@@ -776,6 +776,8 @@ replace site=19 if deathid==54|deathid==232|deathid==2248|deathid==2404|deathid=
 replace site=10 if deathid==1789
 replace site=14 if deathid==12543
 //list deathid cod1a if site==10
+replace site=25 if deathid==1419|deathid==347
+replace site=20 if deathid==734
 //list deathid cod1a if site==11
 //list deathid cod1a if site==12
 replace site=7 if deathid==12890
@@ -1196,6 +1198,9 @@ replace topography=761 if deathid==13401 & did=="T1" //1 change
 ** Bladder
 replace topography=679 if deathid==734 & did=="T1" //0 changes
 replace icd10="C679" if deathid==734 & did=="T1" //1 change
+** Salivary gland
+replace topography=89 if deathid==12001 & did=="T1"
+replace icd10="C089" if deathid==12001 & did=="T1"
 
 
 replace icd10="C029" if topography==29 & icd10=="" & site!=10 //2 changes
@@ -1245,7 +1250,7 @@ replace icd10="C719" if topography==719 & icd10=="" & site!=10 //6 changes
 replace icd10="C73" if topography==739 & icd10=="" & site!=10 //6 changes
 replace icd10="C761" if topography==761 & icd10=="" & site!=10 //1 change
 replace icd10="C762" if topography==762 & icd10=="" & site!=10 //2 changes
-replace icd10="C800" if site==25 & icd10=="" //28 changes
+replace icd10="C800" if site==25 & icd10=="" //30 changes
 replace icd10="C800" if topography==809 & icd10=="" & site!=10 //0 changes
 
 
@@ -1286,11 +1291,15 @@ replace icd10="C189" if deathid==13476 & did=="T2" //1 change
 
 replace icd10="C259" if deathid==13633 & did=="T1" //0 changes
 replace icd10="C900" if deathid==13633 & did=="T2" //1 change
+replace topography=421 if deathid==13633 & did=="T2" //1 change
+replace morph=9732 if deathid==13633 & did=="T2" //1 change
 
 replace icd10="C55" if deathid==13793 & did=="T1" //1 change
 replace icd10="C509" if deathid==13793 & did=="T2" //1 change
 
 replace icd10="C340" if deathid==13899 & did=="T1" //1 change
+replace topography=421 if deathid==13899 & did=="T2" //1 change
+replace morph=9975 if deathid==13899 & did=="T2" //1 change
 replace icd10="C946" if deathid==13899 & did=="T2" //1 change
 
 replace icd10="C220" if deathid==13920 & did=="T1" //0 changes
@@ -1299,6 +1308,8 @@ replace icd10="C61" if deathid==13920 & did=="T2" //0 changes
 replace icd10="C23" if deathid==14269 & did=="T1" //0 changes
 replace icd10="C259" if deathid==14269 & did=="T2" //1 change
 
+replace topography=779 if deathid==14288 & did=="T1" //1 change
+replace morph=9590 if deathid==14288 & did=="T1" //1 change
 replace icd10="C859" if deathid==14288 & did=="T1" //1 change
 replace icd10="C61" if deathid==14288 & did=="T2" //0 changes
 
@@ -1317,8 +1328,10 @@ count if icd10=="" //57
 replace topography=779 if (deathid==298|deathid==111|deathid==1589) & icd10=="" //3 changes
 replace morph=9650 if (deathid==298|deathid==111|deathid==1589) & icd10=="" //3 changes
 ** NHL
-replace topography=779 if (deathid==237|deathid==1367|deathid==1434|deathid==12172|deathid==12633) & icd10=="" //5 changes
-replace morph=9591 if (deathid==237|deathid==1367|deathid==1434|deathid==12172|deathid==12633) & icd10=="" //5 changes
+replace topography=779 if deathid==1399 //1 change
+replace icd10="" if deathid==1399 //1 change
+replace topography=779 if (deathid==237|deathid==1367|deathid==1399|deathid==1434|deathid==12172|deathid==12633) & icd10=="" //6 changes
+replace morph=9591 if (deathid==237|deathid==1367|deathid==1399|deathid==1434|deathid==12172|deathid==12633) & icd10=="" //6 changes
 ** Lymphoma, NOS
 replace topography=779 if (deathid==12748|deathid==14044) & icd10=="" //2 changes
 replace morph=9590 if (deathid==12748|deathid==14044) & icd10=="" //2 changes
@@ -1350,8 +1363,9 @@ replace morph=9732 if (deathid==230|deathid==393|deathid==498|deathid==793|death
 replace topography=421 if (deathid==61|deathid==13848|deathid==13914|deathid==14291) & icd10=="" //4 changes
 replace morph=9863 if (deathid==61|deathid==13848|deathid==13914|deathid==14291) & icd10=="" //4 changes
 ** acute myeloid leukaemia
-replace topography=421 if (deathid==705|deathid==1248|deathid==11894|deathid==12795|deathid==12998|deathid==13109) & icd10=="" //6 changes
-replace morph=9861 if (deathid==705|deathid==1248|deathid==11894|deathid==12795|deathid==12998|deathid==13109) & icd10=="" //6 changes
+replace icd10="" if deathid==766 //1 change
+replace topography=421 if (deathid==705|deathid==766|deathid==1248|deathid==11894|deathid==12795|deathid==12998|deathid==13109) & icd10=="" //7 changes
+replace morph=9861 if (deathid==705|deathid==766|deathid==1248|deathid==11894|deathid==12795|deathid==12998|deathid==13109) & icd10=="" //7 changes
 ** myelomonocytic leukaemia
 replace topography=421 if deathid==860 & icd10=="" //1 change
 replace morph=9867 if deathid==860 & icd10=="" //1 change
@@ -1362,8 +1376,10 @@ replace morph=9823 if (deathid==2416|deathid==12675|deathid==12863|deathid==1379
 replace topography=421 if deathid==1290 & icd10=="" //1 change
 replace morph=9898 if deathid==1290 & icd10=="" //1 change
 ** leukaemia, NOS
-replace topography=421 if (deathid==12583|deathid==12100|deathid==13710) & icd10=="" //3 changes
-replace morph=9800 if (deathid==12583|deathid==12100|deathid==13710) & icd10=="" //3 changes
+replace topography=421 if deathid==13523 //1 change
+replace icd10="" if deathid==13523 //1 change
+replace topography=421 if (deathid==12583|deathid==12100|deathid==13523|deathid==13710) & icd10=="" //4 changes
+replace morph=9800 if (deathid==12583|deathid==12100|deathid==13523|deathid==13710) & icd10=="" //4 changes
 ** acute T-cell leukaemia
 replace topography=421 if deathid==14201 & icd10=="" //1 change
 replace morph=9827 if deathid==14201 & icd10=="" //1 change
@@ -1375,13 +1391,13 @@ replace morph=9931 if (deathid==390|deathid==11934|deathid==14263) & icd10=="" /
 ** Assign icd10 codes to haem & lymph. cancers
 replace icd10="C819" if morph==9650 & icd10=="" //3 changes
 replace icd10="C829" if morph==9690 & icd10=="" //2 changes
-replace icd10="C859" if (morph==9590|morph==9591) & icd10=="" //7 changes
+replace icd10="C859" if (morph==9590|morph==9591) & icd10=="" //8 changes
 replace icd10="C844" if morph==9702 & icd10=="" //1 change
 replace icd10="C900" if morph==9732 & icd10=="" //21 changes
-replace icd10="C959" if morph==9800 & icd10=="" //3 changes
+replace icd10="C959" if morph==9800 & icd10=="" //4 changes
 replace icd10="C911" if morph==9823 & icd10=="" //4 changes
 replace icd10="C915" if morph==9827 & icd10=="" //1 changes
-replace icd10="C920" if morph==9861 & icd10=="" //6 changes
+replace icd10="C920" if morph==9861 & icd10=="" //7 changes
 replace icd10="C921" if morph==9863 & icd10=="" //4 changes
 replace icd10="C925" if morph==9867 & icd10=="" //1 change
 replace icd10="C927" if morph==9898 & icd10=="" //1 change
@@ -1421,7 +1437,7 @@ tab icd10,m
 count //1,068
 
 
-STOPPED HERE
+
 **********************
 ** Create IARC site **
 **********************
@@ -1459,66 +1475,66 @@ label var siteiarc "IARC CI5-XI sites"
 label values siteiarc siteiarc_lab
 
 replace siteiarc=1 if regexm(icd10,"C00") //0 changes
-replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //4 changes
-replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //2 changes
-replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //1 change
-replace siteiarc=5 if regexm(icd10,"C09") //1 change
-replace siteiarc=6 if regexm(icd10,"C10") //5 changes
-replace siteiarc=7 if regexm(icd10,"C11") //3 changes
+replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //3 changes
+replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //4 changes
+replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //2 changes
+replace siteiarc=5 if regexm(icd10,"C09") //5 changes
+replace siteiarc=6 if regexm(icd10,"C10") //1 change
+replace siteiarc=7 if regexm(icd10,"C11") //1 change
 replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //4 changes
-replace siteiarc=9 if regexm(icd10,"C14") //1 change
-replace siteiarc=10 if regexm(icd10,"C15") //10 changes
-replace siteiarc=11 if regexm(icd10,"C16") //20 changes
-replace siteiarc=12 if regexm(icd10,"C17") //2 changes
-replace siteiarc=13 if regexm(icd10,"C18") //71 changes
-replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //20 changes
-replace siteiarc=15 if regexm(icd10,"C21") //1 change
-replace siteiarc=16 if regexm(icd10,"C22") //9 changes
-replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //9 changes
-replace siteiarc=18 if regexm(icd10,"C25") //29 changes
+replace siteiarc=9 if regexm(icd10,"C14") //2 changes
+replace siteiarc=10 if regexm(icd10,"C15") //12 changes
+replace siteiarc=11 if regexm(icd10,"C16") //45 changes
+replace siteiarc=12 if regexm(icd10,"C17") //7 changes
+replace siteiarc=13 if regexm(icd10,"C18") //123 changes
+replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //32 changes
+replace siteiarc=15 if regexm(icd10,"C21") //5 changes
+replace siteiarc=16 if regexm(icd10,"C22") //14 changes
+replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //16 changes
+replace siteiarc=18 if regexm(icd10,"C25") //52 changes
 replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //1 change
-replace siteiarc=20 if regexm(icd10,"C32") //1 change
-replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //41 changes
+replace siteiarc=20 if regexm(icd10,"C32") //11 changes
+replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //55 changes
 replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //0 changes
 replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
 replace siteiarc=24 if regexm(icd10,"C43") //1 change
-replace siteiarc=25 if regexm(icd10,"C44") //7 change
-replace siteiarc=26 if regexm(icd10,"C45") //1 change
+replace siteiarc=25 if regexm(icd10,"C44") //4 changes
+replace siteiarc=26 if regexm(icd10,"C45") //0 changes
 replace siteiarc=27 if regexm(icd10,"C46") //0 changes
 replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //0 changes
-replace siteiarc=29 if regexm(icd10,"C50") //72 changes
-replace siteiarc=30 if regexm(icd10,"C51") //0 changes
-replace siteiarc=31 if regexm(icd10,"C52") //2 changes
-replace siteiarc=32 if regexm(icd10,"C53") //12 changes
-replace siteiarc=33 if regexm(icd10,"C54") //21 changes
+replace siteiarc=29 if regexm(icd10,"C50") //109 changes
+replace siteiarc=30 if regexm(icd10,"C51") //3 changes
+replace siteiarc=31 if regexm(icd10,"C52") //1 change
+replace siteiarc=32 if regexm(icd10,"C53") //50 changes
+replace siteiarc=33 if regexm(icd10,"C54") //32 changes
 replace siteiarc=34 if regexm(icd10,"C55") //3 changes
-replace siteiarc=35 if regexm(icd10,"C56") //1 change
-replace siteiarc=36 if regexm(icd10,"C57") //0 changes
-replace siteiarc=37 if regexm(icd10,"C58") //0 changes
+replace siteiarc=35 if regexm(icd10,"C56") //23 changes
+replace siteiarc=36 if regexm(icd10,"C57") //2 changes
+replace siteiarc=37 if regexm(icd10,"C58") //1 change
 replace siteiarc=38 if regexm(icd10,"C60") //2 changes
-replace siteiarc=39 if regexm(icd10,"C61") //150 changes
-replace siteiarc=40 if regexm(icd10,"C62") //0 changes
+replace siteiarc=39 if regexm(icd10,"C61") //208 changes
+replace siteiarc=40 if regexm(icd10,"C62") //2 changes
 replace siteiarc=41 if regexm(icd10,"C63") //0 changes
 replace siteiarc=42 if regexm(icd10,"C64") //11 changes
 replace siteiarc=43 if regexm(icd10,"C65") //0 changes
 replace siteiarc=44 if regexm(icd10,"C66") //0 changes
-replace siteiarc=45 if regexm(icd10,"C67") //13 changes
-replace siteiarc=46 if regexm(icd10,"C68") //0 changes
+replace siteiarc=45 if regexm(icd10,"C67") //24 changes
+replace siteiarc=46 if regexm(icd10,"C68") //1 change
 replace siteiarc=47 if regexm(icd10,"C69") //0 changes
-replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //0 changes
-replace siteiarc=49 if regexm(icd10,"C73") //3 changes
+replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //7 changes
+replace siteiarc=49 if regexm(icd10,"C73") //8 changes
 replace siteiarc=50 if regexm(icd10,"C74") //0 changes
 replace siteiarc=51 if regexm(icd10,"C75") //0 changes
-replace siteiarc=52 if regexm(icd10,"C81") //2 changes
-replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //18 changes
-replace siteiarc=54 if regexm(icd10,"C88") //1 change
-replace siteiarc=55 if regexm(icd10,"C90") //22 changes
-replace siteiarc=56 if regexm(icd10,"C91") //5 changes
-replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //4 changes
-replace siteiarc=58 if regexm(icd10,"C95") //3 changes
+replace siteiarc=52 if regexm(icd10,"C81") //4 changes
+replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //23 changes
+replace siteiarc=54 if regexm(icd10,"C88") //0 changes
+replace siteiarc=55 if regexm(icd10,"C90") //34 changes
+replace siteiarc=56 if regexm(icd10,"C91") //7 changes
+replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //25 changes
+replace siteiarc=58 if regexm(icd10,"C95") //7 changes
 replace siteiarc=59 if (morph>9949 & morph<9970)|(morph>9969 & morph<9980) //2 changes
-replace siteiarc=60 if morph>9979 & morph<9999 //1 change
-replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //57 changes
+replace siteiarc=60 if morph>9979 & morph<9999 //0 changes
+replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //79 changes
 **replace siteiarc=62 if siteiarc<62
 **replace siteiarc=63 if siteiarc<62 & siteiarc!=25
 replace siteiarc=64 if morph==8077 //0 changes - no CIN 3 in death data
@@ -1530,6 +1546,10 @@ label var allsites "All sites (ALL)"
 
 gen allsitesnoC44=1 if siteiarc<62 & siteiarc!=25 //7 missing so 7=C44
 label var allsitesnoC44 "All sites but skin (ALLbC44)"
+
+** Check siteiarc and sex correct for female and male only sites
+tab siteiarc ddsex,m
+//list deathid did ddsex cod1a if siteiarc==32 & ddsex==2
 
 ** Create site variable for lymphoid and haematopoietic diseases for conversion of these from ICD-O-3 1st edition (M9590-M9992)
 ** (see chapter 3 Table 3.2 of CI5-XI)
@@ -1574,13 +1594,16 @@ replace siteiarchaem=16 if morph>9979 & morph<9999 //1 change
 
 tab siteiarchaem ,m //593 missing - correct!
 count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //0
+//list deathid did morph site cod1a if (siteiarc>51 & siteiarc<59) & siteiarchaem==.
+count if site==10 & siteiarchaem==. //0
+//list deathid did topography morph site cod1a if site==10 & siteiarchaem==.
 
-STOPPED HERE
+
 ***********************
 ** Create ICD10 site **
 ***********************
 ** Create variable based on ICD-10 2010 version to use in graphs (dofile 12) - may not use
-gen siteicd10=1 if regexm(icd10,""
+gen siteicd10=.
 label define siteicd10_lab ///
 1 "C00-C14: lip,oral cavity & pharynx" ///
 2 "C15-C26: digestive organs" ///
@@ -1591,76 +1614,60 @@ label define siteicd10_lab ///
 7 "C45-C49: mesothelial & soft tissue" ///
 8 "C50: breast" ///
 9 "C51-C58: female genital organs" ///
-10 "C60-C63: male genital organs" ///
-11 "C64-C68: urinary tract" ///
-12 "C69-C72: eye,brain,other CNS" ///
-13 "C73-C75: thyroid & other endocrine glands" ///
-14 "C76-C79: ill-defined sites" ///
-15 "C80: primary site unknown" ///
-16 "C81-C96: lymphoid & haem"
+10 "C61: prostate" ///
+11 "C60-C62,C63: male genital organs" ///
+12 "C64-C68: urinary tract" ///
+13 "C69-C72: eye,brain,other CNS" ///
+14 "C73-C75: thyroid & other endocrine glands" ///
+15 "C76-C79: ill-defined sites" ///
+16 "C80: primary site unknown" ///
+17 "C81-C96: lymphoid & haem"
 label var siteicd10 "ICD-10 site of tumour"
 label values siteicd10 siteicd10_lab
 
 
-** Create ICD-10 groups according to Angie's previous site labels but more standardized site assignment based on all ICD-10 not mixtured of ICD-10 & ICD-O-3 (added after analysis dofiles 4,6)
-tab icd10 ,m
-gen sitear=.
-label define sitear_lab 1 "C00-C14: lip, oral cavity & pharynx" 2 "C16: stomach"  3 "C18: colon" /// 
-  					  4 "C19: colon and rectum"  5 "C20-C21: rectum & anus" 6 "C25: pancreas" ///
-					  7 "C15, C17, C22-C24, C26: other digestive organs" ///
-					  8 "C30-C39: respiratory and intrathoracic organs" 9 "C40-41: bone and articular cartilage" ///
-					  10 "C42,C77: haem & lymph systems" ///
-					  11 "C43: melanoma & reportable skin cancers" 12 "C44: skin (non-reportable)" ///
-					  13 "C45-C49: mesothelial and soft tissue" 14 "C50: breast" 15 "C53: cervix" ///
-					  16 "C54,55: uterus" 17 "C51-C52, C56-58: other female genital organs" ///
-					  18 "C60, C62, C63: male genital organs" 19 "C61: prostate" ///
-					  20 "C64-C68: urinary tract" 21 "C69-C72: eye, brain, other CNS" ///
-					  22 "C73-C75: thyroid and other endocrine glands"  /// 
-					  23 "C76: other and ill-defined sites" ///
-					  24 "C77: lymph nodes" 25 "C80: unknown primary site"
-label var sitear "site of tumour"
-label values sitear site_lab
-
-replace sitear=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
+replace siteicd10=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
 					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
 					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
 					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
 					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //34 changes
-replace sitear=2 if regexm(icd10,"C16") //23 changes
-replace sitear=3 if regexm(icd10,"C18") //131 changes
-replace sitear=4 if regexm(icd10,"C19") //5 changes
-replace sitear=5 if (regexm(icd10,"C20")|regexm(icd10,"C21")) //28 changes
-replace sitear=6 if regexm(icd10,"C25") //23 changes
-replace sitear=7 if (regexm(icd10,"C15")|regexm(icd10,"C17")|regexm(icd10,"C22")|regexm(icd10,"C23")|regexm(icd10,"C24")|regexm(icd10,"C26")) //40 changes
-replace sitear=8 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //57 changes
-replace sitear=9 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //3 changes
-replace sitear=10 if sitecr5db==21|sitecr5db==22|sitecr5db==30|sitecr5db==31 //73 changes
-replace sitear=11 if siteiarc==24 //7 changes
-replace sitear=12 if siteiarc==25 //0 changes
-replace sitear=13 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //12 changes
-replace sitear=14 if regexm(icd10,"C50") //174 changes
-replace sitear=15 if regexm(icd10,"C53") //21 changes
-replace sitear=16 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //49 changes
-replace sitear=17 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //14 changes
-replace sitear=18 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //5 changes
-replace sitear=19 if regexm(icd10,"C61") //216 changes
-replace sitear=20 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //37 changes
-replace sitear=21 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //6 changes
-replace sitear=22 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //12 changes
-replace sitear=23 if regexm(icd10,"C76") //3 changes
-**replace sitear=24 if  // captured in sitear 10
-replace sitear=25 if regexm(icd10,"C80") //43 changes
+replace siteicd10=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
+					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
+					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
+					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) // changes
+replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //57 changes
+replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //3 changes
+replace siteicd10=5 if siteiarc==24 //7 changes
+replace siteicd10=6 if siteiarc==25 //0 changes
+replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //12 changes
+replace siteicd10=8 if regexm(icd10,"C50") //174 changes
+replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //14 changes
+replace siteicd10=10 if regexm(icd10,"C61") //216 changes
+replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //5 changes
+replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //37 changes
+replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //6 changes
+replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //12 changes
+replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //3 changess
+replace siteicd10=16 if regexm(icd10,"C80") //43 changes
+replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
+					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
+					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
+					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
+					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")|regexm(icd10,"C96")) //34 changes
 
-tab sitear ,m //0 missing
 
-drop cod1b cod1c cod1d cod2a cod2b onsetnumcod1b onsettxtcod1b onsetnumcod1c ///
-	 onsettxtcod1c onsetnumcod1d onsettxtcod1d onsetnumcod2a onsettxtcod2a ///
-	 onsetnumcod2b onsettxtcod2b death_certificate_complete tempcod1a
-	 
-order deathid did fname lname age age5 age_10 sex dob nrn parish dod dodyear mrcancer siteiarc siteiarchaem site pod cod1a
+tab siteicd10 ,m //0 missing
 
-count // 651
+drop tempcod1a cod1a_orig
 
-save "`datapath'\version01\2-working\2014_mort_dc" ,replace
-label data "National deaths prepared 2014 data"
+rename ddsex sex
+rename ddparish parish
+rename ddage age
+
+order deathid did fname lname age age5 age_10 sex dob nrn parish dod dodyear mrcancer siteiarc siteiarchaem site siteicd10 pod cod1a
+
+count // 
+
+save "`datapath'\version01\2-working\2008_2013_mort_dc_v01" ,replace
+label data "National deaths prepared 2008 & 2013 data"
 notes _dta :These data prepared for 2014 cancer report

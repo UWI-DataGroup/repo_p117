@@ -252,7 +252,110 @@ graph twoway 	(bar case site if site>6 , yaxis(1) col(lavender) barw(0.5) ),
 
 restore
 
-*
+
+********************************************************************************
+** Fig. 4 death by specific site - ALTERNATIVE using siteicd10 from dofile 6
+********************************************************************************
+** NOT USED!
+
+preserve
+use "`datapath'\version01\2-working\2014_cancer_rx_outcomes_da", clear
+sort sex siteicd10
+keep if deceased==1 & dodyear<2018 //424 deleted
+drop if cod!=1
+count //476
+collapse (sum) case , by(siteicd10)
+sort siteicd10
+gsort -case
+** These will be difficult to show on a chart so let's re-input into more
+** amenable names
+/*
+drop _all
+input id site2 case
+1	1	85	// colorectal (colon 65, rectum 19, anus 1)
+2	2	37  // uterus (23), cervix (7), other female genital organs (ovary 3, vag 2, vul 2)
+3   3   50	// lymphoid/blood (MM 20, NHL 14, LL 5, ML 4, Leu 3, HL 1, MPD 1, MDS 1, Immuno 1)
+4	4	66	// prostate (64), other male genital organs (penis 2)
+5	5	46  // stomach (17), other digestive organs (liver 10, oseoph 8, GB 8, small intest 3)
+6	6	51	// breast (51)
+7   7   32  // respiratory and intra-thoracic (lung 28, larynx 4)
+8   8   20  // pancreas  (20)
+9   9   16  // head & neck (lip etc.)(hypo 4, nose 3, oro 3, naso 2, tongue 2, tonsil 1, mouth 1)
+10  10  15  // urinary tract (bladder 11, kidney 4)
+11  11  15  // misc. sites (bone 1, skin 3, meso 4, brain 4, thyroid 3)
+12  12  43  // O&U (oth & unk)(43)
+end
+
+sort site2
+label define site2_lab 1 "Colorectal" 2 "Uterus, OFG" 3 "Prostate, OMG" 4 "Lymph/blood" ///
+					   5 "Stomach+other GI" 6 "Breast" 7 "Respiratory" ///
+					   8 "Pancreas" 9 "Head & Neck"  10 "Urinary tract" ///
+					   11 "Misc. Sites" 12 "O&U (other & unk)"
+label values site2 site2_lab
+*/
+#delimit ;
+graph twoway 	(bar case siteicd10 if siteicd10<9 , yaxis(1) col(lavender) barw(0.5) ),
+			/// Making background completely white
+			plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			/// and insist on a long thin graphic
+			ysize(2)
+			
+	       	xlabel(1 2 3 4 5 6, valuelabel
+		
+	       	labs(large) nogrid glc(gs12) angle(0))
+	       	xtitle("", size(vlarge) margin(t=3)) 
+			//xscale(range(1(1)3))
+			//xmtick(1(1)3)
+
+			ylab(0(20)80, labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
+	       	ytitle("Number of tumours", size(large) margin(r=3)) 
+			ymtick(0(10)80)
+			/// title info
+			title("Figure 3. Site of cancer for 476 fatal tumours diagnosed in 2014 which caused" "death within 3 years, Barbados", size(huge) margin(medium) color(white) fcolor(lavender) lcolor(black) box)
+			/// Legend information
+			legend(off size(medlarge) nobox position(11) colf cols(2)
+			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2)
+			lab(1 "Number of tumours (men)") 
+			lab(2 "Number of tumours (women)")
+			)
+			name(figure3b, replace)
+			;
+#delimit cr
+
+
+
+#delimit ;
+graph twoway 	(bar case siteicd10 if siteicd10>8 , yaxis(1) col(lavender) barw(0.5) ),
+			/// Making background completely white
+			plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			/// and insist on a long thin graphic
+			ysize(2)
+			
+	       	xlabel(7 8 9 10 11 12, valuelabel
+		
+	       	labs(large) nogrid glc(gs12) angle(0))
+	       	xtitle("Site of tumour", size(vlarge) margin(t=3)) 
+			//xscale(range(1(1)3))
+			//xmtick(1(1)3)
+
+			ylab(0(20)80, labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
+	       	ytitle("Number of tumours", size(large) margin(r=3)) 
+			ymtick(0(10)80)
+			
+			/// Legend information
+			legend(off size(medlarge) nobox position(11) colf cols(2)
+			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2)
+			lab(1 "Number of tumours (men)") 
+			lab(2 "Number of tumours (women)")
+			)
+			name(figure4b, replace)
+			;
+#delimit cr
+
+restore
+
 ***********************************************************************
 ** Fig 1: Graph of numbers of tumours by month (men and women combined)
 ***********************************************************************
