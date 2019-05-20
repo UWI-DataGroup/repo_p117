@@ -1,11 +1,11 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			13_survival_2013_da_v01.do
-    //  project:				BNR
-    //  analysts:				Jacqueline CAMPBELL
+    //  algorithm name		13_3yr_survival_2013_da_v01.do
+    //  project:		BNR
+    //  analysts:		Jacqueline CAMPBELL
     //  date first created      18-APR-2019
-    // 	date last modified	    18-APR-2019
-    //  algorithm task			Generate 3-year survival % for report: Table ES1
+    // 	date last modified	18-APR-2019
+    //  algorithm task		Generate 3-year survival % for report: Table ES1
     //  status                  Completed
     //  objectve                To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
 
@@ -34,7 +34,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\13_survival_2013_da_v01.smcl", replace
+    log using "`logpath'\13_3yr_survival_2013_da_v01.smcl", replace
 ** HEADER -----------------------------------------------------
 
 
@@ -191,8 +191,8 @@ tab deceased ,m //48.03% used as 3-yr survival in table ES1 (executive summary, 
 */
 
 ** Save this new dataset 
-save "`datapath'\version01\2-working\2013_survival_da_v01", replace
-label data "2013 BNR-Cancer analysed data - Survival"
+save "`datapath'\version01\2-working\2013_3yr_survival_da_v01", replace
+label data "2013 BNR-Cancer analysed data - 3yr Survival"
 note: TS This dataset does NOT include population data
 	
 /* NS, IH and JC decided (March2019) not to use survival graphs after a review revealed 1-day survival was being used for DCOs (zero survival)

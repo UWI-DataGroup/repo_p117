@@ -1,13 +1,13 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			13_survival_2014_da.do
-    //  project:				BNR
-    //  analysts:				Jacqueline CAMPBELL
-    //  date first created      28-MAR-2019
-    // 	date last modified	    28-MAR-2019
-    //  algorithm task			Generate 3-year survival % for report: Table ES1
+    //  algorithm name		13_3yr_survival_2008_da_v01.do
+    //  project:		BNR
+    //  analysts:		Jacqueline CAMPBELL
+    //  date first created      18-APR-2019
+    // 	date last modified	18-APR-2019
+    //  algorithm task		Generate 3-year survival % for report: Table ES1
     //  status                  Completed
-    //  objectve                To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
+    //  objectve                To have one dataset with cleaned, grouped and analysed 2008 data for 2014 cancer report.
 
     ** DO FILE BASED ON
     * AMC Rose code for BNR Cancer 2008 annual report
@@ -34,7 +34,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\13_survival_2014_da.smcl", replace
+    log using "`logpath'\13_3yr_survival_2008_da_v01.smcl", replace
 ** HEADER -----------------------------------------------------
 
 
@@ -44,93 +44,106 @@
 **************************************************************************
 
 ** Load the dataset
-use "`datapath'\version01\2-working\2014_cancer_rx_outcomes_da", clear
+use "`datapath'\version01\2-working\2008_cancer_rx_outcomes_da_v01", clear
 
-count //927
+count //829
 
 ** first we have to restrict dataset to patients not tumours
 drop if patient!=1
-count //912
+count //829
 
 ** now ensure everyone has a unique id
 count if pid=="" //0
 
-** IRH (12feb2019) tab id ,m
-** IRH (12feb2019) summ
 
 ** failure is defined as deceased==1
-** IRH (12feb2019) codebook deceased
-recode deceased 2=0 //424 changes
-** IRH (12feb2019) tab deceased ,m
-** JC (14feb2019) tab dod ,m
-** JC (14feb2019) tab dlc ,m //dlc used in 2013,2014 datasets for date last contact
-** JC (14feb2019) count if dlc==. //0
-** JC (14feb2019) count if dod==. //424 so 488 are deceased
+recode deceased 2=0 //277 changes
+** IRH (12feb2019) 
+tab deceased ,m
+** JC (18apr2019) 
+tab dod ,m
+** JC (18apr2019) 
+tab dlc ,m //dlc used in 2013,2014 datasets for date last contact
+** JC (18apr2019) 
+count if dlc==. //0
+** JC (18apr2019) 
+count if dod==. //277 so 552 are deceased
 
 ** check for all patients who are deceased but missing dod
 count if deceased==1 & dod==. //0
-** JC (14feb2019) tab dod ,m
+** JC (18apr2019) 
+tab dod ,m
 
 version 14.1
 
 ** check all patients have a dot (incidence date)
-** IRH (12feb2019) tab dot ,m
+** IRH (12feb2019) 
+tab dot ,m
 
 ** set study end date variable as 3 years from dx date IF PT HAS NOT DIED
-** JC (14feb2019): I used 3 yrs instead of 5 as we have death info up to end of 2017
+** JC (18apr2019): I used 3 yrs instead of 5 as we have death info up to end of 2017
 gen end_date=(dot+(365.25*3)) if dot!=.
 
 format end_date %dD_m_CY
 
 ** check all patients have an end_date
-** IRH (12feb2019) tab end_date ,m
+** IRH (12feb2019) 
+tab end_date ,m
 
 ** check that all who died have a dod
-** IRH (12feb2019) tab dod if deceased==1 ,m
-// 0 have dod in 2018 but we saw above
-// that all end_dates are in 2017
+** IRH (12feb2019) 
+tab dod if deceased==1 ,m
+// some have dod >2011 but we saw above
+// that all end_dates are in 2016
 
-** none with dod in 2018 so no need to reset to "alive". However,
-** and any with dod >3 years from dx even if dod still in 2017,
+** some with dod >2011 so no need to reset to "alive" as
+** any with dod >3 years from dx even if dod still in 2011,
 ** needs to be reset as alive
-** JC (14feb2019) list deceased dot dod dlc if dod!=. & dod>dot+(365.25*3)
-replace deceased=0 if dod!=. & dod>dot+(365.25*3) //14 changes
+** JC (18apr2019) list deceased dot dod end_date dlc if dod!=. & dod>dot+(365.25*3)
+replace deceased=0 if dod!=. & dod>dot+(365.25*3) //137 changes
 
 ** set to missing those who have dod>3 years from incidence date - but
 ** first create new variable for time to death/date last seen, called "time"
 
 ** (1) use dod to define time to death if died within 3 yrs
-gen time=dod-dot if (dod!=. & deceased==1 & dod<dot+(365.25*3))
+gen time=dod-dot if (dod!=. & deceased==1 & dod<dot+(365.25*3)) //415 changes
 
 ** (2) next use 3 yrs as time, if died >3 yrs from incidence
 replace time=end_date-dot if (end_date<dod & dod!=. & deceased==1) //0 changes
 
 ** (2) next use dlc as end date, if alive and have date last seen (dlc)
-replace time=dlc-dot if (dlc<end_date & deceased==0) //422 changes
+replace time=dlc-dot if (dlc<end_date & deceased==0) //218 changes
 
-** IRH (12feb2019) tab time ,m
-** IRH (12feb2019) count if time!=. // at this point we are missing 9 for time... why?
-** JC (14feb2019) count if time==. //16 missing time
+** IRH (12feb2019) 
+tab time ,m
+** IRH (12feb2019) count if time!=. // at this point we are missing 196 for time... why?
+** JC (18apr2019) 
+count if time==. //196 missing time
 
 ** IRH (12feb2019) list time dot dlc end_date dod deceased if time==.
 ** these have date last seen > end_date - so here make dlc the end_date
-replace time=end_date-dot if (end_date<dlc & deceased==0) & time==. & dlc!=. //7 changes
-** JC (14feb2019) count if deceased==0 & time==. //1 didn't change above
-** JC (14feb2019) list pid vstatus slc dlc dod if deceased==0 & time==. //dlc=end_date so need to update
-replace time=dlc-dot if deceased==0 & time==. //16 changes
+replace time=end_date-dot if (end_date<dlc & deceased==0) & time==. & dlc!=. //196 changes - all updated
+** JC (18apr2019) count if deceased==0 & time==. //1 didn't change above
+** JC (18apr2019) list pid vstatus slc dlc dod if deceased==0 & time==. //dlc=end_date so need to update
+**replace time=dlc-dot if deceased==0 & time==. //0 changes
 
-** what to do with the 3 missing values for dlc??
+** IRH (12feb2019) what to do with the 3 missing values for dlc??
 ** IRH (12feb2019) list if dlc==.
-** JC (14feb2019) count if dlc==. //0
+** JC (18apr2019) 
+count if dlc==. //0
 
-** JC (14feb2019) list dot end_date dod deceased if end_date<dod & dod!=.
-** these are the 14 from above - change dod to missing (deceased already
+** JC (18apr2019)
+count if end_date<dod & dod!=. //137
+//list dot end_date dod deceased if end_date<dod & dod!=.
+** these are the 37 from above - change dod to missing (deceased already
 ** set to 0 above) as they did not die within 3 years
-replace dod=. if end_date<dod & dod!=. //14 changes
+replace dod=. if end_date<dod & dod!=. //137 changes
 
-** JC (14feb2019) tab deceased ,m // now 474 (used to be 488 but 14 died >3 years)
+** JC (18apr2019) 
+tab deceased ,m // now 415 (used to be 552 but 137 died >3 years)
 sort end_date   // death from comments so changed from alive to dead
-** IRH (12feb2019) tab end_date ,m
+** IRH (12feb2019) 
+tab end_date ,m
 
 ** Now to set up dataset for survival analysis, we need each patient's date of
 ** entry to study (incidence date, or dot), and exit date from study which is end_date
@@ -140,43 +153,47 @@ sort end_date   // death from comments so changed from alive to dead
 sort dot
 sort pid
 
-** JC (14feb2019) list pid dot deceased dod dlc end_date
+** JC (18apr2019) list pid dot deceased dod dlc end_date
 
-gen newend_date=dod if (end_date>dod & dod!=. & deceased==1)
-replace newend_date=dlc if (dlc<end_date) & dod==. & deceased==0 //422 changes
-** JC (14feb2019) count if newend_date==. //16
-** JC (14feb2019) list dot deceased dod dlc end_date if newend_date==.
-replace newend_date=end_date if newend_date==. //16 changes
+gen newend_date=dod if (end_date>dod & dod!=. & deceased==1) //415 changes
+replace newend_date=dlc if (dlc<end_date) & dod==. & deceased==0 //218 changes
+** JC (18apr2019) 
+count if newend_date==. //196
+** JC (18apr2019) list dot deceased dod dlc end_date if newend_date==.
+replace newend_date=end_date if newend_date==. //196 changes
 format newend_date %dD_m_CY
 
 ** IRH (12feb2019) describe dot  newend_date
 sort dot
 ** IRH (12feb2019) list pid dot dod dlc end_date newend_date
 
-** IRH (12feb2019) tab time ,m
-** JC (14feb2019) list deceased dot dod dlc end_date newend_date time if time==0
-** there are 393 records with time=0 (ie either DCO or defaulted as not seen after dx date)
+** IRH (12feb2019) 
+tab time ,m
+** JC (18apr2019) list deceased dot dod dlc end_date newend_date time if time==0
+** there are 76 records with time=0 (ie either DCO or defaulted as not seen after dx date)
 ** honestly those who did not die (ie no death certificate) should have at least a
 ** value of 1 day... while those DCOs are understandably at time=0
-replace newend_date=newend_date+1 if (time==0 & deceased==0) //238 changes
-replace time=1 if (time==0 & deceased==0) //238 changes
+replace newend_date=newend_date+1 if (time==0 & deceased==0) //20 changes
+replace time=1 if (time==0 & deceased==0) //20 changes
+** Still 56 records with time=0
+list basis deceased dot dod dlc time if time==0 //all dot=dod so leave as is
 
 ** AR: after meeting RH 26-aug-2016: CHANGE THOSE WITH DOT>DOD SO DOT=DOD
 
-tab deceased ,m //48.03% used as 3-yr survival in table ES1 (executive summary, 2014 annual report) - JC (14feb2019)
+tab deceased ,m //49.9% used as 3-yr survival in table ES1 (executive summary, 2014 annual report) - JC (14feb2019)
 /*
    whether patient is |
              deceased |      Freq.     Percent        Cum.
 ----------------------+-----------------------------------
-                    0 |        438       48.03       48.03
-                 dead |        474       51.97      100.00
+                    0 |        414       49.94       49.94
+                 dead |        415       50.06      100.00
 ----------------------+-----------------------------------
-                Total |        912      100.00
+                Total |        829      100.00
 */
 
 ** Save this new dataset 
-save "`datapath'\version01\2-working\2014_survival_da", replace
-label data "2014 BNR-Cancer analysed data - Survival"
+save "`datapath'\version01\2-working\2008_3yr_survival_da_v01", replace
+label data "2008 BNR-Cancer analysed data - 3yr Survival"
 note: TS This dataset does NOT include population data
 	
 /* NS, IH and JC decided (March2019) not to use survival graphs after a review revealed 1-day survival was being used for DCOs (zero survival)
