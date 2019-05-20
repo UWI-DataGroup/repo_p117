@@ -186,7 +186,7 @@ sort site2
 label define site2_lab 1 "Colorectal" 2 "Uterus, OFG" 3 "Prostate, OMG" 4 "Lymph/blood" ///
 					   5 "Stomach+other GI" 6 "Breast" 7 "Respiratory" ///
 					   8 "Pancreas" 9 "Head & Neck"  10 "Urinary tract" ///
-					   11 "Misc. Sites" 12 "O&U (other & unk)"
+					   11 "Misc. Sites" 12 "O&U"
 label values site2 site2_lab
 
 #delimit ;
