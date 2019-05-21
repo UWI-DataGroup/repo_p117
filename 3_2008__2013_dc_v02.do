@@ -388,6 +388,9 @@ count if sex==2 & topcat>51 & topcat<56 & (regexm(cr5cod, "PENIS")|regexm(cr5cod
 ** Status Last Contact
 
 ** Date Last Contact
+replace dlc=d(31dec2014) if pid=="20080196" //see DLC for 2nd patient record
+replace dlc=d(01jul2014) if pid=="20080242" //see dot for T2
+replace dlc=d(19mar2014) if pid=="20080690" //see DLC for 2nd patient record
 
 ** Comments
 

@@ -207,9 +207,9 @@ merge m:m sex age_10 using "`datapath'\version01\2-working\bb2010_10-2"
 **	age_10	site  dup	sex	 pfu	age45	age55	pop_bb	_merge
 ** 15-24	  .     .	female .	0-44	0-54	18530	using only (2)
 ** 15-24	  .     .	male   .	0-44	0-54	18510	using only (2)
-drop if _merge==2
+**drop if _merge==2 //do not drop these age groups as it skews population 
 
-gen case=1
+gen case=1 if deathid!=. //do not generate case for missing age group 0-14 as it skews case total
 gen pfu=1 // for % year if not whole year collected; not done for cancer
 
 list deathid sex age_10 if age_10==1 // age range 0-14 for female & male: change case=0 for age_10=1
@@ -217,7 +217,7 @@ list deathid sex age_10 if age_10==1 // age range 0-14 for female & male: change
 tab pop age_10  if sex==1 //female
 tab pop age_10  if sex==2 //male
 
-
+/*
 ** Next, MRs for all tumours
 preserve
 	* crude rate: point estimate
@@ -263,7 +263,32 @@ preserve
   +--------------------------------------------------+
 */
 restore
+*/
 
+** Next, IRs for all tumours
+tab pop age_10
+tab age_10 ,m //none missing
+preserve
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+		
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bb
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR ALL TUMOURS - STD TO WHO WORLD POPN 
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  581   277814   209.13    136.28   124.98   148.39     5.90 |
+  +-------------------------------------------------------------+
+*/
+restore
 
 ** PROSTATE
 tab pop age_10 if siteiarc==39 //male
