@@ -791,6 +791,126 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
 */
 restore
 
+** PROSTATE - <65 yrs old
+tab pop_bb age_10 if siteiarc==39 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //102 deleted
+	keep if siteiarc==39 // prostate only
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: M 0-14, 15-24, 25-34
+	** JC: I had to change the obsID so that the replacements could take place as the
+	** dataset stopped at obsID when the above code was run
+	expand 2 in 1
+	replace sex=2 in 7
+	replace age_10=1 in 7
+	replace case=0 in 7
+	replace pop_bb=(28005) in 7
+	sort age_10	
+	
+	expand 2 in 1
+	replace sex=2 in 8
+	replace age_10=2 in 8
+	replace case=0 in 8
+	replace pop_bb=(18510)  in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 9
+	replace age_10=3 in 9
+	replace case=0 in 9
+	replace pop_bb=(18465) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bb
+
+drop if age_10>6
+replace age_10=1
+label define age_10 1 "0-64"  2 "65 & over" , modify
+label values age_10 age_10
+rename age_10 age65
+
+collapse (sum) case (sum) pop_bb, by(pfu age65 sex)
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_64", 	///	
+		         stand(age65) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR PC <65 - STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   61   118195   51.61     51.61    39.48    66.29     6.66 |
+  +------------------------------------------------------------+
+*/
+restore
+
+** PROSTATE - 65 and over yrs old
+tab pop_bb age_10 if siteiarc==39 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //102 deleted
+	keep if siteiarc==39 // prostate only
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: M 0-14, 15-24, 25-34
+	** JC: I had to change the obsID so that the replacements could take place as the
+	** dataset stopped at obsID when the above code was run
+	expand 2 in 1
+	replace sex=2 in 7
+	replace age_10=1 in 7
+	replace case=0 in 7
+	replace pop_bb=(28005) in 7
+	sort age_10	
+	
+	expand 2 in 1
+	replace sex=2 in 8
+	replace age_10=2 in 8
+	replace case=0 in 8
+	replace pop_bb=(18510)  in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 9
+	replace age_10=3 in 9
+	replace case=0 in 9
+	replace pop_bb=(18465) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bb
+
+drop if age_10<7
+replace age_10=2
+label define age_10 1 "0-64"  2 "65 & over" , modify
+label values age_10 age_10
+rename age_10 age65
+
+collapse (sum) case (sum) pop_bb, by(pfu age65 sex)
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_65", 	///	
+		         stand(age65) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR PC 65+ - STD TO WHO WORLD POPN 
+/*
+  +-------------------------------------------------------------+
+  | case       N    crude   rateadj   lb_gam    ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  143   14816   965.17    965.17   813.47   1136.96    80.99 |
+  +-------------------------------------------------------------+
+*/
+restore
+
 
 ** BREAST
 tab pop age_10  if siteiarc==29 & sex==1 //female
@@ -832,6 +952,156 @@ distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
   |  133   144803   91.85     63.87    53.09    76.29     5.79 |
+  +------------------------------------------------------------+
+*/
+restore
+
+
+** BREAST - female only
+tab pop age_10  if siteiarc==29 & sex==1 //female
+tab pop age_10  if siteiarc==29 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //102 deleted
+	keep if siteiarc==29 // breast only
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** F 0-14, 15-24
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=1 in 8
+	replace case=0 in 8
+	replace pop_bb=(26755) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=2 in 9
+	replace case=0 in 9
+	replace pop_bb=(18530) in 9
+	sort age_10
+
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+sort age_10
+total pop_bb
+
+drop if sex==2 // for breast cancer - female ONLY
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR BC (FEMALE ONLY) - STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  133   144803   91.85     63.87    53.09    76.29     5.79 |
+  +------------------------------------------------------------+
+
+*/
+restore
+
+** BREAST - female only <65 yrs old
+preserve
+	drop if age_10==.
+	drop if beh!=3 //102 deleted
+	keep if siteiarc==29 // breast only
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** F 0-14, 15-24
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=1 in 8
+	replace case=0 in 8
+	replace pop_bb=(26755) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=2 in 9
+	replace case=0 in 9
+	replace pop_bb=(18530) in 9
+	sort age_10
+
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+sort age_10
+total pop_bb
+
+drop if sex==2 // for breast cancer - female ONLY
+
+drop if age_10>6
+replace age_10=1
+label define age_10 1 "0-64"  2 "65 & over" , modify
+label values age_10 age_10
+rename age_10 age65
+
+collapse (sum) case (sum) pop_bb, by(pfu age65 sex)
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_64", 	///	
+		         stand(age65) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR BC (FEMALE ONLY) <65 - STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   73   123660   59.03     59.03    46.27    74.22     6.96 |
+  +------------------------------------------------------------+
+*/
+restore
+
+** BREAST - female only 65 and over yrs old
+preserve
+	drop if age_10==.
+	drop if beh!=3 //102 deleted
+	keep if siteiarc==29 // breast only
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** F 0-14, 15-24
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=1 in 8
+	replace case=0 in 8
+	replace pop_bb=(26755) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=2 in 9
+	replace case=0 in 9
+	replace pop_bb=(18530) in 9
+	sort age_10
+
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+sort age_10
+total pop_bb
+
+drop if sex==2 // for breast cancer - female ONLY
+
+drop if age_10<7
+replace age_10=2
+label define age_10 1 "0-64"  2 "65 & over" , modify
+label values age_10 age_10
+rename age_10 age65
+
+collapse (sum) case (sum) pop_bb, by(pfu age65 sex)
+
+distrate case pop_bb using "`datapath'\version01\2-working\who2000_65", 	///	
+		         stand(age65) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR BC (FEMALE ONLY) 65+ - STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case       N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   60   21143   283.78    283.78   216.56   365.28    36.94 |
   +------------------------------------------------------------+
 */
 restore

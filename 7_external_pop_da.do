@@ -159,6 +159,14 @@ recode age60 59=1 200=2
 label define age60  1 "0-59"	 2 "60+" , modify
 label values age60 age60
 
+**age65 (to be saved as dataset bb2010_65)
+**********************************
+** Two age bands (adult <65, elderly adult 65+)
+gen age65 = recode(age,64,200)
+recode age65 64=1 200=2
+label define age65  1 "0-64"	 2 "65+" , modify
+label values age65 age65
+
 ** Sex
 ******
 label define sex_lab 1 "female" 2 "male",modify
@@ -166,10 +174,11 @@ label values sex sex_lab
 
 ** Barbados population denominator file
 ***************************************
-collapse (sum) pop_bb, by(age5 age10 age_10 age45 age55 age60 sex)
+collapse (sum) pop_bb, by(age5 age10 age_10 age45 age55 age60 age65 sex)
 label var age45 "Age in 2 groups (<45, 45 & over)"
 label var age55 "Age in 2 groups (<55, 55 & over)"
 label var age60 "Age in 2 groups (<60, 60+)"
+label var age65 "Age in 2 groups (<65, 65+)"
 label var age5 "Age in 5-year age bands (18 groups)"
 label var age10 "Age in 10-year age bands (10 groups)"
 label var age_10 "Age in 10-year age bands from 15 (10 groups)"
@@ -192,17 +201,21 @@ collapse (sum) pop_bb, by(age60 sex)
 save "`datapath'\version01\2-working\bb2010_60" , replace
 restore
 
-collapse (sum) pop_bb, by(age_10 age45 age55 sex)
+collapse (sum) pop_bb, by(age_10 age45 age55 age65 sex)
 	label data "Barbados census 2010: 10-year age bands2"
 save "`datapath'\version01\2-working\bb2010_10-2" , replace
 
-collapse (sum) pop_bb, by(age45 age55 sex)
+collapse (sum) pop_bb, by(age45 age55 age65 sex)
 	label data "Barbados census 2010: 2 age groups. <45 and 45 & over"
 save "`datapath'\version01\2-working\bb2010_45" , replace
 
-collapse (sum) pop_bb, by(age55 sex)
+collapse (sum) pop_bb, by(age55 age65 sex)
 	label data "Barbados census 2010: 2 age groups. <55 and 55 & over"
 save "`datapath'\version01\2-working\bb2010_55" , replace
+
+collapse (sum) pop_bb, by(age65 sex)	
+	label data "Barbados census 2010: 2 age groups. <65 and 65 & over"
+save "`datapath'\version01\2-working\bb2010_65" , replace
 
 
 **********************************
@@ -295,6 +308,11 @@ recode age60 12=1 18=2
 label define age60  1 "0-59"   2 "60 & over" , modify
 label values age60 age60
 
+gen age65 = recode(age5,13,18)
+recode age65 13=1 18=2
+label define age65 1 "0-64"  2 "65 & over" , modify
+label values age65 age65
+
 sort age5
 label data "WHO world standard million: 5-year age bands"
 
@@ -312,7 +330,7 @@ collapse (sum) pop , by(age60 intdn)
 save "`datapath'\version01\2-working\who2000_60", replace
 restore
 
-collapse (sum) pop , by(age_10 age45 age55 intdn)
+collapse (sum) pop , by(age_10 age45 age55 age65 intdn)
 	label data "WHO world standard million: 10-year age bands2"
 	sort age_10
 save "`datapath'\version01\2-working\who2000_10-2", replace
@@ -327,17 +345,31 @@ save "`datapath'\version01\2-working\who2000_10-2", replace
 save "data\population\who2000_10-2_PC", replace
 */
 
-collapse (sum) pop , by(age45 age55 intdn)
+collapse (sum) pop , by(age45 age55 age65 intdn)
 	label data "WHO world standard million: 2 age groups. <45 and 45 & over"
 	sort age45
 save "`datapath'\version01\2-working\who2000_45", replace
 
-collapse (sum) pop , by(age55 intdn)
+collapse (sum) pop , by(age55 age65 intdn)
 	label data "WHO world standard million: 2 age groups. <55 and 55 & over"
 	sort age55
 save "`datapath'\version01\2-working\who2000_55", replace
 
+preserve
+collapse (sum) pop , by(age65 intdn)
+	drop if age65==2
+	label data "WHO world standard million: 1 age group. <65"
+	sort age65
+save "`datapath'\version01\2-working\who2000_64", replace
+restore
 
+preserve
+collapse (sum) pop , by(age65 intdn)
+	drop if age65==1
+	label data "WHO world standard million: 1 age group. 65 & over"
+	sort age65
+save "`datapath'\version01\2-working\who2000_65", replace
+restore
 
 
 **********************************
