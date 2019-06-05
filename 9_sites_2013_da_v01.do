@@ -440,6 +440,7 @@ total count //285
 restore
 
 
+
 **********************************************************************************
 ** ASIR and 95% CI for Table 1 using AR's site groupings - using WHO World popn **
 gen pfu=1 // for % year if not whole year collected; not done for cancer        **

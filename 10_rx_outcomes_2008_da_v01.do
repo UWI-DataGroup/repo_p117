@@ -356,6 +356,21 @@ Dead of other cause |         36       15.52       99.14
 */
 tab siteiarc if deceased==1 & patient==1 & dodyear<2009 & cod==1 ,m
 
+*****************************
+**   Data Quality Indices  **
+*****************************
+** MV %
+** Missing sex %
+** Missing age %
+
+
+
+
+
+
+
+
+
 
 ** Save this new dataset for graphs in dofile 12 
 save "`datapath'\version01\2-working\2008_cancer_rx_outcomes_da_v01", replace

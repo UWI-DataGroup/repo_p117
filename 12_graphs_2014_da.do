@@ -253,6 +253,116 @@ graph twoway 	(bar case site if site>6 , yaxis(1) col(lavender) barw(0.5) ),
 restore
 
 
+
+********************************************************************************
+** Fig. 6 ASIR by specific site by country
+********************************************************************************
+
+preserve
+use "`datapath'\version01\2-working\2014_cancer_rx_outcomes_da", clear
+sort sex siteiarc
+keep if siteiarc==39|siteiarc==21
+count //
+**gen asir=111.5 if siteiarc==39
+**replace asir=7.4 if siteiarc==21
+**collapse asir, by(siteiarc)
+collapse siteiarc
+**gen country="Barbados (2014)"
+sort siteiarc
+
+** These will be difficult to show on a chart so let's re-input into more
+** amenable names
+
+drop _all
+input id site country asir
+1	39	1	111.5	// prostate: Barbados
+2	39	2	60.1	// prostate: Colombia, Cali
+3	39	3	54.2	// prostate: Costa Rica
+4	39	4	165.5	// prostate: France, Martinique
+5	39	5	72.7	// prostate: Jamaica, Kingston and St Andrew
+6	39	6	100.8	// prostate: USA, Puerto Rico
+7   21	7	7.4		// lung: Barbados
+8   21	8	13.9	// lung: Colombia, Cali
+9	21	9	8.8		// lung: Costa Rica
+10  21  10	9.5		// lung: France, Martinique
+11	21  11	18.9	// lung: Jamaica, Kingston and St Andrew
+12	21	12	14.7	// lung: USA, Puerto Rico
+end
+
+sort country
+label define country_lab 1 "Barbados" ///
+						 2 "Colombia" ///
+						 3 "Costa Rica" ///
+						 4 "Martinique" ///
+						 5 "Jamaica" ///
+						 6 "Puerto Rico" ///
+						 7 "Barbados" ///
+						 8 "Colombia" ///
+						 9 "Costa Rica" ///
+						 10 "Martinique" ///
+						 11 "Jamaica" ///
+						 12 "Puerto Rico" //
+label values country country_lab
+
+
+gsort -asir
+gsort -asir
+#delimit ;
+graph twoway 	(bar asir country if site==39 , yaxis(1) col(red) barw(0.5) ),
+			/// Making background completely white
+			plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			/// and insist on a long thin graphic
+			ysize(2)
+			xsize(2)
+			
+	       	xlabel(1 2 3 4 5 6, valuelabel
+		
+	       	labs(medium) nogrid glc(gs12) angle(45))
+	       	xtitle("", size(small) margin(t=3)) 
+			//xscale(range(1(1)3))
+			//xmtick(1(1)3)
+
+			ylab(0(20)180, labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
+	       	ytitle("Age-standardized incidence rate per 100,000", size(small) margin(r=3)) 
+			ymtick(0(20)180)
+			/// title info
+			title("Prostate - Male", size(large) margin(medium) color(black))
+			name(figure6a, replace)
+			;
+#delimit cr
+
+
+
+#delimit ;
+graph twoway 	(bar asir country if site==21 , yaxis(1) col(blue) barw(0.5) ),
+			/// Making background completely white
+			plotregion(c(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			graphregion(color(gs16) ic(gs16) ilw(thin) lw(thin)) 
+			/// and insist on a long thin graphic
+			ysize(2)
+			xsize(2)
+			
+	       	xlabel(7 8 9 10 11 12, valuelabel
+		
+	       	labs(medium) nogrid glc(gs12) angle(45))
+	       	xtitle("", size(small) margin(t=3)) 
+			//xscale(range(1(1)3))
+			//xmtick(1(1)3)
+
+			ylab(0(2)20, labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
+	       	ytitle("Age-standardized incidence rate per 100,000", size(small) margin(r=3)) 
+			ymtick(0(2)20)
+			/// title info
+			title("Lung, trachea, bronchus - Male", size(large) margin(medium) color(black))
+			name(figure6b, replace)
+			;
+#delimit cr
+
+restore
+
+
+
 ********************************************************************************
 ** Fig. 4 death by specific site - ALTERNATIVE using siteicd10 from dofile 6
 ********************************************************************************

@@ -378,6 +378,136 @@ total count //296
 restore
 
 
+*****************************
+**   Data Quality Indices  **
+*****************************
+** Added on 04-June-2019 by JC as requested by NS for 2014 cancer annual report
+
+*****************************
+** Identifying & Reporting **
+** 	 Data Quality Index	   **
+** MV,DCO,O+U,UnkAge,CLIN  **
+*****************************
+tab basis ,m
+tab siteicd10 basis ,m 
+tab sex ,m //0 missing
+tab age ,m //3 missing=999
+tab sex age if age==.|age==999 //used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+tab sex if sitecr5db==20 //used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+
+gen boddqi=1 if basis>4 & basis <9 //720 changes; 
+replace boddqi=2 if basis==0 //245 changes; 132 changes
+replace boddqi=3 if basis>0 & basis<5 //52 changes
+replace boddqi=4 if basis==9 //23 changes
+label define boddqi_lab 1 "MV" 2 "DCO"  3 "CLIN" 4 "UNK.BASIS" , modify
+label var boddqi "basis DQI"
+label values boddqi boddqi_lab
+
+tab boddqi ,m
+tab siteicd10 boddqi ,m
+tab siteicd10 ,m //28 missing site
+list pid top morph beh basis siteiarc icd10 if siteicd10==. //these are MPDs/MDS and CIN3 so exclude
+tab siteicd10 boddqi if siteicd10!=.
+** Use CanReg5 site groupings for basis DQI
+tab sitecr5db ,m
+tab sitecr5db boddqi if sex==1 & boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=20 //male: used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+tab sitecr5db boddqi if sex==2 & boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=20 //female: used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+tab sitecr5db boddqi if boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=20
+
+preserve
+tab basis ,m
+gen boddqi=1 if basis>4 & basis <9 //720 changes; 
+replace boddqi=2 if basis==0 //245 changes; 132 changes
+replace boddqi=3 if basis>0 & basis<5 //52 changes
+replace boddqi=4 if basis==9 //23 changes
+label define boddqi_lab 1 "MV" 2 "DCO"  3 "CLIN" 4 "UNK.BASIS" , modify
+label var boddqi "basis DQI"
+label values boddqi boddqi_lab
+
+gen siteagedqi=1 if siteiarc==61 //51 changes; 45 changes
+replace siteagedqi=2 if age==.|age==999 //3 changes
+replace siteagedqi=3 if dob==. & siteagedqi!=2 //141 changes; 28 changes
+replace siteagedqi=4 if siteiarc==61 & siteagedqi!=1 //9 changes - 9 O&U with missing dob; 3 changes
+replace siteagedqi=5 if sex==.|sex==9 //3 changes
+label define siteagedqi_lab 1 "O&U SITE" 2 "UNK.AGE" 3 "UNK.DOB" 4 "O&U+UNK.AGE/DOB" 5 "UNK.SEX", modify
+label var siteagedqi "site/age DQI"
+label values siteagedqi siteagedqi_lab
+
+tab boddqi ,m
+generate rectot=_N //1,040; 927
+tab boddqi rectot,m
+
+tab siteagedqi ,m
+tab siteagedqi rectot,m
+
+** Append to above .docx for NS of basis,site,age but want to retain this dataset
+** % tumours - basis by siteicd10
+tab boddqi
+contract boddqi siteicd10, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Basis"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=927)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename boddqi Total_DQI
+rename count Total_Records
+rename percentage Pct_DQI
+putdocx table tbl_bod = data("Total_DQI Total_Records Pct_DQI"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_bod(1,.), bold
+
+putdocx save "L:\BNR_data\DM\data_cleaning\2014\cancer\versions\version02\data\clean\2018-12-18_DQI.docx", replace
+putdocx clear
+
+save "data\clean\2014_cancer_dqi_basis.dta" ,replace
+label data "BNR-Cancer 2014 Data Quality Index - Basis"
+notes _dta :These data prepared for Natasha Sobers - 2014 annual report
+restore
+
+preserve
+** % tumours - site,age
+tab siteagedqi
+contract siteagedqi, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Unknown - Site, DOB & Age"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Site,DOB,Age (# tumours/n=927)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename siteagedqi Total_DQI
+rename count Total_Records
+rename percentage Pct_DQI
+putdocx table tbl_site = data("Total_DQI Total_Records Pct_DQI"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+putdocx save "L:\BNR_data\DM\data_cleaning\2014\cancer\versions\version02\data\clean\2018-12-18_DQI.docx", append
+putdocx clear
+
+save "data\clean\2014_cancer_dqi_siteage.dta" ,replace
+label data "BNR-Cancer 2014 Data Quality Index - Site,Age"
+notes _dta :These data prepared for Natasha Sobers - 2014 annual report
+restore
+** Missing sex %
+** Missing age %
+
+
+
+
+
+
+
+
 **********************************************************************************
 ** ASIR and 95% CI for Table 1 using AR's site groupings - using WHO World popn **
 gen pfu=1 // for % year if not whole year collected; not done for cancer        **
