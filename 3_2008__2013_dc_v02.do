@@ -46,7 +46,13 @@ use "`datapath'\version01\2-working\2008_2013_cancer_dp", clear
 
 count //2,608
 
-
+STOPPED HERE: need to think how to combine this data file with CR5 2015 REVIEW DB as some 2008/2013 updated in there
+pid 20080563 DLC updated in REVIEW db.
+pid 20080169 SLC, DLC updated in REVIEW db.
+pid 20141523 changed to ineligible in REVIEW db.
+pid 20080563 DLC updated in REVIEW db.
+pid 20080169 DLC updated in REVIEW db.
+pid 20080336 DLC updated in REVIEW db.
 ** Corrections based on updates already found when doing cleaning for NAACCR-IACR 
 ** (some may already be corrected as using different dataset than the one originally used that found these errors)
 replace natregno="210620-0062" if pid=="20080497"
