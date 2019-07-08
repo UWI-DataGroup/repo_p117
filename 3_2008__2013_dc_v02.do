@@ -53,6 +53,7 @@ pid 20141523 changed to ineligible in REVIEW db.
 pid 20080563 DLC updated in REVIEW db.
 pid 20080169 DLC updated in REVIEW db.
 pid 20080336 DLC updated in REVIEW db.
+
 ** Corrections based on updates already found when doing cleaning for NAACCR-IACR 
 ** (some may already be corrected as using different dataset than the one originally used that found these errors)
 replace natregno="210620-0062" if pid=="20080497"
