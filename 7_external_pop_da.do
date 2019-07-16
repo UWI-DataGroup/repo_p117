@@ -484,3 +484,139 @@ collapse (sum) pop , by(age55 intdn)
 	label data "US standard population: 2 age groups. <55 and 55 & over"
 	sort age55
 save "`datapath'\version01\2-working\us2000_55", replace
+
+
+
+********************************************
+** WHO WORLD STANDARD POPULATION (SEGI 1960)
+********************************************
+** Added in by JC on 16jul2019 in response to query in difference between BNR's prostate ASMR and WHO/IARC's prostate ASMR for B'dos
+** Create different world stnd pop based on Segi 1960 to re-calculate prostate ASMR due to difference in rate reported for B'dos by WHO
+display `"{browse "http://www-dep.iarc.fr/WHOdb/WHOdb.htm":WHO Cancer Mortality Database-Glossary of Terms}"'
+
+** Below adds up to 100,000
+		drop _all
+		input age5 pop_segi
+		1	12000
+		2	10000
+		3	9000
+		4	9000
+		5	8000
+		6	8000
+		7	6000
+		8	6000
+		9	6000
+		10	6000
+		11	5000
+		12	4000
+		13	4000
+		14	3000
+		15	2000
+		16	1000
+		17	500
+		18	500
+		end
+
+** International Standard dataset Number
+gen intdn = 001
+label var intdn "Segi's World Std Million (18 age groups)"
+
+** NOTE THAT IN ORDER TO MERGE WITH BB POPN DATA AS OF 2010 CENSUS DATA
+** We need to break these higher age groups down to one (18 total age-groups
+** instead of 21)
+
+** Age labelling
+label define whoage5_lab  	1 "0-4"    2 "5-9"	  3 "10-14"	///
+		            4 "15-19"  5 "20-24"  6 "25-29"	///
+					7 "30-34"  8 "35-39"  9 "40-44"	///
+		           10 "45-49" 11 "50-54" 12 "55-59"	///
+				   13 "60-64" 14 "65-69" 15 "70-74"	///
+		           16 "75-79" 17 "80-84" 18 "85 & over", modify
+label values age5 whoage5_lab
+label var age5 "WHO standard 5-year age-grouping (18 groups)"
+
+** TEN age groups in TEN-year bands. 
+** This is the standard for all standard population distributions
+gen age10 = recode(age5,2,4,6,8,10,12,14,16,17)
+recode age10 2=1 4=2 6=3 8=4 10=5 12=6 14=7 16=8 17=9
+label define age10_lab  1 "0-9"	   2 "10-19"  3 "20-29"	///
+		            	4 "30-39"  5 "40-49"  6 "50-59"	///
+						7 "60-69"  8 "70-79"  9 "80 & over" , modify
+label values age10 age10_lab
+
+** TEN age groups in TEN-year bands with <15 as first group. 
+** This is another standard for population distributions
+gen age_10 = recode(age5,3,5,7,9,11,13,15,17,18)
+recode age_10 3=1 5=2 7=3 9=4 11=5 13=6 15=7 17=8 18=9
+label define age_10_lab 	1 "0-14"   2 "15-24"  3 "25-34"	///
+				4 "35-44"  5 "45-54"  6 "55-64"	///
+				7 "65-74"  8 "75-84"  9 "85 & over" , modify
+label values age_10 age_10_lab
+
+gen age45 = recode(age5,9,18)
+recode age45 9=1 18=2
+label define age45_lab  1 "0-44"   2 "45 & over" , modify
+label values age45 age45_lab
+
+gen age55 = recode(age5,11,18)
+recode age55 11=1 18=2
+label define age55_lab  1 "0-54"   2 "55 & over" , modify
+label values age55 age55_lab
+
+gen age60 = recode(age5,12,18)
+recode age60 12=1 18=2
+label define age60  1 "0-59"   2 "60 & over" , modify
+label values age60 age60
+
+gen age65 = recode(age5,13,18)
+recode age65 13=1 18=2
+label define age65 1 "0-64"  2 "65 & over" , modify
+label values age65 age65
+
+sort age5
+label data "Segi's WHO world standard million: 5-year age bands"
+
+save "`datapath'\version01\2-working\whosegi2000_5", replace
+
+preserve
+collapse (sum) pop_segi , by(age10 age60 intdn)
+	label data "Segi's WHO world standard million: 10-year age bands1"
+	sort age10
+save "`datapath'\version01\2-working\whosegi2000_10-1", replace
+
+collapse (sum) pop_segi , by(age60 intdn)
+	label data "Segi's WHO world standard million: 2 age groups. <60 and 60+"
+	sort age60
+save "`datapath'\version01\2-working\whosegi2000_60", replace
+restore
+
+collapse (sum) pop_segi , by(age_10 age45 age55 age65 intdn)
+	label data "Segi's WHO world standard million: 10-year age bands2"
+	sort age_10
+save "`datapath'\version01\2-working\whosegi2000_10-2", replace
+
+collapse (sum) pop_segi , by(age45 age55 age65 intdn)
+	label data "Segi's WHO world standard million: 2 age groups. <45 and 45 & over"
+	sort age45
+save "`datapath'\version01\2-working\whosegi2000_45", replace
+
+collapse (sum) pop_segi , by(age55 age65 intdn)
+	label data "Segi's WHO world standard million: 2 age groups. <55 and 55 & over"
+	sort age55
+save "`datapath'\version01\2-working\whosegi2000_55", replace
+
+preserve
+collapse (sum) pop_segi , by(age65 intdn)
+	drop if age65==2
+	label data "Segi's WHO world standard million: 1 age group. <65"
+	sort age65
+save "`datapath'\version01\2-working\whosegi2000_64", replace
+restore
+
+preserve
+collapse (sum) pop_segi , by(age65 intdn)
+	drop if age65==1
+	label data "Segi's WHO world standard million: 1 age group. 65 & over"
+	sort age65
+save "`datapath'\version01\2-working\whosegi2000_65", replace
+restore
