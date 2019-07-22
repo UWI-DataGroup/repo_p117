@@ -527,6 +527,72 @@ distrate case pop_bb using "`datapath'\version01\2-working\whosegi2000_10-2", 	/
 restore
 
 
+** PROSTATE - used MoH deaths AND Segi's WHO population (1960) to check ASMR against IARC rate as large difference in rates
+** Create different world stnd pop based on Segi 1960 to re-calculate prostate ASMR due to difference in rate reported for B'dos by WHO
+display `"{browse "http://www-dep.iarc.fr/WHOdb/WHOdb.htm":WHO Cancer Mortality Database-Glossary of Terms}"'
+tab pop age_10 if siteiarc==39 //male
+
+preserve
+	drop if age_10==.
+	keep if siteiarc==39 // 
+	
+	collapse (sum) case (mean) pop_bb, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M 0-14,15-24,25-34
+		
+	expand 2 in 1
+	replace sex=2 in 6
+	replace age_10=1 in 6
+	replace case=0 in 6
+	replace pop_bb=(28005)  in 6
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 7
+	replace age_10=2 in 7
+	replace case=0 in 7
+	replace pop_bb=(18510)  in 7
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 8
+	replace age_10=3 in 8
+	replace case=0 in 8
+	replace pop_bb=(18465) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 9
+	replace age_10=4 in 9
+	replace case=0 in 9
+	replace pop_bb=(19550) in 9
+	sort age_10
+			
+
+	replace case=38 in 9 //added 4 deaths to match MoH
+
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bb
+
+distrate case pop_bb using "`datapath'\version01\2-working\whosegi2000_10-2", 	///	
+		         stand(age_10) popstand(pop_segi) mult(100000) format(%8.2f)
+** THIS IS FOR PC - STD TO WHO WORLD POPN: SEGI 1960
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  104   133011   78.19     38.86    31.40    47.85     4.07 |
+  +------------------------------------------------------------+
+*/
+restore
+
+
+
 ** BREAST
 tab pop age_10 if siteiarc==29 & sex==1 //female
 tab pop age_10 if siteiarc==29 & sex==2 //male
