@@ -54,6 +54,12 @@ pid 20080563 DLC updated in REVIEW db.
 pid 20080169 DLC updated in REVIEW db.
 pid 20080336 DLC updated in REVIEW db.
 
+DCO cases have now changed to 71 cases or 8% - SAF's email from 31-Jul-2019 (published in 2014 ann rpt)
+Need to update incidence for 2013 as some of the 2014 DCO were 2013 cases;
+Need to update DCO/incidence for 2014 based on the above.
+
+External WHO population not correct?? see '7_external_pop_da.do' and WHO website for more info.
+
 ** Corrections based on updates already found when doing cleaning for NAACCR-IACR 
 ** (some may already be corrected as using different dataset than the one originally used that found these errors)
 replace natregno="210620-0062" if pid=="20080497"

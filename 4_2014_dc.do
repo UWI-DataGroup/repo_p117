@@ -44,6 +44,9 @@ use "`datapath'\version01\1-input\2014_cancer_merge_dc", clear
 
 count //
 
+STOPPED HERE 
+20150037 missed 2014 case abs as 2015 (see MasterDb frmCF_2014 #3649.)
+For 2015 data cleaning, flag corrections missed by myself and SF at review - see dofile 4 for repo_p141 (death data)
 
 ** Re-assign deathid values to match BNR-DeathDataALL redcap database
 count if deathid==. & slc==2 //4 - checked and not found in redcap death data
