@@ -401,6 +401,9 @@ label values rvptdobdqi rvptsexdqi rvptresidentdqi rvptslcdqi rvptdlcdqi rvttage
 label define formstatus_lab 0 "Incomplete" 1 "Unverified" 2 "Complete", modify
 label values rvformstatus rvptformstatus rvttformstatus rvstformstatus rvedformstatus formstatus_lab
 
+label define da_lab 1 "JC" 9 "SF" 13 "KWG" 14 "TH" 98 "Other", modify
+label values rvptda rvttda rvstda da_lab
+
 order record_id event instrument
 
 
@@ -427,10 +430,14 @@ count if event==1 & instrument==. & rvdxyr!=2015 //0
 count if reviewingtot!=. & reviewingtot>10 //1 - corrected in redcapdb
 replace reviewingtot=1 if reviewingtot==20140962
 //list record_id reviewingtot if reviewingtot!=. & reviewingtot>10
-STOPPED HERE
+
 ** check 5
-count if event==1 & instrument==. & rvdoaend==. //2
-count if event==1 & instrument==. & rvdoaend>today //
+count if event==1 & instrument==. & rvdoaend==. //2 - 1 corrected in redcapdb; the other is still pending review completion
+replace rvdoaend=clock("2019-09-12 14:39:00", "YMD hms") if record_id==138 & rvreviewer==9 //1 change
+replace rvelapsed=14 if record_id==138 & rvreviewer==9 //1 change
+replace rverrtot=4 if record_id==138 & rvreviewer==9 //1 change
+//list record_id rvreviewer rvdoaend if event==1 & instrument==. & rvdoaend==.
+count if event==1 & instrument==. & rvdoaend>today //0
 
 ** check 6
 count if rvelapsed!=. & rvelapsed>100 //0
@@ -440,7 +447,7 @@ count if rvelapsed!=. & rvelapsed>100 //0
 count if rverrtot!=. & rverrtot>50 //0
 
 ** check 8
-count if rvformstatus!=. & rvformstatus!=2 //3
+count if rvformstatus!=. & rvformstatus!=2 //3 - leave as is; review pending completion
 //list record_id rvreviewer rvformstatus if rvformstatus!=. & rvformstatus!=2
 
 *********************
@@ -452,76 +459,95 @@ tostring rvcr5pid ,replace
 count if instrument==1 & (length(rvcr5pid)<8|length(rvcr5pid)>8) //0
 
 ** check 10
-count if instrument==1 & rvptda==.
-count if instrument==1 & rvptda!=13 & rvptda!=14
-count if rvptda==98 & rvptoda==.
+count if instrument==1 & rvptda==. //0
+count if instrument==1 & rvptda!=9 & rvptda!=13 & rvptda!=14 //6 - corrected in redcapdb
+//list record_id rvptda rvreviewer if instrument==1 & rvptda!=9 & rvptda!=13 & rvptda!=14
+replace rvptda=13 if record_id==94 & rvptda==98 //1 change
+replace rvptoda=. if record_id==94 & rvptoda==99 //1 change
+replace rvptda=13 if record_id==98 & rvptda==98 //1 change
+replace rvptoda=. if record_id==98 & rvptoda==99 //1 change
+replace rvptda=13 if record_id==121 & rvptda==98 //1 change
+replace rvptoda=. if record_id==121 & rvptoda==99 //1 change
+replace rvptda=13 if record_id==132 & rvptda==98 //1 change
+replace rvptoda=. if record_id==132 & rvptoda==99 //1 change
+replace rvptda=13 if record_id==185 & rvptda==1 //1 change
+replace rvptda=13 if record_id==263 & rvptda==98 //1 change
+replace rvptoda=. if record_id==263 & rvptoda==99 //1 change
+count if rvptda==98 & rvptoda==. //0
 
 ** check 11
-count if instrument==1 & rvpterrtot!=. & rvpterrtot>50
+count if instrument==1 & rvpterrtot!=. & rvpterrtot>50 //0
 
 ** check 12
-count if instrument==1 & rvptcfda==.
-count if instrument==1 & rvptdoa==.
-count if instrument==1 & rvptcstatus==.
-count if instrument==1 & rvptretsource==.
-count if instrument==1 & rvptnotesseen==.
-count if instrument==1 & rvptnsdate==.
-count if instrument==1 & rvptfretsource==.
-count if instrument==1 & rvptlname==.
-count if instrument==1 & rvptfname==.
-count if instrument==1 & rvptinit==.
-count if instrument==1 & rvptdob==.
-count if instrument==1 & rvptsex==.
-count if instrument==1 & rvptnrn==.
-count if instrument==1 & rvpthospnum==.
-count if instrument==1 & rvptresident==.
-count if instrument==1 & rvptslc==.
-count if instrument==1 & rvptdlc==.
-count if instrument==1 & rvptcomments==.
+count if instrument==1 & rvptcfda==. //0
+count if instrument==1 & rvptdoa==. //0
+count if instrument==1 & rvptcstatus==. //0
+count if instrument==1 & rvptretsource==. //0
+count if instrument==1 & rvptnotesseen==. //0
+count if instrument==1 & rvptnsdate==. //0
+count if instrument==1 & rvptfretsource==. //0
+count if instrument==1 & rvptlname==. //0
+count if instrument==1 & rvptfname==. //0
+count if instrument==1 & rvptinit==. //0
+count if instrument==1 & rvptdob==. //0
+count if instrument==1 & rvptsex==. //0
+count if instrument==1 & rvptnrn==. //0
+count if instrument==1 & rvpthospnum==. //0
+count if instrument==1 & rvptresident==. //0
+count if instrument==1 & rvptslc==. //0
+count if instrument==1 & rvptdlc==. //0
+count if instrument==1 & rvptcomments==. //0
 
 ** check 13
-count if instrument==1 & rvptdob==2 & rvptdobdqi==.
-count if instrument==1 & rvptsex==2 & rvptsexdqi==.
-count if instrument==1 & rvptresident==2 & rvptresidentdqi==.
-count if instrument==1 & rvptslc==2 & rvptslcdqi==.
-count if instrument==1 & rvptdlc==2 & rvptdlcdqi==.
+count if instrument==1 & rvptdob==2 & rvptdobdqi==. //0
+count if instrument==1 & rvptsex==2 & rvptsexdqi==. //0
+count if instrument==1 & rvptresident==2 & rvptresidentdqi==. //0
+count if instrument==1 & rvptslc==2 & rvptslcdqi==. //0
+count if instrument==1 & rvptdlc==2 & rvptdlcdqi==. //0
 
 ** check 14
-count if rvptformstatus!=. & rvptformstatus!=2
+count if rvptformstatus!=. & rvptformstatus!=2 //0
 
 *********************
 * Reviewing TT Form *
 *********************
 ** check 15
-count if instrument==2 & rvttcr5id==""
-count if instrument==2 & (length(rvttcr5id)<2|length(rvttcr5id)>2)
+count if instrument==2 & rvttcr5id=="" //0
+count if instrument==2 & (length(rvttcr5id)<2|length(rvttcr5id)>2) //4 - corrected in redcapdb
+//list record_id rvreviewer rvttcr5id if instrument==2 & (length(rvttcr5id)<2|length(rvttcr5id)>2)
+replace rvttcr5id="T2" if record_id==10 & event==1 & instrument==2 //1 change
+replace rvttcr5id="T1" if record_id==133 & event==1 & instrument==2 //1 change
+replace rvttcr5id="T1" if record_id==169 & event==1 & instrument==2 //1 change
+replace rvttcr5id="T1" if record_id==218 & event==1 & instrument==2 //1 change
 
 ** check 16
-count if instrument==2 & rvttda==.
-count if instrument==2 & rvttda!=13 & rvttda!=14 & rvttda!=99
-count if rvttda==98 & rvttoda==""
+count if instrument==2 & rvttda==. //0
+count if instrument==2 & rvttda!=9 & rvttda!=13 & rvttda!=14 & rvttda!=98 //0
+//list record_id rvttda rvreviewer if instrument==2 & rvttda!=9 & rvttda!=13 & rvttda!=14 & rvttda!=98
+count if rvttda==98 & rvttoda=="" //0
 
 ** check 17
-count if instrument==2 & rvtterrtot!=. & rvtterrtot>50
+count if instrument==2 & rvtterrtot!=. & rvtterrtot>50 //0
 
 ** check 18
-count if instrument==2 & rvttabsda==.
-count if instrument==2 & rvttadoa==.
-count if instrument==2 & rvttparish==.
-count if instrument==2 & rvttaddr==.
-count if instrument==2 & rvttage==.
-count if instrument==2 & rvttprimsite==.
-count if instrument==2 & rvtttop==.
-count if instrument==2 & rvtthx==.
-count if instrument==2 & rvttmorph==.
-count if instrument==2 & rvttlat==.
-count if instrument==2 & rvttbeh==.
-count if instrument==2 & rvttgrade==.
-count if instrument==2 & rvttbasis==.
-count if instrument==2 & rvttstaging==.
-count if instrument==2 & rvttdot==.
-count if instrument==2 & rvttdxyr==.
-count if instrument==2 & rvttconsult==.
+count if instrument==2 & rvttabsda==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttadoa==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttparish==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttaddr==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttage==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttprimsite==. //1 - leave as is; review pending completion
+count if instrument==2 & rvtttop==. //1 - leave as is; review pending completion
+count if instrument==2 & rvtthx==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttmorph==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttlat==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttbeh==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttgrade==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttbasis==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttstaging==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttdot==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttdxyr==. //1 - leave as is; review pending completion
+count if instrument==2 & rvttconsult==. //1 - leave as is; review pending completion
+/* - not currently in use; hidden on redcap form
 count if instrument==2 & rvttrx1==.
 count if instrument==2 & rvttrx1d==.
 count if instrument==2 & rvttrx2==.
@@ -536,112 +562,168 @@ count if instrument==2 & rvttorx1==.
 count if instrument==2 & rvttorx2==.
 count if instrument==2 & rvttnorx1==.
 count if instrument==2 & rvttnorx2==.
-count if instrument==2 & rvttrecstatus==.
+*/
+count if instrument==2 & rvttrecstatus==. //1 - leave as is; review pending completion
 
 ** check 19
-count if instrument==2 & rvttage==2 & rvttagedqi==.
-count if instrument==2 & rvtttop==2 & rvtttopdqi==.
-count if instrument==2 & rvttmorph==2 & rvttmorphdqi==.
-count if instrument==2 & rvttlat==2 & rvttlatdqi==.
-count if instrument==2 & rvttbeh==2 & rvttbehdqi==.
-count if instrument==2 & rvttbasis==2 & rvttbasisdqi==.
-count if instrument==2 & rvttstaging==2 & rvttstagingdqi==.
-count if instrument==2 & rvttdot==2 & rvttdotdqi==.
-count if instrument==2 & rvttrx1==2 & rvttrx1dqi==.
-count if instrument==2 & rvttrx1d==2 & rvttrx1ddqi==.
-count if instrument==2 & rvttrx2==2 & rvttrx2dqi==.
-count if instrument==2 & rvttrx2d==2 & rvttrx2ddqi==.
-count if instrument==2 & rvttrx3==2 & rvttrx3dqi==.
-count if instrument==2 & rvttrx3d==2 & rvttrx3ddqi==.
-count if instrument==2 & rvttrx4==2 & rvttrx4dqi==.
-count if instrument==2 & rvttrx4d==2 & rvttrx4ddqi==.
-count if instrument==2 & rvttrx5==2 & rvttrx5dqi==.
-count if instrument==2 & rvttrx5d==2 & rvttrx5ddqi==.
+count if instrument==2 & rvttage==2 & rvttagedqi==. //0
+count if instrument==2 & rvtttop==2 & rvtttopdqi==. //0
+count if instrument==2 & rvttmorph==2 & rvttmorphdqi==. //0
+count if instrument==2 & rvttlat==2 & rvttlatdqi==. //0
+count if instrument==2 & rvttbeh==2 & rvttbehdqi==. //0
+count if instrument==2 & rvttbasis==2 & rvttbasisdqi==. //0
+count if instrument==2 & rvttstaging==2 & rvttstagingdqi==. //0
+count if instrument==2 & rvttdot==2 & rvttdotdqi==. //0
+count if instrument==2 & rvttrx1==2 & rvttrx1dqi==. //0
+count if instrument==2 & rvttrx1d==2 & rvttrx1ddqi==. //0
+count if instrument==2 & rvttrx2==2 & rvttrx2dqi==. //0
+count if instrument==2 & rvttrx2d==2 & rvttrx2ddqi==. //0
+count if instrument==2 & rvttrx3==2 & rvttrx3dqi==. //0
+count if instrument==2 & rvttrx3d==2 & rvttrx3ddqi==. //0
+count if instrument==2 & rvttrx4==2 & rvttrx4dqi==. //0
+count if instrument==2 & rvttrx4d==2 & rvttrx4ddqi==. //0
+count if instrument==2 & rvttrx5==2 & rvttrx5dqi==. //0
+count if instrument==2 & rvttrx5d==2 & rvttrx5ddqi==. //0
 
 ** check 20
-count if rvttformstatus!=. & rvttformstatus!=2
+count if rvttformstatus!=. & rvttformstatus!=2 //1 - leave as is; review pending completion
 
 *********************
 * Reviewing ST Form *
 *********************
 ** check 21
-count if instrument==3 & rvstcr5id==""
-count if instrument==3 & (length(rvstcr5id)<4|length(rvstcr5id)>4)
+count if instrument==3 & rvstcr5id=="" //0
+count if instrument==3 & (length(rvstcr5id)<4|length(rvstcr5id)>4) //4
+//list record_id rvreviewer instance rvstcr5id if instrument==3 & (length(rvstcr5id)<4|length(rvstcr5id)>4)
+replace rvstcr5id="T1S1" if record_id==120 & instrument==3 & instance==1 //1 change
+replace rvstcr5id="T1S1" if record_id==180 & instrument==3 & instance==1 //1 change
+replace rvstcr5id="T1S1" if record_id==181 & instrument==3 & instance==1 //1 change
+replace rvstabsda=14 if record_id==180 & instrument==3 & instance==1 //1 change
+replace rvstcr5id="T1S1" if record_id==184 & instrument==3 & instance==1 //1 change
 
 ** check 22
-count if instrument==3 & rvstda==.
-count if instrument==3 & rvstda!=13 & rvstda!=14 & rvstda!=98 & rvstda!=99
-count if rvstda==98 & rvstoda==""
+count if instrument==3 & rvstda==. //0
+count if instrument==3 & rvstda!=9 & rvstda!=13 & rvstda!=14 & rvstda!=98 & rvstda!=99 //2 - corrected in redcapdb
+//list record_id rvreviewer instance rvstda if instrument==3 & rvstda!=9 & rvstda!=13 & rvstda!=14 & rvstda!=98 & rvstda!=99
+replace rvstda=13 if record_id==235 & instrument==3 & instance==3 //1 change
+replace rvstda=13 if record_id==253 & instrument==3 & instance==2 //1 change
+count if rvstda==98 & rvstoda=="" //0
 
 ** check 23
-count if instrument==3 & rvsterrtot!=. & rvsterrtot>50
+count if instrument==3 & rvsterrtot!=. & rvsterrtot>50 //0
 
 ** check 24
-count if instrument==3 & rvstrectype==.
+count if instrument==3 & rvstrectype==. //0
 
 ** check 25
-count if instrument==3 & rvstabsda==.
-count if instrument==3 & rvstadoa==.
-count if instrument==3 & rvstnftype==.
-count if instrument==3 & rvstsourcename==.
-count if instrument==3 & rvstdoc==.
-count if instrument==3 & rvstdocaddr==.
-count if instrument==3 & rvstrecnum==.
-count if instrument==3 & rvstcfdx==.
-count if instrument==3 & rvstlabnum==.
-count if instrument==3 & rvstspecimen==.
-count if instrument==3 & rvstsampledate==.
-count if instrument==3 & rvstrecvdate==.
-count if instrument==3 & rvstrptdate==.
-count if instrument==3 & rvstclindets==.
-count if instrument==3 & rvstcytofinds==.
-count if instrument==3 & rvstmd==.
-count if instrument==3 & rvstconsrpt==.
-count if instrument==3 & rvstcod==.
-count if instrument==3 & rvstduration==.
-count if instrument==3 & rvstonset==.
-count if instrument==3 & rvstcertifier==.
-count if instrument==3 & rvstadmdate==.
-count if instrument==3 & rvstdfc==.
-count if instrument==3 & rvstrtdate==.
+count if instrument==3 & rvstabsda==. //0
+count if instrument==3 & rvstadoa==. //1 - leave as is; review pending completion
+count if instrument==3 & rvstnftype==. //1 - leave as is; review pending completion
+count if instrument==3 & rvstsourcename==. //1 - leave as is; review pending completion
+count if instrument==3 & rvstdoc==. //1 - leave as is; review pending completion
+count if instrument==3 & rvstdocaddr==. //1 - leave as is; review pending completion
+count if instrument==3 & rvstrecnum==. //1 - leave as is; review pending completion
+count if instrument==3 & rvstcfdx==. //1 - leave as is; review pending completion
+count if instrument==3 & rvstlabnum==. & (rvstrectype==1|rvstrectype==2) //1 - leave as is; review pending completion
+count if instrument==3 & rvstspecimen==. & (rvstrectype==1|rvstrectype==2) //1 - leave as is; review pending completion
+count if instrument==3 & rvstsampledate==. & (rvstrectype==1|rvstrectype==2) //1 - leave as is; review pending completion
+count if instrument==3 & rvstrecvdate==. & (rvstrectype==1|rvstrectype==2) //1 - leave as is; review pending completion
+count if instrument==3 & rvstrptdate==. & (rvstrectype==1|rvstrectype==2) //1 - leave as is; review pending completion
+count if instrument==3 & rvstclindets==. & (rvstrectype==1|rvstrectype==2) //1 - leave as is; review pending completion
+count if instrument==3 & rvstcytofinds==. & rvstrectype==2 //0
+count if instrument==3 & rvstmd==. & rvstrectype==1 //1 - leave as is; review pending completion
+count if instrument==3 & rvstconsrpt==. & rvstrectype==1 //1 - leave as is; review pending completion
+count if instrument==3 & rvstcod==. & rvstrectype>4 & rvstrectype<8 //0
+count if instrument==3 & rvstduration==. & rvstrectype>4 & rvstrectype<8 & rvstrectype!=5 //0
+count if instrument==3 & rvstonset==. & rvstrectype>4 & rvstrectype<8 & rvstrectype!=5 //0
+count if instrument==3 & rvstcertifier==. & rvstrectype>4 & rvstrectype<8 //0
+count if instrument==3 & rvstadmdate==. & (rvstrectype==5|rvstrectype==8|rvstrectype==9) //0
+count if instrument==3 & rvstdfc==. & (rvstrectype==8|rvstrectype==9) //0
+count if instrument==3 & rvstrtdate==. & rvstrectype==4 //0
 
 ** check 26
-count if rvstformstatus!=. & rvstformstatus!=2
+count if rvstformstatus!=. & rvstformstatus!=2 //1 - leave as is; review pending completion
 
 
 *****************
 * Reviewed Form *
 *****************
 ** check 27
-count if event==2 & rvdoa==.
-count if event!=2 & rvdoa!=.
+count if event==2 & rvdoa==. //0
+count if event!=2 & rvdoa!=. //1
 
 ** check 28
-count if event==2 & reviewtot==.
-count if event!=2 & reviewtot!=.
+count if event==2 & reviewtot==. //0
+count if event!=2 & reviewtot!=. //2
 
 ** check 29
-count if event==2 & reviewedtot==.
-count if event!=2 & reviewedtot!=.
+count if event==2 & reviewedtot==. //0
+count if event!=2 & reviewedtot!=. //0
 
 ** check 30
-count if event==2 & rvtotpending==.
-count if event!=2 & rvtotpending!=.
+count if event==2 & rvtotpending==. //0
+count if event!=2 & rvtotpending!=. //2
 
 ** check 31
-count if event==2 & rvtotpendingper==.
-count if event!=2 & rvtotpendingper!=.
+count if event==2 & rvtotpendingper==. //0
+count if event!=2 & rvtotpendingper!=. //2
 
 ** check 32
-count if rvedformstatus!=. & rvedformstatus!=1
-count if event!=2 & rvedformstatus!=.
+count if rvedformstatus!=. & rvedformstatus!=1 //2 - leave record_id=5 as is
+count if event!=2 & rvedformstatus!=. //1
+
+replace rvdoa=. if record_id==3 & instrument==. //1 change
+replace reviewtot=. if record_id==3 & instrument==. //1 change
+replace rvtotpending=. if record_id==3 & instrument==. //1 change
+replace rvtotpendingper=. if record_id==3 & instrument==. //1 change
+replace rvedformstatus=. if record_id==3 & instrument==. //1 change
+
+replace reviewtot=. if record_id==4 & instrument==. //1 change
+replace rvtotpending=. if record_id==4 & instrument==. //1 change
+replace rvtotpendingper=. if record_id==4 & instrument==. //1 change
 
 
-/*
 ** CREATE report variables
-egen rvtotal=total(reviewingtot) if reviewingtot!=. | reviewingtot!=0
-egen rvpterrtotal=total(rvpterrtot) if rvpterrtot!=. | rvpterrtot!=0
-
+** Total records reviewed
+egen rvtotal=total(reviewingtot) if reviewingtot!=.|reviewingtot!=0
+egen rvtotal_SF=count(rvptda|rvttda|rvstda) if rvptda==9|rvttda==9|rvstda==9
+egen rvtotal_KWG=count(rvptda|rvttda|rvstda) if rvptda==13|rvttda==13|rvstda==13
+egen rvtotal_TH=count(rvptda|rvttda|rvstda) if rvptda==14|rvttda==14|rvstda==14
+egen rvtotal_intern=count(rvptda|rvttda|rvstda) if rvptda==98|rvttda==98|rvstda==98
+** Percentage records reviewed
+gen rvtotalper_SF=rvtotal_SF/rvtotal*100
+gen rvtotalper_KWG=rvtotal_KWG/rvtotal*100
+gen rvtotalper_TH=rvtotal_TH/rvtotal*100
+gen rvtotalper_intern=rvtotal_intern/rvtotal*100
+** Total errors
+STOPPED HERE - BELOW NOT CALCULATING CORRECTLY - CHECK REDCAP REPORTS FOR TOTALS
+egen rverrtotal=total(rverrtot)
+egen rvpterrtotal=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0
+egen rvtterrtotal=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0
+egen rvsterrtotal=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0
+egen rvpterrtotal_SF=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==9
+egen rvtterrtotal_SF=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==9
+egen rvsterrtotal_SF=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==9
+egen rvpterrtotal_KWG=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==13
+egen rvtterrtotal_KWG=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==13
+egen rvsterrtotal_KWG=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==13
+egen rvpterrtotal_TH=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==14
+egen rvtterrtotal_TH=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==14
+egen rvsterrtotal_TH=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==14
+egen rvpterrtotal_intern=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==98
+egen rvtterrtotal_intern=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==98
+egen rvsterrtotal_intern=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==98
+** Percentage errors
+gen rvpterrtotalper_SF=rvpterrtotal_SF/rvpterrtotal*100
+gen rvpterrtotalper_KWG=rvpterrtotal_KWG/rvpterrtotal*100
+gen rvpterrtotalper_TH=rvpterrtotal_TH/rvpterrtotal*100
+gen rvpterrtotalper_intern=rvpterrtotal_intern/rvpterrtotal*100
+** Total no errors
+egen rvptnoerrtotal=count(rvptcfda|rvptdoa|rvptcstatus|rvptretsource|rvptnotesseen|rvptnsdate|rvptfretsource|rvptlname|rvptfname|rvptinit|rvptdob|rvptsex|rvptnrn|rvpthospnum|rvptresident|rvptslc|rvptdlc|rvptcomments) ///
+     if rvptcfda==1|rvptdoa==1|rvptcstatus==1|rvptretsource==1|rvptnotesseen==1|rvptnsdate==1|rvptfretsource==1|rvptlname==1|rvptfname==1|rvptinit==1|rvptdob==1|rvptsex==1|rvptnrn==1|rvpthospnum==1|rvptresident==1|rvptslc==1|rvptdlc==1|rvptcomments==1
+/*    
+**egen rvpterrrec=total(rvpterrtot & rvtterrtot & rvsterrtot) if rvpterrtot!=. & rvpterrtot!=0
+egen
 
 
 ** CREATE progress report
