@@ -839,11 +839,17 @@ gen rverrtotal_minor=147 //total from above errors by variable
 ** Percentage errors - minor
 gen rverrtotalper_minor=rverrtotal_minor/rverrtotal*100
 
+** TOTAL review time
+egen rvtime_mins=total(rvelapsed)
+gen rvtime_hrs=rvtime_mins/60
+gen rvtime_days=rvtime_hrs/7
+gen rvtime_wks=rvtime_days/2
+format rvtime_wks %4.0g
 
 ** CREATE progress report
 ** CREATE dataset with results to be used in pdf report
 preserve
-collapse rvtotal rverrtotal rverrtotal_major rverrtotalper_major rverrtotal_minor rverrtotalper_minor
+collapse rvtotpendingper rvtotal rverrtotal rverrtotal_major rverrtotalper_major rverrtotal_minor rverrtotalper_minor rvtime_wks
 format rverrtotalper_major rverrtotalper_minor %9.0f
 save "`datapath'\version01\3-output\2015_review_dqi_da" ,replace
 
@@ -869,11 +875,19 @@ putdocx text ("Review of 74 CanReg5 Variables"), shading("pink") font(Helvetica,
 putdocx paragraph, halign(center)
 putdocx text ("QUANTITY"), bold font(Helvetica,20,"blue")
 putdocx paragraph
+qui sum rvtime_wks
+local sum : display %3.0f `r(sum)'
+putdocx text ("TOTAL time for review: `sum' work wks")
+putdocx paragraph
 qui sum rvtotal
 local sum : display %3.0f `r(sum)'
-putdocx text ("TOTAL records reviewed: `sum'")
+putdocx text ("TOTAL records reviewed: `sum' (27%)")
 putdocx paragraph, halign(center)
 putdocx text ("QUALITY"), bold font(Helvetica,20,"blue")
+putdocx paragraph
+qui sum rvtotpendingper
+local sum : display %3.0f `r(sum)'
+putdocx text ("TOTAL pending review: `sum'%")
 putdocx paragraph
 qui sum rverrtotal
 local sum : display %3.0f `r(sum)'
@@ -894,7 +908,6 @@ putdocx paragraph
 qui sum rverrtotalper_minor
 local sum : display %2.0f `r(sum)'
 putdocx text ("TOTAL errors MINOR: `sum'%"), bold shading("yellow")
-putdocx paragraph
 
 putdocx save "`datapath'\version01\3-output\2019-09-30_review_quality_report.docx", replace
 putdocx clear
