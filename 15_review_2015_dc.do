@@ -705,24 +705,7 @@ gen vartotal_tt=vartot_tt*18 //5,472
 gen vartotal_st=vartot_st*24 //13,272
 gen vartotal=4752+5472+13272
 
-** Total errors
-egen rverrtotal=count(rvptcfda|rvptdoa|rvptcstatus|rvptretsource|rvptnotesseen|rvptnsdate|rvptfretsource|rvptlname|rvptfname|rvptinit|rvptdob|rvptsex|rvptnrn|rvpthospnum|rvptresident|rvptslc|rvptdlc|rvptcomments|rvttabsda|rvttadoa|rvttparish|rvttaddr|rvttage|rvttprimsite|rvtttop|rvtthx|rvttmorph|rvttlat|rvttbeh|rvttgrade|rvttbasis|rvttstaging|rvttdot|rvttdxyr|rvttconsult|rvttrx1|rvttrx1d|rvttrx2|rvttrx2d|rvttrx3|rvttrx3d|rvttrx4|rvttrx4d|rvttrx5|rvttrx5d|rvttorx1|rvttorx2|rvttnorx1|rvttnorx2|rvttrecstatus|rvstabsda|rvstadoa|rvstnftype|rvstsourcename|rvstdoc|rvstdocaddr|rvstrecnum|rvstcfdx|rvstlabnum|rvstspecimen|rvstsampledate|rvstrecvdate|rvstrptdate|rvstclindets|rvstcytofinds|rvstmd|rvstconsrpt|rvstcod|rvstduration|rvstonset|rvstcertifier|rvstadmdate|rvstdfc|rvstrtdate) ///
-if rvptcfda==2|rvptdoa==2|rvptcstatus==2|rvptretsource==2|rvptnotesseen==2|rvptnsdate==2|rvptfretsource==2| ///
-rvptlname==2|rvptfname==2|rvptinit==2|rvptdob==2|rvptsex==2|rvptnrn==2|rvpthospnum==2|rvptresident==2|rvptslc==2|rvptdlc==2|rvptcomments==2| ///
-rvttabsda==2|rvttadoa==2|rvttparish==2|rvttaddr==2|rvttage==2|rvttprimsite==2|rvtttop==2|rvtthx==2|rvttmorph==2|rvttlat==2| ///
-rvttbeh==2|rvttgrade==2|rvttbasis==2|rvttstaging==2|rvttdot==2|rvttdxyr==2|rvttconsult==2|rvttrx1==2|rvttrx1d==2| ///
-rvttrx2==2|rvttrx2d==2|rvttrx3==2|rvttrx3d==2|rvttrx4==2|rvttrx4d==2|rvttrx5==2|rvttrx5d==2|rvttorx1==2|rvttorx2==2|rvttnorx1==2|rvttnorx2==2|rvttrecstatus==2| ///
-rvstabsda==2|rvstadoa==2|rvstnftype==2|rvstsourcename==2|rvstdoc==2|rvstdocaddr==2|rvstrecnum==2|rvstcfdx==2|rvstlabnum==2| ///
-rvstspecimen==2|rvstsampledate==2|rvstrecvdate==2|rvstrptdate==2|rvstclindets==2|rvstcytofinds==2|rvstmd==2|rvstconsrpt==2| ///
-rvstcod==2|rvstduration==2|rvstonset==2|rvstcertifier==2|rvstadmdate==2|rvstdfc==2|rvstrtdate==2
 
-** Total errors - major
-/*
-egen rverrtotal_major=count(rvptdobdqi|rvptsexdqi|rvptresidentdqi|rvptslcdqi|rvptdlcdqi|rvttagedqi|rvtttopdqi|rvttmorphdqi|rvttlatdqi|rvttbehdqi|rvttbasisdqi|rvttstagingdqi|rvttdotdqi|rvttrx1dqi|rvttrx1ddqi|rvttrx2dqi|rvttrx2ddqi|rvttrx3dqi|rvttrx3ddqi|rvttrx4dqi|rvttrx4ddqi|rvttrx5dqi|rvttrx5ddqi) ///
-if rvptdobdqi==1|rvptsexdqi==1|rvptresidentdqi==1|rvptslcdqi==1|rvptdlcdqi==1|rvttagedqi==1|rvtttopdqi==1|rvttmorphdqi==1| ///
-rvttlatdqi==1|rvttbehdqi==1|rvttbasisdqi==1|rvttstagingdqi==1|rvttdotdqi==1|rvttrx1dqi==1|rvttrx1ddqi==1|rvttrx2dqi==1| ///
-rvttrx2ddqi==1|rvttrx3dqi==1|rvttrx3ddqi==1|rvttrx4dqi==1|rvttrx4ddqi==1|rvttrx5dqi==1|rvttrx5ddqi==1
-*/
 ** Total errors - major, by variable
 egen rverrtotal_major_dob=count(rvptdobdqi) if rvptdobdqi==1 //2
 egen rverrtotal_major_sex=count(rvptsexdqi) if rvptsexdqi==1 //2
@@ -751,65 +734,7 @@ egen rverrtotal_major_rx5d=count(rvttrx5dqi) if rvttrx5ddqi==1 //0
 gen rverrtotal_major=254 //total from above errors by variable
 ** Percentage errors - major
 gen rverrtotalper_major=rverrtotal_major/rverrtotal*100
-/*
-** Total errors - major, by variable
-egen rverrtot_major_dob=count(rvptdobdqi) if rvptdobdqi==1
-egen rverrtotal_major_dob=total(rverrtot_major_dob)
-egen rverrtot_major_sex=count(rvptsexdqi) if rvptsexdqi==1
-egen rverrtotal_major_sex=total(rverrtot_major_sex)
-egen rverrtot_major_resident=count(rvptresidentdqi) if rvptresidentdqi==1
-egen rverrtotal_major_resident=total(rverrtot_major_resident)
-egen rverrtot_major_slc=count(rvptslcdqi) if rvptslcdqi==1
-egen rverrtotal_major_slc=total(rverrtot_major_slc)
-egen rverrtot_major_dlc=count(rvptdlcdqi) if rvptdlcdqi==1
-egen rverrtotal_major_dlc=total(rverrtot_major_dlc)
-egen rverrtot_major_age=count(rvttagedqi) if rvttagedqi==1
-egen rverrtotal_major_age=total(rverrtot_major_age)
-egen rverrtot_major_top=count(rvtttopdqi) if rvtttopdqi==1
-egen rverrtotal_major_top=total(rverrtot_major_top)
-egen rverrtot_major_morph=count(rvttmorphdqi) if rvttmorphdqi==1
-egen rverrtotal_major_morph=total(rverrtot_major_morph)
-egen rverrtot_major_lat=count(rvttlatdqi) if rvttlatdqi==1
-egen rverrtotal_major_lat=total(rverrtot_major_lat)
-egen rverrtot_major_beh=count(rvttbehdqi) if rvttbehdqi==1
-egen rverrtotal_major_beh=total(rverrtot_major_beh)
-egen rverrtot_major_basis=count(rvttbasisdqi) if rvttbasisdqi==1
-egen rverrtotal_major_basis=total(rverrtot_major_basis)
-egen rverrtot_major_staging=count(rvttstagingdqi) if rvttstagingdqi==1
-egen rverrtotal_major_staging=total(rverrtot_major_staging)
-egen rverrtot_major_dot=count(rvttdotdqi) if rvttdotdqi==1
-egen rverrtotal_major_dot=total(rverrtot_major_dot)
-egen rverrtot_major_rx1=count(rvttrx1dqi) if rvttrx1dqi==1
-egen rverrtotal_major_rx1=total(rverrtot_major_rx1)
-egen rverrtot_major_rx1d=count(rvttrx1dqi) if rvttrx1ddqi==1
-egen rverrtotal_major_rx1d=total(rverrtot_major_rx1d)
-egen rverrtot_major_rx2=count(rvttrx2dqi) if rvttrx2dqi==1
-egen rverrtotal_major_rx2=total(rverrtot_major_rx2)
-egen rverrtot_major_rx2d=count(rvttrx2dqi) if rvttrx2ddqi==1
-egen rverrtotal_major_rx2d=total(rverrtot_major_rx2d)
-egen rverrtot_major_rx3=count(rvttrx3dqi) if rvttrx3dqi==1
-egen rverrtotal_major_rx3=total(rverrtot_major_rx3)
-egen rverrtot_major_rx3d=count(rvttrx3dqi) if rvttrx3ddqi==1
-egen rverrtotal_major_rx3d=total(rverrtot_major_rx3d)
-egen rverrtot_major_rx4=count(rvttrx4dqi) if rvttrx4dqi==1
-egen rverrtotal_major_rx4=total(rverrtot_major_rx4)
-egen rverrtot_major_rx4d=count(rvttrx4dqi) if rvttrx4ddqi==1
-egen rverrtotal_major_rx4d=total(rverrtot_major_rx4d)
-egen rverrtot_major_rx5=count(rvttrx5dqi) if rvttrx5dqi==1
-egen rverrtotal_major_rx5=total(rverrtot_major_rx5)
-egen rverrtot_major_rx5d=count(rvttrx5dqi) if rvttrx5ddqi==1
-egen rverrtotal_major_rx5d=total(rverrtot_major_rx5d)
-** Total errors - MAJOR
-egen rverrtotal_major2=rowtotal(rverrtotal_major_*)
-*/
 
-** Total errors - minor
-/*
-egen rverrtotal_minor=count(rvptdobdqi|rvptsexdqi|rvptresidentdqi|rvptslcdqi|rvptdlcdqi|rvttagedqi|rvtttopdqi|rvttmorphdqi|rvttlatdqi|rvttbehdqi|rvttbasisdqi|rvttstagingdqi|rvttdotdqi|rvttrx2dqi|rvttrx2ddqi|rvttrx2dqi|rvttrx2ddqi|rvttrx3dqi|rvttrx3ddqi|rvttrx4dqi|rvttrx4ddqi|rvttrx5dqi|rvttrx5ddqi) ///
-if rvptdobdqi==2|rvptsexdqi==2|rvptresidentdqi==2|rvptslcdqi==2|rvptdlcdqi==2|rvttagedqi==2|rvtttopdqi==2|rvttmorphdqi==2| ///
-rvttlatdqi==2|rvttbehdqi==2|rvttbasisdqi==2|rvttstagingdqi==2|rvttdotdqi==2|rvttrx2dqi==2|rvttrx2ddqi==2|rvttrx2dqi==2| ///
-rvttrx2ddqi==2|rvttrx3dqi==2|rvttrx3ddqi==2|rvttrx4dqi==2|rvttrx4ddqi==2|rvttrx5dqi==2|rvttrx5ddqi==2
-*/
 ** Total errors - minor, by variable
 egen rverrtotal_minor_dob=count(rvptdobdqi) if rvptdobdqi==2 //1
 egen rverrtotal_minor_sex=count(rvptsexdqi) if rvptsexdqi==2 //0
@@ -922,20 +847,19 @@ drop _all
 input errorvar case
 1	2
 2	2
-3   63
+3      63
 4	9
 5	58
 6	4
-7   19
-8   25
-9   0
-10  13
-11  31
-12  1
-13  27
+7      19
+8      25
+9      0
+10     13
+11     31
+12     1
+13     27
 end
 
-//gen errorvar=.
 label var errorvar "Variable"
 label define errorvar_lab 1 "DOB" 2 "Sex" 3 "Resident" 4 "StatusLastContact" 5 "DateLastContact" ///
                           6 "Age" 7 "Topography" 8 "Morphology" 9 "Laterality" 10 "Behaviour" ///
@@ -971,20 +895,19 @@ drop _all
 input errorvar case
 1	1
 2	0
-3   6
+3      6
 4	0
 5	6
 6	0
-7   18
-8   10
-9   74
-10  0
-11  4
-12  6
-13  22
+7      18
+8      10
+9      74
+10     0
+11     4
+12     6
+13     22
 end
 
-//gen errorvar=.
 label var errorvar "Variable"
 label define errorvar_lab 1 "DOB" 2 "Sex" 3 "Resident" 4 "StatusLastContact" 5 "DateLastContact" ///
                           6 "Age" 7 "Topography" 8 "Morphology" 9 "Laterality" 10 "Behaviour" ///
@@ -1010,287 +933,3 @@ putdocx table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
 putdocx save "`datapath'\version01\3-output\2019-09-30_review_quality_report.docx", append
 putdocx clear
 restore
-/*
-				****************************
-				*	      PDF REPORT  	   *
-				*    QUANTITY & QUALITY    *
-				****************************
-
-putpdf clear
-putpdf begin
-
-//Create a paragraph
-putpdf paragraph
-putpdf text ("Quantity & Quality Report"), bold
-putpdf paragraph
-putpdf text ("Cancer: 2015"), font(Helvetica,10)
-putpdf paragraph
-putpdf text ("Date Prepared: 30-Sep-2019"),  font(Helvetica,10)
-putpdf paragraph
-putpdf text ("Prepared by: JC using Stata & Redcap, 25-Sep-2019"),  font(Helvetica,10)
-putpdf paragraph
-putpdf text ("Review of 74 CanReg5 Variables"), bgcolor("pink") font(Helvetica,10)
-putpdf paragraph, halign(center)
-putpdf text ("QUANTITY"), bold font(Helvetica,20,"blue")
-putpdf paragraph
-qui sum rvtotal
-local sum : display %3.0f `r(sum)'
-putpdf text ("TOTAL records reviewed: `sum'")
-putpdf paragraph, halign(center)
-putpdf text ("QUALITY"), bold font(Helvetica,20,"blue")
-putpdf paragraph
-qui sum rverrtotal
-local sum : display %3.0f `r(sum)'
-putpdf text ("TOTAL errors: `sum'")
-putpdf paragraph
-qui sum rverrtotal_major
-local sum : display %3.0f `r(sum)'
-putpdf text ("TOTAL errors MAJOR: `sum'")
-putpdf paragraph
-qui sum rverrtotalper_major
-local sum : display %2.0f `r(sum)'
-putpdf text ("TOTAL errors MAJOR: `sum'%"), bold bgcolor("yellow")
-putpdf paragraph
-qui sum rverrtotal_minor
-local sum : display %3.0f `r(sum)'
-putpdf text ("TOTAL errors MINOR: `sum'")
-putpdf paragraph
-qui sum rverrtotalper_minor
-local sum : display %2.0f `r(sum)'
-putpdf text ("TOTAL errors MINOR: `sum'%"), bold bgcolor("yellow")
-putpdf paragraph
-
-putpdf save "`datapath'\version01\3-output\2019-09-30_review_quality_report.pdf", replace
-putpdf clear
-restore
-
-
-preserve
-collapse rverrtotal_major_*
-drop *rx* //remove treatment fields as not needed for this report
-
-drop _all
-input errorvar case
-1	2
-2	2
-3   63
-4	9
-5	58
-6	4
-7   19
-8   25
-9   0
-10  13
-11  31
-12  1
-13  27
-end
-
-//gen errorvar=.
-label var errorvar "Variable"
-label define errorvar_lab 1 "DOB" 2 "Sex" 3 "Resident" 4 "StatusLastContact" 5 "DateLastContact" ///
-                          6 "Age" 7 "Topography" 8 "Morphology" 9 "Laterality" 10 "Behaviour" ///
-                          11 "BasisOfDiagnosis" 12 "Staging" 13 "IncidenceDate", modify
-label values errorvar errorvar_lab
-gen errorper=case/254*100
-format errorper %9.0f
-gsort -case
-
-putpdf clear
-putpdf begin
-
-putpdf paragraph, halign(center)
-putpdf text ("QUALITY - MAJOR"), bold font(Helvetica,20,"blue")
-putpdf paragraph
-rename errorvar Variable
-rename case Total_Errors
-rename errorper Percentage
-putpdf table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
-       border(start, nil) border(insideV, nil) border(end, nil)
-
-
-putpdf save "`datapath'\version01\3-output\2019-09-30_review_quality_report.pdf", append
-putpdf clear
-restore
-
-
-preserve
-collapse rverrtotal_minor_*
-drop *rx* //remove treatment fields as not needed for this report
-
-drop _all
-input errorvar case
-1	1
-2	0
-3   6
-4	0
-5	6
-6	0
-7   18
-8   10
-9   74
-10  0
-11  4
-12  6
-13  22
-end
-
-//gen errorvar=.
-label var errorvar "Variable"
-label define errorvar_lab 1 "DOB" 2 "Sex" 3 "Resident" 4 "StatusLastContact" 5 "DateLastContact" ///
-                          6 "Age" 7 "Topography" 8 "Morphology" 9 "Laterality" 10 "Behaviour" ///
-                          11 "BasisOfDiagnosis" 12 "Staging" 13 "IncidenceDate", modify
-label values errorvar errorvar_lab
-gen errorper=case/147*100
-format errorper %9.0f
-gsort -case
-
-putpdf clear
-putpdf begin
-
-putpdf paragraph, halign(center)
-putpdf text ("QUALITY - MINOR"), bold font(Helvetica,20,"blue")
-putpdf paragraph
-rename errorvar Variable
-rename case Total_Errors
-rename errorper Percentage
-putpdf table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
-       border(start, nil) border(insideV, nil) border(end, nil)
-
-
-putpdf save "`datapath'\version01\3-output\2019-09-30_review_quality_report.pdf", append
-putpdf clear
-restore
-
-save "`datapath'\version01\2-working\2015_review_cancer_dc" ,replace
-label data "BNR-Cancer prepared 2015 data"
-notes _dta :These data prepared for 2015 cancer review report
-
-
-
-/*
-** Total errors
-count if rvptcfda==2|rvptdoa==2|rvptcstatus==2|rvptretsource==2|rvptnotesseen==2|rvptnsdate==2|rvptfretsource==2| ///
-rvptlname==2|rvptfname==2|rvptinit==2|rvptdob==2|rvptsex==2|rvptnrn==2|rvpthospnum==2|rvptresident==2|rvptslc==2|rvptdlc==2|rvptcomments==2| ///
-rvttabsda==2|rvttadoa==2|rvttparish==2|rvttaddr==2|rvttage==2|rvttprimsite==2|rvtttop==2|rvtthx==2|rvttmorph==2|rvttlat==2| ///
-rvttbeh==2|rvttgrade==2|rvttbasis==2|rvttstaging==2|rvttdot==2|rvttdxyr==2|rvttconsult==2|rvttrx1==2|rvttrx1d==2| ///
-rvttrx2==2|rvttrx2d==2|rvttrx3==2|rvttrx3d==2|rvttrx4==2|rvttrx4d==2|rvttrx5==2|rvttrx5d==2|rvttorx1==2|rvttorx2==2|rvttnorx1==2|rvttnorx2==2|rvttrecstatus==2| ///
-rvstabsda==2|rvstadoa==2|rvstnftype==2|rvstsourcename==2|rvstdoc==2|rvstdocaddr==2|rvstrecnum==2|rvstcfdx==2|rvstlabnum==2| ///
-rvstspecimen==2|rvstsampledate==2|rvstrecvdate==2|rvstrptdate==2|rvstclindets==2|rvstcytofinds==2|rvstmd==2|rvstconsrpt==2| ///
-rvstcod==2|rvstduration==2|rvstonset==2|rvstcertifier==2|rvstadmdate==2|rvstdfc==2|rvstrtdate==2 //543
-
-count if rvptcfda==2
-count if rvptdoa==2
-count if rvptcstatus==2
-count if rvptretsource==2
-count if rvptnotesseen==2
-count if rvptnsdate==2
-count if rvptfretsource==2
-count if rvptlname==2
-count if rvptfname==2
-count if rvptinit==2
-count if rvptdob==2
-count if rvptsex==2
-count if rvptnrn==2
-count if rvpthospnum==2
-count if rvptresident==2
-count if rvptslc==2
-count if rvptdlc==2
-count if rvptcomments==2
-count if rvttabsda==2
-count if rvttadoa==2
-count if rvttparish==2
-count if rvttaddr==2
-count if rvttage==2
-count if rvttprimsite==2
-count if rvtttop==2
-count if rvtthx==2
-count if rvttmorph==2
-count if rvttlat==2
-count if rvttbeh==2
-count if rvttgrade==2
-count if rvttbasis==2
-count if rvttstaging==2
-count if rvttdot==2
-count if rvttdxyr==2
-count if rvttconsult==2
-count if rvttrx1==2
-count if rvttrx1d==2
-count if rvttrx2==2
-count if rvttrx2d==2
-count if rvttrx3==2
-count if rvttrx3d==2
-count if rvttrx4==2
-count if rvttrx4d==2
-count if rvttrx5==2
-count if rvttrx5d==2
-count if rvttorx1==2
-count if rvttorx2==2
-count if rvttnorx1==2
-count if rvttnorx2==2
-count if rvttrecstatus==2
-count if rvstabsda==2
-count if rvstadoa==2
-count if rvstnftype==2
-count if rvstsourcename==2
-count if rvstdoc==2
-count if rvstdocaddr==2
-count if rvstrecnum==2
-count if rvstcfdx==2
-count if rvstlabnum==2
-count if rvstspecimen==2
-count if rvstsampledate==2
-count if rvstrecvdate==2
-count if rvstrptdate==2
-count if rvstclindets==2
-count if rvstcytofinds==2
-count if rvstmd==2
-count if rvstconsrpt==2
-count if rvstcod==2
-count if rvstduration==2
-count if rvstonset==2
-count if rvstcertifier==2
-count if rvstadmdate==2
-count if rvstdfc==2
-count if rvstrtdate==2
-//1,452
-** Total errors - 
-count if rvptcfda==2|rvptdoa==2|rvptcstatus==2|rvptretsource==2|rvptnotesseen==2|rvptnsdate==2|rvptfretsource==2| ///
-rvptlname==2|rvptfname==2|rvptinit==2|rvptdob==2|rvptsex==2|rvptnrn==2|rvpthospnum==2|rvptresident==2|rvptslc==2|rvptdlc==2|rvptcomments==2| ///
-rvttabsda==2|rvttadoa==2|rvttparish==2|rvttaddr==2|rvttage==2|rvttprimsite==2|rvtttop==2|rvtthx==2|rvttmorph==2|rvttlat==2| ///
-rvttbeh==2|rvttgrade==2|rvttbasis==2|rvttstaging==2|rvttdot==2|rvttdxyr==2|rvttconsult==2|rvttrx1==2|rvttrx1d==2| ///
-rvttrx2==2|rvttrx2d==2|rvttrx3==2|rvttrx3d==2|rvttrx4==2|rvttrx4d==2|rvttrx5==2|rvttrx5d==2|rvttorx1==2|rvttorx2==2|rvttnorx1==2|rvttnorx2==2|rvttrecstatus==2| ///
-rvstabsda==2|rvstadoa==2|rvstnftype==2|rvstsourcename==2|rvstdoc==2|rvstdocaddr==2|rvstrecnum==2|rvstcfdx==2|rvstlabnum==2| ///
-rvstspecimen==2|rvstsampledate==2|rvstrecvdate==2|rvstrptdate==2|rvstclindets==2|rvstcytofinds==2|rvstmd==2|rvstconsrpt==2| ///
-rvstcod==2|rvstduration==2|rvstonset==2|rvstcertifier==2|rvstadmdate==2|rvstdfc==2|rvstrtdate==2
-
-** Total errors
-STOPPED HERE - BELOW NOT CALCULATING CORRECTLY - CHECK REDCAP REPORTS FOR TOTALS
-egen rverrtotal=total(rverrtot)
-egen rvpterrtotal=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0
-egen rvtterrtotal=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0
-egen rvsterrtotal=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0
-egen rvpterrtotal_SF=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==9
-egen rvtterrtotal_SF=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==9
-egen rvsterrtotal_SF=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==9
-egen rvpterrtotal_KWG=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==13
-egen rvtterrtotal_KWG=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==13
-egen rvsterrtotal_KWG=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==13
-egen rvpterrtotal_TH=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==14
-egen rvtterrtotal_TH=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==14
-egen rvsterrtotal_TH=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==14
-egen rvpterrtotal_intern=total(rvpterrtot) if rvpterrtot!=. & rvpterrtot!=0 & rvptda==98
-egen rvtterrtotal_intern=total(rvtterrtot) if rvtterrtot!=. & rvtterrtot!=0 & rvttda==98
-egen rvsterrtotal_intern=total(rvsterrtot) if rvsterrtot!=. & rvsterrtot!=0 & rvstda==98
-** Percentage errors
-gen rvpterrtotalper_SF=rvpterrtotal_SF/rvpterrtotal*100
-gen rvpterrtotalper_KWG=rvpterrtotal_KWG/rvpterrtotal*100
-gen rvpterrtotalper_TH=rvpterrtotal_TH/rvpterrtotal*100
-gen rvpterrtotalper_intern=rvpterrtotal_intern/rvpterrtotal*100
-** Total no errors
-egen rvptnoerrtotal=count(rvptcfda|rvptdoa|rvptcstatus|rvptretsource|rvptnotesseen|rvptnsdate|rvptfretsource|rvptlname|rvptfname|rvptinit|rvptdob|rvptsex|rvptnrn|rvpthospnum|rvptresident|rvptslc|rvptdlc|rvptcomments) ///
-     if rvptcfda==1|rvptdoa==1|rvptcstatus==1|rvptretsource==1|rvptnotesseen==1|rvptnsdate==1|rvptfretsource==1|rvptlname==1|rvptfname==1|rvptinit==1|rvptdob==1|rvptsex==1|rvptnrn==1|rvpthospnum==1|rvptresident==1|rvptslc==1|rvptdlc==1|rvptcomments==1
-   
-**egen rvpterrrec=total(rvpterrtot & rvtterrtot & rvsterrtot) if rvpterrtot!=. & rvpterrtot!=0
-egen
-*/
