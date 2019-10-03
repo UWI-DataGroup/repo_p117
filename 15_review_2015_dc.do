@@ -705,6 +705,92 @@ gen vartotal_tt=vartot_tt*18 //5,472
 gen vartotal_st=vartot_st*24 //13,272
 gen vartotal=4752+5472+13272
 
+** Total errors
+egen rvpterrtotal=total(rvpterrtot) //614
+egen rvtterrtotal=total(rvtterrtot) //752
+egen rvsterrtotal=total(rvsterrtot) //86
+gen rverrtotal=rvpterrtotal + rvtterrtotal + rvsterrtotal //1452
+
+** TOTAL errors - distributed by variable
+** PT (614)
+count if rvptcfda==2 //0
+count if rvptdoa==2 //0
+count if rvptcstatus==2 //5
+count if rvptretsource==2 //53
+count if rvptnotesseen==2 //240
+count if rvptnsdate==2 //23
+count if rvptfretsource==2 //2
+count if rvptlname==2 //1
+count if rvptfname==2 //1
+count if rvptinit==2 //5
+count if rvptdob==2 //3
+count if rvptsex==2 //4
+count if rvptnrn==2 //3
+count if rvpthospnum==2 //1
+count if rvptresident==2 //148
+count if rvptslc==2 //29
+count if rvptdlc==2 //85
+count if rvptcomments==2 //11
+** TT (752)
+count if rvttabsda==2 //21
+count if rvttadoa==2 //22
+count if rvttparish==2 //12
+count if rvttaddr==2 //13
+count if rvttage==2 //13
+count if rvttprimsite==2 //44
+count if rvtttop==2 //37
+count if rvtthx==2 //42
+count if rvttmorph==2 //35
+count if rvttlat==2 //86
+count if rvttbeh==2 //13
+count if rvttgrade==2 //24
+count if rvttbasis==2 //35
+count if rvttstaging==2 //218
+count if rvttdot==2 //49
+count if rvttdxyr==2 //28
+count if rvttconsult==2 //21
+/*
+count if rvttrx1==2 //
+count if rvttrx1d==2 //
+count if rvttrx2==2 //
+count if rvttrx2d==2 //
+count if rvttrx3==2 //
+count if rvttrx3d==2 //
+count if rvttrx4==2 //
+count if rvttrx4d==2 //
+count if rvttrx5==2 //
+count if rvttrx5d==2 //
+count if rvttorx1==2 //
+count if rvttorx2==2 //
+count if rvttnorx1==2 //
+count if rvttnorx2==2 //
+*/
+count if rvttrecstatus==2 //39
+** ST (86)
+count if rvstabsda==2 //8
+count if rvstadoa==2 //3
+count if rvstnftype==2 //4
+count if rvstsourcename==2 //4
+count if rvstdoc==2 //12
+count if rvstdocaddr==2 //6
+count if rvstrecnum==2 //9
+count if rvstcfdx==2 //3
+count if rvstlabnum==2 //3
+count if rvstspecimen==2 //1
+count if rvstsampledate==2 //6
+count if rvstrecvdate==2 //5
+count if rvstrptdate==2 //6
+count if rvstclindets==2 //2
+count if rvstcytofinds==2 //1
+count if rvstmd==2 //1
+count if rvstconsrpt==2 //0
+count if rvstcod==2 //2
+count if rvstduration==2 //3
+count if rvstonset==2 //3
+count if rvstcertifier==2 //3
+count if rvstadmdate==2 //1
+count if rvstdfc==2 //0
+count if rvstrtdate==2 //0
 
 ** Total errors - major, by variable
 egen rverrtotal_major_dob=count(rvptdobdqi) if rvptdobdqi==1 //2
@@ -771,6 +857,7 @@ gen rvtime_days=rvtime_hrs/7
 gen rvtime_wks=rvtime_days/2
 format rvtime_wks %4.0g
 
+
 ** CREATE progress report
 ** CREATE dataset with results to be used in pdf report
 preserve
@@ -834,7 +921,7 @@ qui sum rverrtotalper_minor
 local sum : display %2.0f `r(sum)'
 putdocx text ("TOTAL errors MINOR: `sum'%"), bold shading("yellow")
 
-putdocx save "`datapath'\version01\3-output\2019-09-30_review_quality_report.docx", replace
+putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", replace
 putdocx clear
 restore
 
@@ -882,7 +969,7 @@ putdocx table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
        border(start, nil) border(insideV, nil) border(end, nil)
 
 
-putdocx save "`datapath'\version01\3-output\2019-09-30_review_quality_report.docx", append
+putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", append
 putdocx clear
 restore
 
@@ -930,6 +1017,118 @@ putdocx table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
        border(start, nil) border(insideV, nil) border(end, nil)
 
 
-putdocx save "`datapath'\version01\3-output\2019-09-30_review_quality_report.docx", append
+putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", append
+putdocx clear
+restore
+
+
+preserve
+input errorvar case
+1	0
+2	0
+3      5
+4	53
+5	240
+6	23
+7      2
+8      1
+9      1
+10     5
+11     3
+12     4
+13     3
+14     1
+15     148
+16     29
+17     85
+18     11
+19     21
+20     22
+21     12
+22     13
+23     13
+24     44
+25     37
+26     42
+27     35
+28     86
+29     13
+30     24
+31     35
+32     218
+33     49
+34     28
+35     21
+36     39
+37     8
+38     3
+39     4
+40     4
+41     12
+42     6
+43     9
+44     3
+45     3
+46     1
+47     6
+48     5
+49     6
+50     2
+51     1
+52     1
+53     0
+54     2
+55     3
+56     3
+57     3
+58     1
+59     0
+60     0
+end
+
+label var errorvar "Variable"
+label define errorvar_lab 1 "CF DA" 2 "CF Date" 3 "Case Status" 4 "Ret.Source" 5 "Notes Seen" 6 "Notes Seen Date" ///
+                          7 "Fur.Ret.Source" 8 "Last Name" 9 "First Name" 10 "Initials" 11 "DOB" 12 "Sex" 13 "NRN" ///
+                          14 "Hospital #" 15 "Resident" 16 "StatusLastContact" 17 "DateLastContact" 18 "CR5 Comments" ///
+                          19 "ABS DA" 20 "ABS Date" 21 "Parish" 22 "Address" 23 "Age" 24 "Primary Site" 25 "Topography" ///
+                          26 "Histology" 27 "Morphology" 28 "Laterality" 29 "Behaviour" 30 "Grade" 31 "BasisOfDiagnosis" ///
+                          32 "Staging" 33 "IncidenceDate" 34 "Dx Year" 35 "Consultant" 36 "Record Status" ///
+                          37 "Source DA" 38 "Source Date" 39 "NF Type" 40 "Source Name" 41 "Doctor" 42 "Doc Address" ///
+                          43 "Record #" 44 "CF Dx" 45 "Lab #" 46 "Specimen" 47 "Sample Taken Date" 48 "Received Date" ///
+                          49 "Report Date" 50 "Clinical Details" 51 "Cytological Findings" 52 "Microscopic Des." ///
+                          53 "Consultation Rpt" 54 "COD" 55 "Duration" 56 "Onset & Death Interval" 57 "Certifier" ///
+                          58 "Admission Date" 59 "Date First Consultation" 60 "RT Date", modify
+label values errorvar errorvar_lab
+gen errorper=case/1452*100
+format errorper %9.0f
+gsort -case
+drop if case<10
+
+putdocx clear
+putdocx begin
+
+putdocx paragraph, halign(center)
+putdocx text ("QUALITY - ALL"), bold font(Helvetica,20,"blue")
+putdocx paragraph
+rename errorvar Variable
+rename case Total_Errors
+rename errorper Percentage
+putdocx table tbl_all = data("Variable Total_Errors Percentage"), varnames ///
+       border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_all(3,.), bold
+putdocx table tbl_all(4,.), bold
+putdocx table tbl_all(5,.), bold
+putdocx table tbl_all(6,.), bold
+putdocx table tbl_all(8,.), bold
+putdocx table tbl_all(12,.), bold
+putdocx table tbl_all(13,.), bold
+putdocx table tbl_all(14,.), bold
+putdocx table tbl_all(15,.), bold
+putdocx table tbl_all(23,.), bold
+putdocx table tbl_all(24,.), bold
+putdocx table tbl_all(38,.), bold
+putdocx table tbl_all(43,.), bold
+
+putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", append
 putdocx clear
 restore
