@@ -176,6 +176,9 @@ tab deceased ,m //59.43% used as 1-yr survival in table ES1 (executive summary, 
 ----------------------+-----------------------------------
                 Total |        912      100.00
 */
+** JC 09oct2019: BNR newsletter vol 4
+tab deceased if siteiarc==39 //prostate 1-yr survival
+tab deceased if siteiarc==29 //breast 1-yr survival
 
 ** Save this new dataset 
 save "`datapath'\version01\2-working\2014_1yr_survival_da", replace
