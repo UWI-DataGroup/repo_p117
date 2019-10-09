@@ -191,6 +191,10 @@ tab deceased ,m //64.74% used as 1-yr survival in table ES1 (executive summary, 
 ----------------------+-----------------------------------
                 Total |        831      100.00
 */
+For 2015 rpt, use BELOW corrected survival code to determine 2008-2015 1-yr survival (drop DCOs)
+
+drop if basis==0
+tab deceased ,m
 
 ** Save this new dataset 
 save "`datapath'\version01\2-working\2013_1yr_survival_da_v01", replace

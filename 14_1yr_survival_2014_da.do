@@ -1,13 +1,13 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name		13_3yr_survival_2014_da.do
-    //  project:		    BNR
-    //  analysts:		    Jacqueline CAMPBELL
-    //  date first created  20-MAY-2019
+    //  algorithm name          14_3yr_survival_2014_da.do
+    //  project:		BNR
+    //  analysts:		Jacqueline CAMPBELL
+    //  date first created      20-MAY-2019
     // 	date last modified	20-MAY-2019
     //  algorithm task		Generate 1-year survival % for report: Table ES1
-    //  status              Completed
-    //  objectve            To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
+    //  status                  Completed
+    //  objectve                To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
 
     ** DO FILE BASED ON
     * AMC Rose code for BNR Cancer 2008 annual report
@@ -179,6 +179,17 @@ tab deceased ,m //59.43% used as 1-yr survival in table ES1 (executive summary, 
 ** JC 09oct2019: BNR newsletter vol 4
 tab deceased if siteiarc==39 //prostate 1-yr survival
 tab deceased if siteiarc==29 //breast 1-yr survival
+** JC 09oct2019: BNR newsletter vol 4
+preserve
+drop if basis==0
+tab deceased if siteiarc==39 //prostate 1-yr survival
+tab deceased if siteiarc==29 //breast 1-yr survival
+restore
+
+For 2015 rpt, use BELOW corrected survival code to determine 2008-2015 1-yr survival (drop DCOs)
+
+drop if basis==0
+tab deceased ,m
 
 ** Save this new dataset 
 save "`datapath'\version01\2-working\2014_1yr_survival_da", replace
