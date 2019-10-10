@@ -858,6 +858,8 @@ gen rvtime_wks=rvtime_days/2
 format rvtime_wks %4.0g
 
 
+save "`datapath'\version01\2-working\2015_review_dc" ,replace
+
 ** CREATE progress report
 ** CREATE dataset with results to be used in pdf report
 preserve
@@ -1023,67 +1025,68 @@ restore
 
 
 preserve
+drop _all
 input errorvar case
 1	0
 2	0
-3      5
+3	5
 4	53
 5	240
 6	23
-7      2
-8      1
-9      1
-10     5
-11     3
-12     4
-13     3
-14     1
-15     148
-16     29
-17     85
-18     11
-19     21
-20     22
-21     12
-22     13
-23     13
-24     44
-25     37
-26     42
-27     35
-28     86
-29     13
-30     24
-31     35
-32     218
-33     49
-34     28
-35     21
-36     39
-37     8
-38     3
-39     4
-40     4
-41     12
-42     6
-43     9
-44     3
-45     3
-46     1
-47     6
-48     5
-49     6
-50     2
-51     1
-52     1
-53     0
-54     2
-55     3
-56     3
-57     3
-58     1
-59     0
-60     0
+7	2
+8	1
+9	1
+10	5
+11	3
+12	4
+13	3
+14	1
+15	148
+16	29
+17	85
+18	11
+19	21
+20	22
+21	12
+22	13
+23	13
+24	44
+25	37
+26	42
+27	35
+28	86
+29	13
+30	24
+31	35
+32	218
+33	49
+34	28
+35	21
+36	39
+37	8
+38	3
+39	4
+40	4
+41	12
+42	6
+43	9
+44	3
+45	3
+46	1
+47	6
+48	5
+49	6
+50	2
+51	1
+52	1
+53	0
+54	2
+55	3
+56	3
+57	3
+58	1
+59	0
+60	0
 end
 
 label var errorvar "Variable"
@@ -1102,7 +1105,7 @@ label values errorvar errorvar_lab
 gen errorper=case/1452*100
 format errorper %9.0f
 gsort -case
-drop if case<10
+drop if case==.|case==0 // deleted
 
 putdocx clear
 putdocx begin
@@ -1126,9 +1129,14 @@ putdocx table tbl_all(14,.), bold
 putdocx table tbl_all(15,.), bold
 putdocx table tbl_all(23,.), bold
 putdocx table tbl_all(24,.), bold
+STOPPED HERE - trying to fix order of Variable in docx
+/*
+putdocx table tbl1(23,1) = ("Behaviour"), bold
+putdocx table tbl1(24,1) = ("Age"), bold
+*/
 putdocx table tbl_all(38,.), bold
 putdocx table tbl_all(43,.), bold
 
-putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", append
+putdocx save "`datapath'\version01\3-output\2019-10-10_review_quality_report.docx", append
 putdocx clear
 restore
