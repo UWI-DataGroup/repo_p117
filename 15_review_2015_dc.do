@@ -710,6 +710,50 @@ egen rvpterrtotal=total(rvpterrtot) //614
 egen rvtterrtotal=total(rvtterrtot) //752
 egen rvsterrtotal=total(rvsterrtot) //86
 gen rverrtotal=rvpterrtotal + rvtterrtotal + rvsterrtotal //1452
+** Total errors for IARC quality variables
+/*
+egen rverrtotal_iarc_dob=count(rvptdobdqi) if rvptdobdqi!=8|rvptdobdqi!=. //
+egen rverrtotal_iarc_sex=count(rvptsexdqi) if rvptsexdqi!=8|rvptsexdqi!=. //
+egen rverrtotal_iarc_resident=count(rvptresidentdqi) if rvptresidentdqi!=8|rvptresidentdqi!=. //
+egen rverrtotal_iarc_slc=count(rvptslcdqi) if rvptslcdqi!=8|rvptslcdqi!=. //
+egen rverrtotal_iarc_dlc=count(rvptdlcdqi) if rvptdlcdqi!=8|rvptdlcdqi!=. //
+egen rverrtotal_iarc_age=count(rvttagedqi) if rvttagedqi!=8|rvttagedqi!=. //
+egen rverrtotal_iarc_top=count(rvtttopdqi) if rvtttopdqi!=8|rvtttopdqi!=. //
+egen rverrtotal_iarc_morph=count(rvttmorphdqi) if rvttmorphdqi!=8|rvttmorphdqi!=. //
+egen rverrtotal_iarc_lat=count(rvttlatdqi) if rvttlatdqi!=8|rvttlatdqi!=. //
+egen rverrtotal_iarc_beh=count(rvttbehdqi) if rvttbehdqi!=8|rvttbehdqi!=. //
+egen rverrtotal_iarc_basis=count(rvttbasisdqi) if rvttbasisdqi!=8|rvttbasisdqi!=. //
+egen rverrtotal_iarc_staging=count(rvttstagingdqi) if rvttstagingdqi!=8|rvttstagingdqi!=. //
+egen rverrtotal_iarc_dot=count(rvttdotdqi) if rvttdotdqi!=8|rvttdotdqi!=. //
+egen rverrtotal_iarc_rx1=count(rvttrx1dqi) if rvttrx1dqi!=8|rvttrx1dqi!=. //0
+egen rverrtotal_iarc_rx1d=count(rvttrx1dqi) if rvttrx1ddqi!=8|rvttrx1ddqi!=. //0
+egen rverrtotal_iarc_rx2=count(rvttrx2dqi) if rvttrx2dqi!=8|rvttrx2dqi!=. //0
+egen rverrtotal_iarc_rx2d=count(rvttrx2dqi) if rvttrx2ddqi!=8|rvttrx2ddqi!=. //0
+egen rverrtotal_iarc_rx3=count(rvttrx3dqi) if rvttrx3dqi!=8|rvttrx3dqi!=. //0
+egen rverrtotal_iarc_rx3d=count(rvttrx3dqi) if rvttrx3ddqi!=8|rvttrx3ddqi!=. //0
+egen rverrtotal_iarc_rx4=count(rvttrx4dqi) if rvttrx4dqi!=8|rvttrx4dqi!=. //0
+egen rverrtotal_iarc_rx4d=count(rvttrx4dqi) if rvttrx4ddqi!=8|rvttrx4ddqi!=. //0
+egen rverrtotal_iarc_rx5=count(rvttrx5dqi) if rvttrx5dqi!=8|rvttrx5dqi!=. //0
+egen rverrtotal_iarc_rx5d=count(rvttrx5dqi) if rvttrx5ddqi!=8|rvttrx5ddqi!=. //0
+
+egen rverrtotal_iarc=count(rvptdob|rvptsex|rvptresident|rvptslc|rvptdlc|rvttage|rvtttop|rvttmorph|rvttlat|rvttbeh|rvttbasis|rvttstaging|rvttdot) if ///
+       rvptdob==2|rvptsex==2|rvptresident==2|rvptslc==2|rvptdlc==2|rvttage==2|rvtttop==2|rvttmorph==2| ///
+       rvttlat==2|rvttbeh==2|rvttbasis==2|rvttstaging==2|rvttdot==2 //418 - not correct, use below code instead
+*/
+count if rvptdob==2 //3
+count if rvptsex==2 //4
+count if rvptresident==2 //148
+count if rvptslc==2 //29
+count if rvptdlc==2 //85
+count if rvttage==2 //13
+count if rvtttop==2 //37
+count if rvttmorph==2 //35
+count if rvttlat==2 //86
+count if rvttbeh==2 //13
+count if rvttbasis==2 //35
+count if rvttstaging==2 //218
+count if rvttdot==2 //49
+gen rverrtotal_iarc=755
 
 ** TOTAL errors - distributed by variable
 ** PT (614)
@@ -819,7 +863,8 @@ egen rverrtotal_major_rx5d=count(rvttrx5dqi) if rvttrx5ddqi==1 //0
 ** Total errors - major
 gen rverrtotal_major=254 //total from above errors by variable
 ** Percentage errors - major
-gen rverrtotalper_major=rverrtotal_major/rverrtotal*100
+gen rverrtotalper_major=rverrtotal_major/rverrtotal_iarc*100
+gen rverrtotalper_major_all=rverrtotal_major/rverrtotal*100
 
 ** Total errors - minor, by variable
 egen rverrtotal_minor_dob=count(rvptdobdqi) if rvptdobdqi==2 //1
@@ -848,7 +893,8 @@ egen rverrtotal_minor_rx5d=count(rvttrx5dqi) if rvttrx5ddqi==2 //0
 ** Total errors - minor
 gen rverrtotal_minor=147 //total from above errors by variable
 ** Percentage errors - minor
-gen rverrtotalper_minor=rverrtotal_minor/rverrtotal*100
+gen rverrtotalper_minor=rverrtotal_minor/rverrtotal_iarc*100
+gen rverrtotalper_minor_all=rverrtotal_minor/rverrtotal*100
 
 ** TOTAL review time
 egen rvtime_mins=total(rvelapsed)
@@ -863,12 +909,12 @@ save "`datapath'\version01\2-working\2015_review_dc" ,replace
 ** CREATE progress report
 ** CREATE dataset with results to be used in pdf report
 preserve
-collapse rvtotpendingper rvtotal rverrtotal rverrtotal_major rverrtotalper_major rverrtotal_minor rverrtotalper_minor rvtime_wks
-format rverrtotalper_major rverrtotalper_minor %9.0f
+collapse rvtotpendingper rvtotal rverrtotal rverrtotal_iarc rverrtotal_major rverrtotalper_major rverrtotalper_major_all rverrtotal_minor rverrtotalper_minor_all rverrtotalper_minor rvtime_wks
+format rverrtotalper_major rverrtotalper_major_all rverrtotalper_minor rverrtotalper_minor_all %9.0f
 save "`datapath'\version01\3-output\2015_review_dqi_da" ,replace
 
 				****************************
-				*	      PDF REPORT  	   *
+				*	  PDF REPORT        *
 				*    QUANTITY & QUALITY    *
 				****************************
 
@@ -881,7 +927,7 @@ putdocx text ("Quantity & Quality Report"), bold
 putdocx paragraph
 putdocx text ("Cancer: 2015"), font(Helvetica,10)
 putdocx paragraph
-putdocx text ("Date Prepared: 30-Sep-2019"),  font(Helvetica,10)
+putdocx text ("Date Prepared: 24-Oct-2019"),  font(Helvetica,10)
 putdocx paragraph
 putdocx text ("Prepared by: JC using Stata & Redcap data release date: 25-Sep-2019"),  font(Helvetica,10)
 putdocx paragraph
@@ -897,15 +943,15 @@ qui sum rvtotal
 local sum : display %3.0f `r(sum)'
 putdocx text ("TOTAL records reviewed: `sum' (27%)")
 putdocx paragraph, halign(center)
-putdocx text ("QUALITY"), bold font(Helvetica,20,"blue")
+putdocx text ("QUALITY - IARC ONLY"), bold font(Helvetica,20,"blue")
 putdocx paragraph
 qui sum rvtotpendingper
 local sum : display %3.0f `r(sum)'
 putdocx text ("TOTAL pending review: `sum'%")
 putdocx paragraph
-qui sum rverrtotal
+qui sum rverrtotal_iarc
 local sum : display %3.0f `r(sum)'
-putdocx text ("TOTAL errors: `sum'")
+putdocx text ("TOTAL errors: `sum'"), bold shading("yellow")
 putdocx paragraph
 qui sum rverrtotal_major
 local sum : display %3.0f `r(sum)'
@@ -923,7 +969,7 @@ qui sum rverrtotalper_minor
 local sum : display %2.0f `r(sum)'
 putdocx text ("TOTAL errors MINOR: `sum'%"), bold shading("yellow")
 
-putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", replace
+putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", replace
 putdocx clear
 restore
 
@@ -963,7 +1009,6 @@ putdocx begin
 
 putdocx paragraph, halign(center)
 putdocx text ("QUALITY - MAJOR"), bold font(Helvetica,20,"blue")
-putdocx paragraph
 rename errorvar Variable
 rename case Total_Errors
 rename errorper Percentage
@@ -971,7 +1016,7 @@ putdocx table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
        border(start, nil) border(insideV, nil) border(end, nil)
 
 
-putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", append
+putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
 putdocx clear
 restore
 
@@ -1011,7 +1056,6 @@ putdocx begin
 
 putdocx paragraph, halign(center)
 putdocx text ("QUALITY - MINOR"), bold font(Helvetica,20,"blue")
-putdocx paragraph
 rename errorvar Variable
 rename case Total_Errors
 rename errorper Percentage
@@ -1019,10 +1063,55 @@ putdocx table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
        border(start, nil) border(insideV, nil) border(end, nil)
 
 
-putdocx save "`datapath'\version01\3-output\2019-10-03_review_quality_report.docx", append
+putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
 putdocx clear
 restore
 
+preserve
+collapse rvtotpendingper rvtotal rverrtotal rverrtotal_iarc rverrtotal_major rverrtotalper_major rverrtotalper_major_all rverrtotal_minor rverrtotalper_minor_all rverrtotalper_minor rvtime_wks
+format rverrtotalper_major rverrtotalper_major_all rverrtotalper_minor rverrtotalper_minor_all %9.0f
+save "`datapath'\version01\3-output\2015_review_dqi_da" ,replace
+
+				****************************
+				*	  PDF REPORT        *
+				*         QUALITY          *
+				****************************
+
+putdocx clear
+putdocx begin
+
+
+putdocx paragraph, halign(center)
+putdocx text ("QUALITY - ALL"), bold font(Helvetica,20,"blue")
+putdocx paragraph
+qui sum rvtotpendingper
+local sum : display %3.0f `r(sum)'
+putdocx text ("TOTAL pending review: `sum'%")
+putdocx paragraph
+qui sum rverrtotal
+local sum : display %3.0f `r(sum)'
+putdocx text ("TOTAL errors: `sum'"), bold shading("yellow")
+putdocx paragraph
+qui sum rverrtotal_major
+local sum : display %3.0f `r(sum)'
+putdocx text ("TOTAL errors MAJOR: `sum'")
+putdocx paragraph
+qui sum rverrtotalper_major_all
+local sum : display %2.0f `r(sum)'
+putdocx text ("TOTAL errors MAJOR: `sum'%"), bold shading("yellow")
+putdocx paragraph
+qui sum rverrtotal_minor
+local sum : display %3.0f `r(sum)'
+putdocx text ("TOTAL errors MINOR: `sum'")
+putdocx paragraph
+qui sum rverrtotalper_minor_all
+local sum : display %2.0f `r(sum)'
+putdocx text ("TOTAL errors MINOR: `sum'%"), bold shading("yellow")
+putdocx paragraph
+
+putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
+putdocx clear
+restore
 
 preserve
 drop _all
@@ -1110,33 +1199,47 @@ drop if case==.|case==0 // deleted
 putdocx clear
 putdocx begin
 
-putdocx paragraph, halign(center)
-putdocx text ("QUALITY - ALL"), bold font(Helvetica,20,"blue")
-putdocx paragraph
+
 rename errorvar Variable
 rename case Total_Errors
 rename errorper Percentage
 putdocx table tbl_all = data("Variable Total_Errors Percentage"), varnames ///
        border(start, nil) border(insideV, nil) border(end, nil)
-putdocx table tbl_all(3,.), bold
-putdocx table tbl_all(4,.), bold
-putdocx table tbl_all(5,.), bold
-putdocx table tbl_all(6,.), bold
-putdocx table tbl_all(8,.), bold
-putdocx table tbl_all(12,.), bold
-putdocx table tbl_all(13,.), bold
-putdocx table tbl_all(14,.), bold
-putdocx table tbl_all(15,.), bold
+putdocx table tbl_all(3,.), bold shading("yellow")
+putdocx table tbl_all(4,.), bold shading("yellow")
+putdocx table tbl_all(5,.), bold shading("yellow")
+putdocx table tbl_all(6,.), bold shading("yellow")
+putdocx table tbl_all(8,.), bold shading("yellow")
+putdocx table tbl_all(12,.), bold shading("yellow")
+putdocx table tbl_all(13,.), bold shading("yellow")
+putdocx table tbl_all(14,.), bold shading("yellow")
+putdocx table tbl_all(15,.), bold shading("yellow")
+**STOPPED HERE - trying to fix order of Variable in docx
+
+putdocx table tbl_all(22,1) = ("Behaviour"), bold shading("yellow")
+putdocx table tbl_all(22,.), bold shading("yellow")
+putdocx table tbl_all(23,1) = ("Age"), bold shading("yellow")
+putdocx table tbl_all(23,.), bold shading("yellow")
+putdocx table tbl_all(24,1) = ("Address")
+putdocx table tbl_all(36,1) = ("Sex"), bold shading("yellow")
+putdocx table tbl_all(36,.), bold shading("yellow")
+putdocx table tbl_all(37,1) = ("Source Name")
+putdocx table tbl_all(38,1) = ("NF Type")
+putdocx table tbl_all(39,1) = ("DOB"), bold shading("yellow")
+putdocx table tbl_all(39,.), bold shading("yellow")
+putdocx table tbl_all(40,1) = ("NRN")
+putdocx table tbl_all(41,1) = ("Lab #")
+putdocx table tbl_all(42,1) = ("Duration")
+putdocx table tbl_all(43,1) = ("CF Dx")
+putdocx table tbl_all(44,1) = ("Source Date")
+putdocx table tbl_all(45,1) = ("Certifier")
+putdocx table tbl_all(46,1) = ("Onset & Death Interval")
+/*
 putdocx table tbl_all(23,.), bold
 putdocx table tbl_all(24,.), bold
-STOPPED HERE - trying to fix order of Variable in docx
-/*
-putdocx table tbl1(23,1) = ("Behaviour"), bold
-putdocx table tbl1(24,1) = ("Age"), bold
-*/
 putdocx table tbl_all(38,.), bold
 putdocx table tbl_all(43,.), bold
-
-putdocx save "`datapath'\version01\3-output\2019-10-10_review_quality_report.docx", append
+*/
+putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
 putdocx clear
 restore

@@ -42,6 +42,23 @@
 * SURVIVAL ANALYSIS
 * Survival analysis to 1 year
 **************************************************************************
+Data ineligible/excluded from survival analysis - taken from IARC 2012 summer school presented by Manuela Quaresma
+Ineligible Criteria:
+- Incomplete data
+- Beh not=/3
+- Not resident
+- Inappropriate morph code
+
+Excluded Criteria:
+- Age 100+
+- SLC unknown
+- Duplicate
+- Synchronous tumour
+- Sex incompatible with site
+- Dates invalid
+- Inconsistency between dob, dot and dlc
+- Multiple primary
+- DCO / zero survival (true zero survival included i.e. dot=dod but not a DCO)
 
 ** Load the dataset
 use "`datapath'\version01\2-working\2014_cancer_rx_outcomes_da", clear
