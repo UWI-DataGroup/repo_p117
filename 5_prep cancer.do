@@ -649,7 +649,7 @@ replace dot=d(07aug2014) if pid=="20140586"
 replace nsdate=d(04jul2019) if pid=="20140586"
 
 STOP
-ABS 20140587 as 2008 - see frmCaseFinding 4024 and main CR5db and 2014 dataset
+ABS in Stata data editor 20140587 as 2008 - see frmCaseFinding 4024 and main CR5db and 2014 dataset
 
 replace basis=7 if pid=="20140590"
 replace dot=d(24may2012) if pid=="20140590"
