@@ -35,103 +35,6 @@
 ** HEADER -----------------------------------------------------
 
 *******************************
-** 2008 Non-survival Dataset **
-*******************************
-
-** Load the dataset (2008)
-use "`datapath'\version02\1-input\2008_cancer_sites_da_v01", replace
-count //845
-
-** Remove non-reportable skin cancers
-drop if siteiarc==25 //303 deleted
-
-** Remove non-malignant and non-insitu tumours
-drop if beh!=2 & beh!=3 //18 deleted
-
-** Export dataset to run data in IARCcrg Tools (Check Programme)
-gen INCIDYR=year(dot)
-tostring INCIDYR, replace
-gen INCIDMONTH=month(dot)
-gen str2 INCIDMM = string(INCIDMONTH, "%02.0f")
-gen INCIDDAY=day(dot)
-gen str2 INCIDDD = string(INCIDDAY, "%02.0f")
-gen INCID=INCIDYR+INCIDMM+INCIDDD
-replace INCID="" if INCID=="..." //0 changes
-drop INCIDMONTH INCIDDAY INCIDYR INCIDMM INCIDDD
-rename INCID dot_iarc
-label var dot_iarc "IARC IncidenceDate"
-
-gen BIRTHYR=year(dob)
-tostring BIRTHYR, replace
-gen BIRTHMONTH=month(dob)
-gen str2 BIRTHMM = string(BIRTHMONTH, "%02.0f")
-gen BIRTHDAY=day(dob)
-gen str2 BIRTHDD = string(BIRTHDAY, "%02.0f")
-gen BIRTHD=BIRTHYR+BIRTHMM+BIRTHDD
-replace BIRTHD="" if BIRTHD=="..." //17 changes
-drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
-rename BIRTHD dob_iarc
-label var dob_iarc "IARC BirthDate"
-
-export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age ///
-using "`datapath'\version02\2-working\2008_nonsurvival_iarccrgtools.txt", nolabel replace
-
-/*
-IARC crg Tools - see SOP for steps on how to perform below checks:
-
-(1) Perform file transfer using '2008_nonsuvival_iarccrgtools.txt'
-(2) Perform check using '2008_iarccrgtools_to check.prn'
-(3) Perform multiple primary check using ''
-
-Results of IARC Check Program:
-(Titles for each data column: pid sex top morph beh grade basis dot dob age)
-    888 records processed
-	0 errors
-        
-	26 warnings
-        - 7 unlikely hx/site
-		- 1 unlikely beh/hx
-        - 18 unlikely grade/hx
-*/
-/*	
-Results of IARC MP Program:
-	83 excluded (non-malignant)
-	16 MPs (multiple tumours)
-	 1 Duplicate registration
-*/
-** No updates needed for warnings/errors report
-** Updates for multiple primary report:
-replace persearch=2 if pid=="20080967" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080966" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080586" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080536" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080405" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080295" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080215" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080170" & eidmp==2 //1 change
-replace recstatus=4 if pid=="20080170" & eidmp==2 //1 change
-drop if pid=="20080170" & recstatus==4 //1 deleted - removed duplicate MP
-replace persearch=1 if persearch==0|persearch==. //880 changes
-
-** Add 2008 cases (3) found in 2014 (DCO) dataset
-STOP
-
-tab resident ,m 
-drop if resident==9 //... deleted
-
-** Rename cod in prep for death data matching
-rename cod codcancer
-
-count //887
-
-** Save this corrected dataset
-save "`datapath'\version02\2-working\2008_cancer_nonsurvival", replace
-label data "2008 BNR-Cancer analysed data - Non-survival Dataset"
-note: This dataset was used for 2015 annual report
-
-clear
-
-*******************************
 ** 2014 Non-survival Dataset **
 *******************************
 /*
@@ -442,7 +345,7 @@ replace rx1=5 if pid=="20140393"
 replace rx1d=d(29mar2014) if pid=="20140393"
 
 replace basis=1 if pid=="20140404"
-replace dcostatus=1 if pid=="20140404""
+replace dcostatus=1 if pid=="20140404"
 
 replace basis=9 if pid=="20140408"
 replace dcostatus=1 if pid=="20140408"
@@ -648,9 +551,6 @@ replace dcostatus=1 if pid=="20140586"
 replace dot=d(07aug2014) if pid=="20140586"
 replace nsdate=d(04jul2019) if pid=="20140586"
 
-STOP
-ABS in Stata data editor 20140587 as 2008 - see frmCaseFinding 4024 and main CR5db and 2014 dataset
-
 replace basis=7 if pid=="20140590"
 replace dot=d(24may2012) if pid=="20140590"
 replace dotyear=2012 if pid=="20140590"
@@ -721,9 +621,9 @@ replace topography=772 if pid=="20140659"
 replace hx="AGGRESSIVE B CELL LYMPHOMA, DIFFUSE LARGE B-CELL, NON-GERMINAL CENTER SUBTYPE" if pid=="20140659"
 replace morph=9680 if pid=="20140659"
 replace morphcat=43 if pid=="20140659"
-replace topat=69 if pid=="20140659"
+replace topcat=69 if pid=="20140659"
 replace icd10="C833" if pid=="20140659"
-replace icd10site=17 if pid=="20140659"
+replace siteicd10=17 if pid=="20140659"
 replace sitecr5db=21 if pid=="20140659"
 replace siteiarc=53 if pid=="20140659"
 replace site=10 if pid=="20140659"
@@ -736,46 +636,418 @@ replace dot=d(28nov2013) if pid=="20140665"
 replace dotyear=2013 if pid=="20140665"
 replace dxyr=2013 if pid=="20140665"
 
+sort pid
+/*
+20140587 abstracted directly into dataset via Stata data editor as 2008 case;
+See frmCaseFinding 4024 and main CR5db and DCO ptnames excel in version02/1-input
+Saved in and as: version02\2-working\'2014_cancer_nonsurvival_extras.dta'
 
+20150037 entered directly into Stata editor using 2015 CLEAN CR5db (2015BNR-C.xml)
+*/
+count //926 (1 deleted above)
 
-tab resident ,m 
-drop if resident==9 //... deleted
+clear
+use "`datapath'\version02\2-working\2014_cancer_nonsurvival_extras", replace
+count //928
 
-drop if recstatus==3 //2.. deleted
-tab dcostatus ,m
 
 ** Create missed 2008 dataset
 preserve
-drop if dxyr!=2008 //... deleted
-list pid
-count //
+drop if dxyr!=2008
+list pid dot
+count //3
 
-save "`datapath'\version02\2-working\2014_cancer_2008only", replace
+save "`datapath'\version02\2-working\2008_cancer_nonsurvival_extras", replace
 label data "2014 BNR-Cancer analysed data - 2008 Cases"
 note: This dataset was used for 2015 annual report
 restore
-//import 2008 case to 2008_cancer_nonsurvival.dta above
+//import 2008 cases to 2008_cancer_nonsurvival.dta below
 
 ** Create missed 2013 dataset
 preserve
-drop if dxyr!=2013 //... deleted
-list pid
-count //
+drop if dxyr!=2013
+list pid dot
+count //26
 
-save "`datapath'\version02\2-working\2014_cancer_2013only", replace
+save "`datapath'\version02\2-working\2013_cancer_nonsurvival_extras", replace
 label data "2014 BNR-Cancer analysed data - 2013 Cases"
 note: This dataset was used for 2015 annual report
 restore
 
 ** Remove cases before 2014 from 2014 dataset
-drop if dxyr!=2014 //... deleted
+tab dxyr ,m //3 missing
+//list pid dot if dxyr==.
+replace dxyr=2014 if dxyr==. //3 changes
+drop if dxyr!=2014 //43 deleted
 
-** Import 2014 cases from 2015 CLEAN CR5db (2015BNR-C.xml)
-except 20140537 as this already updated above
+count //
+
+** Export dataset to run data in IARCcrg Tools (Check Programme)
+gen INCIDYR=year(dot)
+tostring INCIDYR, replace
+gen INCIDMONTH=month(dot)
+gen str2 INCIDMM = string(INCIDMONTH, "%02.0f")
+gen INCIDDAY=day(dot)
+gen str2 INCIDDD = string(INCIDDAY, "%02.0f")
+gen INCID=INCIDYR+INCIDMM+INCIDDD
+replace INCID="" if INCID=="..." //0 changes
+drop INCIDMONTH INCIDDAY INCIDYR INCIDMM INCIDDD
+rename INCID dot_iarc
+label var dot_iarc "IARC IncidenceDate"
+
+gen BIRTHYR=year(dob)
+tostring BIRTHYR, replace
+gen BIRTHMONTH=month(dob)
+gen str2 BIRTHMM = string(BIRTHMONTH, "%02.0f")
+gen BIRTHDAY=day(dob)
+gen str2 BIRTHDD = string(BIRTHDAY, "%02.0f")
+gen BIRTHD=BIRTHYR+BIRTHMM+BIRTHDD
+replace BIRTHD="" if BIRTHD=="..." //17 changes
+drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
+rename BIRTHD dob_iarc
+label var dob_iarc "IARC BirthDate"
+
+** mpseq was dropped so need to create
+gen mpseq=0 if persearch==1
+replace mpseq=1 if persearch!=1 & regexm(cr5id,"T1") //12 changes
+replace mpseq=2 if persearch!=1 & !(strmatch(strupper(cr5id), "*T1*")) //10 changes
+
+export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age ///
+using "`datapath'\version02\2-working\2014_nonsurvival_iarccrgtools.txt", nolabel replace
+
+/*
+IARC crg Tools - see SOP for steps on how to perform below checks:
+
+(1) Perform file transfer using '2014_nonsuvival_iarccrgtools.txt'
+(2) Perform check using '2014_iarccrgtools_to check.prn'
+(3) Perform multiple primary check using ''
+
+Results of IARC Check Program:
+(Titles for each data column: pid sex top morph beh grade basis dot dob age)
+    885 records processed
+	0 errors
+        
+	51 warnings
+        - 6 unlikely hx/site
+		- 3 unlikely grade/hx
+        - 42 unlikely basis/hx
+*/
+/*	
+Results of IARC MP Program:
+	24 excluded (non-malignant)
+	22 MPs (multiple tumours)
+	 3 Duplicate registration
+*/
+** Below updates needed for warnings/errors report
+replace grade=6 if pid=="20140394"
+replace grade=6 if pid=="20140659"
+replace grade=4 if pid=="20140525"
+replace morph=8460 if pid=="20140707"
+
+** Only report non-duplicate MPs (see IARC MP rules on recording and reporting)
+display `"{browse "http://www.iacr.com.fr/images/doc/MPrules_july2004.pdf":IARC-MP}"'
+tab persearch ,m
+//list pid cr5id if persearch==3 //3
+drop if pid=="20140555" & cr5id=="T2S1" //1 deleted
+replace primarysite="SIGMOID COLON" if pid=="20140887" & cr5id=="T1S1"
+replace top="187" if pid=="20140887" & cr5id=="T1S1"
+replace topography=187 if pid=="20140887" & cr5id=="T1S1"
+replace primarysite="CECUM" if pid=="20140887" & cr5id=="T2S1"
+replace top="180" if pid=="20140887" & cr5id=="T2S1"
+replace topography=180 if pid=="20140887" & cr5id=="T2S1"
+replace persearch=1 if pid=="20140887" & cr5id=="T1S1"
+drop if pid=="20140887" & cr5id=="T2S1" //1 deleted
+replace primarysite="COLON-SIGMOID" if pid=="20141351" & cr5id=="T1S1"
+replace top="187" if pid=="20141351" & cr5id=="T1S1"
+replace topography=187 if pid=="20141351" & cr5id=="T1S1"
+replace persearch=1 if pid=="20141351" & cr5id=="T1S1"
+replace primarysite="COLON-CECUM" if pid=="20141351" & cr5id=="T2S1"
+replace top="180" if pid=="20141351" & cr5id=="T2S1"
+replace topography=180 if pid=="20141351" & cr5id=="T2S1"
+drop if pid=="20141351" & cr5id=="T2S1" //1 deleted
+
+** Updates for multiple primary report (define which is the MP so can remove in survival dataset):
+replace persearch=1 if pid=="20140786" & eidmp==1 //1 change
+replace persearch=1 if pid=="20140690" & cr5id=="T1S1" //1 change
+replace persearch=2 if pid=="20140690" & cr5id=="T5S1" //1 change
+replace persearch=1 if pid=="20140672" & eidmp==1 //1 change
+replace persearch=1 if pid=="20140566" & eidmp==1 //1 change
+replace persearch=1 if pid=="20140526" & eidmp==1 //1 change
+replace persearch=1 if pid=="20140339" & eidmp==1 //1 change
+replace persearch=1 if pid=="20140176" & eidmp==1 //1 change
+replace persearch=1 if pid=="20140077" & eidmp==1 //1 change
+
+** Updates from MP exclusion report (excludes in-situ/unreportable cancers)
+label drop persearch_lab
+label define persearch_lab 0 "Not done" 1 "Done: OK" 2 "Done: MP" 3 "Done: Duplicate/Non-IARC MP" 4 "Done: Exclude", modify
+label values persearch persearch_lab
+replace persearch=4 if morph==8077 //24 changes
+
+tab persearch ,m
+replace persearch=1 if pid=="20140474"
+replace persearch=1 if pid=="20140570"
+replace persearch=1 if pid=="20140490"
+
+** Remove non-residents (see IARC validity presentation)
+tab resident ,m 
+label drop resident_lab
+label define resident_lab 1 "Yes" 2 "No" 99 "Unknown", modify
+label values resident resident_lab
+replace resident=99 if resident==9 //47 changes
+//list pid natregno nrn if resident==99
+replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
+replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*-9999*")) //16 changes
+drop if resident==2 //1 deleted
+** Check electoral list and CR5db for those resident=99
+//list pid fname lname nrn natregno dob if resident==99
+//list pid fname lname addr dob if resident==99
+replace natregno="500906-0061" if pid=="20130294"
+replace dob=d(06sep1950) if pid=="20130294"
+replace resident=1 if pid=="20130294"
+replace resident=1 if pid=="20145040" //JC knows this pt was a resident
+replace natregno="550416-7015" if pid=="20141414"
+replace dob=d(16apr1955) if pid=="20141414"
+replace resident=1 if pid=="20141414"
+replace natregno="370117-8018" if pid=="20141510"
+replace dob=d(17jan1937) if pid=="20141510"
+replace resident=1 if pid=="20141510"
+replace age=77 if pid=="20141510"
+
+drop if resident==99 //27 deleted
+
+** Remove missing sex
+tab sex ,m //none missing
+
+** Check for missing age & 100+
+tab age ,m //none missing - 2 are 100+
+
+** Check for missing follow-up
+label drop slc_lab
+label define slc_lab 1 "Alive" 2 "Deceased" 3 "Emigrated" 99 "Unknown", modify
+label values slc slc_lab
+replace slc=99 if slc==9 //5 changes
+tab slc ,m 
+** Check missing in CR5db
+//list pid if slc==99
+replace slc=1 if pid=="20140817"
+replace dlc=d(10sep2015) if pid=="20140817"
+replace slc=1 if pid=="20140808"
+replace dlc=d(27aug2014) if pid=="20140808"
+replace dot=d(27aug2014) if pid=="20140808"
+replace slc=1 if pid=="20140186"
+replace dlc=d(30jun2014) if pid=="20140186"
+replace slc=1 if pid=="20140701"
+replace dlc=d(15may2014) if pid=="20140701"
+replace dot=d(15may2014) if pid=="20140701"
+replace slc=1 if pid=="20140773"
+replace dlc=d(20feb2014) if pid=="20140773"
+replace dot=d(20feb2014) if pid=="20140773"
+tab dlc ,m
+
+** Remove ineligibles
+tab recstatus ,m
+drop if recstatus==3 //0 deleted
+
+** Check DCOs
+tab basis ,m
+replace basis=1 if pid=="20140672" & cr5id=="T2S1"
+replace dcostatus=1 if pid=="20140672" & cr5id=="T2S1"
+replace nsdate=d(24jul2018) if pid=="20140672" & cr5id=="T2S1"
+
+** Re-assign dcostatus for cases with updated death trace-back
+tab dcostatus ,m
+
+** Rename cod in prep for death data matching
+rename cod codcancer
+
+count //854
 
 ** Save this corrected dataset
 save "`datapath'\version02\2-working\2014_cancer_nonsurvival", replace
 label data "2014 BNR-Cancer analysed data - Non-survival Dataset"
+note: This dataset was used for 2015 annual report
+
+clear
+
+*******************************
+** 2008 Non-survival Dataset **
+*******************************
+
+** Load the dataset (2008)
+use "`datapath'\version02\1-input\2008_cancer_sites_da_v01", replace
+count //1209
+
+** Add 2008 cases (3) found in 2014 (DCO) dataset
+append using "`datapath'\version02\2-working\2008_cancer_nonsurvival_extras"
+count //1212
+
+** Remove non-reportable skin cancers
+drop if siteiarc==25 //303 deleted
+
+** Remove non-malignant and non-insitu tumours
+drop if beh!=2 & beh!=3 //18 deleted
+
+count //
+
+** Export dataset to run data in IARCcrg Tools (Check Programme)
+gen INCIDYR=year(dot)
+tostring INCIDYR, replace
+gen INCIDMONTH=month(dot)
+gen str2 INCIDMM = string(INCIDMONTH, "%02.0f")
+gen INCIDDAY=day(dot)
+gen str2 INCIDDD = string(INCIDDAY, "%02.0f")
+gen INCID=INCIDYR+INCIDMM+INCIDDD
+replace INCID="" if INCID=="..." //0 changes
+drop INCIDMONTH INCIDDAY INCIDYR INCIDMM INCIDDD
+rename INCID dot_iarc
+label var dot_iarc "IARC IncidenceDate"
+
+gen BIRTHYR=year(dob)
+tostring BIRTHYR, replace
+gen BIRTHMONTH=month(dob)
+gen str2 BIRTHMM = string(BIRTHMONTH, "%02.0f")
+gen BIRTHDAY=day(dob)
+gen str2 BIRTHDD = string(BIRTHDAY, "%02.0f")
+gen BIRTHD=BIRTHYR+BIRTHMM+BIRTHDD
+replace BIRTHD="" if BIRTHD=="..." //17 changes
+drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
+rename BIRTHD dob_iarc
+label var dob_iarc "IARC BirthDate"
+
+export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age ///
+using "`datapath'\version02\2-working\2008_nonsurvival_iarccrgtools.txt", nolabel replace
+
+/*
+IARC crg Tools - see SOP for steps on how to perform below checks:
+
+(1) Perform file transfer using '2008_nonsuvival_iarccrgtools.txt'
+(2) Perform check using '2008_iarccrgtools_to check.prn'
+(3) Perform multiple primary check using ''
+
+Results of IARC Check Program:
+(Titles for each data column: pid sex top morph beh grade basis dot dob age)
+    891 records processed
+	0 errors
+        
+	26 warnings
+        - 7 unlikely hx/site
+		- 1 unlikely beh/hx
+        - 18 unlikely grade/hx
+*/
+/*	
+Results of IARC MP Program:
+	83 excluded (non-malignant)
+	16 MPs (multiple tumours)
+	 1 Duplicate registration
+*/
+** No updates needed for warnings/errors report
+** Updates for multiple primary report:
+replace persearch=2 if pid=="20080967" & eidmp==2 //1 change
+replace persearch=2 if pid=="20080966" & eidmp==2 //1 change
+replace persearch=2 if pid=="20080586" & eidmp==2 //1 change
+replace persearch=2 if pid=="20080536" & eidmp==2 //1 change
+replace persearch=2 if pid=="20080405" & eidmp==2 //1 change
+replace persearch=2 if pid=="20080295" & eidmp==2 //1 change
+replace persearch=2 if pid=="20080215" & eidmp==2 //1 change
+replace persearch=3 if pid=="20080170" & eidmp==2 //1 change
+replace recstatus=4 if pid=="20080170" & eidmp==2 //1 change
+drop if pid=="20080170" & recstatus==4 //1 deleted - removed duplicate MP
+replace persearch=1 if persearch==0|persearch==. //880 changes
+
+** Updates from MP exclusion report (excludes in-situ/unreportable cancers)
+label drop persearch_lab
+label define persearch_lab 0 "Not done" 1 "Done: OK" 2 "Done: MP" 3 "Done: Duplicate/Non-IARC MP" 4 "Done: Exclude", modify
+label values persearch persearch_lab
+tab beh ,m //84 in-situ so check against exclusion report to find extra
+//list pid morph beh if beh!=3
+replace beh=3 if pid=="20080695"
+replace persearch=4 if beh!=3 //83 changes
+
+tab persearch ,m
+
+** Remove non-residents (see IARC validity presentation)
+tab resident ,m 
+label drop resident_lab
+label define resident_lab 1 "Yes" 2 "No" 99 "Unknown", modify
+label values resident resident_lab
+replace resident=99 if resident==9 //214 changes
+//list pid natregno nrn if resident==99
+//replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
+replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*-9999*")) //161 changes
+** Check electoral list and CR5db
+//list pid natregno if resident==2
+replace natregno=subinstr(natregno,"9999","0027",.) if pid=="20080981"
+replace resident=1 if pid=="20080981"
+drop if resident==2 //0 deleted
+** Check electoral list, CR5db, MasterDb, death data for those resident=99
+count if resident==99 //54
+STOP
+//list pid fname lname nrn natregno dob if resident==99
+//list pid fname lname addr dob if resident==99
+replace natregno=subinstr(natregno,"9999","0120",.) if pid=="20081066"
+replace resident=1 if pid=="20081066"
+replace resident=1 if pid=="20081073" //see MasterDb frmCF path sample dates are 6 months apart
+replace resident=1 if pid=="20081106" //see MasterDb frmCF path & RT dates
+replace natregno=subinstr(natregno,"9999","0024",.) if pid=="20081058"
+replace resident=1 if pid=="20081058"
+replace addr="37 GAYS" if pid=="20081058"
+
+
+
+
+drop if resident==99 //... deleted
+
+** Remove missing sex
+tab sex ,m //none missing
+
+** Check for missing age & 100+
+tab age ,m //none missing - 2 are 100+
+
+** Check for missing follow-up
+label drop slc_lab
+label define slc_lab 1 "Alive" 2 "Deceased" 3 "Emigrated" 99 "Unknown", modify
+label values slc slc_lab
+replace slc=99 if slc==9 //5 changes
+tab slc ,m 
+** Check missing in CR5db
+//list pid if slc==99
+replace slc=1 if pid=="20140817"
+replace dlc=d(10sep2015) if pid=="20140817"
+replace slc=1 if pid=="20140808"
+replace dlc=d(27aug2014) if pid=="20140808"
+replace dot=d(27aug2014) if pid=="20140808"
+replace slc=1 if pid=="20140186"
+replace dlc=d(30jun2014) if pid=="20140186"
+replace slc=1 if pid=="20140701"
+replace dlc=d(15may2014) if pid=="20140701"
+replace dot=d(15may2014) if pid=="20140701"
+replace slc=1 if pid=="20140773"
+replace dlc=d(20feb2014) if pid=="20140773"
+replace dot=d(20feb2014) if pid=="20140773"
+tab dlc ,m
+
+** Remove ineligibles
+tab recstatus ,m
+drop if recstatus==3 //0 deleted
+
+** Check DCOs
+tab basis ,m
+replace basis=1 if pid=="20140672" & cr5id=="T2S1"
+replace dcostatus=1 if pid=="20140672" & cr5id=="T2S1"
+replace nsdate=d(24jul2018) if pid=="20140672" & cr5id=="T2S1"
+
+** Re-assign dcostatus for cases with updated death trace-back
+tab dcostatus ,m
+
+** Rename cod in prep for death data matching
+rename cod codcancer
+
+count //854
+
+
+** Save this corrected dataset
+save "`datapath'\version02\2-working\2008_cancer_nonsurvival", replace
+label data "2008 BNR-Cancer analysed data - Non-survival Dataset"
 note: This dataset was used for 2015 annual report
 
 clear
@@ -824,6 +1096,13 @@ clear
 *******************************
 ** 2015 Non-survival Dataset **
 *******************************
+VALIDITY PRESENTATION
+Below items should be assessed for missing values:
+age (not >3%)
+primarysite
+stage
+follow up (slc, dlc)
+(Missing sex, resident and dotyear not acceptable)
 
 tab resident ,m 
 drop if resident==9 //... deleted
