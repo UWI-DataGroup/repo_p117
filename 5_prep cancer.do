@@ -7,7 +7,7 @@
     // 	date last modified      28-OCT-2019
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
-    //  objectve                To have one dataset with cleaned and grouped 2008 & 2013 data for inclusion in 2014 cancer report.
+    //  objective                To have one dataset with cleaned and grouped 2008 & 2013 data for inclusion in 2014 cancer report.
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
 
     ** General algorithm set-up
@@ -788,6 +788,18 @@ replace persearch=1 if pid=="20140474"
 replace persearch=1 if pid=="20140570"
 replace persearch=1 if pid=="20140490"
 
+** Check DCOs
+tab basis ,m
+replace basis=1 if pid=="20140672" & cr5id=="T2S1"
+replace dcostatus=1 if pid=="20140672" & cr5id=="T2S1"
+replace nsdate=d(24jul2018) if pid=="20140672" & cr5id=="T2S1"
+
+** Re-assign dcostatus for cases with updated death trace-back
+tab dcostatus ,m
+
+** Rename cod in prep for death data matching
+rename cod codcancer
+
 ** Remove non-residents (see IARC validity presentation)
 tab resident ,m 
 label drop resident_lab
@@ -797,7 +809,6 @@ replace resident=99 if resident==9 //47 changes
 //list pid natregno nrn if resident==99
 replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
 replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*-9999*")) //16 changes
-drop if resident==2 //1 deleted
 ** Check electoral list and CR5db for those resident=99
 //list pid fname lname nrn natregno dob if resident==99
 //list pid fname lname addr dob if resident==99
@@ -812,8 +823,6 @@ replace natregno="370117-8018" if pid=="20141510"
 replace dob=d(17jan1937) if pid=="20141510"
 replace resident=1 if pid=="20141510"
 replace age=77 if pid=="20141510"
-
-drop if resident==99 //27 deleted
 
 ** Remove missing sex
 tab sex ,m //none missing
@@ -846,19 +855,18 @@ tab dlc ,m
 
 ** Remove ineligibles
 tab recstatus ,m
+
+count //
+
+** Save this corrected dataset
+save "`datapath'\version02\2-working\2014_cancer_nonsurvival_nonreportable", replace
+label data "2014 BNR-Cancer analysed data - Non-survival Dataset"
+note: This dataset was used for 2015 annual report
+
+** Removing cases not eligible for reporting
+drop if resident==2 //1 deleted
+drop if resident==99 //27 deleted
 drop if recstatus==3 //0 deleted
-
-** Check DCOs
-tab basis ,m
-replace basis=1 if pid=="20140672" & cr5id=="T2S1"
-replace dcostatus=1 if pid=="20140672" & cr5id=="T2S1"
-replace nsdate=d(24jul2018) if pid=="20140672" & cr5id=="T2S1"
-
-** Re-assign dcostatus for cases with updated death trace-back
-tab dcostatus ,m
-
-** Rename cod in prep for death data matching
-rename cod codcancer
 
 count //854
 
