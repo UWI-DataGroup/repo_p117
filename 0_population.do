@@ -7,7 +7,7 @@
     // 	date last modified	    28-OCT-2019
     //  algorithm task			Prep for external population for incidence and mortality analyses
     //  status                  Completed
-    //  objectve                To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
+    //  objective               To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
     //  methods                 2000 bb census updated to 2010 bb census; World Standard Population based on SEER (https://seer.cancer.gov/stdpopulations/world.who.html)
 
     ** DO FILE BASED ON
