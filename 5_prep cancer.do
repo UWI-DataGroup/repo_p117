@@ -870,6 +870,14 @@ count if dob!=. & dot!=. & age!=checkage2 //8
 //list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2
 replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //8 changes
 
+** Check no missing dxyr so this can be used in analysis
+tab dxyr ,m //0 missing
+
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //5056 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //5056 changes
+
 count //882
 
 ** Save this corrected dataset with non-reportable cases
@@ -1309,6 +1317,14 @@ replace fname = lower(rtrim(ltrim(itrim(fname)))) //1208 changes
 replace init = lower(rtrim(ltrim(itrim(init)))) //847 changes
 replace lname = lower(rtrim(ltrim(itrim(lname)))) //1208 changes
 
+** Check no missing dxyr so this can be used in analysis
+tab dxyr ,m //0 missing
+
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //5056 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //5056 changes
+
 count //1211
 
 ** Save this corrected dataset with non-reportable cases
@@ -1342,13 +1358,19 @@ clear
 *******************************
 ** Load the dataset (2013)
 use "`datapath'\version02\1-input\2013_cancer_sites_da_v01", replace
-count //1209
+count //845
 
 ** Add 2013 cases (26) found in 2014 (DCO) dataset
 append using "`datapath'\version02\2-working\2013_cancer_nonsurvival_extras"
-count //1212
+count //871
 
-** Check if 2013 cases from 2014 dataset are not already in this dataset
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //5056 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //5056 changes
+
+sort lname fname pid
+** Check if 2013 cases from 2014 dataset are not already in this dataset - use Stata browse
 list pid fname lname if pid=="20130175"|pid=="20140027"|pid=="20140032"|pid=="20140033" ///
                        |pid=="20140042"|pid=="20140049"|pid=="20140078"|pid=="20140100" ///
                        |pid=="20140110"|pid=="20140117"|pid=="20140127"|pid=="20140136" ///
@@ -1358,7 +1380,8 @@ list pid fname lname if pid=="20130175"|pid=="20140027"|pid=="20140032"|pid=="20
                        |pid=="20140380"|pid=="20140389"|pid=="20140411"|pid=="20140461" ///
                        |pid=="20140462"|pid=="20140491"|pid=="20140517"| ///
                        pid=="20140570" & cr5id=="T2S1"|pid=="20140584"|pid=="20140665"
-STOP
+//no matches
+
 ** Export dataset to run data in IARCcrg Tools (Check Programme)
 gen INCIDYR=year(dot)
 tostring INCIDYR, replace
@@ -1384,6 +1407,11 @@ drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
 rename BIRTHD dob_iarc
 label var dob_iarc "IARC BirthDate"
 
+** mpseq missing for 26 extra cases
+replace mpseq=0 if mpseq==. & persearch==1 & regexm(cr5id,"T1") //25 changes - MP in 2014 ds
+replace mpseq=1 if mpseq==. & persearch!=1 & regexm(cr5id,"T1") //0 changes
+replace mpseq=2 if mpseq==. & persearch!=1 & !(strmatch(strupper(cr5id), "*T1*")) //1 change
+
 export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age cr5id eidmp ///
 using "`datapath'\version02\2-working\2013_nonsurvival_iarccrgtools.txt", nolabel replace
 
@@ -1396,134 +1424,45 @@ IARC crg Tools - see SOP for steps on how to perform below checks:
 
 Results of IARC Check Program:
 (Titles for each data column: pid sex top morph beh grade basis dot dob age)
-    1212 records processed
-	0 errors
+    871 records processed
+	3 errors - invalid age
         
-	26 warnings
-        - 7 unlikely hx/site
-		- 1 unlikely beh/hx
-        - 18 unlikely grade/hx
+	33 warnings
+        - 6 unlikely histology/site combination
+        - 20 unlikely grade/histology combination
+        - 7 unlikely basis/histology combination
+
 */
 /*	
 Results of IARC MP Program:
-	101 excluded (non-malignant)
-	148 MPs (multiple tumours)
-	 65 Duplicate registration
+	9 excluded (non-malignant)
+   22 MPs (multiple tumours)
+	2 Duplicate registration
 */
-** No updates needed for warnings/errors report
+** Updates needed for errors report
+replace age=79 if pid=="20140584"
+replace age=80 if pid=="20140380"
+replace age=84 if pid=="20140411"
+** No updates needed for warnings report
 ** Updates for multiple primary report:
-replace persearch=2 if pid=="20080967" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080966" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080586" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080536" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080405" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080295" & eidmp==2 //1 change
-replace eidmp=2 if pid=="20080215" & cr5id=="T1S1" //1 change
-replace patient=2 if pid=="20080215" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080215" & cr5id=="T3S1" //1 change
-replace patient=1 if pid=="20080215" & cr5id=="T3S1" //1 change
-replace persearch=2 if pid=="20080215" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080170" & eidmp==2 //1 change
-replace recstatus=4 if pid=="20080170" & eidmp==2 //1 change
-drop if pid=="20080170" & recstatus==4 //1 deleted - removed duplicate abs
-replace persearch=3 if pid=="20081104" & eidmp==2 //1 change
-replace persearch=3 if pid=="20081089" & eidmp==2 //1 change
-replace persearch=3 if pid=="20081083" & eidmp==2 //2 changes
-replace persearch=3 if pid=="20081076" & eidmp==2 //2 changes
-replace persearch=3 if pid=="20080790" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080766" & eidmp==2 & cr5id!="T2S1" //2 changes
-replace persearch=2 if pid=="20080766" & eidmp==2 & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080740" & eidmp==2 //1 change
-replace eidmp=2 if pid=="20080739" & cr5id=="T1S1" //1 change
-replace patient=2 if pid=="20080739" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080739" & cr5id=="T3S1" //1 change
-replace patient=1 if pid=="20080739" & cr5id=="T3S1" //1 change
-replace persearch=3 if pid=="20080739" & eidmp==2 //3 changes
-replace eidmp=2 if pid=="20080738" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080738" & cr5id=="T2S1" //1 change
-replace patient=2 if pid=="20080738" & cr5id=="T1S1" //1 change
-replace patient=1 if pid=="20080738" & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080738" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080734" & eidmp==2 //1 change
-replace eidmp=2 if pid=="20080733" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080733" & cr5id=="T4S1" //1 change
-replace patient=2 if pid=="20080733" & cr5id=="T1S1" //1 change
-replace patient=1 if pid=="20080733" & cr5id=="T4S1" //1 change
-replace persearch=3 if pid=="20080733" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080731" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080730" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080728" & eidmp==2 & cr5id!="T2S1" //2 changes
-replace persearch=2 if pid=="20080728" & eidmp==2 & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080725" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080709" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080708" & eidmp==2 //1 change
-replace eidmp=2 if pid=="20080705" & cr5id=="T1S1" //1 change
-replace patient=2 if pid=="20080705" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080705" & cr5id=="T2S1" //1 change
-replace patient=1 if pid=="20080705" & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080705" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080667" & cr5id=="T3S1" //1 change
-replace persearch=2 if pid=="20080667" & cr5id=="T2S1" //1 change
-replace eidmp=2 if pid=="20080662" & cr5id=="T1S1" //1 change
-replace patient=2 if pid=="20080662" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080662" & cr5id=="T2S1" //1 change
-replace patient=1 if pid=="20080662" & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080662" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080655" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080626" & eidmp==2 & cr5id!="T2S1" //4 changes
-replace persearch=2 if pid=="20080626" & eidmp==2 & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080499" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080477" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080475" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080465" & eidmp==2 & cr5id!="T3S1" //2 changes
-replace persearch=2 if pid=="20080465" & eidmp==2 & cr5id=="T3S1" //1 change
-replace persearch=3 if pid=="20080464" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080463" & eidmp==2 & cr5id!="T3S1" //1 change
-replace persearch=2 if pid=="20080463" & eidmp==2 & cr5id=="T3S1" //1 change
-replace persearch=2 if pid=="20080462" & eidmp==2 //1 change
-replace eidmp=2 if pid=="20080460" & cr5id=="T1S1" //1 change
-replace patient=2 if pid=="20080460" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080460" & cr5id=="T2S1" //1 change
-replace patient=1 if pid=="20080460" & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080460" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080457" & eidmp==2 //3 changes - T4S1=insitu not included in IARC MP check
-replace persearch=3 if pid=="20080449" & eidmp==2 //3 changes
-replace persearch=3 if pid=="20080446" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080443" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080441" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080440" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080432" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080386" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080383" & eidmp==2 //1 change
-replace eidmp=2 if pid=="20080381" & cr5id=="T1S1" //1 change
-replace patient=2 if pid=="20080381" & cr5id=="T1S1" //1 change
-replace eidmp=1 if pid=="20080381" & cr5id=="T2S1" //1 change
-replace patient=1 if pid=="20080381" & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080381" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080378" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080372" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080364" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080363" & eidmp==2 & cr5id!="T2S1" //3 changes - T5S1=insitu not included in IARC MP check
-replace persearch=2 if pid=="20080363" & eidmp==2 & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080362" & eidmp==2 & cr5id!="T2S1" //2 changes
-replace persearch=2 if pid=="20080362" & eidmp==2 & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080360" & eidmp==2 //1 change
-replace persearch=3 if pid=="20080317" & eidmp==2 & cr5id!="T2S1" //4 changes
-replace persearch=2 if pid=="20080317" & eidmp==2 & cr5id=="T2S1" //1 change
-replace persearch=3 if pid=="20080310" & eidmp==2 //3 changes
-replace persearch=3 if pid=="20080308" & eidmp==2 //2 changes
-replace persearch=2 if pid=="20080167" & eidmp==2 //1 change
-replace persearch=2 if pid=="20080139" & eidmp==2 //1 change
-replace persearch=1 if persearch==0|persearch==. //1118 changes
-
+replace persearch=2 if pid=="20130786" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130539" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130425" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130343" & eidmp==2 //1 change
+replace persearch=3 if pid=="20130323" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130245" & eidmp==2 //1 change
+replace persearch=3 if pid=="20130160" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130116" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130067" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130022" & eidmp==2 //1 change
+replace persearch=2 if pid=="20130006" & eidmp==2 //1 change
+replace persearch=1 if persearch==0|persearch==. //804 changes
 ** Updates from MP exclusion report (excludes in-situ/unreportable cancers)
 label drop persearch_lab
 label define persearch_lab 0 "Not done" 1 "Done: OK" 2 "Done: MP" 3 "Done: Duplicate/Non-IARC MP" 4 "Done: Exclude", modify
 label values persearch persearch_lab
-tab beh ,m //102 non-malignant so check against exclusion report (101) to find extra
+tab beh ,m //9 non-malignant so check against exclusion report (9) - no extra record
 //list pid morph beh if beh!=3
-replace beh=3 if pid=="20080695"
-replace persearch=4 if beh!=3 //101 changes
 
 tab persearch ,m
 
@@ -1535,14 +1474,13 @@ tab resident ,m
 label drop resident_lab
 label define resident_lab 1 "Yes" 2 "No" 99 "Unknown", modify
 label values resident resident_lab
-replace resident=99 if resident==9 //260 changes
+replace resident=99 if resident==9 //139 changes
 //list pid natregno nrn if resident==99
 //replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
-replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*-9999*")) //173 changes
+replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*-9999*")) //26 changes
+STOP
 ** Check electoral list and CR5db
 //list pid natregno if resident==2
-replace natregno=subinstr(natregno,"9999","0027",.) if pid=="20080981"
-replace resident=1 if pid=="20080981"
 ** Check electoral list (those with dob-use filter text contains in NRN), CR5db, MasterDb, death data for those resident=99
 count if resident==99 //88
 //list pid fname lname nrn natregno dob if resident==99
@@ -1725,8 +1663,8 @@ replace dcostatus=2 if basis==0 //54 changes
 tab recstatus ,m //none
 
 ** Check for non-malignant
-tab beh ,m //83 in-situ
-tab morph if beh!=3 //34 CIN III
+tab beh ,m //9 in-situ
+tab morph if beh!=3 //9 CIN III
 
 ** Check for duplicate tumours
 tab persearch ,m //101 excluded; 64 duplicate
@@ -1753,10 +1691,13 @@ replace age=checkage2 if pid=="20080877"
 replace age=checkage2 if pid=="20080887"
 //replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //2 changes
 
-** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //1208 changes
-replace init = lower(rtrim(ltrim(itrim(init)))) //847 changes
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //1208 changes
+** Check no missing dxyr so this can be used in analysis
+tab dxyr ,m 
+
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //5056 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //5056 changes
 
 count //1211
 
@@ -1797,6 +1738,36 @@ count //802
 append using "`datapath'\version02\2-working\2014_cancer_nonsurvival"
 STOP
 append using "`datapath'\version02\2-working\2013_cancer_nonsurvival"
+
+export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age cr5id eidmp ///
+using "`datapath'\version02\2-working\2013_nonsurvival_iarccrgtools.txt", nolabel replace
+
+** Perform MP check to identify MPs in 'multi-year' dataset and correctly assign persearch and mpseq
+/*
+IARC crg Tools - see SOP for steps on how to perform below checks:
+
+(1) Perform file transfer using '2008_nonsuvival_iarccrgtools.txt'
+(2) Perform check using '2008_iarccrgtools_to check.prn'
+(3) Perform multiple primary check using ''
+
+Results of IARC Check Program:
+(Titles for each data column: pid sex top morph beh grade basis dot dob age)
+    1212 records processed
+	0 errors
+        
+	26 warnings
+        - 7 unlikely hx/site
+		- 1 unlikely beh/hx
+        - 18 unlikely grade/hx
+*/
+/*	
+Results of IARC MP Program:
+	101 excluded (non-malignant)
+	148 MPs (multiple tumours)
+	 65 Duplicate registration
+*/
+** No updates needed for warnings/errors report
+** Updates for multiple primary report:
 
 save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival", replace
 label data "2008, 2013, 2014 BNR-Cancer analysed data - Non-survival Dataset"
