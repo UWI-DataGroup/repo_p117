@@ -732,7 +732,7 @@ Results of IARC MP Program:
 	22 MPs (multiple tumours)
 	 3 Duplicate registration
 */
-** Below updates needed for warnings/errors report
+** Below updates from warnings/errors report
 replace grade=6 if pid=="20140394"
 replace grade=6 if pid=="20140659"
 replace grade=4 if pid=="20140525"
@@ -760,7 +760,7 @@ replace top="180" if pid=="20141351" & cr5id=="T2S1"
 replace topography=180 if pid=="20141351" & cr5id=="T2S1"
 drop if pid=="20141351" & cr5id=="T2S1" //1 deleted
 
-** Updates for multiple primary report (define which is the MP so can remove in survival dataset):
+** Updates from multiple primary report (define which is the MP so can remove in survival dataset):
 replace persearch=1 if pid=="20140786" & eidmp==1 //1 change
 replace persearch=1 if pid=="20140690" & cr5id=="T1S1" //1 change
 replace persearch=2 if pid=="20140690" & cr5id=="T5S1" //1 change
@@ -979,8 +979,8 @@ Results of IARC MP Program:
 	148 MPs (multiple tumours)
 	 65 Duplicate registration
 */
-** No updates needed for warnings/errors report
-** Updates for multiple primary report:
+** No updates from warnings/errors report
+** Updates from multiple primary report:
 replace persearch=2 if pid=="20080967" & eidmp==2 //1 change
 replace persearch=2 if pid=="20080966" & eidmp==2 //1 change
 replace persearch=2 if pid=="20080586" & eidmp==2 //1 change
@@ -1175,6 +1175,8 @@ replace resident=1 if pid=="20080588"
 replace slc=2 if pid=="20080588" //see CR5db comments; keep dlc as cannot find dod in death data
 replace dod=dlc if pid=="20080588"
 replace dodyear=2008 if pid=="20080588"
+swapval fname lname if pid=="20080588" //ssc install swapval
+replace natregno="490212-0031" if pid=="20080588"
 replace natregno="450805-0079" if pid=="20080877"
 replace dob=d(05aug1945) if pid=="20080887"
 replace resident=1 if pid=="20080877"
@@ -1450,12 +1452,12 @@ Results of IARC MP Program:
    22 MPs (multiple tumours)
 	2 Duplicate registration
 */
-** Updates needed for errors report
+** Updates from errors report
 replace age=79 if pid=="20140584"
 replace age=80 if pid=="20140380"
 replace age=84 if pid=="20140411"
-** No updates needed for warnings report
-** Updates for multiple primary report:
+** No updates from warnings report
+** Updates from multiple primary report:
 replace persearch=2 if pid=="20130786" & eidmp==2 //1 change
 replace persearch=2 if pid=="20130539" & eidmp==2 //1 change
 replace persearch=2 if pid=="20130425" & eidmp==2 //1 change
@@ -1603,7 +1605,7 @@ replace parish=2 if pid=="20130698"
 replace natregno="630830-0182" if pid=="20130414"
 replace resident=1 if pid=="20130414"
 replace addr="REDMAN'S VILLAGE" if pid=="20130414"
-swapval fname lname if pid=="20130414"
+swapval fname lname if pid=="20130414" //ssc install swapval
 replace resident=1 if pid=="20130333"
 replace natregno="380228-0150" if pid=="20130882"
 replace resident=1 if pid=="20130882"
@@ -1688,7 +1690,7 @@ drop birthd year month day dob2
 gen age2 = (dot - dob)/365.25
 gen checkage2=int(age2)
 drop age2
-count if dob!=. & dot!=. & age!=checkage2 /23
+count if dob!=. & dot!=. & age!=checkage2 //23
 //list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2 //0 correct
 replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //23 changes
 
@@ -1744,9 +1746,58 @@ count //2419
 
 tab dxyr ,m 
 
-export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age cr5id eidmp ///
+** Check for duplicates and/or MPs
+sort natregno lname fname pid
+quietly by natregno :  gen dupnrn = cond(_N==1,0,_n)
+sort natregno
+count if dupnrn>0 //87 - check pid in Stata results then primarysite & cod1a in Stata data editor
+sort lname fname pid
+order pid fname lname natregno sex age primarysite cod1a
+list pid deathid fname lname natregno sex age persearch nm if dupnrn>0
+
+sort lname fname pid
+quietly by lname fname :  gen duppt = cond(_N==1,0,_n)
+sort lname fname
+count if duppt>0 //107 - check pid in Stata results then  primarysite & cod1a in Stata data editor for ones not matched in above list
+sort lname fname pid
+order pid fname lname natregno sex age primarysite cod1a
+list pid deathid fname lname natregno sex age persearch nm if duppt>0
+replace nm=1 if pid=="20080092"
+replace nm=1 if pid=="20080959"
+replace nm=1 if pid=="20080878"
+replace nm=1 if pid=="20130187"
+replace nm=1 if pid=="20080334"
+replace nm=1 if pid=="20130886"
+replace nm=1 if pid=="20080579"
+replace nm=1 if pid=="20141553"
+replace nm=1 if pid=="20130534"
+replace nm=1 if pid=="20130836"
+replace nm=1 if pid=="20130546"
+replace nm=1 if pid=="20080081"
+replace nm=1 if pid=="20081017"
+replace nm=1 if pid=="20130171"
+replace nm=1 if pid=="20130775"
+replace nm=1 if pid=="20080296"
+replace nm=1 if pid=="20080558"
+replace nm=1 if pid=="20130426"
+replace nm=1 if pid=="20130549"
+replace nm=1 if pid=="20130232"
+replace nm=1 if pid=="20130813"
+replace nm=1 if pid=="20130695"
+replace dlc=dod if pid=="20130886"
+
+** Check deceased
+tab deceased slc ,m 
+count if deceased==2 & slc==2 //5 
+count if deceased==1 & slc==1 //0
+//list pid fname lname natregno dlc dod if deceased==2 & slc==2
+replace dod=dlc if pid=="20130331" //1 change
+replace deceased=1 if deceased==2 & slc==2 //5 changes
+
+sort dot pid
+export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age cr5id eidmp persearch ///
 using "`datapath'\version02\2-working\2008_2013_2014_nonsurvival_iarccrgtools.txt", nolabel replace
-STOP
+
 ** Perform MP check to identify MPs in 'multi-year' dataset and correctly assign persearch and mpseq
 /*
 IARC crg Tools - see SOP for steps on how to perform below checks:
@@ -1757,32 +1808,196 @@ IARC crg Tools - see SOP for steps on how to perform below checks:
 
 Results of IARC Check Program:
 (Titles for each data column: pid sex top morph beh grade basis dot dob age)
-    1212 records processed
-	0 errors
+    2419 records processed
+	1 errors
         
-	26 warnings
-        - 7 unlikely hx/site
-		- 1 unlikely beh/hx
-        - 18 unlikely grade/hx
+	106 warnings
+        - 19 unlikely hx/site
+		- 38 unlikely grade/hx
+        - 49 unlikely basis/hx
 */
 /*	
 Results of IARC MP Program:
-	101 excluded (non-malignant)
-	148 MPs (multiple tumours)
-	 65 Duplicate registration
+	0 excluded (non-malignant)
+	72 MPs (multiple tumours)
+	 1 Duplicate registration
 */
-** No updates needed for warnings/errors report
+** Updates from errors report
+replace age=89 if pid=="20080887"
+** Updates from warnings report
+
 ** Updates for multiple primary report:
+replace patient=2 if pid=="20130294" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20130294" & cr5id=="T2S1"
+replace persearch=2 if pid=="20130294" & cr5id=="T2S1"
+replace patient=2 if pid=="20130275" & cr5id=="T3S1"
+replace eidmp=2 if pid=="20130275" & cr5id=="T3S1"
+replace persearch=2 if pid=="20130275" & cr5id=="T3S1"
+replace patient=2 if pid=="20130175" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20130175" & cr5id=="T2S1"
+replace persearch=2 if pid=="20130175" & cr5id=="T2S1"
+replace patient=2 if pid=="20130162" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20130162" & cr5id=="T2S1"
+replace persearch=2 if pid=="20130162" & cr5id=="T2S1"
+replace patient=2 if pid=="20080690" & cr5id=="T3S1"
+replace eidmp=2 if pid=="20080690" & cr5id=="T3S1"
+replace persearch=2 if pid=="20080690" & cr5id=="T3S1"
+replace patient=2 if pid=="20080636" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080636" & cr5id=="T2S1" //0 changes
+replace persearch=2 if pid=="20080636" & cr5id=="T2S1"
+replace patient=2 if pid=="20080539" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080539" & cr5id=="T2S1" //0 changes
+replace persearch=2 if pid=="20080539" & cr5id=="T2S1"
+replace patient=2 if pid=="20080401" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080401" & cr5id=="T2S1"
+replace persearch=2 if pid=="20080401" & cr5id=="T2S1"
+replace patient=2 if pid=="20080340" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080340" & cr5id=="T2S1" //0 changes
+replace persearch=2 if pid=="20080340" & cr5id=="T2S1"
+replace patient=2 if pid=="20080242" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080242" & cr5id=="T2S1"
+replace persearch=2 if pid=="20080242" & cr5id=="T2S1"
+replace persearch=3 if pid=="20080196" & cr5id=="T2S1" //1 change
 
-** Format NRN to match with death data
-remove hyphen
-addr vs address
+tab persearch ,m
 
-save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival", replace
-label data "2008, 2013, 2014 BNR-Cancer analysed data - Non-survival Dataset"
-note: This dataset was used for 2015 annual report
-clear
+** Check parish
+count if parish!=. & parish!=99 & addr=="" //0
+count if parish==. & addr!="" & addr!="99" //0
+//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
 
+** Check missing sex
+tab sex ,m //none missing
+
+** Check for missing age & 100+
+tab age ,m //none missing - 3 are 100+
+
+** Check for missing follow-up
+tab slc ,m //none missing
+tab deceased ,m //none missing and parallels slc correctly
+tab dlc ,m //none missing
+** Check missing in CR5db
+//list pid if slc==99
+
+** Check DCOs
+tab basis ,m
+** Re-assign dcostatus for cases with updated death trace-back
+tab dcostatus ,m
+//list pid basis dcostatus if basis==0 & dcostatus!=2
+replace dcostatus=2 if pid=="20140339" & cr5id=="T2S1"
+replace dcostatus=2 if pid=="20140526" & cr5id=="T2S1"
+
+replace dcostatus=1 if slc==2 & basis!=0 //0 changes
+replace dcostatus=6 if slc!=2 //8 changes
+replace dcostatus=2 if basis==0 //0 changes
+
+** Check for ineligibles
+tab recstatus ,m //1 ineligible
+
+** Check for non-malignant
+tab beh ,m //0 in-situ
+
+** Check for duplicate tumours
+tab persearch ,m //1 duplicate
+
+** Check dob
+count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //0
+//list pid age natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
+/*
+gen birthd=substr(natregno,1,6) if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
+destring birthd, replace
+format birthd %06.0f
+nsplit birthd, digits(2 2 2) gen(year month day)
+format year month day %02.0f
+tostring year, replace
+replace year="19"+year
+destring year, replace
+gen dob2=mdy(month, day, year)
+format dob2 %dD_m_CY
+replace dob=dob2 if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //47 changes
+drop birthd year month day dob2
+*/
+
+** Check age
+gen age2 = (dot - dob)/365.25
+drop checkage2
+gen checkage2=int(age2)
+drop age2
+count if dob!=. & dot!=. & age!=checkage2 //3
+//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2 //0 correct
+replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //3 changes
+
+** Check no missing dxyr so this can be used in analysis
+tab dxyr ,m 
+
+** Format dataset in prep for match with death data
+replace natregno=subinstr(natregno,"-","",.)
+rename address address_cancer
+replace addr=subinstr(addr,"9999 ","",.)
+replace addr=subinstr(addr,"99 ","",.)
+count if regexm(address,"99") //0 - didn't replace true value for house #=99
+rename cod1a cod1a_cancer
+count if cancer==. & slc==2 //16
+//list pid deathid fname lname natregno dod if cancer==. & slc==2
+replace deathid=6410180084 if pid=="20130331"
+replace cancer=2 if pid=="20130331"
+replace deathid=6410180084 if pid=="20080885"
+replace cancer=1 if pid=="20080885"
+gen notindd=1 if cancer==. & slc==2 //14
+replace notindd=2 if pid=="20130331"|pid=="20080885"
+label var notindd "Not found in death data"
+label define notindd_lab 1 "Searched, not found" 2 "Searched, found", modify
+label values notindd notindd_lab
+count if cancer!=. & slc!=2 //387
+//list pid deathid fname lname natregno dod if cancer!=. & slc!=2
+replace cancer=. if cancer!=. & slc!=2 //387 changes
+
+drop dodyear
+gen dodyear_cancer=year(dod)
+tab dodyear ,m
+
+drop dotyear
+gen dotyear=year(dot)
+tab dotyear ,m
+
+** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+
+count //2419
+
+** Save this corrected dataset with non-reportable cases
+save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_nonreportable", replace
+label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Non-reportable Dataset"
+note: TS This dataset was used for 2015 annual report
+
+** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
+drop dup_id
+sort pid
+duplicates tag pid, gen(dup_id)
+list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
+drop if resident==2 //0 deleted - nonresident
+drop if resident==99 //0 deleted - resident unknown
+drop if recstatus==3 //0 deleted - ineligible case definition
+drop if sex==9 //0 deleted - sex unknown
+drop if beh!=3 //0 deleted - nonmalignant
+drop if persearch>2 //1 to be deleted
+drop if siteiarc==25 //0 deleted - nonreportable skin cancers
+
+** Remove unnecessary variables
+drop dotyear2 dupnrn duppt checkage2
+
+count //2418
+
+** Save this corrected dataset with only reportable cases
+save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_prematch", replace
+label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+note: TS This dataset was used for 2015 annual report
+note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
+
+STOP
 ********************
 ** Death Matching **
 ********************
@@ -1801,6 +2016,217 @@ slc
 natregno
 dob
 age
+
+rename nm namematch
+
+** Save this corrected dataset with only reportable cases
+save "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", replace
+label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+note: TS This dataset was used for 2015 annual report
+note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
+
+
+***********************
+**  2008 2013 2014   **
+** Survival Datasets **
+***********************
+
+* ************************************************************************
+* SURVIVAL ANALYSIS
+* Survival analysis to 1 year
+**************************************************************************
+Data ineligible/excluded from survival analysis - taken from IARC 2012 summer school presented by Manuela Quaresma
+Ineligible Criteria:
+- Incomplete data
+- Beh not=/3
+- Not resident
+- Inappropriate morph code
+
+Excluded Criteria:
+- Age 100+
+- SLC unknown
+- Duplicate
+- Synchronous tumour
+- Sex incompatible with site
+- Dates invalid
+- Inconsistency between dob, dot and dlc
+- Multiple primary
+- DCO / zero survival (true zero survival included i.e. dot=dod but not a DCO)
+
+** Load the dataset
+use "`datapath'\version01\2-working\2008_2013_2014_cancer_nonsurvival", clear
+
+count //927
+
+** first we have to restrict dataset to patients not tumours
+drop if patient!=1
+count //912
+
+** now ensure everyone has a unique id
+count if pid=="" //0
+
+** IRH (12feb2019) tab id ,m
+** IRH (12feb2019) summ
+
+** failure is defined as deceased==1
+** IRH (12feb2019) codebook deceased
+recode deceased 2=0 //424 changes
+** IRH (12feb2019) tab deceased ,m
+** JC (14feb2019) tab dod ,m
+** JC (14feb2019) tab dlc ,m //dlc used in 2013,2014 datasets for date last contact
+** JC (14feb2019) count if dlc==. //0
+** JC (14feb2019) count if dod==. //424 so 488 are deceased
+
+** check for all patients who are deceased but missing dod
+count if deceased==1 & dod==. //0
+** JC (14feb2019) tab dod ,m
+
+version 14.1
+
+** check all patients have a dot (incidence date)
+** IRH (12feb2019) tab dot ,m
+
+** set study end date variable as 1 year from dx date IF PT HAS NOT DIED
+** JC (20may2019): I used 1 yr instead of 3 as we want to compare 1-yr and 3-yr survival as we do not yet have 5 years of death data
+gen end_date=(dot+(365.25*1)) if dot!=.
+
+format end_date %dD_m_CY
+
+** check all patients have an end_date
+** IRH (12feb2019) tab end_date ,m
+
+** check that all who died have a dod
+** IRH (12feb2019) tab dod if deceased==1 ,m
+// 0 have dod in 2018 but we saw above
+// that all end_dates are in 2017
+
+** none with dod in 2018 so no need to reset to "alive". However,
+** and any with dod >1 year from dx even if dod still in 2015,
+** needs to be reset as alive
+** JC (14feb2019) list deceased dot dod dlc if dod!=. & dod>dot+(365.25*1)
+replace deceased=0 if dod!=. & dod>dot+(365.25*1) //118 changes
+
+** set to missing those who have dod>1 year from incidence date - but
+** first create new variable for time to death/date last seen, called "time"
+
+** (1) use dod to define time to death if died within 1 yr
+gen time=dod-dot if (dod!=. & deceased==1 & dod<dot+(365.25*1))
+
+** (2) next use 1 yr as time, if died >1 yr from incidence
+replace time=end_date-dot if (end_date<dod & dod!=. & deceased==1) //0 changes
+
+** (2) next use dlc as end date, if alive and have date last seen (dlc)
+replace time=dlc-dot if (dlc<end_date & deceased==0) //429 changes
+
+** IRH (12feb2019) tab time ,m
+** IRH (12feb2019) count if time!=. // at this point we are missing 113 for time... why?
+** JC (14feb2019) count if time==. //113 missing time
+
+** IRH (12feb2019) list time dot dlc end_date dod deceased if time==.
+** these have date last seen > end_date - so here make dlc the end_date
+replace time=end_date-dot if (end_date<dlc & deceased==0) & time==. & dlc!=. //113 changes
+** JC (14feb2019) count if deceased==0 & time==. //1 didn't change above
+** JC (14feb2019) list pid vstatus slc dlc dod if deceased==0 & time==. //dlc=end_date so need to update
+replace time=dlc-dot if deceased==0 & time==. //0 changes
+
+** what to do with the 3 missing values for dlc??
+** IRH (12feb2019) list if dlc==.
+** JC (14feb2019) count if dlc==. //0
+
+** JC (14feb2019) list dot end_date dod deceased if end_date<dod & dod!=.
+** these are the 118 from above - change dod to missing (deceased already
+** set to 0 above) as they did not die within 1 year
+replace dod=. if end_date<dod & dod!=. //118 changes
+
+** JC (14feb2019) tab deceased ,m // now 370 (used to be 488 but 118 died >1 year)
+sort end_date   // death from comments so changed from alive to dead
+** IRH (12feb2019) tab end_date ,m
+
+** Now to set up dataset for survival analysis, we need each patient's date of
+** entry to study (incidence date, or dot), and exit date from study which is end_date
+** UNLESS they died before end_date or were last seen before end_date in which case
+** they should be censored... so now we create a NEW end_date as a combination of
+** the above
+sort dot
+sort pid
+
+** JC (14feb2019) list pid dot deceased dod dlc end_date
+
+gen newend_date=dod if (end_date>dod & dod!=. & deceased==1)
+replace newend_date=dlc if (dlc<end_date) & dod==. & deceased==0 //429 changes
+** JC (14feb2019) count if newend_date==. //113
+** JC (14feb2019) list dot deceased dod dlc end_date if newend_date==.
+replace newend_date=end_date if newend_date==. //113 changes
+format newend_date %dD_m_CY
+
+** IRH (12feb2019) describe dot  newend_date
+sort dot
+** IRH (12feb2019) list pid dot dod dlc end_date newend_date
+
+** IRH (12feb2019) 
+tab time ,m
+** JC (20may2019) there are 113 with time=365.25 so change the 113 to time=365
+replace time=365 if time==365.25 //113 changes
+** JC (14feb2019) list deceased dot dod dlc end_date newend_date time if time==0
+** there are 393 records with time=0 (ie either DCO or defaulted as not seen after dx date)
+** honestly those who did not die (ie no death certificate) should have at least a
+** value of 1 day... while those DCOs are understandably at time=0
+replace newend_date=newend_date+1 if (time==0 & deceased==0) //241 changes
+replace time=1 if (time==0 & deceased==0) //241 changes
+
+** AR: after meeting RH 26-aug-2016: CHANGE THOSE WITH DOT>DOD SO DOT=DOD
+
+tab deceased ,m //59.43% used as 1-yr survival in table ES1 (executive summary, 2014 annual report) - JC (14feb2019)
+/*
+   whether patient is |
+             deceased |      Freq.     Percent        Cum.
+----------------------+-----------------------------------
+                    0 |        542       59.43       59.43
+                 dead |        370       40.57      100.00
+----------------------+-----------------------------------
+                Total |        912      100.00
+*/
+gen surv1yr_2008=1 if deceased==1 & dxyr==2008
+gen surv1yr_2013=1 if deceased==1 & dxyr==2013
+gen surv1yr_2014=1 if deceased==1 & dxyr==2014
+
+** JC 09oct2019: BNR newsletter vol 4
+tab deceased if siteiarc==39 //prostate 1-yr survival
+tab deceased if siteiarc==29 //breast 1-yr survival
+** JC 09oct2019: BNR newsletter vol 4
+preserve
+drop if basis==0
+tab deceased if siteiarc==39 //prostate 1-yr survival
+tab deceased if siteiarc==29 //breast 1-yr survival
+restore
+
+For 2015 rpt, use BELOW corrected survival code to determine 2008-2015 1-yr survival (drop DCOs)
+
+drop if basis==0
+tab deceased ,m
+** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
+drop dup_id
+sort pid
+duplicates tag pid, gen(dup_id)
+list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
+drop if resident==2 //0 deleted - nonresident
+drop if resident==99 //0 deleted - resident unknown
+drop if recstatus==3 //0 deleted - ineligible case definition
+drop if sex==9 //0 deleted - sex unknown
+drop if beh!=3 //0 deleted - nonmalignant
+drop if persearch>2 //1 to be deleted
+drop if siteiarc==25 //0 deleted - nonreportable skin cancers
+
+count //2418
+
+REPEAT ALL OF ABOVE SURVIVAL CODE FOR 3-YR AND FOR 5-YR
+
+** Save this corrected dataset with only reportable cases
+save "`datapath'\version02\3-output\2008_2013_2014_cancer_survival", replace
+label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+note: TS This dataset was used for 2015 annual report
+note: TS Excludes age 100+, multiple primaries, ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
+
 
 *******************************
 ** 2015 Non-survival Dataset **

@@ -517,73 +517,64 @@ count if cod1c!="99" //567
 count if cod1d!="99" //132
 count if cod2a!="99" //1005
 count if cod2b!="99" //462
-replace cancer=1 if regexm(cod1a, "CANCER")|regexm(cod1b, "CANCER")|regexm(cod1c, "CANCER")|regexm(cod1d, "CANCER")|regexm(cod2a, "CANCER")|regexm(cod2b, "CANCER") // changes
-replace cancer=1 if regexm(cod1a, "TUMOUR")|regexm(cod1b, "TUMOUR")|regexm(cod1c, "TUMOUR")|regexm(cod1d, "TUMOUR")|regexm(cod2a, "TUMOUR")|regexm(cod2b, "TUMOUR") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "TUMOR")|regexm(cod1b, "TUMOR")|regexm(cod1c, "TUMOR")|regexm(cod1d, "TUMOR")|regexm(cod2a, "TUMOR")|regexm(cod2b, "TUMOR") &  cancer==. // changes
-STOP
-replace cancer=1 if regexm(cod1a, "MALIGNANT") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "MALIGNANCY") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "NEOPLASM") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "CARCINOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "CARCIMONA") &  cancer==. // change
-replace cancer=1 if regexm(cod1a, "CARINOMA") &  cancer==. // change
-replace cancer=1 if regexm(cod1a, "MYELOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "LYMPHOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "LYMPHOMIA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "LYMPHONA") &  cancer==. // change
-replace cancer=1 if regexm(cod1a, "SARCOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "TERATOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "LEUKEMIA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "LEUKAEMIA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "HEPATOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "CARANOMA PROSTATE") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "MENINGIOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "MYELOSIS") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "MYELOFIBROSIS") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "CYTHEMIA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "CYTOSIS") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "BLASTOMA") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "METASTATIC") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "MASS") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "METASTASES") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "METASTASIS") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "REFRACTORY") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "FUNGOIDES") &  cancer==. // change
-replace cancer=1 if regexm(cod1a, "HODGKIN") &  cancer==. // changes
-replace cancer=1 if regexm(cod1a, "MELANOMA") &  cancer==. // change
-replace cancer=1 if regexm(cod1a,"MYELODYS") &  cancer==. // changes
+//ssc install unique
+//ssc install distinct
+** Create variable with combined CODs
+gen coddeath=cod1a+" "+cod1b+" "+cod1c+" "+cod1d+" "+cod2a+" "+cod2b
+replace coddeath=subinstr(coddeath,"99 ","",.) //4990
+replace coddeath=subinstr(coddeath," 99","",.) //4591
+** Identify cancer deaths using variable called 'cancer'
+replace cancer=1 if regexm(coddeath, "CANCER") & cancer==. //719 changes
+replace cancer=1 if regexm(coddeath, "TUMOUR") &  cancer==. //25 changes
+replace cancer=1 if regexm(coddeath, "TUMOR") &  cancer==. //21 changes
+replace cancer=1 if regexm(coddeath, "MALIGNANT") &  cancer==. //16 changes
+replace cancer=1 if regexm(coddeath, "MALIGNANCY") &  cancer==. //65 changes
+replace cancer=1 if regexm(coddeath, "NEOPLASM") &  cancer==. //3 changes
+replace cancer=1 if regexm(coddeath, "CARCINOMA") &  cancer==. //333 changes
+replace cancer=1 if regexm(coddeath, "CARCIMONA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CARINOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MYELOMA") &  cancer==. //43 changes
+replace cancer=1 if regexm(coddeath, "LYMPHOMA") &  cancer==. //24 changes
+replace cancer=1 if regexm(coddeath, "LYMPHOMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "LYMPHONA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "SARCOMA") &  cancer==. //20 changes
+replace cancer=1 if regexm(coddeath, "TERATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "LEUKEMIA") &  cancer==. //24 changes
+replace cancer=1 if regexm(coddeath, "LEUKAEMIA") &  cancer==. //5 changes
+replace cancer=1 if regexm(coddeath, "HEPATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CARANOMA PROSTATE") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MENINGIOMA") &  cancer==. //3 changes
+replace cancer=1 if regexm(coddeath, "MYELOSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MYELOFIBROSIS") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath, "CYTHEMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CYTOSIS") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath, "BLASTOMA") &  cancer==. //5 changes
+replace cancer=1 if regexm(coddeath, "METASTATIC") &  cancer==. //10 changes
+replace cancer=1 if regexm(coddeath, "MASS") &  cancer==. //40 changes
+replace cancer=1 if regexm(coddeath, "METASTASES") &  cancer==. //2 changes
+replace cancer=1 if regexm(coddeath, "METASTASIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "REFRACTORY") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "FUNGOIDES") &  cancer==. //2 change
+replace cancer=1 if regexm(coddeath, "HODGKIN") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MELANOMA") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath,"MYELODYS") &  cancer==. //3 changes
 
 ** Strip possible leading/trailing blanks in cod1a
-replace cod1a = rtrim(ltrim(itrim(cod1a))) //0 changes
+replace coddeath = rtrim(ltrim(itrim(coddeath))) //0 changes
 
 tab cancer, missing
-/*
-     cancer |
-  diagnoses |      Freq.     Percent        Cum.
-------------+-----------------------------------
-     cancer |      3,245       26.41       26.41
-          . |      9,041       73.59      100.00
-------------+-----------------------------------
-      Total |     12,286      100.00
-*/
-tab deathyear cancer,m
-/*
-           |   cancer diagnoses
- deathyear |    cancer          . |     Total
------------+----------------------+----------
-      2013 |       614      1,796 |     2,410 
-      2014 |       692      1,804 |     2,496 
-      2015 |       629      1,853 |     2,482 
-      2016 |       668      1,820 |     2,488 
-      2017 |       642      1,768 |     2,410 
------------+----------------------+----------
-     Total |     3,245      9,041 |    12,286
-*/
+
+drop dodyear
+gen dodyear=year(dod)
+tab dodyear cancer,m
 
 ** Check that all cancer CODs for 2014 are eligible
-sort cod1a record_id
-order record_id cod1a
-list cod1a if cancer==1 & deathyear==2014 //692
+sort coddeath record_id
+order record_id coddeath
+//list coddeath if cancer==1 & inrange(record_id, 0, 24000)
+** 588
+//list coddeath if cancer==1 & inrange(record_id, 24001, 27000)
+** 778
 
 ** Replace 2014 cases that are not cancer according to eligibility SOP:
 /*
@@ -594,48 +585,30 @@ list cod1a if cancer==1 & deathyear==2014 //692
 		Data Editor in browse mode-copy and paste record_id below from here
 */
 replace cancer=2 if ///
-record_id==16285 |record_id==1292  |record_id==15458 |record_id==11987 |record_id==1552| ///
-record_id==23771 |record_id==19815 |record_id==11910 |record_id==23750 |record_id==8118| ///
-record_id==3725  |record_id==932   |record_id==3419  |record_id==23473 |record_id==19097| ///
-record_id==16546 |record_id==20819 |record_id==20241 |record_id==13572 |record_id==6444| ///
-record_id==4644  |record_id==14413 |record_id==16702 |record_id==14249 |record_id==14688| ///
-record_id==5469  |record_id==15378 |record_id==2231  |record_id==22807 |record_id==12102| ///
-record_id==22127 |record_id==23906 |record_id==6243  |record_id==22248 |record_id==18365| ///
-record_id==17054 |record_id==13194 |record_id==19770 |record_id==2742  |record_id==20031| ///
-record_id==8574  |record_id==10793 |record_id==20504 |record_id==20634 |record_id==5531| ///
-record_id==17077 |record_id==11945 |record_id==19303 |record_id==1429  |record_id==17327| ///
-record_id==7925  |record_id==23413 |record_id==5189  |record_id==12137 |record_id==16726| ///
-record_id==19979 |record_id==21864 |record_id==2477  |record_id==19620 |record_id==5741| ///
-record_id==183
-//61 changes
+record_id==23197|record_id==21945|record_id==22224|record_id==23208|record_id==23685| ///
+record_id==22399|record_id==23068|record_id==22940|record_id==22575|record_id==21804| ///
+record_id==23447|record_id==23179|record_id==23873|record_id==22514|record_id==25364| ///
+record_id==24032|record_id==25675|record_id==24989|record_id==24752|record_id==25574| ///
+record_id==25452|record_id==26634|record_id==25561|record_id==25157|record_id==26562| ///
+record_id==26409|record_id==26124|record_id==25031|record_id==25968|record_id==26711| ///
+record_id==25255|record_id==25660|record_id==26127|record_id==25258|record_id==24452| ///
+record_id==24874|record_id==24536|record_id==25092|record_id==24583|record_id==24077| ///
+record_id==24244|record_id==24525|record_id==25640|record_id==24440|record_id==24589| ///
+record_id==24383|record_id==25916|record_id==24409|record_id==25385|record_id==24361| ///
+record_id==24510|record_id==24786|record_id==26219|record_id==26376|record_id==24168| ///
+record_id==24921|record_id==25012|record_id==26129|record_id==24164|record_id==26673| ///
+record_id==26553|record_id==26795|record_id==24237|record_id==25772|record_id==25152| ///
+record_id==24736|record_id==24394
+replace coddeath=subinstr(coddeath,"GLIORRIA","GLIOMA",.) //1 change
+//67 changes
 
 ** Check that all 2014 CODs that are not cancer for eligibility
-tab deathyear cancer,m
-/*
-           |         cancer diagnoses
- deathyear |    cancer  not cancer         . |     Total
------------+---------------------------------+----------
-      2013 |       614          0      1,796 |     2,410 
-      2014 |       631         61      1,804 |     2,496 
-      2015 |       629          0      1,853 |     2,482 
-      2016 |       668          0      1,820 |     2,488 
-      2017 |       642          0      1,768 |     2,410 
------------+---------------------------------+----------
-     Total |     3,184         61      9,041 |    12,286
-*/
-count if cancer==. & deathyear==2014 & (record_id>0 & record_id<5000) //376
-count if cancer==. & deathyear==2014 & (record_id>5000 & record_id<10000) //374
-count if cancer==. & deathyear==2014 & (record_id>10000 & record_id<15000) //368
-count if cancer==. & deathyear==2014 & (record_id>15000 & record_id<20000) //374
-count if cancer==. & deathyear==2014 & (record_id>20000 & record_id<25000) //311
-count if cancer==. & deathyear==2014 & (record_id>25000 & record_id<30000) //0
-
-list cod1a if cancer==. & deathyear==2014 & (record_id>0 & record_id<5000)
-list cod1a if cancer==. & deathyear==2014 & (record_id>5000 & record_id<10000)
-list cod1a if cancer==. & deathyear==2014 & (record_id>10000 & record_id<15000)
-list cod1a if cancer==. & deathyear==2014 & (record_id>15000 & record_id<20000)
-list cod1a if cancer==. & deathyear==2014 & (record_id>20000 & record_id<25000)
-list cod1a if cancer==. & deathyear==2014 & (record_id>25000 & record_id<30000)
+tab dodyear cancer,m
+count if cancer==. & inrange(record_id, 0, 23000) //873
+count if cancer==. & inrange(record_id, 23001, 24000) //761
+count if cancer==. & inrange(record_id, 24001, 2000) //725
+//list coddeath if cancer==. & inrange(record_id, 0, 24000)
+//list coddeath if cancer==. & inrange(record_id, 24001, 27000)
 
 ** No updates needed from above list
 /*
@@ -643,31 +616,19 @@ replace cancer=1 if ///
 record_id==|record_id==|record_id==|record_id==|record_id==| ///
 */
 
-replace cancer=2 if cancer==. //9,041 changes
+replace cancer=2 if cancer==. //3688 changes
 
 ** Create cod variable 
 gen cod=.
 label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known" 4 "NA", modify
 label values cod cod_lab
 label var cod "COD categories"
-replace cod=1 if cancer==1 //3,184 changes
-replace cod=2 if cancer==2 //9,102 changes
+replace cod=1 if cancer==1 //1299 changes
+replace cod=2 if cancer==2 //3755 changes
 ** one unknown causes of death in 2014 data - record_id 12323
-replace cod=3 if regexm(cod1a,"INDETERMINATE")|regexm(cod1a,"UNDETERMINED") //56 changes
+replace cod=3 if coddeath=="99"|(regexm(coddeath,"INDETERMINATE")|regexm(coddeath,"UNDETERMINED")) //42 changes
 
-** NB: pod was cleaned already
-** (see data_cleaning\2008-2017\deaths\versions\version03\dofiles\2_clean_deaths.do)
-tab pod ,miss 
-
-tab dod ,m
-
-** create vital status to match CR5db
-gen slc=2
-label var slc "StatusLastContact"
-label define slc_lab 1 "Alive" 2 "Deceased" 3 "Emigrated" 9 "Unknown", modify
-label values slc slc_lab
-
-order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod slc
+order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod
 
 label data "BNR MORTALITY data 2017-2018"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
