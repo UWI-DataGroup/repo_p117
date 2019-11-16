@@ -817,6 +817,15 @@ replace dob=d(17jan1937) if pid=="20141510"
 replace resident=1 if pid=="20141510"
 replace age=77 if pid=="20141510"
 
+** Check parish
+count if parish!=. & parish!=99 & addr=="" //4
+count if parish==. & addr!="" & addr!="99" //0
+//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
+bysort pid (cr5id) : replace addr = addr[_n-1] if missing(addr) //1 change - 20140566
+replace addr="OXNARD HGTS" if pid=="20149041"
+replace addr="APPLE HALL" if pid=="20149042"
+replace addr="WOODBOURNE" if pid=="20149090"
+
 ** Check missing sex
 tab sex ,m //none missing
 
@@ -873,10 +882,11 @@ replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //8 changes
 ** Check no missing dxyr so this can be used in analysis
 tab dxyr ,m //0 missing
 
-** Convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //5056 changes
-replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //5056 changes
+** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
 count //882
 
@@ -1255,6 +1265,11 @@ replace resident=1 if pid=="20081082"
 replace resident=1 if pid=="20080935"
 tab resident ,m //20 unk
 
+** Check parish
+count if parish!=. & parish!=99 & addr=="" //0
+count if parish==. & addr!="" & addr!="99" //0
+//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
+
 ** Check missing sex
 tab sex ,m //none missing
 
@@ -1315,15 +1330,11 @@ replace age=checkage2 if pid=="20080887"
 ** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
 replace fname = lower(rtrim(ltrim(itrim(fname)))) //1208 changes
 replace init = lower(rtrim(ltrim(itrim(init)))) //847 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
 replace lname = lower(rtrim(ltrim(itrim(lname)))) //1208 changes
 
 ** Check no missing dxyr so this can be used in analysis
 tab dxyr ,m //0 missing
-
-** Convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //5056 changes
-replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //5056 changes
 
 count //1211
 
@@ -1478,161 +1489,149 @@ replace resident=99 if resident==9 //139 changes
 //list pid natregno nrn if resident==99
 //replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
 replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*-9999*")) //26 changes
-STOP
 ** Check electoral list and CR5db
 //list pid natregno if resident==2
 ** Check electoral list (those with dob-use filter text contains in NRN), CR5db, MasterDb, death data for those resident=99
 count if resident==99 //88
 //list pid fname lname nrn natregno dob if resident==99
 //list pid fname lname addr if resident==99
-replace natregno=subinstr(natregno,"9999","0120",.) if pid=="20081066"
-replace resident=1 if pid=="20081066"
-replace resident=1 if pid=="20081073" //see MasterDb frmCF path sample dates are 6 months apart
-replace resident=1 if pid=="20081106" //see MasterDb frmCF path & RT dates
-replace natregno=subinstr(natregno,"9999","0024",.) if pid=="20081058"
-replace resident=1 if pid=="20081058"
-replace addr="37 GAYS" if pid=="20081058"
-replace natregno=subinstr(natregno,"9999","0085",.) if pid=="20081057"
-replace resident=1 if pid=="20081057"
-replace natregno=subinstr(natregno,"9999","0047",.) if pid=="20081107"
-replace resident=1 if pid=="20081107"
-replace natregno=subinstr(natregno,"9999","0081",.) if pid=="20081003"
-replace resident=1 if pid=="20081003"
-replace natregno=subinstr(natregno,"9999","0061",.) if pid=="20081124"
-replace resident=1 if pid=="20081124"
-replace natregno=subinstr(natregno,"9999","0181",.) if pid=="20080865"
-replace resident=1 if pid=="20080865"
-replace natregno=subinstr(natregno,"9999","7004",.) if pid=="20081075"
-replace resident=1 if pid=="20081075"
-replace natregno=subinstr(natregno,"9999","0122",.) if pid=="20081056"
-replace resident=1 if pid=="20081056"
-replace natregno=subinstr(natregno,"9999","0023",.) if pid=="20081118"
-replace resident=1 if pid=="20081118"
-replace natregno=subinstr(natregno,"9999","0143",.) if pid=="20081093"
-replace resident=1 if pid=="20081093"
-replace resident=1 if pid=="20080914"
-replace natregno=subinstr(natregno,"9999","0022",.) if pid=="20080955"
-replace resident=1 if pid=="20080955"
-replace resident=1 if pid=="20081039"
-replace resident=1 if pid=="20081115"
-replace resident=1 if pid=="20081121"
-replace natregno=subinstr(natregno,"9999","0145",.) if pid=="20080936"
-replace resident=1 if pid=="20080936"
-replace natregno=subinstr(natregno,"9999","8025",.) if pid=="20081065"
-replace resident=1 if pid=="20081065"
-replace natregno=subinstr(natregno,"9999","0046",.) if pid=="20081131"
-replace resident=1 if pid=="20081131"
-replace natregno=subinstr(natregno,"9999","0136",.) if pid=="20080882"
-replace resident=1 if pid=="20080882"
-replace natregno=subinstr(natregno,"9999","0076",.) if pid=="20080988"
-replace resident=1 if pid=="20080988"
-replace resident=1 if pid=="20080589"
-replace slc=2 if pid=="20080589" //see CR5db comments; keep dlc as cannot find dod in death data
-replace dod=dlc if pid=="20080589"
-replace dodyear=2008 if pid=="20080589"
-replace natregno=subinstr(natregno,"9999","0171",.) if pid=="20081014"
-replace resident=1 if pid=="20081014"
-replace natregno=subinstr(natregno,"9999","0198",.) if pid=="20080889"
-replace resident=1 if pid=="20080889"
-replace resident=1 if pid=="20080587"
-replace slc=2 if pid=="20080587" //see CR5db comments; keep dlc as cannot find dod in death data
-replace dod=dlc if pid=="20080587"
-replace dodyear=2008 if pid=="20080587"
-replace natregno=subinstr(natregno,"9999","0097",.) if pid=="20080969"
-replace resident=1 if pid=="20080969"
-replace resident=1 if pid=="20080588"
-replace slc=2 if pid=="20080588" //see CR5db comments; keep dlc as cannot find dod in death data
-replace dod=dlc if pid=="20080588"
-replace dodyear=2008 if pid=="20080588"
-replace natregno="450805-0079" if pid=="20080877"
-replace dob=d(05aug1945) if pid=="20080887"
-replace resident=1 if pid=="20080877"
-replace resident=1 if pid=="20080909"
-replace natregno="410324-0018" if pid=="20080881"
-replace dob=d(24mar1941) if pid=="20080881"
-replace resident=1 if pid=="20080881"
-replace addr="MONTGOMERY HILL CAVE HILL" if pid=="20080881"
-replace parish=8 if pid=="20080881"
-replace resident=1 if pid=="20080590"
-replace natregno="351228-0011" if pid=="20080885"
-replace dob=d(28dec1935) if pid=="20080885"
-replace resident=1 if pid=="20080885"
-replace addr="1ST AVENUE FAIR FIELD AVENUE BLACKROCK" if pid=="20080885"
-replace parish=8 if pid=="20080885"
-replace slc=2 if pid=="20080885"
-replace dlc=d(16sep2018) if pid=="20080885"
-replace dod=d(16sep2018) if pid=="20080885"
-replace dodyear=2018 if pid=="20080885"
-replace natregno=subinstr(natregno,"9999","0010",.) if pid=="20081011"
-replace resident=1 if pid=="20081011"
-replace natregno=subinstr(natregno,"9999","0019",.) if pid=="20080976"
-replace resident=1 if pid=="20080976"
-replace natregno=subinstr(natregno,"9999","0015",.) if pid=="20080901"
-replace resident=1 if pid=="20080901"
-replace natregno=subinstr(natregno,"9999","0015",.) if pid=="20081113"
-replace resident=1 if pid=="20081113"
-replace natregno=subinstr(natregno,"9999","0058",.) if pid=="20080998" //see MasterDb frmCF #4088
-replace resident=1 if pid=="20080998"
-replace natregno=subinstr(natregno,"9999","7033",.) if pid=="20080972"
-replace resident=1 if pid=="20080972"
-replace natregno=subinstr(natregno,"9999","0031",.) if pid=="20080949"
-replace resident=1 if pid=="20080949"
-replace natregno=subinstr(natregno,"9999","0018",.) if pid=="20080891"
-replace resident=1 if pid=="20080891"
-replace mname="seon" if pid=="20080891"
-replace init="S" if pid=="20080891"
-replace natregno=subinstr(natregno,"9999","0011",.) if pid=="20080977"
-replace resident=1 if pid=="20080977"
-replace mname="jethro" if pid=="20080977"
-replace init="J" if pid=="20080977"
-replace natregno=subinstr(natregno,"9999","0078",.) if pid=="20080923"
-replace resident=1 if pid=="20080923"
-replace natregno=subinstr(natregno,"9999","0044",.) if pid=="20081055"
-replace resident=1 if pid=="20081055"
-replace natregno=subinstr(natregno,"9999","0204",.) if pid=="20080637"
-replace lname=subinstr(lname,"R","K",.) if pid=="20080637"
-replace init="J" if pid=="20080637"
-replace addr="GUINEA PLTN" if pid=="20080637"
-replace parish=5 if pid=="20080637"
-replace resident=1 if pid=="20080637"
-replace natregno=subinstr(natregno,"9999","0022",.) if pid=="20081062"
-replace resident=1 if pid=="20081062"
-replace natregno=subinstr(natregno,"9999","0105",.) if pid=="20080993"
-replace resident=1 if pid=="20080993"
-replace natregno="270211-0103" if pid=="20081088"
-replace resident=1 if pid=="20081088"
-replace natregno=subinstr(natregno,"9999","0025",.) if pid=="20080895"
-replace resident=1 if pid=="20080895"
-replace natregno=subinstr(natregno,"9999","0028",.) if pid=="20081123"
-replace resident=1 if pid=="20081123"
-replace natregno=subinstr(natregno,"9999","0040",.) if pid=="20081090"
-replace resident=1 if pid=="20081090"
-replace natregno=subinstr(natregno,"9999","0071",.) if pid=="20081089"
-replace resident=1 if pid=="20081089"
-replace natregno=subinstr(natregno,"9999","0146",.) if pid=="20081127"
-replace resident=1 if pid=="20081127"
-replace natregno=subinstr(natregno,"9999","0160",.) if pid=="20081069"
-replace resident=1 if pid=="20081069"
-replace natregno=subinstr(natregno,"9999","8018",.) if pid=="20081102"
-replace resident=1 if pid=="20081102"
-replace natregno=subinstr(natregno,"9999","0078",.) if pid=="20081092"
-replace resident=1 if pid=="20081092"
-replace natregno="550119-0051" if pid=="20081081"
-replace resident=1 if pid=="20081081"
-replace natregno="621220-8018" if pid=="20081094"
-replace resident=1 if pid=="20081094"
-replace natregno="231231-0051" if pid=="20081078"
-replace resident=1 if pid=="20081078"
-replace natregno="330103-0098" if pid=="20081096"
-replace resident=1 if pid=="20081096"
-replace natregno="261118-0015" if pid=="20081083"
-replace resident=1 if pid=="20081083"
-replace natregno="310925-0013" if pid=="20081103"
-replace resident=1 if pid=="20081103"
-replace natregno="320626-0113" if pid=="20081082"
-replace resident=1 if pid=="20081082"
-replace resident=1 if pid=="20080935"
-tab resident ,m //20 unk
+replace natregno="501028-0138" if pid=="20130700"
+replace resident=1 if pid=="20130700"
+replace addr="GARDEN LD COUNTRY RD" if pid=="20130700"
+replace parish=8 if pid=="20130700"
+replace natregno="461127-0077" if pid=="20130792"
+replace resident=1 if pid=="20130792"
+replace natregno="570604-0101" if pid=="20130295"
+replace resident=1 if pid=="20130295"
+replace addr="HENLEY" if pid=="20130295"
+replace parish=5 if pid=="20130295"
+replace natregno="440831-0169" if pid=="20130355"
+replace resident=1 if pid=="20130355"
+replace addr="2ND AVE BIBBY'S LN" if pid=="20130355"
+replace natregno="480130-0130" if pid=="20130793"
+replace resident=1 if pid=="20130793"
+replace addr=subinstr(addr,"99 99","24",.) if pid=="20130793"
+replace natregno="641018-0084" if pid=="20130331"
+replace resident=1 if pid=="20130331"
+replace addr="ENTERPRISE COAST ROAD AURORA DRIVE" if pid=="20130331"
+replace parish=1 if pid=="20130331"
+replace slc=2 if pid=="20130331"
+replace dlc=d(12jun2013) if pid=="20130331"
+replace natregno="451206-0023" if pid=="20130659"
+replace resident=1 if pid=="20130659"
+replace natregno="430306-7021" if pid=="20130701"
+replace resident=1 if pid=="20130701"
+replace addr="SCHOOL RD HINDSBURY RD" if pid=="20130701"
+replace parish=8 if pid=="20130701"
+replace natregno="370719-0025" if pid=="20130330"
+replace resident=1 if pid=="20130330"
+replace addr=subinstr(addr,"99 ","",.) if pid=="20130330"
+replace natregno="620325-0177" if pid=="20130697"
+replace resident=1 if pid=="20130697"
+replace addr="LIGHTFOOT LN" if pid=="20130697"
+replace parish=8 if pid=="20130697"
+replace natregno="590419-7000" if pid=="20130684"
+replace resident=1 if pid=="20130684"
+replace addr=subinstr(addr,"99 ","",.) if pid=="20130684"
+replace natregno="640321-0021" if pid=="20130642"
+replace resident=1 if pid=="20130642"
+replace addr="ST STEPHENS HILL BLACK ROCK" if pid=="20130642"
+replace parish=8 if pid=="20130642"
+replace natregno="630821-0043" if pid=="20130354"
+replace resident=1 if pid=="20130354"
+replace addr="RISK RD FITTS VLGE" if pid=="20130354"
+replace parish=4 if pid=="20130354"
+replace natregno="590614-0040" if pid=="20130360"
+replace resident=1 if pid=="20130360"
+replace addr="WILSON VLGE LODGE RD" if pid=="20130360"
+replace parish=1 if pid=="20130360"
+replace natregno="460201-7024" if pid=="20130280"
+replace resident=1 if pid=="20130280"
+replace addr="1 PANGOLA COURT FRERE PILGRM/159 REGENCY PK" if pid=="20130280"
+replace parish=1 if pid=="20130280"
+replace natregno="500906-0061" if pid=="20130294"
+replace resident=1 if pid=="20130294"
+replace addr="93 WANSTEAD TERR" if pid=="20130294"
+replace parish=4 if pid=="20130294"
+replace natregno="380107-0024" if pid=="20130304"
+replace resident=1 if pid=="20130304"
+replace addr="ELLERTON" if pid=="20130304"
+replace parish=3 if pid=="20130304"
+replace natregno="521117-0104" if pid=="20130804"
+replace resident=1 if pid=="20130804"
+replace addr="CHARNOCKS" if pid=="20130804"
+replace parish=1 if pid=="20130804"
+replace resident=1 if pid=="20130601"
+replace natregno="590421-0076" if pid=="20130816"
+replace resident=1 if pid=="20130816"
+replace addr="KEW ROAD BANK HALL" if pid=="20130816"
+replace parish=8 if pid=="20130816"
+replace lname=subinstr(lname,"er","ar",.) if pid=="20130816"
+replace natregno="790903-0129" if pid=="20130334"
+replace resident=1 if pid=="20130334"
+replace addr="CHECKER HALL" if pid=="20130334"
+replace parish=7 if pid=="20130334"
+replace natregno="790301-8005" if pid=="20130311"
+replace resident=1 if pid=="20130311"
+replace addr=subinstr(addr,"99 ","",.) if pid=="20130311"
+replace natregno="541203-7029" if pid=="20130302"
+replace resident=1 if pid=="20130302"
+replace addr="MORAVIAN GDNS MAXWELL" if pid=="20130302"
+replace parish=1 if pid=="20130302"
+replace natregno="481220-0089" if pid=="20130810"
+replace resident=1 if pid=="20130810"
+replace addr="55 ROCK DUNDO PARK" if pid=="20130810"
+replace parish=8 if pid=="20130810"
+replace natregno="600425-0160" if pid=="20130329"
+replace resident=1 if pid=="20130329"
+replace addr=subinstr(addr,"99","134",.) if pid=="20130329"
+replace natregno="350123-0019" if pid=="20130747"
+replace resident=1 if pid=="20130747"
+replace addr="FAIRWAYS GDNS #2" if pid=="20130747"
+replace parish=1 if pid=="20130747"
+replace natregno="531115-0055" if pid=="20130791"
+replace resident=1 if pid=="20130791"
+replace fname=subinstr(fname,"n","u",.) if pid=="20130791"
+replace fname=subinstr(fname,"se","d",.) if pid=="20130791"
+replace dxyr=2012 if pid=="20130791"
+replace dot=d(30jun2012) if pid=="20130791"
+replace recstatus=3 if pid=="20130791"
+replace natregno="801128-0149" if pid=="20130698"
+replace resident=1 if pid=="20130698"
+replace addr="MOUNT HILLABY" if pid=="20130698"
+replace parish=2 if pid=="20130698"
+replace natregno="630830-0182" if pid=="20130414"
+replace resident=1 if pid=="20130414"
+replace addr="REDMAN'S VILLAGE" if pid=="20130414"
+swapval fname lname if pid=="20130414"
+replace resident=1 if pid=="20130333"
+replace natregno="380228-0150" if pid=="20130882"
+replace resident=1 if pid=="20130882"
+replace addr="50 CHECKER HALL" if pid=="20130882"
+replace parish=7 if pid=="20130882"
+replace natregno="390906-0018" if pid=="20130306"
+replace resident=1 if pid=="20130306"
+replace natregno="390107-7002" if pid=="20130314"
+replace resident=1 if pid=="20130314"
+replace natregno="410502-7025" if pid=="20130794"
+replace resident=1 if pid=="20130794"
+replace natregno="160729-0028" if pid=="20130290"
+replace resident=1 if pid=="20130290"
+replace addr="BOTTOM CLOSE WILDEY" if pid=="20130290"
+replace parish=8 if pid=="20130290"
+replace resident=1 if pid=="20130399"
+replace resident=1 if pid=="20130724"
+replace basis=8 if pid=="20130724"
+replace natregno="651207-0142" if pid=="20130364"
+replace resident=1 if pid=="20130364"
+replace addr="PARKS RD" if pid=="20130364"
+replace parish=6 if pid=="20130364"
+tab resident ,m //75 unk
+
+** Check parish
+count if parish!=. & parish!=99 & addr=="" //0
+count if parish==. & addr!="" & addr!="99" //0
+//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
 
 ** Check missing sex
 tab sex ,m //none missing
@@ -1655,12 +1654,12 @@ tab basis ,m
 ** Re-assign dcostatus for cases with updated death trace-back
 tab dcostatus ,m
 
-replace dcostatus=1 if slc==2 //652 changes
-replace dcostatus=6 if slc!=2 //556 changes
-replace dcostatus=2 if basis==0 //54 changes
+replace dcostatus=1 if slc==2 //457 changes
+replace dcostatus=6 if slc!=2 //388 changes
+replace dcostatus=2 if basis==0 //43 changes
 
 ** Check for ineligibles
-tab recstatus ,m //none
+tab recstatus ,m //1 ineligible
 
 ** Check for non-malignant
 tab beh ,m //9 in-situ
@@ -1670,36 +1669,39 @@ tab morph if beh!=3 //9 CIN III
 tab persearch ,m //101 excluded; 64 duplicate
 
 ** Check dob
-count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*-9999*")) //11
-//list pid natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*-9999*"))
-replace dob=d(11feb1927) if pid=="20081088" //1 change
-replace dob=d(19jan1955) if pid=="20081081" //1 change
-replace dob=d(20dec1962) if pid=="20081094" //1 change
-replace dob=d(05aug1945) if pid=="20080877" //1 change
-replace dob=d(31dec1923) if pid=="20081078" //1 change
-replace dob=d(03jan1933) if pid=="20081096" //1 change
-replace dob=d(18nov1926) if pid=="20081083" //3 changes
-replace dob=d(25sep1931) if pid=="20081103" //1 change
-replace dob=d(26jun1932) if pid=="20081082" //1 change
+count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //47
+//list pid age natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
+gen birthd=substr(natregno,1,6) if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
+destring birthd, replace
+format birthd %06.0f
+nsplit birthd, digits(2 2 2) gen(year month day)
+format year month day %02.0f
+tostring year, replace
+replace year="19"+year
+destring year, replace
+gen dob2=mdy(month, day, year)
+format dob2 %dD_m_CY
+replace dob=dob2 if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //47 changes
+drop birthd year month day dob2
+
 ** Check age
 gen age2 = (dot - dob)/365.25
 gen checkage2=int(age2)
 drop age2
-count if dob!=. & dot!=. & age!=checkage2 //4
-//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2 //2 correct as dod same day and month as dot
-replace age=checkage2 if pid=="20080877"
-replace age=checkage2 if pid=="20080887"
-//replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //2 changes
+count if dob!=. & dot!=. & age!=checkage2 /23
+//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2 //0 correct
+replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //23 changes
 
 ** Check no missing dxyr so this can be used in analysis
 tab dxyr ,m 
 
-** Convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //5056 changes
-replace mname = lower(rtrim(ltrim(itrim(mname)))) //1369 changes
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //5056 changes
+** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //547 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
-count //1211
+count //871
 
 ** Save this corrected dataset with non-reportable cases
 save "`datapath'\version02\2-working\2013_cancer_nonsurvival_nonreportable", replace
@@ -1710,14 +1712,14 @@ note: TS This dataset was used for 2015 annual report
 duplicates tag pid, gen(dup_id)
 list pid cr5id if persearch==1 & (resident==2|resident==99|recstatus==3|sex==9|beh!=3|siteiarc==25), nolabel sepby(pid)
 drop if resident==2 //0 deleted - nonresident
-drop if resident==99 //20 deleted - resident unknown
-drop if recstatus==3 //0 deleted - ineligible case definition
+drop if resident==99 //75 deleted - resident unknown
+drop if recstatus==3 //1 deleted - ineligible case definition
 drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //99 deleted - nonmalignant
-drop if persearch>2 //61 to be deleted; already deleted from above line
-drop if siteiarc==25 //228 deleted - nonreportable skin cancers
+drop if beh!=3 //7 deleted - nonmalignant
+drop if persearch>2 //2 to be deleted
+drop if siteiarc==25 //0 deleted - nonreportable skin cancers
 
-count //803
+count //786
 
 ** Save this corrected dataset with only reportable cases
 save "`datapath'\version02\2-working\2013_cancer_nonsurvival", replace
@@ -1733,15 +1735,18 @@ clear
 ** This done before 2015 data prepared so can be used by NS at CARPHA
 ** Load the dataset (2008)
 use "`datapath'\version02\2-working\2008_cancer_nonsurvival", replace
-count //802
+count //803
 
 append using "`datapath'\version02\2-working\2014_cancer_nonsurvival"
-STOP
+count //1633
 append using "`datapath'\version02\2-working\2013_cancer_nonsurvival"
+count //2419
+
+tab dxyr ,m 
 
 export delimited pid mpseq sex topography morph beh grade basis dot_iarc dob_iarc age cr5id eidmp ///
-using "`datapath'\version02\2-working\2013_nonsurvival_iarccrgtools.txt", nolabel replace
-
+using "`datapath'\version02\2-working\2008_2013_2014_nonsurvival_iarccrgtools.txt", nolabel replace
+STOP
 ** Perform MP check to identify MPs in 'multi-year' dataset and correctly assign persearch and mpseq
 /*
 IARC crg Tools - see SOP for steps on how to perform below checks:
@@ -1769,6 +1774,10 @@ Results of IARC MP Program:
 ** No updates needed for warnings/errors report
 ** Updates for multiple primary report:
 
+** Format NRN to match with death data
+remove hyphen
+addr vs address
+
 save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival", replace
 label data "2008, 2013, 2014 BNR-Cancer analysed data - Non-survival Dataset"
 note: This dataset was used for 2015 annual report
@@ -1785,6 +1794,13 @@ use "`datapath'\version02\2-working\2008-2018_deaths_for_matching", replace
 multiple frames
 count //26908
 
+update variables:
+deceased
+dod
+slc
+natregno
+dob
+age
 
 *******************************
 ** 2015 Non-survival Dataset **
