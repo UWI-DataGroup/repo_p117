@@ -11,7 +11,7 @@
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
 
     ** General algorithm set-up
-    version 15
+    version 16.0
     clear all
     macro drop _all
     set more off
@@ -1997,27 +1997,284 @@ label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Reportable Da
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
-STOP
+
 ********************
 ** Death Matching **
 ********************
 ** Match with most current death data (2017, 2018) - note some 2017 deaths found after previous 2017 matching
-/*
-** LOAD the national registry deaths 2008-2018 dataset
-use "`datapath'\version02\2-working\2008-2018_deaths_for_matching", replace
-*/
-multiple frames
-count //26908
 
-update variables:
-deceased
-dod
-slc
-natregno
-dob
-age
+** LOAD the 2008-2014 cancer_prematch (multi-year) dataset
+use "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_prematch", replace
+drop _merge
+drop nrn
+rename natregno nrn
+destring nrn,replace
+format nrn %12.0g
+tostring certifieraddr,replace
+//list pid deathid fname lname slc redcap_event_name if slc==2
+count if slc==2 & redcap_event_name!="" //997
+gen matchdone=1 if slc==2 & redcap_event_name!=""
+gen record_id=.
+
+** Merge - best to merge without age!
+merge m:1 lname fname sex dod using "`datapath'\version02\3-output\2017-2018_deaths_for_matching"
+
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         7,354
+        from master                     2,358  (_merge==1)
+        from using                      4,996  (_merge==2)
+
+    matched                                60  (_merge==3)
+    -----------------------------------------
+*/
+//list pid deathid record_id fname lname slc matchdone if _merge==3
+count if matchdone==1 & _merge==3 //30
+
+preserve
+drop if slc==2 //1494 deleted
+
+sort lname fname record_id pid
+quietly by lname fname :  gen duppt = cond(_N==1,0,_n)
+sort lname fname
+count if duppt>0 //334
+sort lname fname pid
+order pid fname lname nrn sex age primarysite dds2coddeath
+//list pid record_id fname lname nrn addr dds2address if duppt>0, string(38)
+
+** Check for matches
+sort nrn lname fname pid
+quietly by nrn :  gen dupnrn = cond(_N==1,0,_n)
+sort nrn
+count if dupnrn>0 //406
+sort lname fname pid
+order pid fname lname nrn sex age primarysite dds2coddeath
+//list pid record_id fname lname nrn addr dds2address if dupnrn>0 & nrn!=. & nrn!=9999999999, string(38)
+restore
+
+** Add record_id to cancer cases so records can be merged
+** name match
+replace record_id=22247 if pid=="20140844"
+replace record_id=24588 if pid=="20141257"
+replace record_id=24271 if pid=="20130678"
+replace record_id=24658 if pid=="20141405"
+replace record_id=24817 if pid=="20140872"
+replace record_id=25223 if pid=="20130152"
+replace record_id=25006 if pid=="20145095"
+replace record_id=25055 if pid=="20130040"
+replace record_id=25155 if pid=="20140889"
+replace record_id=26707 if pid=="20130850"
+replace record_id=25768 if pid=="20145020"
+replace record_id=25211 if pid=="20080014"
+replace record_id=26907 if pid=="20140911"
+replace record_id=25560 if pid=="20080124"
+replace record_id=24986 if pid=="20141521"
+replace record_id=25408 if pid=="20145043"
+replace record_id=25628 if pid=="20130137"
+replace record_id=24446 if pid=="20140975"
+replace record_id=26540 if pid=="20080028"
+replace record_id=24534 if pid=="20080151"
+replace record_id=24207 if pid=="20140993"
+replace record_id=25100 if pid=="20140996"
+replace record_id=25496 if pid=="20080035"
+replace record_id=26323 if pid=="20140961"
+replace record_id=24717 if pid=="20141203"
+replace record_id=25088 if pid=="20140701"
+replace record_id=26354 if pid=="20141180"
+replace record_id=24200 if pid=="20080241"
+replace record_id=25732 if pid=="20141359"
+replace record_id=24544 if pid=="20130018"
+replace record_id=24899 if pid=="20141195"
+replace record_id=24972 if pid=="20141249"
+replace record_id=26449 if pid=="20145171"
+replace record_id=25656 if pid=="20140720"
+replace record_id=24619 if pid=="20140684"
+replace record_id=25921 if pid=="20130144"
+replace record_id=26271 if pid=="20080248"
+replace record_id=23556 if pid=="20130816"
+replace record_id=23504 if pid=="20141316"
+replace record_id=25853 if pid=="20130060"
+replace record_id=24468 if pid=="20141058"
+replace record_id=25858 if pid=="20141059"
+replace record_id=25971 if pid=="20130126"
+replace record_id=26150 if pid=="20130028"
+replace record_id=24193 if pid=="20145015"
+replace record_id=26600 if pid=="20130012"
+replace record_id=25622 if pid=="20080069"
+replace record_id=26672 if pid=="20141107"
+replace record_id=22549 if pid=="20141114"
+replace record_id=26333 if pid=="20141116"
+replace record_id=25894 if pid=="20080555"
+replace record_id=25751 if pid=="20130046"
+replace record_id=25822 if pid=="20130820"
+replace record_id=26636 if pid=="20140687"
+replace record_id=24591 if pid=="20130866"
+replace record_id=25331 if pid=="20130806"
+** nrn match
+replace record_id=25325 if pid=="20141451"
+replace record_id=26241 if pid=="20145106"
+replace record_id=26473 if pid=="20141361"
+replace mname="donald" if pid=="20130272"
+replace mname="donald" if record_id==25356
+replace fname="" if pid=="20130272"
+replace record_id=25356 if pid=="20130272"
+bysort nrn (record_id) : replace fname = fname[_n-1] if missing(fname) //1 change
+replace record_id=26342 if pid=="20080184"
+replace record_id=26615 if pid=="20130045"
+replace record_id=24774 if pid=="20141134"
+
+
+** Remove merged death dataset
+drop if _merge==2 //4996 deleted
+rename nrn natregno
+drop _merge
+drop dds2*
+
+count //2418
+
+** Merge again - use record_id this time
+merge m:1 record_id using "`datapath'\version02\3-output\2017-2018_deaths_for_matching"
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         7,346
+        from master                     2,355  (_merge==1)
+        from using                      4,991  (_merge==2)
+
+    matched                                63  (_merge==3)
+    -----------------------------------------
+*/
+replace slc=2 if _merge==3 //63 changes
+replace dod=dds2dod if _merge==3 //63 changes
+replace dlc=dod if _merge==3 //63 changes
+replace deathid=record_id if _merge==3 //63 changes
+replace cancer=dds2cancer if _merge==3 //63 changes
+replace deceased=1 if _merge==3 //63 changes
+replace dcostatus=1 if _merge==3 //63 changes
+tab dcostatus ,m
+
+*********************
+** UNMATCHED DATA: **
+**     CANCER      **
+**     DEATHS	   **
+*********************
+** (1) CHECK FOR CANCER DEATHS 2017-2018 THAT HAVE NOT MERGED WTIH A NATIONAL DEATH
+count if slc==2 //1557 (=1494+63 merged)
+count if deathid==. & slc==2 //19
+count if record_id!=. & slc==2 //63
+count if deathid!=. & slc==2 /1538
+replace deathid=. if record_id!=. & slc==2 //63 changes
+replace deathid=record_id if record_id!=. & slc==2 //63 changes
+tab _merge if deathid==. & slc==2 //19 master only
+count if record_id==. & pid!="" & slc==2 //1494
+replace deathid=12931 if pid=="20130331" //1
+
+** (2) Visually check umerged cancer and deaths (not done as of 17nov2019)
+sort lname fname pid record_id
+//cancer list
+count if slc!=2 & _merge==1 //861
+//list pid fname lname natregno addr if slc!=2 & _merge==1, noobs
+//death list
+count if _merge==2 //4991
+/*
+list record_id fname lname nrn if _merge==2 //full list
+list record_id fname lname nrn if regexm(lname, "^a") & _merge==2 | regexm(lname, "^b") & _merge==2 | regexm(lname, "^c") & _merge==2
+list record_id fname lname nrn if regexm(lname, "^d") & _merge==2 | regexm(lname, "^e") & _merge==2 | regexm(lname, "^f") & _merge==2
+list record_id fname lname nrn dds2address if regexm(lname, "^g") & _merge==2 | regexm(lname, "^h") & _merge==2 | regexm(lname, "^i") & _merge==2
+list record_id fname lname nrn if regexm(lname, "^j") & _merge==2 | regexm(lname, "^k") & _merge==2 | regexm(lname, "^l") & _merge==2
+list record_id fname lname nrn if regexm(lname, "^m") & _merge==2 | regexm(lname, "^n") & _merge==2 | regexm(lname, "^o") & _merge==2
+list record_id fname lname nrn if regexm(lname, "^p") & _merge==2 | regexm(lname, "^q") & _merge==2 | regexm(lname, "^r") & _merge==2
+list record_id fname lname nrn if regexm(lname, "^s") & _merge==2 | regexm(lname, "^t") & _merge==2 | regexm(lname, "^u") & _merge==2
+list record_id fname lname nrn if regexm(lname, "^v") & _merge==2 | regexm(lname, "^w") & _merge==2 | regexm(lname, "^x") & _merge==2 ///
+								| regexm(lname, "^y") & _merge==2 | regexm(lname, "^z") & _merge==2
+*/
+drop if _merge==2 //4991 deleted
+
+count //2418
+
+** Check analysis variables are correct
+tab deceased ,m 
+tab deceased if slc==2 //1557
+
+count if dod==. & slc==2 //0
+tab slc ,m //1557
+
+** Check patient, eidmp, persearch
+tab patient ,m 
+tab persearch ,m 
+tab eidmp ,m 
+count if patient==2 & persearch==1 //1
+//list pid fname lname if patient==2 & persearch==1
+replace patient=1 if pid=="20140490" //1 change
+replace eidmp=1 if pid=="20140490" //1 change
+
+** Check NRN
+count if natregno==. & nrn!=. //0
+count if natregno!=. & nrn!=. & natregno!=nrn //4
+list pid deathid natregno nrn if natregno!=. & nrn!=. & natregno!=nrn //3 are transcription errors so leave as mismatched
+replace natregno=nrn if pid=="20140975" //1 change
+gen nrn2=natregno
+tostring natregno,replace
+count if natregno!="" & length(natregno)!=10 //18
+//list pid deathid dot natregno dob age nrn if natregno!="" & length(natregno)!=10
+replace natregno=subinstr(natregno,"9","09",.) if pid=="20140048"
+replace natregno=subinstr(natregno,"9","09",.) if pid=="20080797"
+replace natregno=subinstr(natregno,"8","08",.) if pid=="20130801"
+replace natregno=subinstr(natregno,"9","09",.) if pid=="20140827"
+replace natregno=subinstr(natregno,"3","03",.) if pid=="20130694"
+replace natregno=subinstr(natregno,"5","05",.) if pid=="20140434"
+replace natregno=subinstr(natregno,"8","08",.) if pid=="20140817"
+replace natregno=subinstr(natregno,"9","09",.) if pid=="20080146"
+replace natregno=subinstr(natregno,"505","0505",.) if pid=="20140699"
+replace natregno=subinstr(natregno,"3","03",.) if pid=="20140826"
+replace natregno=subinstr(natregno,"111","000111",.) if pid=="20130072"
+replace natregno=subinstr(natregno,"8","08",.) if pid=="20080089"
+replace natregno=subinstr(natregno,"909","0909",.) if pid=="20130084"
+replace natregno=subinstr(natregno,"2","02",.) if pid=="20130373"
+replace natregno=subinstr(natregno,"91","091",.) if pid=="20130369"
+replace natregno=subinstr(natregno,"7","07",.) if pid=="20080315"
+replace natregno=subinstr(natregno,"5","05",.) if pid=="20080867"
+replace natregno=subinstr(natregno,"303","0303",.) if pid=="20080703"
+
+** Check dob
+count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //1
+//list pid age natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*9999*"))
+gen birthd=substr(natregno,1,6) if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
+destring birthd, replace
+format birthd %06.0f
+nsplit birthd, digits(2 2 2) gen(year month day)
+format year month day %02.0f
+tostring year, replace
+replace year="19"+year
+destring year, replace
+gen dob2=mdy(month, day, year)
+format dob2 %dD_m_CY
+replace dob=dob2 if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //1 change
+drop birthd year month day dob2
+
+** Check age
+gen age2 = (dot - dob)/365.25
+gen checkage2=int(age2)
+drop age2
+count if dob!=. & dot!=. & age!=checkage2 //0
+//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2 //0 correct
+replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //0 changes
+
+** Check no missing dxyr so this can be used in analysis
+tab dxyr ,m 
+
+count if dodyear_cancer!=year(dod) //63
+//list pid deathid dod dodyear_cancer if dodyear!=year(dod)
+replace dodyear_cancer=year(dod) if dodyear_cancer!=year(dod) //63 changes
+
+tab dotyear ,m
 
 rename nm namematch
+rename dodyear_cancer dodyear
+
+** Remove variables not needed in final dataset
+drop checkage2 nrn2 dds2recstatdc dds2tfdddoa dds2tfddda dds2tfregnumstart dds2tfdistrictstart dds2tfregnumend dds2tfdistrictend dds2tfddtxt dds2recstattf dds2duprec dds2dupname dds2dupdod dds2dodyear
 
 ** Save this corrected dataset with only reportable cases
 save "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", replace
@@ -2030,11 +2287,7 @@ note: TS Excludes ineligible case definition, non-residents, unk sex, non-malign
 **  2008 2013 2014   **
 ** Survival Datasets **
 ***********************
-
-* ************************************************************************
-* SURVIVAL ANALYSIS
-* Survival analysis to 1 year
-**************************************************************************
+/*
 Data ineligible/excluded from survival analysis - taken from IARC 2012 summer school presented by Manuela Quaresma
 Ineligible Criteria:
 - Incomplete data
@@ -2052,95 +2305,146 @@ Excluded Criteria:
 - Inconsistency between dob, dot and dlc
 - Multiple primary
 - DCO / zero survival (true zero survival included i.e. dot=dod but not a DCO)
+*/
 
+**************************************************************************
+* SURVIVAL ANALYSIS
+* Survival analysis to 1 year, 3 years and 5 years
+**************************************************************************
 ** Load the dataset
-use "`datapath'\version01\2-working\2008_2013_2014_cancer_nonsurvival", clear
+use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", clear
 
-count //927
+** Update dataset to meet IARC standards for calculating survival
+tab patient ,m 
+tab persearch ,m 
+tab eidmp ,m 
+count if patient==2 & persearch==1 //0
+//list pid fname lname if patient==2 & persearch==1
 
-** first we have to restrict dataset to patients not tumours
-drop if patient!=1
-count //912
+count //2418
+
+drop if basis==0 //132 deleted - DCO 
+drop if age>100 //3 deleted - age 100+
+drop if slc==99 //0 deleted - status at last contact unknown
+drop if patient!=1 //32 deleted - MP
+drop if resident==2 //0 deleted - nonresident
+drop if resident==99 //0 deleted - resident unknown
+drop if recstatus==3 //0 deleted - ineligible case definition
+drop if sex==9 //0 deleted - sex unknown
+drop if beh!=3 //0 deleted - nonmalignant
+drop if persearch>2 //0 to be deleted
+drop if siteiarc==25 //0 deleted - nonreportable skin cancers
+
+count //2251
 
 ** now ensure everyone has a unique id
 count if pid=="" //0
 
-** IRH (12feb2019) tab id ,m
-** IRH (12feb2019) summ
+recode deceased 2=0 //849 changes
 
-** failure is defined as deceased==1
-** IRH (12feb2019) codebook deceased
-recode deceased 2=0 //424 changes
-** IRH (12feb2019) tab deceased ,m
-** JC (14feb2019) tab dod ,m
-** JC (14feb2019) tab dlc ,m //dlc used in 2013,2014 datasets for date last contact
-** JC (14feb2019) count if dlc==. //0
-** JC (14feb2019) count if dod==. //424 so 488 are deceased
+gen deceased_1yr=deceased
+gen deceased_3yr=deceased
+gen deceased_5yr=deceased
+label drop deceased_lab
+label define deceased_lab 0 "censored" 1 "dead", modify
+label values deceased deceased_1yr deceased_3yr deceased_5yr deceased_lab
+label var deceased "Survival identifer"
+label var deceased_1yr "Survival identifer at 1yr"
+label var deceased_3yr "Survival identifer at 3yrs"
+label var deceased_5yr "Survival identifer at 5yrs"
+
+tab deceased ,m //1402 dead; 849 censored
+tab deceased_1yr ,m //1402 dead; 849 censored
+tab deceased_3yr ,m //1402 dead; 849 censored
+tab deceased_5yr ,m //1402 dead; 849 censored
+count if dlc==. //0
+count if dod==. //849
 
 ** check for all patients who are deceased but missing dod
 count if deceased==1 & dod==. //0
-** JC (14feb2019) tab dod ,m
+count if deceased_1yr==1 & dod==. //0
+count if deceased_3yr==1 & dod==. //0
+count if deceased_5yr==1 & dod==. //0
 
-version 14.1
+count if dot==. //0
 
-** check all patients have a dot (incidence date)
-** IRH (12feb2019) tab dot ,m
+** Create end_date variables: 1 year, 3 years and 5 years from incidence
+gen enddate_1yr=(dot+(365.25*1)) if dot!=.
+gen enddate_3yr=(dot+(365.25*3)) if dot!=.
+gen enddate_5yr=(dot+(365.25*5)) if dot!=. & dxyr!=2014 //2019 death data not available as of 17nov2019
 
-** set study end date variable as 1 year from dx date IF PT HAS NOT DIED
-** JC (20may2019): I used 1 yr instead of 3 as we want to compare 1-yr and 3-yr survival as we do not yet have 5 years of death data
-gen end_date=(dot+(365.25*1)) if dot!=.
+format enddate* %dD_m_CY
 
-format end_date %dD_m_CY
+count if enddate_1yr==. //0
+count if enddate_3yr==. //0
+count if enddate_5yr==. & dxyr!=2014 //0
 
-** check all patients have an end_date
-** IRH (12feb2019) tab end_date ,m
+** Since end_date is 1, 3, 5 years from incidence, reset deceased from dead to censored if pt died after end_date
+count if dod!=. & dod>dot+(365.25*1) //614
+//list pid deceased_1yr dot dod dlc enddate_1yr if dod!=. & dod>dot+(365.25*1)
+count if dod!=. & dod>dot+(365.25*3) //251
+//list pid deceased_3yr dot dod dlc enddate_3yr if dod!=. & dod>dot+(365.25*3)
+count if dod!=. & dod>dot+(365.25*5) & dxyr!=2014 //110
+//list pid deceased_5yr dot dod dlc enddate_5yr if dod!=. & dod>dot+(365.25*5)
 
-** check that all who died have a dod
-** IRH (12feb2019) tab dod if deceased==1 ,m
-// 0 have dod in 2018 but we saw above
-// that all end_dates are in 2017
-
-** none with dod in 2018 so no need to reset to "alive". However,
-** and any with dod >1 year from dx even if dod still in 2015,
-** needs to be reset as alive
-** JC (14feb2019) list deceased dot dod dlc if dod!=. & dod>dot+(365.25*1)
-replace deceased=0 if dod!=. & dod>dot+(365.25*1) //118 changes
+replace deceased_1yr=0 if dod!=. & dod>dot+(365.25*1) //614 changes
+replace deceased_3yr=0 if dod!=. & dod>dot+(365.25*3) //251 changes
+replace deceased_5yr=0 if dod!=. & dod>dot+(365.25*5) & dxyr!=2014 //110 changes
 
 ** set to missing those who have dod>1 year from incidence date - but
 ** first create new variable for time to death/date last seen, called "time"
+** (1) use dod to define time to death if died within 1, 3, 5 yrs
+gen time_1yr=dod-dot if (dod!=. & deceased_1yr==1 & dod<dot+(365.25*1))
+gen time_3yr=dod-dot if (dod!=. & deceased_3yr==1 & dod<dot+(365.25*3))
+gen time_5yr=dod-dot if (dod!=. & deceased_5yr==1 & dod<dot+(365.25*5) & dxyr!=2014)
 
-** (1) use dod to define time to death if died within 1 yr
-gen time=dod-dot if (dod!=. & deceased==1 & dod<dot+(365.25*1))
-
-** (2) next use 1 yr as time, if died >1 yr from incidence
-replace time=end_date-dot if (end_date<dod & dod!=. & deceased==1) //0 changes
+** (2) next use 1, 3, 5 yrs as time, if died >1, >3, >5 yrs from incidence
+count if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0
+replace time_1yr=enddate_1yr-dot if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0 changes
+count if (enddate_3yr<dod & dod!=. & deceased_3yr==1) //0
+replace time_3yr=enddate_3yr-dot if (enddate_3yr<dod & dod!=. & deceased_3yr==1) //0 changes
+count if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr!=2014) //0
+replace time_5yr=enddate_5yr-dot if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr!=2014) //0 changes
 
 ** (2) next use dlc as end date, if alive and have date last seen (dlc)
-replace time=dlc-dot if (dlc<end_date & deceased==0) //429 changes
+count if (dlc<enddate_1yr & deceased_1yr==0) //588
+replace time_1yr=dlc-dot if (dlc<enddate_1yr & deceased_1yr==0) //588 changes
+count if (dlc<enddate_3yr & deceased_3yr==0) //1171
+replace time_3yr=dlc-dot if (dlc<enddate_3yr & deceased_3yr==0) //1171 changes
+count if (dlc<enddate_5yr & deceased_5yr==0 & dxyr!=2014) //923
+replace time_5yr=dlc-dot if (dlc<enddate_5yr & deceased_5yr==0 & dxyr!=2014) //923 changes
 
-** IRH (12feb2019) tab time ,m
-** IRH (12feb2019) count if time!=. // at this point we are missing 113 for time... why?
-** JC (14feb2019) count if time==. //113 missing time
+//tab time_1yr ,m //875=missing; 298=0
+//tab time_3yr ,m //292=missing; 298=0
+//tab time_5yr if dxyr!=2014 ,m //48=missing; 86=0
+//list time_1yr dot dlc enddate_1yr dod deceased_1yr if time_1yr==.
+replace time_1yr=enddate_1yr-dot if (enddate_1yr<dlc & deceased_1yr==0) & time_1yr==. & dlc!=. //875 changes
+replace time_3yr=enddate_3yr-dot if (enddate_3yr<dlc & deceased_3yr==0) & time_3yr==. & dlc!=. //292 changes
+replace time_5yr=enddate_5yr-dot if (enddate_5yr<dlc & deceased_5yr==0) & time_5yr==. & dlc!=. & dxyr!=2014 //48 changes
 
-** IRH (12feb2019) list time dot dlc end_date dod deceased if time==.
-** these have date last seen > end_date - so here make dlc the end_date
-replace time=end_date-dot if (end_date<dlc & deceased==0) & time==. & dlc!=. //113 changes
-** JC (14feb2019) count if deceased==0 & time==. //1 didn't change above
-** JC (14feb2019) list pid vstatus slc dlc dod if deceased==0 & time==. //dlc=end_date so need to update
-replace time=dlc-dot if deceased==0 & time==. //0 changes
+count if time_1yr==. //0
+count if time_3yr==. //0
+count if time_5yr==. & dxyr!=2014 //0
 
-** what to do with the 3 missing values for dlc??
-** IRH (12feb2019) list if dlc==.
-** JC (14feb2019) count if dlc==. //0
+replace time_1yr=dlc-dot if deceased_1yr==0 & time_1yr==. //0 changes
+replace time_3yr=dlc-dot if deceased_3yr==0 & time_3yr==. //0 changes
+replace time_5yr=dlc-dot if deceased_5yr==0 & time_5yr==. & dxyr!=2014 //0 changes
 
-** JC (14feb2019) list dot end_date dod deceased if end_date<dod & dod!=.
-** these are the 118 from above - change dod to missing (deceased already
-** set to 0 above) as they did not die within 1 year
-replace dod=. if end_date<dod & dod!=. //118 changes
+** these are from above - change dod to missing (deceased already
+** set to 0 above) as they did not die within 1, 3, 5 years
+gen dod_1yr=dod
+gen dod_3yr=dod
+gen dod_5yr=dod 
+format dod_* %tdCCYY-NN-DD
 
-** JC (14feb2019) tab deceased ,m // now 370 (used to be 488 but 118 died >1 year)
-sort end_date   // death from comments so changed from alive to dead
-** IRH (12feb2019) tab end_date ,m
+replace dod_1yr=. if enddate_1yr<dod_1yr & dod_1yr!=. //614 changes
+replace dod_3yr=. if enddate_3yr<dod_3yr & dod_3yr!=. //215 changes
+replace dod_5yr=. if enddate_5yr<dod_5yr & dod_5yr!=. & dxyr!=2014 //110 changes
+
+sort enddate_*
+tab enddate_1yr ,m 
+tab enddate_3yr ,m 
+tab enddate_5yr if dxyr!=2014 ,m
 
 ** Now to set up dataset for survival analysis, we need each patient's date of
 ** entry to study (incidence date, or dot), and exit date from study which is end_date
@@ -2150,84 +2454,224 @@ sort end_date   // death from comments so changed from alive to dead
 sort dot
 sort pid
 
-** JC (14feb2019) list pid dot deceased dod dlc end_date
+//list pid dot deceased_1yr dod dlc end_date
+count if (enddate_1yr>dod_1yr & dod_1yr!=. & deceased_1yr==1) //788
+count if (enddate_3yr>dod_3yr & dod_3yr!=. & deceased_3yr==1) //1151
+count if (enddate_5yr>dod_5yr & dod_5yr!=. & deceased_5yr==1 & dxyr!=2014) //854
+gen newenddate_1yr=dod_1yr if (enddate_1yr>dod_1yr & dod_1yr!=. & deceased_1yr==1)
+gen newenddate_3yr=dod_3yr if (enddate_3yr>dod_3yr & dod_3yr!=. & deceased_3yr==1)
+gen newenddate_5yr=dod_5yr if (enddate_5yr>dod_5yr & dod_5yr!=. & deceased_5yr==1 & dxyr!=2014)
 
-gen newend_date=dod if (end_date>dod & dod!=. & deceased==1)
-replace newend_date=dlc if (dlc<end_date) & dod==. & deceased==0 //429 changes
-** JC (14feb2019) count if newend_date==. //113
-** JC (14feb2019) list dot deceased dod dlc end_date if newend_date==.
-replace newend_date=end_date if newend_date==. //113 changes
-format newend_date %dD_m_CY
+count if (dlc<enddate_1yr) & dod_1yr==. & deceased_1yr==0 //588
+count if (dlc<enddate_3yr) & dod_3yr==. & deceased_3yr==0 //808
+count if (dlc<enddate_5yr) & dod_5yr==. & deceased_5yr==0 & dxyr!=2014 //572
+replace newenddate_1yr=dlc if (dlc<enddate_1yr) & dod_1yr==. & deceased_1yr==0 //588 changes
+replace newenddate_3yr=dlc if (dlc<enddate_3yr) & dod_3yr==. & deceased_3yr==0 //808 changes
+replace newenddate_5yr=dlc if (dlc<enddate_5yr) & dod_5yr==. & deceased_5yr==0 & dxyr!=2014 //572 changes
 
-** IRH (12feb2019) describe dot  newend_date
+count if newenddate_1yr==. //875
+count if newenddate_3yr==. //655; 292
+count if newenddate_5yr==. & dxyr!=2014 //399; 48
+
+//list dot deceased_1yr dod_1yr dlc enddate_1yr if newenddate_1yr==.
+replace newenddate_1yr=enddate_1yr if newenddate_1yr==. //875 changes
+replace newenddate_3yr=enddate_3yr if newenddate_3yr==. //655 changes
+replace newenddate_5yr=enddate_5yr if newenddate_5yr==. & dxyr!=2014 //399 changes
+format newenddate_* %dD_m_CY
+
 sort dot
-** IRH (12feb2019) list pid dot dod dlc end_date newend_date
+tab time_1yr ,m //875=365.25
+tab time_3yr ,m //292=1095.75
+tab time_5yr if dxyr!=2014 ,m //48=1826.25
 
-** IRH (12feb2019) 
-tab time ,m
-** JC (20may2019) there are 113 with time=365.25 so change the 113 to time=365
-replace time=365 if time==365.25 //113 changes
-** JC (14feb2019) list deceased dot dod dlc end_date newend_date time if time==0
-** there are 393 records with time=0 (ie either DCO or defaulted as not seen after dx date)
-** honestly those who did not die (ie no death certificate) should have at least a
-** value of 1 day... while those DCOs are understandably at time=0
-replace newend_date=newend_date+1 if (time==0 & deceased==0) //241 changes
+replace time_1yr=365 if time_1yr==365.25 //875 changes
+replace time_3yr=1095 if time_3yr==1095.75 //292 changes
+replace time_5yr=1826 if time_5yr==1826.25 //48 changes
+
+count if time_1yr==0 //298
+count if time_3yr==0 //298; 287
+count if time_5yr==0 //86; 73
+//list basis deceased_1yr dot dod_1yr dlc enddate_1yr newenddate_1yr if time_1yr==0 ,noobs
+//list basis deceased_3yr dot dod_3yr dlc enddate_3yr newenddate_3yr if time_3yr==0 ,noobs
+//list basis deceased_5yr dot dod_5yr dlc enddate_5yr newenddate_5yr if time_5yr==0 ,noobs
+
+** Since DCOs have been removed from this dataset, all cases whether dead or censored
+** should have at least a value of 1 day
+/* old method when DCOs were in ds
+replace newend_date=newend_date+1 if (time==0 & deceased==0)
 replace time=1 if (time==0 & deceased==0) //241 changes
-
-** AR: after meeting RH 26-aug-2016: CHANGE THOSE WITH DOT>DOD SO DOT=DOD
-
-tab deceased ,m //59.43% used as 1-yr survival in table ES1 (executive summary, 2014 annual report) - JC (14feb2019)
-/*
-   whether patient is |
-             deceased |      Freq.     Percent        Cum.
-----------------------+-----------------------------------
-                    0 |        542       59.43       59.43
-                 dead |        370       40.57      100.00
-----------------------+-----------------------------------
-                Total |        912      100.00
 */
-gen surv1yr_2008=1 if deceased==1 & dxyr==2008
-gen surv1yr_2013=1 if deceased==1 & dxyr==2013
-gen surv1yr_2014=1 if deceased==1 & dxyr==2014
+replace newenddate_1yr=newenddate_1yr+1 if time_1yr==0 //298 changes
+replace time_1yr=1 if time_1yr==0 //298 changes
+replace newenddate_3yr=newenddate_3yr+1 if time_3yr==0 //298; 287 changes
+replace time_3yr=1 if time_3yr==0 //298; 287 changes
+replace newenddate_5yr=newenddate_5yr+1 if time_5yr==0 //86; 73 changes
+replace time_5yr=1 if time_5yr==0 //86; 73 changes
 
-** JC 09oct2019: BNR newsletter vol 4
-tab deceased if siteiarc==39 //prostate 1-yr survival
-tab deceased if siteiarc==29 //breast 1-yr survival
-** JC 09oct2019: BNR newsletter vol 4
-preserve
-drop if basis==0
-tab deceased if siteiarc==39 //prostate 1-yr survival
-tab deceased if siteiarc==29 //breast 1-yr survival
-restore
+tab deceased ,m //37.72% for all years
+/*
+   Survival |
+  identifer |      Freq.     Percent        Cum.
+------------+-----------------------------------
+   censored |        849       37.72       37.72
+       dead |      1,402       62.28      100.00
+------------+-----------------------------------
+      Total |      2,251      100.00
+*/
+tab deceased_1yr ,m
+/*
+   Survival |
+  identifer |
+     at 1yr |      Freq.     Percent        Cum.
+------------+-----------------------------------
+   censored |      1,463       64.99       64.99
+       dead |        788       35.01      100.00
+------------+-----------------------------------
+      Total |      2,251      100.00
+*/
+tab deceased_3yr ,m 
+/*
+   Survival |
+  identifer |
+    at 3yrs |      Freq.     Percent        Cum.
+------------+-----------------------------------
+   censored |      1,100       48.87       48.87
+       dead |      1,151       51.13      100.00
+------------+-----------------------------------
+      Total |      2,251      100.00
+*/
+tab deceased_5yr ,m 
+/*
+   Survival |
+  identifer |
+    at 5yrs |      Freq.     Percent        Cum.
+------------+-----------------------------------
+   censored |        959       42.60       42.60
+       dead |      1,292       57.40      100.00
+------------+-----------------------------------
+      Total |      2,251      100.00
+*/
+count //2251
 
-For 2015 rpt, use BELOW corrected survival code to determine 2008-2015 1-yr survival (drop DCOs)
 
-drop if basis==0
-tab deceased ,m
-** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
-drop dup_id
-sort pid
-duplicates tag pid, gen(dup_id)
-list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
-drop if resident==2 //0 deleted - nonresident
-drop if resident==99 //0 deleted - resident unknown
-drop if recstatus==3 //0 deleted - ineligible case definition
-drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //0 deleted - nonmalignant
-drop if persearch>2 //1 to be deleted
-drop if siteiarc==25 //0 deleted - nonreportable skin cancers
+tab deceased_1yr dxyr ,m
+/*
+  Survival |
+ identifer |          DiagnosisYear
+    at 1yr |      2008       2013       2014 |     Total
+-----------+---------------------------------+----------
+  censored |       509        462        492 |     1,463 
+      dead |       236        267        285 |       788 
+-----------+---------------------------------+----------
+     Total |       745        729        777 |     2,251 
+*/
+tab deceased_3yr dxyr ,m
+/*
+  Survival |
+ identifer |          DiagnosisYear
+   at 3yrs |      2008       2013       2014 |     Total
+-----------+---------------------------------+----------
+  censored |       379        337        384 |     1,100 
+      dead |       366        392        393 |     1,151 
+-----------+---------------------------------+----------
+     Total |       745        729        777 |     2,251 
+*/
+tab deceased_5yr dxyr if dxyr!=2014 ,m
+/*
 
-count //2418
+  Survival |
+ identifer |     DiagnosisYear
+   at 5yrs |      2008       2013 |     Total
+-----------+----------------------+----------
+  censored |       326        294 |       620 
+      dead |       419        435 |       854 
+-----------+----------------------+----------
+     Total |       745        729 |     1,474
+*/
 
-REPEAT ALL OF ABOVE SURVIVAL CODE FOR 3-YR AND FOR 5-YR
+** Create survival variables by dxyr
+gen surv1yr_2008=1 if deceased_1yr==1 & dxyr==2008
+replace surv1yr_2008=0 if deceased_1yr==0 & dxyr==2008
+gen surv3yr_2008=1 if deceased_3yr==1 & dxyr==2008
+replace surv3yr_2008=0 if deceased_3yr==0 & dxyr==2008
+gen surv5yr_2008=1 if deceased_5yr==1 & dxyr==2008
+replace surv5yr_2008=0 if deceased_5yr==0 & dxyr==2008
+gen surv1yr_2013=1 if deceased_1yr==1 & dxyr==2013
+replace surv1yr_2013=0 if deceased_1yr==0 & dxyr==2013
+gen surv3yr_2013=1 if deceased_3yr==1 & dxyr==2013
+replace surv3yr_2013=0 if deceased_3yr==0 & dxyr==2013
+gen surv5yr_2013=1 if deceased_5yr==1 & dxyr==2013
+replace surv5yr_2013=0 if deceased_5yr==0 & dxyr==2013
+gen surv1yr_2014=1 if deceased_1yr==1 & dxyr==2014
+replace surv1yr_2014=0 if deceased_1yr==0 & dxyr==2014
+gen surv3yr_2014=1 if deceased_3yr==1 & dxyr==2014
+replace surv3yr_2014=0 if deceased_3yr==0 & dxyr==2014
+label define surv_lab 0 "censored" 1 "dead", modify
+label values surv1yr_2008 surv3yr_2008 surv5yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv_lab
+label var surv1yr_2008 "Survival at 1yr - 2008"
+label var surv3yr_2008 "Survival at 3yrs - 2008"
+label var surv5yr_2008 "Survival at 5yrs - 2008"
+label var surv1yr_2013 "Survival at 1yr - 2013"
+label var surv3yr_2013 "Survival at 3yrs - 2013"
+label var surv5yr_2013 "Survival at 5yrs - 2013"
+label var surv1yr_2014 "Survival at 1yr - 2014"
+label var surv3yr_2014 "Survival at 3yrs - 2014"
+
+tab dxyr ,m
+tab surv1yr_2008 if dxyr==2008 ,m
+tab surv3yr_2008 if dxyr==2008 ,m
+tab surv5yr_2008 if dxyr==2008 ,m
+tab surv1yr_2013 if dxyr==2013 ,m
+tab surv3yr_2013 if dxyr==2013 ,m
+tab surv5yr_2013 if dxyr==2013 ,m
+tab surv1yr_2014 if dxyr==2014 ,m
+tab surv3yr_2014 if dxyr==2014 ,m
+
+** Breast and Prostate survival at 1, 3, 5 years by diagnosis year
+**********
+** 2008 **
+**********
+** BREAST
+tab surv1yr_2008 if siteiarc==29 //breast 1-yr survival
+tab surv3yr_2008 if siteiarc==29 //breast 3-yr survival
+tab surv5yr_2008 if siteiarc==29 //breast 5-yr survival
+** PROSTATE
+tab surv1yr_2008 if siteiarc==39 //prostate 1-yr survival
+tab surv3yr_2008 if siteiarc==39 //prostate 3-yr survival
+tab surv5yr_2008 if siteiarc==39 //prostate 5-yr survival
+
+**********
+** 2013 **
+**********
+** BREAST
+tab surv1yr_2013 if siteiarc==29 //breast 1-yr survival
+tab surv3yr_2013 if siteiarc==29 //breast 3-yr survival
+tab surv5yr_2013 if siteiarc==29 //breast 5-yr survival
+** PROSTATE
+tab surv1yr_2013 if siteiarc==39 //prostate 1-yr survival
+tab surv3yr_2013 if siteiarc==39 //prostate 3-yr survival
+tab surv5yr_2013 if siteiarc==39 //prostate 5-yr survival
+
+**********
+** 2014 **
+**********
+** BREAST
+tab surv1yr_2014 if siteiarc==29 //breast 1-yr survival
+tab surv3yr_2014 if siteiarc==29 //breast 3-yr survival
+** PROSTATE
+tab surv1yr_2014 if siteiarc==39 //prostate 1-yr survival
+tab surv3yr_2014 if siteiarc==39 //prostate 3-yr survival
+
+count //2251
 
 ** Save this corrected dataset with only reportable cases
 save "`datapath'\version02\3-output\2008_2013_2014_cancer_survival", replace
-label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+label data "2008 2013 2014 BNR-Cancer analysed data - Survival Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
-note: TS Excludes age 100+, multiple primaries, ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
+note: TS Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
+note: TS For survival analysis, use variables surv1yr_2008, surv1yr_2013, surv1yr_2014, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv5yr_2008, surv5yr_2013
 
-
+STOP
 *******************************
 ** 2015 Non-survival Dataset **
 *******************************

@@ -14,7 +14,7 @@
     * AMC Rose code for BNR Cancer 2008 annual report
 
     ** General algorithm set-up
-    version 15
+    version 16.0
     clear all
     macro drop _all
     set more off

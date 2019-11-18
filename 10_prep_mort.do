@@ -10,7 +10,7 @@
     //  objective               To have multiple datasets with cleaned death data for matching and reporting.
     
     ** General algorithm set-up
-    version 16
+    version 16.0
     clear all
     macro drop _all
     set more off
@@ -298,7 +298,7 @@ count //26908
 
 label data "BNR MORTALITY data 2008-2018"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version02\2-working\2008-2018_deaths_tf" ,replace
+save "`datapath'\version02\3-output\2008-2018_deaths_tf" ,replace
 note: TS The tracking form data is included in this dataset
 
 ***********************
@@ -628,56 +628,129 @@ replace cod=2 if cancer==2 //3755 changes
 ** one unknown causes of death in 2014 data - record_id 12323
 replace cod=3 if coddeath=="99"|(regexm(coddeath,"INDETERMINATE")|regexm(coddeath,"UNDETERMINED")) //42 changes
 
+** Change sex to match cancer dataset
+tab sex ,m
+rename sex sex_old
+gen sex=1 if sex_old==2 //2467 changes
+replace sex=2 if sex_old==1 //2587 changes
+drop sex_old
+label define sex_lab 1 "Female" 2 "Male", modify
+label values sex sex_lab
+label var sex "Sex"
+tab sex ,m
+
+** Remove, relabel certain variables for merging with cancer ds
+gen dds2dod=dod
+format dds2dod %tdCCYY-NN-DD
+
 order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod
 
+rename regnum dds2regnum 
+rename pname dds2pname 
+rename age dds2age 
+rename cancer dds2cancer 
+rename cod1a dds2cod1a 
+rename address dds2address 
+rename parish dds2parish 
+rename pod dds2pod 
+rename coddeath dds2coddeath
+rename mname dds2mname 
+rename namematch dds2namematch 
+rename event dds2event 
+rename dddoa dds2dddoa 
+rename ddda dds2ddda 
+rename odda dds2odda 
+rename certtype dds2certtype 
+rename district dds2district 
+rename agetxt dds2agetxt 
+rename nrnnd dds2nrnnd
+rename mstatus dds2mstatus 
+rename occu dds2occu 
+rename durationnum dds2durationnum 
+rename durationtxt dds2durationtxt 
+rename onsetnumcod1a dds2onsetnumcod1a 
+rename onsettxtcod1a dds2onsettxtcod1a 
+rename cod1b dds2cod1b
+rename onsetnumcod1b dds2onsetnumcod1b 
+rename onsettxtcod1b dds2onsettxtcod1b 
+rename cod1c dds2cod1c 
+rename onsetnumcod1c dds2onsetnumcod1c 
+rename onsettxtcod1c dds2onsettxtcod1c 
+rename cod1d dds2cod1d 
+rename onsetnumcod1d dds2onsetnumcod1d
+rename onsettxtcod1d dds2onsettxtcod1d 
+rename cod2a dds2cod2a 
+rename onsetnumcod2a dds2onsetnumcod2a 
+rename onsettxtcod2a dds2onsettxtcod2a 
+rename cod2b dds2cod2b 
+rename onsetnumcod2b dds2onsetnumcod2b 
+rename onsettxtcod2b dds2onsettxtcod2b
+rename deathparish dds2deathparish 
+rename regdate dds2regdate 
+rename certifier dds2certifier 
+rename certifieraddr dds2certifieraddr 
+rename recstatdc dds2recstatdc 
+rename tfdddoa dds2tfdddoa 
+rename tfddda dds2tfddda 
+rename tfregnumstart dds2tfregnumstart
+rename tfdistrictstart dds2tfdistrictstart 
+rename tfregnumend dds2tfregnumend 
+rename tfdistrictend dds2tfdistrictend 
+rename tfddtxt dds2tfddtxt 
+rename recstattf dds2recstattf 
+rename duprec dds2duprec 
+rename dupname dds2dupname 
+rename dupdod dds2dupdod
+rename dodyear dds2dodyear 
+rename cod dds2cod
+/*    
+label copy recstattf_lab dds2recstattf_lab       
+label copy tfddda_lab dds2tfddda_lab
+label copy recstatdc_lab dds2recstatdc_lab
+label copy namematch_lab dds2namematch_lab
+label copy deathparish_lab dds2deathparish_lab
+label copy onsettxtcod2b_lab dds2onsettxtcod2b_lab
+label copy onsettxtcod2a_lab dds2onsettxtcod2a_lab
+label copy onsettxtcod1d_lab dds2onsettxtcod1d_lab
+label copy onsettxtcod1c_lab dds2onsettxtcod1c_lab
+label copy onsettxtcod1b_lab dds2onsettxtcod1b_lab
+label copy onsettxtcod1a_lab dds2onsettxtcod1a_lab
+label copy durationtxt_lab dds2durationtxt_lab
+label copy mstatus_lab dds2mstatus_lab
+label copy agetxt_lab dds2agetxt_lab
+label copy parish_lab dds2parish_lab
+label copy district_lab dds2district_lab
+label copy certtype_lab dds2certtype_lab
+label copy ddda_lab dds2ddda_lab
+label copy event_lab dds2event_lab
+label copy cancer_lab dds2cancer_lab
+label copy cod_lab dds2cod_lab
+label copy sex_lab dds2sex_lab
+
+label drop recstattf_lab
+label drop tfddda_lab
+label drop recstatdc_lab
+label drop namematch_lab
+label drop deathparish_lab
+label drop onsettxtcod2b_lab
+label drop onsettxtcod2a_lab
+label drop onsettxtcod1d_lab
+label drop onsettxtcod1c_lab
+label drop onsettxtcod1b_lab
+label drop onsettxtcod1a_lab
+label drop durationtxt_lab
+label drop mstatus_lab
+label drop agetxt_lab
+label drop parish_lab
+label drop district_lab
+label drop certtype_lab
+label drop ddda_lab
+label drop event_lab
+label drop cancer_lab
+label drop cod_lab
+label drop sex_lab
+*/
 label data "BNR MORTALITY data 2017-2018"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version02\2-working\2017-2018_deaths_for_matching" ,replace
+save "`datapath'\version02\3-output\2017-2018_deaths_for_matching" ,replace
 note: TS This dataset can be used for matching 2017, 2018 deaths with incidence data
-
-/*
-** Corrections so cancer and death datasets for below patients can merge in dofile 5
-**    List A	   **
-replace sex=2 if record_id==13430 //1 change
-replace nrn="" if record_id==13430 //1 change
-replace age=28 if record_id==13430 //1 change
-
-replace sex=2 if record_id==22231 //1 change
-replace nrn="" if record_id==22231 //1 change
-replace age=53 if record_id==22231 //1 change
-
-replace sex=1 if record_id==13748 //1 change
-replace nrn="" if record_id==13748 //1 change
-replace age=82 if record_id==13748 //1 change
-
-replace dod=d(21jan2017) if record_id==12255 //1 change
-
-replace dod=d(27sep2015) if record_id==8130 //1 change
-
-**    List B	   **
-replace lname="dookie" if record_id==23963 //1 change
-replace lname="greene" if record_id==16883 //1 change
-replace fname="cecilia" if record_id==2992 //1 change
-replace fname="eulaline" if record_id==8230 //1 change
-replace fname="magdaline" if record_id==15336 //1 change
-replace fname="lorna" if record_id==23231 //1 change
-replace mname="violet" if record_id==23231 //1 change
-replace fname="moretta" if record_id==17249 //1 change
-replace fname="alphonso" if record_id==614 //1 change
-replace fname="anthia" if record_id==3861 //1 change
-replace mname="clemena" if record_id==3861 //1 change
-replace lname="yarde" if record_id==2380 //1 change
-replace lname="yarde" if record_id==5206 //1 change
-
-**    List C	   **
-replace lname="dawood-wilson" if record_id==20766 //1 change
-replace fname="gertrude" if record_id==9502 //1 change
-replace lname="watson" if record_id==10212 //1 change
-
-tab deathyear if cancer==1,m 
-
-count //12,286
-
-save "data\clean\2014_cancer_deaths_dc.dta" ,replace
-label data "BNR-Cancer Cleaning: National Deaths - 2013-2017 "
-notes _dta :These data prepared for 2014 ABS phase
