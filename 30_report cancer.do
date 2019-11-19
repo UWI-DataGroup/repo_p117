@@ -39,6 +39,8 @@
 ** Annual report: Table 1 (executive summary)
 ** Load the NON-SURVIVAL dataset
 use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", clear
+//save "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , replace
+//use "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , clear
 
 ** POPULATION
 tab dxyr ,m 
@@ -66,9 +68,68 @@ gen dcoper_2013=dco_2013/tumourtot_2013*100
 gen dcoper_2014=dco_2014/tumourtot_2014*100
 format dcoper_2008 dcoper_2013 dcoper_2014 %2.1f
 
+** SURVIVAL
+** Create frame for non-survival ds
+frame rename default nonsurv
+frame create surv 
+frame change surv
+** Copy patient totals from survival dataset into this dataset by creating new frame for survival dataset
+use "`datapath'\version02\3-output\2008_2013_2014_cancer_survival", clear
+egen surv1yr_2014_censor=count(surv1yr_2014) if surv1yr_2014==0
+egen surv1yr_2014_dead=count(surv1yr_2014) if surv1yr_2014==1
+drop surv1yr_2014
+gen surv1yr_2014=surv1yr_2014_censor/pttotsurv_2014*100
+egen surv1yr_2013_censor=count(surv1yr_2013) if surv1yr_2013==0
+egen surv1yr_2013_dead=count(surv1yr_2013) if surv1yr_2013==1
+drop surv1yr_2013
+gen surv1yr_2013=surv1yr_2013_censor/pttotsurv_2013*100
+egen surv1yr_2008_censor=count(surv1yr_2008) if surv1yr_2008==0
+egen surv1yr_2008_dead=count(surv1yr_2008) if surv1yr_2008==1
+drop surv1yr_2008
+gen surv1yr_2008=surv1yr_2008_censor/pttotsurv_2008*100
+** 3-yr survival
+egen surv3yr_2014_censor=count(surv3yr_2014) if surv3yr_2014==0
+egen surv3yr_2014_dead=count(surv3yr_2014) if surv3yr_2014==1
+drop surv3yr_2014
+gen surv3yr_2014=surv3yr_2014_censor/pttotsurv_2014*100
+egen surv3yr_2013_censor=count(surv3yr_2013) if surv3yr_2013==0
+egen surv3yr_2013_dead=count(surv3yr_2013) if surv3yr_2013==1
+drop surv3yr_2013
+gen surv3yr_2013=surv3yr_2013_censor/pttotsurv_2013*100
+egen surv3yr_2008_censor=count(surv3yr_2008) if surv3yr_2008==0
+egen surv3yr_2008_dead=count(surv3yr_2008) if surv3yr_2008==1
+drop surv3yr_2008
+gen surv3yr_2008=surv3yr_2008_censor/pttotsurv_2008*100
+** 5-yr survival
+gen surv5yr_2014=.
+egen surv5yr_2013_censor=count(surv5yr_2013) if surv5yr_2013==0
+egen surv5yr_2013_dead=count(surv5yr_2013) if surv5yr_2013==1
+drop surv5yr_2013
+gen surv5yr_2013=surv5yr_2013_censor/pttotsurv_2013*100
+egen surv5yr_2008_censor=count(surv5yr_2008) if surv5yr_2008==0
+egen surv5yr_2008_dead=count(surv5yr_2008) if surv5yr_2008==1
+drop surv5yr_2008
+gen surv5yr_2008=surv5yr_2008_censor/pttotsurv_2008*100
+format surv1yr_2014 surv1yr_2013 surv1yr_2008 surv3yr_2014 surv3yr_2013 surv3yr_2008 surv5yr_2014 surv5yr_2013 surv5yr_2008 %2.1f
+** Input 1yr, 3yr, 5yr survival variables from survival ds to nonsurvival ds
+frame change nonsurv
+//frame surv:describe
+//frame nonsurv: describe
+frlink m:1 pid, frame(surv) //132 unmatched
+//list pid fname lname if surv==.
+frget surv1yr_2014 = surv1yr_2014, from(surv)
+frget surv1yr_2013 = surv1yr_2013, from(surv)
+frget surv1yr_2008 = surv1yr_2008, from(surv)
+frget surv3yr_2014 = surv3yr_2014, from(surv)
+frget surv3yr_2013 = surv3yr_2013, from(surv)
+frget surv3yr_2008 = surv3yr_2008, from(surv)
+frget surv5yr_2014 = surv5yr_2014, from(surv)
+frget surv5yr_2013 = surv5yr_2013, from(surv)
+frget surv5yr_2008 = surv5yr_2008, from(surv)
+
 ** Re-arrange dataset
 gen id=_n
-keep id tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_*
+keep id tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* surv*yr_*
 gen title=1 if id==1
 order id title
 label define title_lab 1 "Year" 2 "No.registrations(tumours)" 3 "% of entire population" 4 "No.registrations(patients)" 5 "Age-standardized Incidence Rate (ASIR) per 100,000" 6 "No.registered by death certificate only" 7 "% of tumours registered" 8 "1-year survival (%)" 9 "3-year survival (%)" 10 "5-year survival (%)",modify
@@ -84,24 +145,21 @@ replace title=3 if tumourtotper_2008!=.
 replace title=4 if patienttot_2014!=.
 replace title=4 if patienttot_2013!=.
 replace title=4 if patienttot_2008!=.
-** Add in ASIR observations
-expand=2 in 1, gen (asir_2008)
-replace id=9000 if asir_2008==1
-expand=2 in 1, gen (asir_2013)
-replace id=9001 if asir_2013==1
-expand=2 in 1, gen (asir_2014)
-replace id=9002 if asir_2014==1
-
-replace title=5 if asir_2014!=0
-replace title=5 if asir_2013!=0
-replace title=5 if asir_2008!=0
-replace title=5 if asir_2014!=0
 replace title=6 if dco_2014!=.
 replace title=6 if dco_2013!=.
 replace title=6 if dco_2008!=.
 replace title=7 if dcoper_2014!=.
 replace title=7 if dcoper_2013!=.
 replace title=7 if dcoper_2008!=.
+replace title=8 if surv1yr_2014!=.
+replace title=8 if surv1yr_2013!=.
+replace title=8 if surv1yr_2008!=.
+replace title=9 if surv3yr_2014!=.
+replace title=9 if surv3yr_2013!=.
+replace title=9 if surv3yr_2008!=.
+replace title=10 if surv5yr_2014!=.
+replace title=10 if surv5yr_2013!=.
+replace title=10 if surv5yr_2008!=.
 
 tab title ,m //some title replaced so add in new obs
 ** % of entire population needs to be added in
@@ -117,75 +175,65 @@ list id tumourtotper_2014 if tumourtotper_2014!=.
 expand=2 in 177, gen (tumtotper_2014)
 replace id=9005 if tumtotper_2014==1
 replace title=3 if tumtotper_2014!=0
+** Add in ASIR observations
+expand=2 in 1, gen (asir_2008)
+replace id=9006 if asir_2008==1
+expand=2 in 1, gen (asir_2013)
+replace id=9007 if asir_2013==1
+expand=2 in 1, gen (asir_2014)
+replace id=9008 if asir_2014==1
+replace title=5 if asir_2014!=0
+replace title=5 if asir_2013!=0
+replace title=5 if asir_2008!=0
 ** No.registered by death certificate only needs to be added in
 list id dco_2008 if dco_2008!=.
 expand=2 in 2, gen (dcotot_2008)
-replace id=9006 if dcotot_2008==1
+replace id=9009 if dcotot_2008==1
 replace title=6 if dcotot_2008!=0
 list id dco_2013 if dco_2013!=.
 expand=2 in 12, gen (dcotot_2013)
-replace id=9007 if dcotot_2013==1
+replace id=9010 if dcotot_2013==1
 replace title=6 if dcotot_2013!=0
 list id dco_2014 if dco_2014!=.
 expand=2 in 20, gen (dcotot_2014)
-replace id=9008 if dcotot_2014==1
+replace id=9011 if dcotot_2014==1
 replace title=6 if dcotot_2014!=0
 drop tumtotper_* dcotot_*
-** 1-yr survival
-expand=2 in 1, gen (surv1yr)
-replace id=9009 if surv1yr==1
-replace title=8 if surv1yr!=0
-gen surv1yr_2014=63.3
-gen surv1yr_2013=63.4
-gen surv1yr_2008=68.3
-** 3-yr survival
-expand=2 in 8, gen (surv3yr)
-replace id=9010 if surv3yr==1
-replace title=9 if surv3yr!=0
-gen surv3yr_2014=49.4
-gen surv3yr_2013=46.2
-gen surv3yr_2008=50.9
-** 3-yr survival
-expand=2 in 9, gen (surv5yr)
-replace id=9011 if surv5yr==1
-replace title=10 if surv5yr!=0
-gen surv5yr_2014=.
-gen surv5yr_2013=40.3
-gen surv5yr_2008=43.8
 
+tab title ,m 
 
-egen tumtot_2008=max(tumourtot_2008)
-egen tumtot_2013=max(tumourtot_2013)
+** Rearrange summ stats datast
 egen tumtot_2014=max(tumourtot_2014)
-egen tumtotper_2008=max(tumourtotper_2008)
-egen tumtotper_2013=max(tumourtotper_2013)
+egen tumtot_2013=max(tumourtot_2013)
+egen tumtot_2008=max(tumourtot_2008)
 egen tumtotper_2014=max(tumourtotper_2014)
+egen tumtotper_2013=max(tumourtotper_2013)
+egen tumtotper_2008=max(tumourtotper_2008)
 format tumtotper_2008 tumtotper_2013 tumtotper_2014 %04.2f
-egen pttot_2008=max(patienttot_2008)
-egen pttot_2013=max(patienttot_2013)
 egen pttot_2014=max(patienttot_2014)
-egen asirtot_2008=max(asir_2008)
-egen asirtot_2013=max(asir_2013)
+egen pttot_2013=max(patienttot_2013)
+egen pttot_2008=max(patienttot_2008)
 egen asirtot_2014=max(asir_2014)
-egen dcotot_2008=max(dco_2008)
-egen dcotot_2013=max(dco_2013)
+egen asirtot_2013=max(asir_2013)
+egen asirtot_2008=max(asir_2008)
 egen dcotot_2014=max(dco_2014)
-egen dcototper_2008=max(dcoper_2008)
-egen dcototper_2013=max(dcoper_2013)
+egen dcotot_2013=max(dco_2013)
+egen dcotot_2008=max(dco_2008)
 egen dcototper_2014=max(dcoper_2014)
-format dcototper_2008 dcototper_2013 dcototper_2014 %2.1f
-egen surv1yrtot_2008=max(surv1yr_2008)
-egen surv1yrtot_2013=max(surv1yr_2013)
+egen dcototper_2013=max(dcoper_2013)
+egen dcototper_2008=max(dcoper_2008)
 egen surv1yrtot_2014=max(surv1yr_2014)
-egen surv3yrtot_2008=max(surv3yr_2008)
-egen surv3yrtot_2013=max(surv3yr_2013)
+egen surv1yrtot_2013=max(surv1yr_2013)
+egen surv1yrtot_2008=max(surv1yr_2008)
 egen surv3yrtot_2014=max(surv3yr_2014)
-egen surv5yrtot_2008=max(surv5yr_2008)
-egen surv5yrtot_2013=max(surv5yr_2013)
+egen surv3yrtot_2013=max(surv3yr_2013)
+egen surv3yrtot_2008=max(surv3yr_2008)
 egen surv5yrtot_2014=max(surv5yr_2014)
-format surv1yrtot_* surv3yrtot_* surv5yrtot_* %2.1f
+egen surv5yrtot_2013=max(surv5yr_2013)
+egen surv5yrtot_2008=max(surv5yr_2008)
+format dcototper_2008 dcototper_2013 dcototper_2014 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2013 surv5yrtot_2008 %2.1f
 
-drop tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv1yr_* surv3yr_* surv5yr_* surv1yr surv3yr surv5yr
+drop tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv1yr_* surv3yr_* surv5yr_*
 order id title tumtot_2014 tumtot_2013 tumtot_2008 tumtotper_2014 tumtotper_2013 tumtotper_2008 pttot_2014 pttot_2013 pttot_2008 asirtot_2014 asirtot_2013 asirtot_2008 dcotot_2014 dcotot_2013 dcotot_2008 dcototper_2014 dcototper_2013 dcototper_2008 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2014 surv5yrtot_2013 surv5yrtot_2008
 
 replace title=1 if id==1
@@ -207,8 +255,6 @@ rename tumtot_2008 results_2008
 replace results_2014=tumtotper_2014 if id==3
 replace results_2013=tumtotper_2013 if id==3
 replace results_2008=tumtotper_2008 if id==3
-//format results_2014 results_2013 results_2008 %04.2f in 2/6
-//format results_2014 results_2013 results_2008 %04.2f if id==2
 drop tumtotper_*
 
 replace results_2014=pttot_2014 if id==4
@@ -229,7 +275,6 @@ drop dcotot_*
 replace results_2014=dcototper_2014 if id==7
 replace results_2013=dcototper_2013 if id==7
 replace results_2008=dcototper_2008 if id==7
-//format results_2014 results_2013 results_2008 %04.2f if id==2
 drop dcototper_*
 
 replace results_2014=surv1yrtot_2014 if id==8
@@ -246,8 +291,6 @@ drop surv1yrtot_* surv3yrtot_* surv5yrtot_*
 replace results_2014=2014 if id==1
 replace results_2013=2013 if id==1
 replace results_2008=2008 if id==1
-
-save "`datapath'\version02\3-output\2008_2013_2014_summstats" ,replace
 
 				****************************
 				*	   MS WORD REPORT      *
@@ -268,39 +311,58 @@ putdocx textblock end
 putdocx paragraph, halign(center)
 putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2015 (Population=277,814))"), bold font(Helvetica,10,"blue")
 putdocx paragraph
+putdocx text ("Standards"), bold
+putdocx paragraph, halign(center)
+putdocx image "`datapath'\version02\1-input\standards.png", width(6.64) height(6.8)
+putdocx paragraph
 putdocx text ("Methods"), bold
 putdocx textblock begin
-(1) No.(tumours): Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
+(1) No.(tumours): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(2) % of population: 2000 population with adjusted 2010 figures (see p_117\2015AnnualReport branch\0_population.do)
+(2) % of population: 2000 (census) population for 2008 diagnoses; 2010 (census) population for 2013 onwards (see p_117\2015AnnualReport branch\0_population.do)
 putdocx textblock end
 putdocx textblock begin
-(3) No.(patients): Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
+(3) No.(patients): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(4) ASIR: Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs (distrate using population dataset: who2000_10-2; cancer dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
+(4) ASIR: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (distrate using barbados population: bb2010_10-2 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(5) No.(DCOs): Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
+(5) No.(DCOs): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(6) % of tumours: Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
+(6) % of tumours: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(7) 1-yr, 3-yr, 5-yr survival (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2008, surv1yr_2013, surv1yr_2014, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv5yr_2008, surv5yr_2013; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_survival")
+(7) 1-yr, 3-yr, 5-yr survival (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2008, surv1yr_2013, surv1yr_2014, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv5yr_2008, surv5yr_2013; dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_survival")
 putdocx textblock end
-
-putdocx pagebreak
-
+//putdocx pagebreak
 putdocx table tbl1 = data(title results_2014 results_2013 results_2008), halign(center)
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(3,2), nformat(%04.2f)
+putdocx table tbl1(3,3), nformat(%04.2f)
+putdocx table tbl1(3,4), nformat(%04.2f)
+putdocx table tbl1(7,2), nformat(%2.1f)
+putdocx table tbl1(7,3), nformat(%2.1f)
+putdocx table tbl1(7,4), nformat(%2.1f)
+putdocx table tbl1(8,2), nformat(%2.1f)
+putdocx table tbl1(8,3), nformat(%2.1f)
+putdocx table tbl1(8,4), nformat(%2.1f)
+putdocx table tbl1(9,2), nformat(%2.1f)
+putdocx table tbl1(9,3), nformat(%2.1f)
+putdocx table tbl1(9,4), nformat(%2.1f)
+putdocx table tbl1(10,2), nformat(%2.1f)
+putdocx table tbl1(10,3), nformat(%2.1f)
+putdocx table tbl1(10,4), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2019-11-17_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2019-11-18_annual_report_stats.docx", replace
 putdocx clear
+
+save "`datapath'\version02\3-output\2008_2013_2014_summstats" ,replace
 clear
 /*
 **************************

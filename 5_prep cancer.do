@@ -2662,6 +2662,12 @@ tab surv3yr_2014 if siteiarc==29 //breast 3-yr survival
 tab surv1yr_2014 if siteiarc==39 //prostate 1-yr survival
 tab surv3yr_2014 if siteiarc==39 //prostate 3-yr survival
 
+** Create patient total variables to use in 30_report cancer.do
+tab patient dxyr ,m
+egen pttotsurv_2014=count(patient) if patient==1 & dxyr==2014
+egen pttotsurv_2013=count(patient) if patient==1 & dxyr==2013
+egen pttotsurv_2008=count(patient) if patient==1 & dxyr==2008
+
 count //2251
 
 ** Save this corrected dataset with only reportable cases

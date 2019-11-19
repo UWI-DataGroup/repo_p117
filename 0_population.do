@@ -49,7 +49,7 @@ rename atotal pop_bb
 
 ** ADDITION IN MARCH 2014: update to 2010 BSS census data (already adjusted for undercount by BSS)
 ** Basically, the 2010 census only gave 5-year age-groups with undercount (not individual ages)
-** so I have done the folllowing: in each 5-year age-group, divided the total by 5 and made that
+** so I have done the following: in each 5-year age-group, divided the total by 5 and made that
 ** the popn total, so that the sums make the 5-year total that we were given
 
 ** Next we create the age5 groupings
