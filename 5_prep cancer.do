@@ -2217,7 +2217,7 @@ replace natregno=nrn if pid=="20140975" //1 change
 gen nrn2=natregno
 tostring natregno,replace
 count if natregno!="" & length(natregno)!=10 //18
-//list pid deathid dot natregno dob age nrn if natregno!="" & length(natregno)!=10
+//list pid deathid dot natregno nrn dob age if natregno!="" & length(natregno)!=10
 replace natregno=subinstr(natregno,"9","09",.) if pid=="20140048"
 replace natregno=subinstr(natregno,"9","09",.) if pid=="20080797"
 replace natregno=subinstr(natregno,"8","08",.) if pid=="20130801"

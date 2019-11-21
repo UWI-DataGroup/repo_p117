@@ -754,3 +754,1138 @@ label data "BNR MORTALITY data 2017-2018"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
 save "`datapath'\version02\3-output\2017-2018_deaths_for_matching" ,replace
 note: TS This dataset can be used for matching 2017, 2018 deaths with incidence data
+
+clear
+
+***********************
+**     Preparing     **
+** 	  2015 Deaths    **
+***********************
+use "`datapath'\version02\3-output\2008-2018_deaths_tf" ,clear
+/*
+This dataset preparation differs from above (2017-2018) in below ways:
+ (1) 2017-2018 ds used for matching with cancer ds for survival analysisas
+ (2) 2015 ds used for reporting on ASMR (age-standardized mortality rates)
+	 - need to identify deaths with multiple eligible cancer CODs
+	 - need to assign each death by site as ASMR reported by site 
+*/
+** Next we get rid of those who died pre-2017 (there are previously unmatched 2017 cases in dataset)
+drop if dod<d(01jan2015) | dod>d(31dec2015) //21778 deleted
+** Remove Tracking Form info
+drop if event==2 //0 deleted
+
+count //2494
+
+*****************
+**  Formatting **
+**    Names    **
+*****************
+** Change variables that contain 'name' so that names can be easily parsed
+rename namematch nm
+
+** Need to check for duplicate death registrations
+** First split full name into first, middle and last names
+** Also - code to split full name into 2 variables fname and lname - else can't merge! 
+split pname, parse(", "" ") gen(name)
+order record_id pname name*
+sort record_id
+
+** Use Stata browse to view results as changes are made
+** (1) sort cases that contain only a first name and a last name
+count if name5=="" & name4=="" & name3=="" //1767
+count if name4=="" & name3=="" & name2=="" //0
+count if name3=="" & name2=="" //0
+count if name2=="" //0
+count if name1=="" //0
+replace name5=name2 if name5=="" & name3=="" & name4=="" //1767
+replace name2="" if name3=="" & name4=="" //1767
+
+** (2) sort cases with name 'baby' or 'b/o' in name1 variable
+count if (regexm(name1,"BABY")|regexm(name1,"B/O")|regexm(name1,"MALE")|regexm(name1,"FEMALE")) //8
+gen tempvarn=1 if (regexm(name1,"BABY")|regexm(name1,"B/O")|regexm(name1,"MALE")|regexm(name1,"FEMALE"))
+//list record_id pname name1 name2 name3 name4 name5 if tempvarn==1
+//list record_id pname name6 name7 if tempvarn==1
+replace name1=name1+" "+name2 if tempvarn==1 //8 changes
+replace name2="" if tempvarn==1 //8 changes
+replace name1=name1+" "+name3 if tempvarn==1 & name4!="" //6 changes
+replace name3=name4 if tempvarn==1 & name4!="" //6 changes
+replace name4="" if tempvarn==1 & name4!="" //6 changes
+drop if record_id==17407 //duplicate registration
+
+** (3)
+** Names containing 'ST' are being interpreted as 'ST'=name1/fname so correct
+count if name1=="ST" | name1=="ST." //3
+replace tempvarn=2 if name1=="ST" | name1=="ST." //3 changes
+//list record_id pname name1 name2 name5 if tempvarn==2
+replace name1=name1+"."+""+name2 if tempvarn==2 //3 changes
+replace name2="" if tempvarn==2 //6 changes
+replace name2=name3+" "+name4 if record_id==18395
+replace name3=name5 if record_id==18395
+replace name4="" if record_id==18395
+replace name5="" if record_id==18395
+replace name1 = subinstr(name1, ".", "",1) if record_id==16807
+** Names containing 'ST' are being interpreted as 'ST'=name2/fname so correct
+count if name2=="ST" | name2=="ST." //12
+replace tempvarn=3 if name2=="ST" | name2=="ST." //12 changes
+replace name3=name2+name3 if tempvarn==3 & name4=="" //3 changess
+replace name2="" if tempvarn==3 & name4=="" //3 changess
+replace name2=name2+"."+""+name3 if tempvarn==3 & name4!="" //9 changes
+replace name2 = subinstr(name2, ".", "",1) if tempvarn==3 & record_id==17454|record_id==18739
+replace name3=name4 if tempvarn==3 & name4!="" //9 changes
+replace name4="" if tempvarn==3 //21 changes
+** Names containing 'ST' are being interpreted as 'ST'=name3/fname so correct
+count if name3=="ST" | name3=="ST." //3
+replace tempvarn=4 if name3=="ST" | name3=="ST."
+replace name3=name3+"."+""+name4 if tempvarn==4 //3 changes
+replace name4="" if tempvarn==4 //3 changes
+replace name3 = subinstr(name3, ".", "",1) if tempvarn==4 & record_id==17658|record_id==17863
+
+** (4) sort cases with name in name5 variable
+count if name5!="" //1768
+count if name5!="" & name4=="" & name3=="" //1767
+count if name5!="" & name4!="" & name3!="" //1
+//list record_id *name* if name5!=""
+replace name2=name2+" "+name3+" "+name4 if record_id==18380
+replace name3=name5 if record_id==18380
+replace name5="" if record_id==18380
+replace name4="" if record_id==18380
+replace name3=name5 if name5!="" & name4=="" & name3=="" //1767 chagnes
+replace name5="" if name3!="" & name4=="" //1767 changes
+
+** (6) sort cases with name in name4 variable
+count if name4!="" //45
+//list record_id *name* if name4!=""
+replace name2=name2+" "+name3 if name4!="" //45 changes
+replace name3=name4 if name4!="" //45 changes
+replace name4="" if name4!="" //45 changes
+
+** (7) sort cases with NO name in name3 variable
+count if name3=="" //0
+//list record_id *name* if name3==""
+
+** (8) sort cases with suffixes
+count if (name3!="" & name3!="99") & length(name3)<4 //17 - 1 needs correcting
+replace tempvarn=5 if (name3!="" & name3!="99") & length(name3)<4 //17 changes
+//list record_id pname fname mname lname if (lname!="" & lname!="99") & length(lname)<3
+replace name3=name2+" "+name3 if record_id==18039
+replace name2="" if record_id==18039
+
+** Now rename, check and remove unnecessary variables
+rename name1 fname
+rename name2 mname
+rename name3 lname
+count if fname=="" //0
+count if lname=="" //0
+drop name4 name5 tempvarn
+
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //2493 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //713 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //2493 changes
+
+rename nm namematch
+order record_id pname fname mname lname namematch
+
+*************************
+** Checking & Removing ** 
+**   Duplicate Death   **
+**    Registrations    **
+*************************
+/* 
+NB: These deaths were cleaned previously for importing into DeathData REDCapdb 
+so the field namematch can be used as a guide for checking duplicates
+	1=names match but different person
+	2=no name match
+*/
+//label define namematch_lab 1 "deaths only namematch,diff.pt" 2 "no namematch" 3 "cr5 & death namematch,diff.pt" 4 "slc=2/9,not in deathdata", modify
+//label values namematch namematch_lab
+sort lname fname record_id
+quietly by lname fname : gen dupname = cond(_N==1,0,_n)
+sort lname fname record_id
+count if dupname>0 //51
+/* 
+Check below list for cases where namematch=no match but 
+there is a pt with same name then:
+ (1) check if same pt and remove duplicate pt;
+ (2) check if same name but different pt and
+	 update namematch variable to reflect this, i.e.
+	 namematch=1
+*/
+//list record_id namematch fname lname nrn dod sex age if dupname>0
+sort record_id
+drop if record_id==17986 //1 deleted - duplicate registration for record_id=17987
+drop if record_id==17614 //1 deleted - duplicate registration for record_id=17613
+replace deathparish=9 if record_id==17613
+drop if record_id==18430 //1 deleted - duplicate registration for record_id=18431
+replace sex=1 if record_id==18431
+drop if record_id==17167 //1 deleted - duplicate registration for record_id=17166
+drop if record_id==16871 //1 deleted - duplicate registration for record_id=16872
+drop if record_id==18505 //1 deleted - duplicate registration for record_id=18504
+drop if record_id==17862 //1 deleted - duplicate registration for record_id=17863
+drop if record_id==17077 //1 deleted - duplicate registration for record_id=17078
+drop if record_id==17064 //1 deleted - duplicate registration for record_id=17065
+drop if record_id==18489 //1 deleted - duplicate registration for record_id=18490
+replace agetxt=6 if record_id==18490
+replace namematch=2 if record_id==18490
+replace namematch=1 if record_id==18323|record_id==18343|record_id==19255|record_id==17135 /// 	 
+						|record_id==17796|record_id==17000|record_id==17724	//8 changes
+
+preserve
+drop if nrn==.
+sort nrn 
+quietly by nrn : gen dupnrn = cond(_N==1,0,_n)
+sort nrn record_id lname fname
+count if dupnrn>0 //2
+//list record_id namematch fname lname nrn dod sex age if dupnrn>0
+restore
+drop if record_id==18039 //1 deleted
+
+** Final check for duplicates by name and dod 
+sort lname fname dod
+quietly by lname fname dod: gen dupdod = cond(_N==1,0,_n)
+sort lname fname dod record_id
+count if dupdod>0 //2 - diff.pt & namematch already=1
+list record_id namematch fname lname nrn dod sex age if dupdod>0
+count if dupdod>0 & namematch!=1 //0
+
+count //2482
+
+** Now generate a new variable which will select out all the potential cancers
+gen cancer=.
+label define cancer_lab 1 "cancer" 2 "not cancer", modify
+label values cancer cancer_lab
+label var cancer "cancer diagnoses"
+label var record_id "Event identifier for registry deaths"
+
+** searching cod1a for these terms
+replace cod1a="99" if cod1a=="999" //0 changes
+replace cod1b="99" if cod1b=="999" //0 changes
+replace cod1c="99" if cod1c=="999" //0 changes
+replace cod1d="99" if cod1d=="999" //0 changes
+replace cod2a="99" if cod2a=="999" //0 changes
+replace cod2b="99" if cod2b=="999" //0 changes
+count if cod1c!="99" //0
+count if cod1d!="99" //0
+count if cod2a!="99" //0
+count if cod2b!="99" //0
+//ssc install unique
+//ssc install distinct
+** Create variable with combined CODs
+gen coddeath=cod1a+" "+cod1b+" "+cod1c+" "+cod1d+" "+cod2a+" "+cod2b
+replace coddeath=subinstr(coddeath,"99 ","",.) //2482
+replace coddeath=subinstr(coddeath," 99","",.) //2482
+
+** Identify cancer deaths using variable called 'cancer'
+replace cancer=1 if regexm(coddeath, "CANCER") & cancer==. //297 changes
+replace cancer=1 if regexm(coddeath, "TUMOUR") &  cancer==. //15 changes
+replace cancer=1 if regexm(coddeath, "TUMOR") &  cancer==. //11 changes
+replace cancer=1 if regexm(coddeath, "MALIGNANT") &  cancer==. //8 changes
+replace cancer=1 if regexm(coddeath, "MALIGNANCY") &  cancer==. //20 changes
+replace cancer=1 if regexm(coddeath, "NEOPLASM") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CARCINOMA") &  cancer==. //200 changes
+replace cancer=1 if regexm(coddeath, "CARCIMONA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CARINOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MYELOMA") &  cancer==. //23 changes
+replace cancer=1 if regexm(coddeath, "LYMPHOMA") &  cancer==. //17 changes
+replace cancer=1 if regexm(coddeath, "LYMPHOMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "LYMPHONA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "SARCOMA") &  cancer==. //5 changes
+replace cancer=1 if regexm(coddeath, "TERATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "LEUKEMIA") &  cancer==. //5 changes
+replace cancer=1 if regexm(coddeath, "LEUKAEMIA") &  cancer==. //2 changes
+//replace cancer=1 if regexm(coddeath, "LUKAEMIA") &  cancer==. //discovered when checking lists below
+//replace cancer=1 if regexm(coddeath, "LUKEMIA") &  cancer==. //discovered when checking lists below
+//replace cancer=1 if regexm(coddeath, "ANAPLASTIC") &  cancer==. //discovered when checking lists below
+//replace cancer=1 if regexm(coddeath, "CARCINOMIA") &  cancer==. //discovered when checking lists below
+//replace cancer=1 if regexm(coddeath, "LYNPHOMA") &  cancer==. //discovered when checking lists below
+//replace cancer=1 if regexm(coddeath, "MELOMA") &  cancer==. //discovered when checking lists below
+//replace cancer=1 if regexm(coddeath, "GLIOBIASTOMA") &  cancer==. //discovered when checking lists below
+//replace cancer=1 if regexm(coddeath, "SEZARY") &  cancer==. //discovered when checking lists below - include in future
+//replace cancer=1 if regexm(coddeath, "MESOTHELIOMA") &  cancer==. //discovered when checking lists below - include in future
+//replace cancer=1 if regexm(coddeath, "MYELODYP") &  cancer==. //discovered when checking lists below
+replace cancer=1 if regexm(coddeath, "HEPATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CARANOMA PROSTATE") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MENINGIOMA") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath, "MYELOSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MYELOFIBROSIS") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath, "CYTHEMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CYTOSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "BLASTOMA") &  cancer==. //3 changes
+replace cancer=1 if regexm(coddeath, "METASTATIC") &  cancer==. //4 changes
+replace cancer=1 if regexm(coddeath, "MASS") &  cancer==. //13 changes
+replace cancer=1 if regexm(coddeath, "METASTASES") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "METASTASIS") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath, "REFRACTORY") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "FUNGOIDES") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "HODGKIN") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MELANOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath,"MYELODYS") &  cancer==. //0 changes
+
+** Strip possible leading/trailing blanks in cod1a
+replace coddeath = rtrim(ltrim(itrim(coddeath))) //0 changes
+replace cod1a = rtrim(ltrim(itrim(cod1a))) //0 changes
+replace cod1b = rtrim(ltrim(itrim(cod1b))) //0 changes
+replace cod1c = rtrim(ltrim(itrim(cod1c))) //0 changes
+replace cod1d = rtrim(ltrim(itrim(cod1d))) //0 changes
+replace cod2a = rtrim(ltrim(itrim(cod2a))) //0 changes
+replace cod2b = rtrim(ltrim(itrim(cod2b))) //0 changes
+
+tab cancer, missing
+
+drop dodyear
+gen dodyear=year(dod)
+tab dodyear cancer,m
+
+** Check that all cancer CODs and for MULTIPLE PRIMARY CODs for 2015 are eligible (use Stata browse)
+sort coddeath record_id
+order record_id coddeath
+count if cancer==1 & inrange(record_id, 0, 18000)
+//list coddeath if cancer==1 & inrange(record_id, 0, 17500)
+** 312
+count if cancer==1 & inrange(record_id, 18001, 20000)
+//list coddeath if cancer==1 & inrange(record_id, 17501, 20000)
+** 317
+//list coddeath if cancer==1
+
+** Replace 2015 cases that are not cancer according to eligibility SOP:
+/*
+	(1) After merge with CR5 data then may need to reassign some of below 
+		deaths as CR5 data may indicate eligibility while COD may exclude
+		(e.g. see record_id==15458)
+	(2) use obsid to check for CODs that incomplete in Results window with 
+		Data Editor in browse mode-copy and paste record_id below from here
+*/
+replace cancer=2 if ///
+record_id==18388|record_id==19237|record_id==19173|record_id==18879|record_id==17681| ///
+record_id==18647|record_id==19200|record_id==17037|record_id==18847|record_id==18994| ///
+record_id==17655|record_id==17529|record_id==17126|record_id==16945|record_id==17014| ///
+record_id==17348|record_id==16853|record_id==17156|record_id==16967|record_id==19083| ///
+record_id==19017|record_id==17963|record_id==18814|record_id==18316|record_id==18178| ///
+record_id==18355
+//26 changes
+
+** Check that all 2015 CODs that are not cancer for eligibility and for MULTIPLE PRIMARY CODs (use Stata browse)
+sort coddeath record_id
+order record_id coddeath
+count if cancer==. & inrange(record_id, 0, 18000)
+//list coddeath if cancer!=1 & inrange(record_id, 0, 17500)
+** 896
+count if cancer==. & inrange(record_id, 18001, 20000)
+//list coddeath if cancer!=1 & inrange(record_id, 17501, 20000)
+** 983
+//list coddeath if cancer!=1
+
+** Updates needed from above list - cancers found
+replace cancer=1 if ///
+record_id==17914|record_id==18073|record_id==18364|record_id==18818|record_id==18075| ///
+record_id==17895|record_id==18909|record_id==18399|record_id==17975|record_id==18198| ///
+record_id==17571|record_id==17815|record_id==18059
+//13 changes
+
+replace cancer=2 if cancer==. //1840 changes
+
+** Create cod variable 
+gen cod=.
+label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known" 4 "NA", modify
+label values cod cod_lab
+label var cod "COD categories"
+replace cod=1 if cancer==1 //616 changes
+replace cod=2 if cancer==2 //1840 changes
+** one unknown causes of death in 2014 data - record_id 12323
+replace cod=3 if coddeath=="99"|(regexm(coddeath,"INDETERMINATE")|regexm(coddeath,"UNDETERMINED")) //14 changes
+tab cod ,m
+
+** Change sex to match cancer dataset
+tab sex ,m
+rename sex sex_old
+gen sex=1 if sex_old==2 //2467 changes
+replace sex=2 if sex_old==1 //2587 changes
+drop sex_old
+label define sex_lab 1 "Female" 2 "Male", modify
+label values sex sex_lab
+label var sex "Sex"
+tab sex ,m
+
+********************
+**   Formatting   **
+** Place of Death **
+********************
+rename pod placeofdeath
+gen pod=.
+
+label define pod_lab 1 "QEH" 2 "At Home" 3 "Geriatric Hospital" ///
+					 4 "Con/Nursing Home" 5 "Other" 6 "District Hospital" ///
+					 7 "Psychiatric Hospital" 8 "Bayview Hospital" ///
+					 9 "Sandy Crest" 10 "Bridgetown Port" ///
+					 11 "Other/Hotel" 99 "ND", modify
+label values pod pod_lab
+label var pod "Place of Death from National Register"
+
+replace pod=1 if regexm(placeofdeath, "ELIZABETH HOSP") & pod==. //0 changes
+replace pod=1 if regexm(placeofdeath, "QUEEN ELZ") & pod==. //0 changes
+replace pod=1 if regexm(placeofdeath, "QEH") & pod==. //1260 changes
+replace pod=3 if regexm(placeofdeath, "GERIATRIC") & pod==. //69 changes
+replace pod=5 if regexm(placeofdeath, "CHILDRENS HOME") & pod==. //0 chagnes
+replace pod=4 if regexm(placeofdeath, "HOME") & pod==. //81 changes
+replace pod=4 if regexm(placeofdeath, "ELDERLY") & pod==. //3 changes
+replace pod=4 if regexm(placeofdeath, "SERENITY MANOR") & pod==. //0 changes
+replace pod=4 if regexm(placeofdeath, "ADULT CARE") & pod==. //0 changes
+replace pod=4 if regexm(placeofdeath, "AGE ASSIST") & pod==. //0 changes
+replace pod=4 if regexm(placeofdeath, "SENIOR") & pod==. //3 changes
+replace pod=4 if regexm(placeofdeath, "RETREAT") & pod==. //8 changes
+replace pod=4 if regexm(placeofdeath, "RETIREMENT") & pod==. //0 changes
+replace pod=4 if regexm(placeofdeath, "NURSING") & pod==. //4 changes
+replace pod=5 if regexm(placeofdeath, "PRISON") & pod==. //0 changes
+replace pod=5 if regexm(placeofdeath, "POLYCLINIC") & pod==. //2 changes
+replace pod=5 if regexm(placeofdeath, "MINISTRIES") & pod==. //0 changes
+replace pod=6 if regexm(placeofdeath, "STRICT HOSP") & pod==. //17 changes
+replace pod=6 if regexm(placeofdeath, "GORDON CUMM") & pod==. //2 changes
+replace pod=7 if regexm(placeofdeath, "PSYCHIATRIC HOSP") & pod==. //9 changes
+replace pod=7 if regexm(placeofdeath, "PSYCIATRIC HOSP") & pod==. //1 change
+replace pod=8 if regexm(placeofdeath, "BAYVIEW") & pod==. //27 changes
+replace pod=9 if regexm(placeofdeath, "SANDY CREST") & pod==. //3 changes
+replace pod=10 if regexm(placeofdeath, "BRIDGETOWN PORT") & pod==. //2 changes
+replace pod=11 if regexm(placeofdeath, "HOTEL") & pod==. //6 changes
+replace pod=99 if placeofdeath=="" & pod==. //0 changes
+
+count if pod==. //985
+//list record_id placeofdeath if pod==.
+replace pod=2 if pod==. //985
+
+//drop placeofdeath
+tab pod ,m 
+
+** Check NRN
+//format nrn %10.0g
+gen double nrn2=nrn
+format nrn2 %15.0g
+rename nrn2 natregno
+tostring natregno ,replace
+//gen nrn4=mod(nrn,10000) - extracting digits from NRN(number)
+count if natregno!="" & natregno!="." & length(natregno)!=10 //11
+//list record_id fname lname dod age agetxt nrn natregno if natregno!="" & natregno!="." & length(natregno)!=10
+replace natregno=subinstr(natregno,"707","0707",.) if record_id==18843
+replace natregno=subinstr(natregno,"4","0004",.) if record_id==18621
+replace natregno=subinstr(natregno,"9","09",.) if record_id==18028
+replace natregno=subinstr(natregno,"30","030",.) if record_id==18001
+replace natregno=subinstr(natregno,"5","05",.) if record_id==19064
+replace natregno=subinstr(natregno,"8","08",.) if record_id==17360
+replace natregno=subinstr(natregno,"9","09",.) if record_id==17517
+replace natregno=subinstr(natregno,"90","090",.) if record_id==17587
+replace natregno=subinstr(natregno,"64","93",.) if record_id==17587
+replace natregno=subinstr(natregno,"9","09",.) if record_id==17960
+replace natregno=subinstr(natregno,"111","000111",.) if record_id==18870
+replace natregno=subinstr(natregno,"9","09",.) if record_id==18428
+count if natregno!="" & natregno!="." & length(natregno)!=10 //0
+//list record_id fname lname natregno age agetxt if age>100
+
+** Check dob** Creating dob variable as none in national death data
+** perform data cleaning on the age variable
+order record_id natregno age
+count if natregno==""|natregno=="." //117
+gen tempvarn=6 if natregno==""|natregno=="."
+gen yr = substr(natregno,1,1) if tempvarn!=6
+gen yr1=. if tempvarn!=6
+replace yr1 = 20 if yr=="0"
+replace yr1 = 19 if yr!="0"
+replace yr1 = 99 if natregno=="99"
+order record_id nrn age yr yr1
+** Check age and yr1 in Stata browse
+//list record_id nrn age yr1 if yr1==20
+** Initially need to run this code separately from entire dofile to determine which nrnyears should be '19' instead of '20' depending on age, e.g. for age 107 nrnyear=19
+replace yr1 = 19 if record_id==17360
+replace yr1 = 19 if record_id==17517
+replace yr1 = 19 if record_id==17587
+replace yr1 = 19 if record_id==17960
+gen nrndob = substr(natregno,1,6) 
+destring nrndob, replace
+format nrndob %06.0f
+nsplit nrndob, digits(2 2 2) gen(dyear month day)
+format dyear month day %02.0f
+tostring yr1, replace
+gen year2 = string(dyear,"%02.0f")
+gen nrnyr = substr(yr1,1,2) + substr(year2,1,2)
+destring nrnyr, replace
+sort nrndob
+gen nrn1=mdy(month, day, nrnyr)
+format nrn1 %dD_m_CY
+rename nrn1 dob
+gen age2 = (dod - dob)/365.25
+gen ageyrs=int(age2)
+sort record_id
+list record_id fname lname address age ageyrs nrn natregno dob dod if tempvarn!=6 & age!=ageyrs, string(20) //check against electoral list
+count if tempvarn!=6 & age!=ageyrs //0
+drop day month dyear nrnyr yr yr1 nrndob age2 ageyrs tempvarn
+
+** Check age
+gen age2 = (dod - dob)/365.25
+gen checkage2=int(age2)
+drop age2
+count if dob!=. & dod!=. & age!=checkage2 //0
+//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2 //0 correct
+replace age=checkage2 if dob!=. & dod!=. & age!=checkage2 //0 changes
+
+** Check no missing dxyr so this can be used in analysis
+tab dodyear ,m 
+
+count if dodyear!=year(dod) //0
+//list pid record_id dod dodyear if dodyear!=year(dod)
+replace dodyear=year(dod) if dodyear!=year(dod) //0 changes
+
+*******************
+** Check for MPs **
+**   in CODs     **
+*******************
+count //2482
+
+//list record_id
+//list cod1a
+tab cancer ,m //616 cancer CODs
+** MPs found above when assigning cancer variable in checking causes of death
+** Create duplicate observations for MPs in CODs
+expand=2 if record_id==18753, gen (dupobs1)
+expand=2 if record_id==17916, gen (dupobs2)
+expand=2 if record_id==18568, gen (dupobs3)
+//(GIST not stated as malignant so ineligible?? - yes, see CR5db pid 20130343)
+expand=2 if record_id==18693, gen (dupobs4)
+expand=2 if record_id==18669, gen (dupobs5)
+expand=2 if record_id==19201, gen (dupobs6)
+expand=2 if record_id==16897, gen (dupobs7)
+expand=2 if record_id==17461, gen (dupobs8)
+expand=2 if record_id==16817, gen (dupobs9)
+expand=2 if record_id==16979, gen (dupobs10)
+expand=2 if record_id==16883, gen (dupobs11)
+expand=2 if record_id==18027, gen (dupobs12)
+expand=2 if record_id==18845, gen (dupobs13)
+expand=2 if record_id==19189, gen (dupobs14)
+expand=2 if record_id==18198, gen (dupobs15) 
+//M9811(9) vs M9837(10) and M9875(8)
+//pid 20130770 CML in 2013 that transformed to either T-ALL or B-ALL in 2015 COD states C-CELL!
+//M9811 (B-ALL) chosen as research shows "With few exceptions, Ph-positive ALL patients are diagnosed with B-ALL "
+//https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4896164/
+display `"{browse "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4896164/":Ph+ALL}"'
+
+count //2497
+
+** Create variables to identify patients vs tumours
+gen ptrectot=.
+replace ptrectot=1 if dupobs1==0|dupobs2==0|dupobs3==0|dupobs4==0 ///
+					 |dupobs5==0|dupobs6==0|dupobs7==0|dupobs8==0 ///
+					 |dupobs9==0|dupobs10==0|dupobs11==0|dupobs12==0 ///
+					 |dupobs13==0|dupobs14==0|dupobs15==0 //2497 changes
+replace ptrectot=2 if dupobs1>0|dupobs2>0|dupobs3>0|dupobs4>0 ///
+					 |dupobs5>0|dupobs6>0|dupobs7>0|dupobs8>0 ///
+					 |dupobs9>0|dupobs10>0|dupobs11>0|dupobs12>0 ///
+					 |dupobs13>0|dupobs14>0|dupobs15>0 //15 changes
+label define ptrectot_lab 1 "COD with single event" 2 "COD with multiple events" , modify
+label values ptrectot ptrectot_lab
+
+tab ptrectot ,m
+
+** Now create id in this dataset so when merging icd10 for siteiarc variable at end of this dofile
+gen did="T1" if ptrectot==1
+replace did="T2" if ptrectot==2 //15 changes
+
+***********************************
+** 1.4 Number of cases by age-group
+***********************************
+** Age labelling
+gen age5 = recode(age,4,9,14,19,24,29,34,39,44,49,54,59,64,69,74,79,84,200)
+recode age5 4=1 9=2 14=3 19=4 24=5 29=6 34=7 39=8 44=9 49=10 54=11 59=12 64=13 /// 
+			69=14 74=15 79=16 84=17 200=18
+label define age5_lab 	1 "0-4"	   2 "5-9"    3 "10-14"		///
+						4 "15-19"  5 "20-24"  6 "25-29"		///
+						7 "30-34"  8 "35-39"  9 "40-44"		///
+						10 "45-49" 11 "50-54" 12 "55-59"	///
+						13 "60-64" 14 "65-69" 15 "70-74"	///
+						16 "75-79" 17 "80-84" 18 "85 & over", modify
+label values age5 age5_lab
+
+gen age_10 = recode(age5,3,5,7,9,11,13,15,17,200)
+recode age_10 3=1 5=2 7=3 9=4 11=5 13=6 15=7 17=8 200=9
+label define age_10_lab 	1 "0-14"   2 "15-24"  3 "25-34"	///
+							4 "35-44"  5 "45-54"  6 "55-64"	///
+							7 "65-74"  8 "75-84"  9 "85 & over" , modify
+label values age_10 age_10_lab
+sort sex age_10
+
+tab age_10 sex ,m
+** None missing age or sex
+
+************************
+** Creating IARC Site **
+************************
+count //2497
+tab cancer ,m 
+drop if cancer!=1 //1866 deleted
+
+** Note: Although siteiarc doesn't need sub-site, the specific icd10 code was used, where applicable
+display `"{browse "https://icd.who.int/browse10/2015/en#/C09":ICD10,v2015}"'
+
+** Use Stata browse instead of lists
+order record_id coddeath
+
+gen icd10=""
+count if regexm(coddeath,"LIP") & icd10=="" //2 - not lip so no replace
+//list record_id coddeath if regexm(coddeath,"LIP"),string(120)
+
+count if regexm(coddeath,"TONGUE") & icd10=="" //5 - all tongue, NOS
+//list record_id coddeath if regexm(coddeath,"TONGUE"),string(120)
+replace icd10="C029" if regexm(coddeath,"TONGUE") & icd10=="" //5 changes
+
+count if regexm(coddeath,"MOUTH") & icd10=="" //0
+//list record_id coddeath if regexm(coddeath,"MOUTH"),string(120)
+
+count if regexm(coddeath,"SALIVARY") & icd10=="" //0
+//list record_id coddeath if regexm(coddeath,"SALIVARY"),string(120)
+
+count if regexm(coddeath,"TONSIL") & icd10=="" //1
+//list record_id coddeath if regexm(coddeath,"TONSIL"),string(120)
+replace icd10="C099" if regexm(coddeath,"TONSIL") & icd10=="" //1 change
+
+count if regexm(coddeath,"OROPHARYNX") & icd10=="" //0
+//list record_id coddeath if regexm(coddeath,"OROPHARYNX"),string(120)
+
+count if regexm(coddeath,"NASOPHARYNX") & icd10=="" //0
+//list record_id coddeath if regexm(coddeath,"NASOPHARYNX"),string(120)
+
+count if regexm(coddeath,"HYPOPHARYNX") & icd10=="" //0
+//list record_id coddeath if regexm(coddeath,"HYPOPHARYNX"),string(120)
+
+count if (regexm(coddeath,"PHARYNX")|regexm(coddeath,"PHARNYX")) & icd10=="" //2
+//list record_id coddeath if (regexm(coddeath,"PHARYNX")|regexm(coddeath,"PHARNYX")) & icd10=="",string(120)
+replace icd10="C140" if record_id==17926
+replace icd10="C148" if record_id==18057
+
+count if (regexm(coddeath,"OESOPHAG")|regexm(coddeath,"ESOPHAG")) & icd10=="" //10
+replace icd10="C159" if (regexm(coddeath,"OESOPHAG")|regexm(coddeath,"ESOPHAG")) & icd10=="" //10 changes
+replace icd10="C159" if record_id==17149
+
+count if (regexm(coddeath,"STOMACH")|regexm(coddeath,"GASTR"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL BLEED*"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL HAEMORR*"))  & !(strmatch(strupper(coddeath), "*GASTROENTER*")) & icd10=="" //37
+replace icd10="C169" if (regexm(coddeath,"STOMACH")|regexm(coddeath,"GASTR"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL BLEED*"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL HAEMORR*"))  & !(strmatch(strupper(coddeath), "*GASTROENTER*")) & icd10=="" //33 changes
+replace icd10="C859" if record_id==17446 //gastric lymphoma
+replace icd10="C269" if record_id==17585|record_id==17966|record_id==19107 //gastronintestinal malignancy
+
+count if (regexm(coddeath,"DUODEN")|regexm(coddeath,"JEJUN")|regexm(coddeath,"ILEUM")|regexm(coddeath,"SMALL")) & !(strmatch(strupper(coddeath), "*SMALL CEL*")) & !(strmatch(strupper(coddeath), "*LARYNGEAL*")) & icd10=="" //3
+replace coddeath=subinstr(coddeath," H"," L",.) if record_id==17901 //see CR5db pid 20155189
+replace cod1a=subinstr(cod1a," H"," L",.) if record_id==17901
+replace icd10="C179" if (regexm(coddeath,"DUODEN")|regexm(coddeath,"JEJUN")|regexm(coddeath,"ILEUM")|regexm(coddeath,"SMALL")) & !(strmatch(strupper(coddeath), "*SMALL CEL*")) & !(strmatch(strupper(coddeath), "*LARYNGEAL*")) & icd10=="" //2 changes
+replace icd10="C170" if record_id==19066 //1 change
+replace icd10="C172" if record_id==17310 //1 change
+
+count if (regexm(coddeath,"CECUM")|regexm(coddeath,"APPEND")|regexm(coddeath,"COLON")) & !(strmatch(strupper(coddeath), "*COLONIC POLYPS*")) & icd10=="" //78
+replace icd10="C189" if (regexm(coddeath,"CECUM")|regexm(coddeath,"APPEND")|regexm(coddeath,"COLON")) & !(strmatch(strupper(coddeath), "*COLONIC POLYPS*")) & icd10=="" //78 changes
+replace icd10="C187" if record_id==16864 //1 change
+replace icd10="C186" if record_id==18753 //1 change
+
+count if (regexm(coddeath,"COLORECTAL")|regexm(coddeath,"RECTO")) & icd10=="" //8
+replace icd10="C19" if (regexm(coddeath,"COLORECT")|regexm(coddeath,"RECTO")) & icd10=="" //8 changes
+
+count if (regexm(coddeath,"RECTUM")|regexm(coddeath,"RECTAL")) & !(strmatch(strupper(coddeath), "*ANORECT*")) & icd10=="" //16
+replace icd10="C20" if (regexm(coddeath,"RECTUM")|regexm(coddeath,"RECTAL")) & !(strmatch(strupper(coddeath), "*ANORECT*")) & icd10=="" //16 changes
+
+count if (regexm(coddeath,"ANUS")|regexm(coddeath,"ANORECT")|regexm(coddeath,"ANAL")) & icd10=="" //2
+replace icd10="C218" if (regexm(coddeath,"ANUS")|regexm(coddeath,"ANORECT")|regexm(coddeath,"ANAL")) & icd10=="" //2 changes
+
+count if (regexm(coddeath,"LIVER")|regexm(coddeath,"BILE")|regexm(coddeath,"HEPATO")) & !(strmatch(strupper(coddeath), "*CHOLANGIOCAR*")) & icd10=="" //15
+replace icd10="C800" if record_id==19076|record_id==18222|record_id==17843
+replace icd10="C220" if record_id==17665|record_id==18381
+replace icd10="C229" if record_id==17761|record_id==18531|record_id==17069
+replace icd10="C249" if record_id==17868
+
+count if regexm(coddeath,"CHOLANGIO") & icd10=="" //3
+replace icd10="C221" if regexm(coddeath,"CHOLANGIO") & icd10=="" //3 changes
+
+count if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //4
+replace icd10="C23" if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //4 changes
+
+count if regexm(coddeath,"BILIARY") & icd10=="" //0
+
+count if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //3
+replace icd10="C250" if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //3 changes
+count if regexm(coddeath,"PANCREA") & icd10=="" //27
+replace icd10="C259" if regexm(coddeath,"PANCREA") & icd10=="" //27 changes
+
+count if (regexm(coddeath,"NASAL")|regexm(coddeath,"EAR")) & icd10=="" //14-none nasal/ear so no replace
+
+count if regexm(coddeath,"SINUS") & icd10=="" //1-not sinus so no replace
+
+count if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //3
+replace icd10="C329" if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //3 changes
+replace icd10="C320" if record_id==18064
+
+count if regexm(coddeath,"TRACHEA") & icd10=="" //0
+
+count if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //39
+replace icd10="C349" if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //39 changes
+replace icd10="C809" if record_id==19100
+replace icd10="C719" if record_id==18722
+replace icd10="C509" if record_id==18424|record_id==18106|record_id==19042
+replace icd10="C541" if record_id==18974
+replace icd10="C64" if record_id==19225
+replace icd10="C900" if record_id==18702
+replace icd10="C419" if record_id==18689
+replace icd10="C61" if record_id==19256|record_id==18195|record_id==18863
+
+count if regexm(coddeath,"THYMUS") & icd10=="" //0
+
+count if (regexm(coddeath,"HEART")|regexm(coddeath,"MEDIASTIN")|regexm(coddeath,"PLEURA")) & icd10=="" //15-none found so no replace
+replace icd10="C809" if record_id==16956 //C782 code for malignant pleural effusion, NOS (met code) ?eligibility so change to PSU
+
+count if (regexm(coddeath,"BONE")|regexm(coddeath,"OSTEO")|regexm(coddeath,"CARTILAGE")) & icd10=="" //9-none found so no replace
+replace icd10="C439" if record_id==18148
+
+count if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //11
+replace icd10="C439" if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //11 changes
+replace icd10="C445" if record_id==17780|record_id==18228
+replace icd10="C447" if record_id==17989
+replace icd10="C52" if record_id==16979 & ptrectot==1
+replace icd10="C800" if record_id==16979 & ptrectot==2
+replace icd10="C809" if record_id==17070|record_id==17684
+replace icd10="C439" if record_id==16835|record_id==17350 //0 changes
+replace icd10="C140" if record_id==17926
+
+count if (regexm(coddeath,"MESOTHELIOMA")|regexm(coddeath,"KAPOSI")|regexm(coddeath,"NERVE")|regexm(coddeath,"PERITON")) & icd10=="" //2
+replace icd10="C459" if record_id==17975
+replace icd10="C482" if record_id==17671
+
+count if regexm(coddeath,"BREAST") & icd10=="" //60
+//list record_id coddeath if regexm(coddeath,"BREAST"),string(120)
+replace icd10="C509" if regexm(coddeath,"BREAST") & icd10=="" //60 changes
+
+count if regexm(coddeath,"VULVA") & icd10=="" //2
+replace icd10="C519" if regexm(coddeath,"VULVA") & icd10=="" //2 changes
+
+count if regexm(coddeath,"VAGINA") & icd10=="" //2
+replace icd10="C52" if regexm(coddeath,"VAGINA") & icd10=="" //2 changes
+replace icd10="C541" if record_id==18350
+
+count if (regexm(coddeath,"CERVICAL")|regexm(coddeath,"CERVIX")) & icd10=="" //16
+replace icd10="C539" if (regexm(coddeath,"CERVICAL")|regexm(coddeath,"CERVIX")) & icd10=="" //16 changes
+
+count if (regexm(coddeath,"ENDOMETRI")|regexm(coddeath,"CORPUS")) & icd10=="" //20
+replace icd10="C541" if (regexm(coddeath,"ENDOMETRI")|regexm(coddeath,"CORPUS")) & icd10=="" //20 changes
+
+count if (regexm(coddeath,"UTERINE")|regexm(coddeath,"UTERUS")) & icd10=="" //9
+replace icd10="C55" if (regexm(coddeath,"UTERINE")|regexm(coddeath,"UTERUS")) & icd10=="" //9 changes
+
+count if (regexm(coddeath,"OVARY")|regexm(coddeath,"OVARIAN")) & icd10=="" //13
+replace icd10="C56" if (regexm(coddeath,"OVARY")|regexm(coddeath,"OVARIAN")) & icd10=="" //13 changes
+
+count if (regexm(coddeath,"FALLOPIAN")|regexm(coddeath,"FEMALE")) & icd10=="" //0
+
+count if (regexm(coddeath,"PENIS")|regexm(coddeath,"PENILE")) & icd10=="" //0
+
+count if regexm(coddeath,"PROSTATE") & icd10=="" //94
+replace icd10="C61" if regexm(coddeath,"PROSTATE") & icd10=="" //94 changes
+
+count if (regexm(coddeath,"TESTIS")|regexm(coddeath,"TESTES")) & icd10=="" //0
+
+count if (regexm(coddeath,"SCROT")|regexm(coddeath,"MALE")) & icd10=="" //0
+
+count if (regexm(coddeath,"KIDNEY")|regexm(coddeath,"RENAL")) & icd10=="" //16
+replace icd10="C64" if (regexm(coddeath,"KIDNEY")|regexm(coddeath,"RENAL")) & icd10=="" //16 changes
+replace icd10="C900" if record_id==17216|record_id==19290|record_id==18303 //3 changes
+replace icd10="C809" if record_id==19056
+replace icd10="C679" if record_id==16804
+replace icd10="C859" if record_id==18217|record_id==18293 //2 changes
+replace icd10="C61" if record_id==17714
+
+count if (regexm(coddeath,"BLADDER")|regexm(coddeath,"URIN")) & icd10=="" //12
+replace icd10="C679" if (regexm(coddeath,"BLADDER")|regexm(coddeath,"URIN")) & icd10=="" //12 changes
+replace icd10="D469" if record_id==18059
+replace icd10="C819" if record_id==18639
+
+count if (regexm(coddeath,"EYE")|regexm(coddeath,"RETINA")|regexm(coddeath,"NEURO")) & icd10=="" //5
+replace icd10="C699" if (regexm(coddeath,"EYE")|regexm(coddeath,"RETINA")|regexm(coddeath,"NEURO")) & icd10=="" //5 changes
+replace icd10="C809" if record_id==19088|record_id==17793|record_id==17145 //3 changes
+replace icd10="C800" if record_id==19112
+
+count if (regexm(coddeath,"ASTROCY")|regexm(coddeath,"MULTIFORME")|regexm(coddeath,"BRAIN")) & icd10=="" //8
+replace icd10="C719" if (regexm(coddeath,"ASTROCY")|regexm(coddeath,"MULTIFORME")|regexm(coddeath,"BRAIN")) & icd10=="" //8 changes
+
+count if (regexm(coddeath,"THYROID")|regexm(coddeath,"ADRENAL")|regexm(coddeath,"ENDOCRI")) & icd10=="" //6
+replace icd10="C73" if (regexm(coddeath,"THYROID")|regexm(coddeath,"ADRENAL")|regexm(coddeath,"ENDOCRI")) & icd10=="" //6 changes
+replace icd10="C900" if record_id==19062
+
+count if (regexm(coddeath,"UNKNOWN")|regexm(coddeath,"CULT")) & icd10=="" //9
+replace icd10="C800" if (regexm(coddeath,"UNKNOWN")|regexm(coddeath,"CULT")) & icd10=="" //9 changes
+
+count if (regexm(coddeath,"HODGKIN") & regexm(coddeath,"NON")) & icd10=="" //8
+replace icd10="C859" if (regexm(coddeath,"HODGKIN") & regexm(coddeath,"NON")) & icd10=="" //8 changes
+replace icd10="C910" if record_id==17476
+
+count if regexm(coddeath,"HODGKIN") & icd10=="" //3
+replace icd10="C819" if regexm(coddeath,"HODGKIN") & icd10=="" //3 changes
+
+count if (regexm(coddeath,"FOLLICUL") & regexm(coddeath,"LYMPH")) & icd10=="" //0
+
+count if (regexm(coddeath,"MULTIPLE") & regexm(coddeath,"OMA")) & icd10=="" //19
+replace icd10="C900" if (regexm(coddeath,"MULTIPLE") & regexm(coddeath,"OMA")) & icd10=="" //19 changes
+
+count if regexm(coddeath,"PLASMACYTOMA") & icd10=="" //1
+replace icd10="C903" if regexm(coddeath,"PLASMACYTOMA") & icd10=="" //1 change
+
+count if regexm(coddeath,"SEZARY") & icd10=="" //1
+replace icd10="C841" if regexm(coddeath,"SEZARY") & icd10=="" //1 change
+
+count if (regexm(coddeath,"LYMPH")|regexm(coddeath,"EMIA")|regexm(coddeath,"PHOMA")) & icd10=="" //22
+replace icd10="C910" if record_id==18428|record_id==18198
+replace icd10="C959" if record_id==18407|record_id==17699|record_id==17282
+replace icd10="C915" if record_id==17815
+replace icd10="C579" if record_id==18954
+replace icd10="C800" if record_id==18989
+replace icd10="C911" if record_id==17914
+replace icd10="D469" if record_id==18970|record_id==17000
+replace icd10="C848" if record_id==17845
+replace icd10="C866" if record_id==16907
+replace icd10="C920" if record_id==18182|record_id==16859
+replace icd10="C833" if record_id==18519
+replace icd10="C865" if record_id==18552
+replace icd10="C859" if record_id==17998|record_id==18075
+replace icd10="C809" if record_id==19281
+replace icd10="C921" if record_id==18787
+replace icd10="C924" if record_id==17571
+
+count if icd10=="" //40
+replace icd10="C159" if record_id==18215
+replace icd10="C541" if record_id==17762
+replace icd10="D474" if record_id==18903
+replace icd10="C349" if record_id==17385
+replace icd10="C180" if record_id==18451
+replace icd10="C189" if record_id==16808
+replace icd10="C321" if record_id==18058
+replace icd10="C900" if record_id==18893|record_id==17713
+replace icd10="C109" if record_id==18672
+replace icd10="C23" if record_id==17656
+replace icd10="C380" if record_id==19188
+replace icd10="C490" if record_id==18849
+replace icd10="C61" if record_id==17718
+replace icd10="D469" if record_id==18498
+replace icd10="C444" if record_id==18302
+replace icd10="C221" if record_id==18585
+replace icd10="C969" if record_id==17635
+replace icd10="C809" if icd10=="" //22 changes
+
+tab icd10 ,m
+
+** Check icd10 for MP CODs
+duplicates tag record_id, gen(dup_id)
+sort record_id
+//list record_id icd10 coddeath ptrectot if dup_id>0, nolabel sepby(record_id) string(120)
+replace icd10="C800" if record_id==16817 & ptrectot==2 //1 change
+replace icd10="C56" if record_id==16883 & ptrectot==1 //1 change
+replace icd10="C61" if record_id==16897 & ptrectot==2 //1 change
+replace icd10="C900" if record_id==17461 & ptrectot==1 //1 change
+replace icd10="C61" if record_id==17916 & ptrectot==1 //1 change
+replace icd10="C509" if record_id==18027 & ptrectot==2 //1 change
+replace icd10="C921" if record_id==18198 & ptrectot==2 //1 change
+replace icd10="C509" if record_id==18568 & ptrectot==2 //1 change
+replace icd10="C64" if record_id==18669 & ptrectot==2 //1 change
+replace icd10="C61" if record_id==18693 & ptrectot==1 //1 change
+replace icd10="C61" if record_id==18753 & ptrectot==2 //1 change
+replace icd10="C412" if record_id==18845 & ptrectot==2 //1 change
+replace icd10="C61" if record_id==19189 & ptrectot==1 //1 change
+replace icd10="C541" if record_id==19201 & ptrectot==2 //1 change
+
+tab icd10 ,m
+
+** Create new site variable with CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
+display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
+
+gen siteiarc=.
+label define siteiarc_lab ///
+1 "Lip (C00)" 2 "Tongue (C01-02)" 3 "Mouth (C03-06)" ///
+4 "Salivary gland (C07-08)" 5 "Tonsil (C09)" 6 "Other oropharynx (C10)" ///
+7 "Nasopharynx (C11)" 8 "Hypopharynx (C12-13)" 9 "Pharynx unspecified (C14)" ///
+10 "Oesophagus (C15)" 11 "Stomach (C16)" 12 "Small intestine (C17)" ///
+13 "Colon (C18)" 14 "Rectum (C19-20)" 15 "Anus (C21)" ///
+16 "Liver (C22)" 17 "Gallbladder etc. (C23-24)" 18 "Pancreas (C25)" ///
+19 "Nose, sinuses etc. (C30-31)" 20 "Larynx (C32)" ///
+21 "Lung (incl. trachea and bronchus) (C33-34)" 22 "Other thoracic organs (C37-38)" ///
+23 "Bone (C40-41)" 24 "Melanoma of skin (C43)" 25 "Other skin (C44)" ///
+26 "Mesothelioma (C45)" 27 "Kaposi sarcoma (C46)" 28 "Connective and soft tissue (C47+C49)" ///
+29 "Breast (C50)" 30 "Vulva (C51)" 31 "Vagina (C52)" 32 "Cervix uteri (C53)" ///
+33 "Corpus uteri (C54)" 34 "Uterus unspecified (C55)" 35 "Ovary (C56)" ///
+36 "Other female genital organs (C57)" 37 "Placenta (C58)" ///
+38 "Penis (C60)" 39 "Prostate (C61)" 40 "Testis (C62)" 41 "Other male genital organs (C63)" ///
+42 "Kidney (C64)" 43 "Renal pelvis (C65)" 44 "Ureter (C66)" 45 "Bladder (C67)" ///
+46 "Other urinary organs (C68)" 47 "Eye (C69)" 48 "Brain, nervous system (C70-72)" ///
+49 "Thyroid (C73)" 50 "Adrenal gland (C74)" 51 "Other endocrine (C75)" ///
+52 "Hodgkin lymphoma (C81)" 53 "Non-Hodgkin lymphoma (C82-86,C96)" ///
+54 "Immunoproliferative diseases (C88)" 55 "Multiple myeloma (C90)" ///
+56 "Lymphoid leukaemia (C91)" 57 "Myeloid leukaemia (C92-94)" 58 "Leukaemia unspecified (C95)" ///
+59 "Myeloproliferative disorders (MPD)" 60 "Myselodysplastic syndromes (MDS)" ///
+61 "Other and unspecified (O&U)" ///
+62 "All sites(ALL)" 63 "All sites but skin (ALLbC44)" ///
+64 "D069: CIN 3"
+label var siteiarc "IARC CI5-XI sites"
+label values siteiarc siteiarc_lab
+
+replace siteiarc=1 if regexm(icd10,"C00") //0 changes
+replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //5 changes
+replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //0 changes
+replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //0 changes
+replace siteiarc=5 if regexm(icd10,"C09") //1 change
+replace siteiarc=6 if regexm(icd10,"C10") //1 change
+replace siteiarc=7 if regexm(icd10,"C11") //0 changes
+replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //0 changes
+replace siteiarc=9 if regexm(icd10,"C14") //2 changes
+replace siteiarc=10 if regexm(icd10,"C15") //12 changes
+replace siteiarc=11 if regexm(icd10,"C16") //31 changes
+replace siteiarc=12 if regexm(icd10,"C17") //4 changes
+replace siteiarc=13 if regexm(icd10,"C18") //75 changes
+replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //23 changes
+replace siteiarc=15 if regexm(icd10,"C21") //2 changes
+replace siteiarc=16 if regexm(icd10,"C22") //9 changes
+replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //6 changes
+replace siteiarc=18 if regexm(icd10,"C25") //29 changes
+replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //0 changes
+replace siteiarc=20 if regexm(icd10,"C32") //1 change
+replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //28 changes
+replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //1 change
+replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
+replace siteiarc=24 if regexm(icd10,"C43") //3 changes
+replace siteiarc=25 if regexm(icd10,"C44") //4 changes
+replace siteiarc=26 if regexm(icd10,"C45") //1 change
+replace siteiarc=27 if regexm(icd10,"C46") //0 changes
+replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //1 change
+replace siteiarc=29 if regexm(icd10,"C50") //64 changes
+replace siteiarc=30 if regexm(icd10,"C51") //2 changes
+replace siteiarc=31 if regexm(icd10,"C52") //2 changes
+replace siteiarc=32 if regexm(icd10,"C53") //15 changes
+replace siteiarc=33 if regexm(icd10,"C54") //24 changes
+replace siteiarc=34 if regexm(icd10,"C55") //9 changes
+replace siteiarc=35 if regexm(icd10,"C56") //1 change
+replace siteiarc=36 if regexm(icd10,"C57") //1 change
+replace siteiarc=37 if regexm(icd10,"C58") //0 changes
+replace siteiarc=38 if regexm(icd10,"C60") //0 changes
+replace siteiarc=39 if regexm(icd10,"C61") //104 changes
+replace siteiarc=40 if regexm(icd10,"C62") //0 changes
+replace siteiarc=41 if regexm(icd10,"C63") //0 changes
+replace siteiarc=42 if regexm(icd10,"C64") //10 changes
+replace siteiarc=43 if regexm(icd10,"C65") //0 changes
+replace siteiarc=44 if regexm(icd10,"C66") //0 changes
+replace siteiarc=45 if regexm(icd10,"C67") //11 changes
+replace siteiarc=46 if regexm(icd10,"C68") //0 changes
+replace siteiarc=47 if regexm(icd10,"C69") //1 change
+replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //9 changes
+replace siteiarc=49 if regexm(icd10,"C73") //5 changes
+replace siteiarc=50 if regexm(icd10,"C74") //0 changes
+replace siteiarc=51 if regexm(icd10,"C75") //0 changes
+replace siteiarc=52 if regexm(icd10,"C81") //3 changes
+replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //17 changes
+replace siteiarc=54 if regexm(icd10,"C88") //0 changes
+replace siteiarc=55 if regexm(icd10,"C90") //27 changes
+replace siteiarc=56 if regexm(icd10,"C91") //5 changes
+replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //5 changes
+replace siteiarc=58 if regexm(icd10,"C95") //3 changes
+replace siteiarc=59 if regexm(icd10,"D47") //1 change
+replace siteiarc=60 if regexm(icd10,"D46") //4 changes
+replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //50 changes
+**replace siteiarc=62 if siteiarc<62
+**replace siteiarc=63 if siteiarc<62 & siteiarc!=25
+replace siteiarc=64 if regexm(icd10,"D06") //0 changes - no CIN 3 in death data
+
+tab siteiarc ,m //none missing
+
+gen allsites=1 if siteiarc<62 //651 changes
+label var allsites "All sites (ALL)"
+
+gen allsitesnoC44=1 if siteiarc<62 & siteiarc!=25 //4 missing so 4=C44 (NMSCs)
+label var allsitesnoC44 "All sites but skin (ALLbC44)"
+
+** Create site variable for lymphoid and haematopoietic diseases for conversion of these from ICD-O-3 1st edition (M9590-M9992)
+** (see chapter 3 Table 3.2 of CI5-XI)
+gen siteiarchaem=.
+label define siteiarchaem_lab ///
+1 "Malignant lymphomas,NOS or diffuse" ///
+2 "Hodgkin lymphoma" ///
+3 "Mature B-cell lymphomas" ///
+4 "Mature T- and NK-cell lymphomas" ///
+5 "Precursor cell lymphoblastic lymphoma" ///
+6 "Plasma cell tumours" ///
+7 "Mast cell tumours" ///
+8 "Neoplasms of histiocytes and accessory lymphoid cells" ///
+9 "Immunoproliferative diseases" ///
+10 "Leukemias, NOS" ///
+11 "Lymphoid leukemias" ///
+12 "Myeloid leukemias" ///
+13 "Other leukemias" ///
+14 "Chronic myeloproliferative disorders" ///
+15 "Other hematologic disorders" ///
+16 "Myelodysplastic syndromes"
+label var siteiarchaem "IARC CI5-XI lymphoid & haem diseases"
+label values siteiarchaem siteiarchaem_lab
+
+** Note that morphcat is based on ICD-O-3 edition 3.1. so e.g. morphcat54
+replace siteiarchaem=1 if icd10=="C85.9"|icd10=="C85.1"|icd10=="C82.6" //14 changes
+replace siteiarchaem=2 if icd10=="C819"|icd10=="C814"|icd10=="C813"|icd10=="C812"|icd10=="C811"|icd10=="C810" //2 changes
+replace siteiarchaem=3 if icd10=="C830"|icd10=="C831"|icd10=="C833"|icd10=="C837"|icd10=="C838"|icd10=="C859"|icd10=="C852"|icd10=="C829"|icd10=="C821"|icd10=="C820"|icd10=="C822"|icd10=="C420"|icd10=="C421"|icd10=="C424"|icd10=="C884"|regexm(icd10,"C77") //4 changes
+STOP - see table online
+replace siteiarchaem=4 if regexm(icd10,"C") //0 changes
+replace siteiarchaem=5 if regexm(icd10,"C") //1 change
+replace siteiarchaem=6 if regexm(icd10,"C") //22 changes
+replace siteiarchaem=7 if regexm(icd10,"C") //0 changes
+replace siteiarchaem=8 if regexm(icd10,"C") //0 changes
+replace siteiarchaem=9 if regexm(icd10,"C") //0 changes
+replace siteiarchaem=10 if regexm(icd10,"C") //3 changes
+replace siteiarchaem=11 if regexm(icd10,"C") //5 changes
+replace siteiarchaem=12 if regexm(icd10,"C") //4 changes
+replace siteiarchaem=13 if regexm(icd10,"C") //0 changes
+replace siteiarchaem=14 if regexm(icd10,"C") //1 change
+replace siteiarchaem=15 if regexm(icd10,"C") //1 change
+replace siteiarchaem=16 if regexm(icd10,"C") //1 change
+
+tab siteiarchaem ,m //593 missing - correct!
+count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //0
+
+** Create ICD-10 groups according to analysis tables in CR5 db (added after analysis dofiles 4,6)
+gen sitecr5db=.
+label define sitecr5db_lab ///
+1 "Mouth & pharynx (C00-14)" ///
+2 "Oesophagus (C15)" ///
+3 "Stomach (C16)" ///
+4 "Colon, rectum, anus (C18-21)" ///
+5 "Liver (C22)" ///
+6 "Pancreas (C25)" ///
+7 "Larynx (C32)" ///
+8 "Lung, trachea, bronchus (C33-34)" ///
+9 "Melanoma of skin (C43)" ///
+10 "Breast (C50)" ///
+11 "Cervix (C53)" ///
+12 "Corpus & Uterus NOS (C54-55)" ///
+13 "Ovary & adnexa (C56)" ///
+14 "Prostate (C61)" ///
+15 "Testis (C62)" ///
+16 "Kidney & urinary NOS (C64-66,68)" ///
+17 "Bladder (C67)" ///
+18 "Brain, nervous system (C70-72)" ///
+19 "Thyroid (C73)" ///
+20 "O&U (C26,39,48,76,80)" ///
+21 "Lymphoma (C81-85,88,90,96)" ///
+22 "Leukaemia (C91-95)" ///
+23 "Other digestive (C17,23-24)" ///
+24 "Nose, sinuses (C30-31)" ///
+25 "Bone, cartilage, etc (C40-41,45,47,49)" ///
+26 "Other skin (C44)" ///
+27 "Other female organs (C51-52,57-58)" ///
+28 "Other male organs (C60,63)" ///
+29 "Other endocrine (C74-75)" ///
+30 "Myeloproliferative disorders (MPD)" ///
+31 "Myselodysplastic syndromes (MDS)" ///
+32 "D069: CIN 3" ///
+33 "All sites but C44"
+label var sitecr5db "CR5db sites"
+label values sitecr5db sitecr5db_lab
+
+replace sitecr5db=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
+					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
+					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
+					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //21 changes
+replace sitecr5db=2 if regexm(icd10,"C15") //10 changes
+replace sitecr5db=3 if regexm(icd10,"C16") //20 changes
+replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //92 changes
+replace sitecr5db=5 if regexm(icd10,"C22") //9 changes
+replace sitecr5db=6 if regexm(icd10,"C25") //29 changes
+replace sitecr5db=7 if regexm(icd10,"C32") //1 change
+replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //41 changes
+replace sitecr5db=9 if regexm(icd10,"C43") //1 change
+replace sitecr5db=10 if regexm(icd10,"C50") //72 changes
+replace sitecr5db=11 if regexm(icd10,"C53") //12 changes
+replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //24 changes
+replace sitecr5db=13 if regexm(icd10,"C56") //1 change
+replace sitecr5db=14 if regexm(icd10,"C61") //150 changes
+replace sitecr5db=15 if regexm(icd10,"C62") //0 changes
+replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //11 changes
+replace sitecr5db=17 if regexm(icd10,"C67") //13 changes
+replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //0 changes
+replace sitecr5db=19 if regexm(icd10,"C73") //3 changes
+replace sitecr5db=20 if siteiarc==61 //57 changes
+replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //43 changes
+replace sitecr5db=22 if (regexm(icd10,"C91")|regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")) //12 changes
+replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //11 changes
+replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //1 change
+replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //3 changes
+replace sitecr5db=26 if siteiarc==25 //7 changes
+replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //2 changes
+replace sitecr5db=28 if (regexm(icd10,"C60")|regexm(icd10,"C63")) //2 changes
+replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //0 changes
+replace sitecr5db=30 if siteiarc==59 //2 changes
+replace sitecr5db=31 if siteiarc==60 //1 change
+replace sitecr5db=32 if siteiarc==64 //0 changes
+
+tab sitecr5db ,m
+
+***********************
+** Create ICD10 site **
+***********************
+** Create variable based on ICD-10 2010 version to use in graphs (dofile 12) - may not use
+gen siteicd10=.
+label define siteicd10_lab ///
+1 "C00-C14: lip,oral cavity & pharynx" ///
+2 "C15-C26: digestive organs" ///
+3 "C30-C39: respiratory & intrathoracic organs" ///
+4 "C40-C41: bone & articular cartilage" ///
+5 "C43: melanoma" ///
+6 "C44: other skin" ///
+7 "C45-C49: mesothelial & soft tissue" ///
+8 "C50: breast" ///
+9 "C51-C58: female genital organs" ///
+10 "C61: prostate" ///
+11 "C60-C62,C63: male genital organs" ///
+12 "C64-C68: urinary tract" ///
+13 "C69-C72: eye,brain,other CNS" ///
+14 "C73-C75: thyroid & other endocrine glands" ///
+15 "C76-C79: ill-defined sites" ///
+16 "C80: primary site unknown" ///
+17 "C81-C96: lymphoid & haem"
+label var siteicd10 "ICD-10 site of tumour"
+label values siteicd10 siteicd10_lab
+
+
+replace siteicd10=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
+					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
+					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
+					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //34 changes
+replace siteicd10=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
+					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
+					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
+					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) // changes
+replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //57 changes
+replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //3 changes
+replace siteicd10=5 if siteiarc==24 //7 changes
+replace siteicd10=6 if siteiarc==25 //0 changes
+replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //12 changes
+replace siteicd10=8 if regexm(icd10,"C50") //174 changes
+replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //14 changes
+replace siteicd10=10 if regexm(icd10,"C61") //216 changes
+replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //5 changes
+replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //37 changes
+replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //6 changes
+replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //12 changes
+replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //3 changess
+replace siteicd10=16 if regexm(icd10,"C80") //43 changes
+replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
+					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
+					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
+					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
+					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")|regexm(icd10,"C96")) //34 changes
+
+
+tab siteicd10 ,m //0 missing
+
+drop cod1b cod1c cod1d cod2a cod2b onsetnumcod1b onsettxtcod1b onsetnumcod1c ///
+	 onsettxtcod1c onsetnumcod1d onsettxtcod1d onsetnumcod2a onsettxtcod2a ///
+	 onsetnumcod2b onsettxtcod2b death_certificate_complete tempcod1a
+	 
+order deathid did fname lname age age5 age_10 sex dob nrn parish dod dodyear mrcancer siteiarc siteiarchaem site pod cod1a
+
+
+label data "BNR MORTALITY data 2015"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\3-output\2015_prep mort" ,replace
+note: TS This dataset is used for analysis of age-standardized mortality rates
+note: TS This dataset includes patients with multiple eligible cancer causes of death
