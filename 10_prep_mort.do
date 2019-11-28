@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      14-NOV-2019
-    // 	date last modified      14-NOV-2019
+    // 	date last modified      28-NOV-2019
     //  algorithm task          Prep and format death data
     //  status                  Completed
     //  objective               To have multiple datasets with cleaned death data for matching and reporting.
@@ -1719,23 +1719,22 @@ label var siteiarchaem "IARC CI5-XI lymphoid & haem diseases"
 label values siteiarchaem siteiarchaem_lab
 
 ** Note that morphcat is based on ICD-O-3 edition 3.1. so e.g. morphcat54
-replace siteiarchaem=1 if icd10=="C85.9"|icd10=="C85.1"|icd10=="C82.6" //14 changes
-replace siteiarchaem=2 if icd10=="C819"|icd10=="C814"|icd10=="C813"|icd10=="C812"|icd10=="C811"|icd10=="C810" //2 changes
-replace siteiarchaem=3 if icd10=="C830"|icd10=="C831"|icd10=="C833"|icd10=="C837"|icd10=="C838"|icd10=="C859"|icd10=="C852"|icd10=="C829"|icd10=="C821"|icd10=="C820"|icd10=="C822"|icd10=="C420"|icd10=="C421"|icd10=="C424"|icd10=="C884"|regexm(icd10,"C77") //4 changes
-STOP - see table online
-replace siteiarchaem=4 if regexm(icd10,"C") //0 changes
-replace siteiarchaem=5 if regexm(icd10,"C") //1 change
-replace siteiarchaem=6 if regexm(icd10,"C") //22 changes
-replace siteiarchaem=7 if regexm(icd10,"C") //0 changes
-replace siteiarchaem=8 if regexm(icd10,"C") //0 changes
-replace siteiarchaem=9 if regexm(icd10,"C") //0 changes
-replace siteiarchaem=10 if regexm(icd10,"C") //3 changes
-replace siteiarchaem=11 if regexm(icd10,"C") //5 changes
-replace siteiarchaem=12 if regexm(icd10,"C") //4 changes
-replace siteiarchaem=13 if regexm(icd10,"C") //0 changes
-replace siteiarchaem=14 if regexm(icd10,"C") //1 change
-replace siteiarchaem=15 if regexm(icd10,"C") //1 change
-replace siteiarchaem=16 if regexm(icd10,"C") //1 change
+replace siteiarchaem=1 if icd10=="C859"|icd10=="C851"|icd10=="C826"|icd10=="C969" //12 changes
+replace siteiarchaem=2 if icd10=="C819"|icd10=="C814"|icd10=="C813"|icd10=="C812"|icd10=="C811"|icd10=="C810" //3 changes
+replace siteiarchaem=3 if icd10=="C830"|icd10=="C831"|icd10=="C833"|icd10=="C837"|icd10=="C838"|icd10=="C859"|icd10=="C852"|icd10=="C829"|icd10=="C821"|icd10=="C820"|icd10=="C822"|icd10=="C420"|icd10=="C421"|icd10=="C424"|icd10=="C884"|regexm(icd10,"C77") //12 changes
+replace siteiarchaem=4 if icd10=="C840"|icd10=="C841"|icd10=="C844"|icd10=="C865"|icd10=="C863"|icd10=="C848"|icd10=="C838"|icd10=="C846"|icd10=="C861"|icd10=="C862"|icd10=="C866"|icd10=="C860" //4 changes
+replace siteiarchaem=5 if icd10=="C845"|icd10=="C835" //0 changes
+replace siteiarchaem=6 if icd10=="C903"|icd10=="C900"|icd10=="C901"|icd10=="C902"|icd10=="C833" //28 changes
+replace siteiarchaem=7 if icd10=="D470"|icd10=="C962"|icd10=="C943" //0 changes
+replace siteiarchaem=8 if icd10=="C968"|icd10=="C966"|icd10=="C964" //0 changes
+replace siteiarchaem=9 if icd10=="C889"|icd10=="C880"|icd10=="C882"|icd10=="C883"|icd10=="D472"|icd10=="C838"|icd10=="C865"|icd10=="D479"|icd10=="D477" //1 change
+replace siteiarchaem=10 if icd10=="C959"|icd10=="C950" //3 changes
+replace siteiarchaem=11 if icd10=="C910"|icd10=="C919"|icd10=="C911"|icd10=="C918"|icd10=="C915"|icd10=="C917"|icd10=="C913"|icd10=="C916" //5 changes
+replace siteiarchaem=12 if icd10=="C940"|icd10=="C929"|icd10=="C920"|icd10=="C921"|icd10=="C924"|icd10=="C925"|icd10=="C947"|icd10=="C922"|icd10=="C930"|icd10=="C928"|icd10=="C926"|icd10=="D471"|icd10=="C927"|icd10=="C942"|icd10=="C946"|icd10=="C923"|icd10=="C944"|icd10=="C914" //5 changes
+replace siteiarchaem=13 if icd10=="C931"|icd10=="C933"|icd10=="C947" //0 changes
+replace siteiarchaem=14 if icd10=="D45"|icd10=="D471"|icd10=="D474"|icd10=="D473"|icd10=="D475"|icd10=="C927"|icd10=="C967" //1 change
+replace siteiarchaem=15 if icd10=="D477"|icd10=="D471" //0 changes
+replace siteiarchaem=16 if icd10=="D465"|icd10=="D466"|icd10=="D467"|icd10=="D469" //4 changes
 
 tab siteiarchaem ,m //593 missing - correct!
 count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //0
@@ -1775,7 +1774,8 @@ label define sitecr5db_lab ///
 30 "Myeloproliferative disorders (MPD)" ///
 31 "Myselodysplastic syndromes (MDS)" ///
 32 "D069: CIN 3" ///
-33 "All sites but C44"
+33 "All sites but C44" ///
+34 "Excluded from CR5db"
 label var sitecr5db "CR5db sites"
 label values sitecr5db sitecr5db_lab
 
@@ -1815,6 +1815,7 @@ replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //0 changes
 replace sitecr5db=30 if siteiarc==59 //2 changes
 replace sitecr5db=31 if siteiarc==60 //1 change
 replace sitecr5db=32 if siteiarc==64 //0 changes
+replace sitecr5db=34 if icd10=="C380"|icd10=="C699"|icd10=="C865"|icd10=="C866" //4 changes
 
 tab sitecr5db ,m
 
@@ -1849,39 +1850,38 @@ replace siteicd10=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C0
 					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
 					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
 					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //34 changes
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //9 changes
 replace siteicd10=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
 					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
 					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
-					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) // changes
-replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //57 changes
-replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //3 changes
-replace siteicd10=5 if siteiarc==24 //7 changes
-replace siteicd10=6 if siteiarc==25 //0 changes
-replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //12 changes
-replace siteicd10=8 if regexm(icd10,"C50") //174 changes
-replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //14 changes
-replace siteicd10=10 if regexm(icd10,"C61") //216 changes
-replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //5 changes
-replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //37 changes
-replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //6 changes
-replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //12 changes
-replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //3 changess
-replace siteicd10=16 if regexm(icd10,"C80") //43 changes
+					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) //194 changes
+replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //33 changes
+replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
+replace siteicd10=5 if siteiarc==24 //4 changes
+replace siteicd10=6 if siteiarc==25 //4 changes
+replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //3 changes
+replace siteicd10=8 if regexm(icd10,"C50") //64 changes
+replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //67 changes
+replace siteicd10=10 if regexm(icd10,"C61") //104 changes
+replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //0 changes
+replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //21 changes
+replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //10 changes
+replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //5 changes
+replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //0 changess
+replace siteicd10=16 if regexm(icd10,"C80") //46 changes
 replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
 					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
 					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
 					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
-					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")|regexm(icd10,"C96")) //34 changes
+					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95") ///
+					 |regexm(icd10,"C96")|regexm(icd10,"D46")|regexm(icd10,"D47")) //65 changes
 
 
 tab siteicd10 ,m //0 missing
 
-drop cod1b cod1c cod1d cod2a cod2b onsetnumcod1b onsettxtcod1b onsetnumcod1c ///
-	 onsettxtcod1c onsetnumcod1d onsettxtcod1d onsetnumcod2a onsettxtcod2a ///
-	 onsetnumcod2b onsettxtcod2b death_certificate_complete tempcod1a
+drop recstatdc tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf
 	 
-order deathid did fname lname age age5 age_10 sex dob nrn parish dod dodyear mrcancer siteiarc siteiarchaem site pod cod1a
+order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear cancer siteiarc siteiarchaem pod coddeath
 
 
 label data "BNR MORTALITY data 2015"
