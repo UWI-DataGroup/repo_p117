@@ -44,7 +44,7 @@ use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", clear
 
 ** POPULATION
 tab dxyr ,m 
-unique pop_bb, by(pop_bb) gen(poptotal)
+unique pop_bb, by(pop_bb) gen(poptotal) //ssc install unique
 egen poptot=total(pop_bb) if poptotal==1
 ** TUMOURS
 egen tumourtot_2008=count(pid) if dxyr==2008
@@ -359,7 +359,7 @@ putdocx table tbl1(10,2), nformat(%2.1f)
 putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2019-11-18_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2019-12-02_annual_report_stats.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_summstats" ,replace

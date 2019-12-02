@@ -7,7 +7,7 @@
     // 	date last modified      28-OCT-2019
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2008 & 2013 data for inclusion in 2014 cancer report.
+    //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
 
     ** General algorithm set-up
@@ -2273,6 +2273,20 @@ tab dotyear ,m
 rename nm namematch
 rename dodyear_cancer dodyear
 
+** Picked up some cases correctoins incidentally while reviewing 2015 data
+replace dot=d(30jun2012) if pid=="20141523" //1 change
+replace dxyr=2012 if pid=="20141523" //1 change
+replace recstatus=3 if pid=="20141523" //1 change
+drop if pid=="20141523" //1 deleted
+
+replace dlc=d(08apr2015) if pid=="20080563" //1 change
+
+replace slc=2 if pid=="20080169" //1 change
+replace dlc=d(17jun2015) if pid=="20080169" //1 change
+
+replace slc=2 if pid=="20080336" //0 changes
+replace dlc=d(08mar2015) if pid=="20080336" //0 changes
+
 ** Remove variables not needed in final dataset
 drop checkage2 nrn2 dds2recstatdc dds2tfdddoa dds2tfddda dds2tfregnumstart dds2tfdistrictstart dds2tfregnumend dds2tfdistrictend dds2tfddtxt dds2recstattf dds2duprec dds2dupname dds2dupdod dds2dodyear
 
@@ -2321,6 +2335,7 @@ tab eidmp ,m
 count if patient==2 & persearch==1 //0
 //list pid fname lname if patient==2 & persearch==1
 
+** Note: most below figures will be less one(1) as found one(1) ineligible during 2015 reviews (pid=20141523)
 count //2418
 
 drop if basis==0 //132 deleted - DCO 

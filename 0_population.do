@@ -4,10 +4,10 @@
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      28-OCT-2019
-    // 	date last modified	    28-OCT-2019
+    // 	date last modified	    02-DEC-2019
     //  algorithm task			Prep for external population for incidence and mortality analyses
     //  status                  Completed
-    //  objective               To have one dataset with cleaned, grouped and analysed 2014 data for 2014 cancer report.
+    //  objective               To have one dataset with 2008, 2013, 2014 & 2015 population data for 2015 cancer report.
     //  methods                 2000 bb census updated to 2010 bb census; World Standard Population based on SEER (https://seer.cancer.gov/stdpopulations/world.who.html)
 
     ** DO FILE BASED ON
@@ -620,4 +620,373 @@ collapse (sum) pop_segi , by(age65 intdn)
 	label data "Segi's WHO world standard million: 1 age group. 65 & over"
 	sort age65
 save "`datapath'\version02\2-working\whosegi2000_65", replace
+restore
+
+clear
+
+*************************************
+**			BSS populations        **
+** (Barbados Statistical Services) **
+*************************************
+** Written by JCampbell on 02-Dec-2019 as requested by NS for ASIRs comparisons with BSS vs UN WPP's populations
+
+***************
+** DATA IMPORT  
+***************
+** LOAD the BSS 2010-2018 excel dataset, multiple sheets at once
+import excel using "`datapath'\version02\1-input\BSS.xlsx" , describe
+forvalues i=6(-1)1 {  
+import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D38) clear
+import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D38) clear
+import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D38) clear
+import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D38) clear
+import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D38) clear
+import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D38) clear
+if `i'==6 {
+    save "`datapath'\version02\2-working\pop_bss", replace
+  }
+  else {
+    append using "`datapath'\version02\2-working\pop_bss.dta"
+    save "`datapath'\version02\2-working\pop_bss", replace
+  }
+  
+}
+
+** Formatting values
+rename A sex 
+rename B age5 
+rename D year
+
+drop if sex==. 
+//remove blank extra rows (6 deleted)
+
+gen pop_bss=round(C, 1)
+drop C
+//remove decimal points
+
+label define age5_lab 	1 "0-4"	   2 "5-9"    3 "10-14"		///
+						4 "15-19"  5 "20-24"  6 "25-29"		///
+						7 "30-34"  8 "35-39"  9 "40-44"		///
+						10 "45-49" 11 "50-54" 12 "55-59"	///
+						13 "60-64" 14 "65-69" 15 "70-74"	///
+						16 "75-79" 17 "80-84" 18 "85 & over", modify
+label values age5 age5_lab
+
+label define sex_lab 1 "female" 2 "male",modify
+label values sex sex_lab
+//labelling age and sex variables
+
+** TEN age groups in TEN-year bands with <15 as first group. 
+** This is another standard for population distributions
+gen age_10 = recode(age5,3,5,7,9,11,13,15,17,18)
+recode age_10 3=1 5=2 7=3 9=4 11=5 13=6 15=7 17=8 18=9
+label define age_10_lab 	1 "0-14"   2 "15-24"  3 "25-34"	///
+				4 "35-44"  5 "45-54"  6 "55-64"	///
+				7 "65-74"  8 "75-84"  9 "85 & over" , modify
+label values age_10 age_10_lab
+
+** Create datasets by year
+preserve
+drop if year!=2013
+drop year
+collapse (sum) pop_bss, by(age5 sex)
+label data "BSS Population data 2013: 5-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2013-5" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2013
+drop year
+collapse (sum) pop_bss, by(age_10 sex)
+label data "BSS Population data 2013: 10-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2013-10" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2014
+drop year
+collapse (sum) pop_bss, by(age5 sex)
+label data "BSS Population data 2014: 5-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2014-5" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2014
+drop year
+collapse (sum) pop_bss, by(age_10 sex)
+label data "BSS Population data 2014: 10-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2014-10" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2015
+drop year
+collapse (sum) pop_bss, by(age5 sex)
+label data "BSS Population data 2015: 5-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2015-5" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2015
+drop year
+collapse (sum) pop_bss, by(age_10 sex)
+label data "BSS Population data 2015: 10-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2015-10" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2016
+drop year
+collapse (sum) pop_bss, by(age5 sex)
+label data "BSS Population data 2016: 5-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2016-5" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2016
+drop year
+collapse (sum) pop_bss, by(age_10 sex)
+label data "BSS Population data 2016: 10-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2016-10" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2017
+drop year
+collapse (sum) pop_bss, by(age5 sex)
+label data "BSS Population data 2017: 5-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2017-5" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2017
+drop year
+collapse (sum) pop_bss, by(age_10 sex)
+label data "BSS Population data 2017: 10-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2017-10" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2018
+drop year
+collapse (sum) pop_bss, by(age5 sex)
+label data "BSS Population data 2018: 5-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2018-5" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2018
+drop year
+collapse (sum) pop_bss, by(age_10 sex)
+label data "BSS Population data 2018: 10-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2018-10" , replace
+note: TS This dataset prepared using 2010-2018 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+clear
+
+***************************************
+**		   UN WPP populations        **
+** (World Population Prospects 2019) **
+***************************************
+** Written by JCampbell on 02-Dec-2019 as requested by NS for ASIRs comparisons with BSS vs UN WPP's populations
+
+***************
+** DATA IMPORT  
+***************
+** LOAD the 2019 WPP 2008,2013-2018 excel dataset, multiple sheets at once
+import excel using "`datapath'\version02\1-input\wpp.xlsx" , describe
+forvalues i=7(-1)1 {  
+import excel using "`datapath'\version02\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+import excel using "`datapath'\version02\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+import excel using "`datapath'\version02\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+import excel using "`datapath'\version02\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+import excel using "`datapath'\version02\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+import excel using "`datapath'\version02\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+if `i'==7 {
+    save "`datapath'\version02\2-working\pop_wpp", replace
+  }
+  else {
+    append using "`datapath'\version02\2-working\pop_wpp.dta"
+    save "`datapath'\version02\2-working\pop_wpp", replace
+  }
+  
+}
+
+** Formatting values
+rename A sex 
+rename B age5 
+rename C pop_wpp
+rename D year
+
+label define age5_lab 	1 "0-4"	   2 "5-9"    3 "10-14"		///
+						4 "15-19"  5 "20-24"  6 "25-29"		///
+						7 "30-34"  8 "35-39"  9 "40-44"		///
+						10 "45-49" 11 "50-54" 12 "55-59"	///
+						13 "60-64" 14 "65-69" 15 "70-74"	///
+						16 "75-79" 17 "80-84" 18 "85 & over", modify
+label values age5 age5_lab
+
+label define sex_lab 1 "female" 2 "male",modify
+label values sex sex_lab
+//labelling age and sex variables
+
+** TEN age groups in TEN-year bands with <15 as first group. 
+** This is another standard for population distributions
+gen age_10 = recode(age5,3,5,7,9,11,13,15,17,18)
+recode age_10 3=1 5=2 7=3 9=4 11=5 13=6 15=7 17=8 18=9
+label define age_10_lab 	1 "0-14"   2 "15-24"  3 "25-34"	///
+				4 "35-44"  5 "45-54"  6 "55-64"	///
+				7 "65-74"  8 "75-84"  9 "85 & over" , modify
+label values age_10 age_10_lab
+
+
+** Create datasets by year
+preserve
+drop if year!=2008
+drop year
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2008: 5-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2008-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2008
+drop year
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2008: 10-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2008-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2013
+drop year
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2013: 5-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2013-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2013
+drop year
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2013: 10-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2013-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2014
+drop year
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2014: 5-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2014-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2014
+drop year
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2014: 10-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2014-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2015
+drop year
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2015: 5-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2015-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2015
+drop year
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2015: 10-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2015-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2016
+drop year
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2016: 5-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2016-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2016
+drop year
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2016: 10-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2016-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2017
+drop year
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2017: 5-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2017-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2017
+drop year
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2017: 10-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2017-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2018
+drop year
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2018: 5-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2018-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2018
+drop year
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2018: 10-year age bands"
+save "`datapath'\version02\2-working\pop_wpp_2018-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
 restore
