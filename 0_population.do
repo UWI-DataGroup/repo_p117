@@ -694,7 +694,7 @@ label values age_10 age_10_lab
 ** Create datasets by year
 preserve
 drop if year!=2013
-drop year
+drop year age_10
 collapse (sum) pop_bss, by(age5 sex)
 label data "BSS Population data 2013: 5-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2013-5" , replace
@@ -703,7 +703,7 @@ restore
 
 preserve
 drop if year!=2013
-drop year
+drop year age5
 collapse (sum) pop_bss, by(age_10 sex)
 label data "BSS Population data 2013: 10-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2013-10" , replace
@@ -712,7 +712,7 @@ restore
 
 preserve
 drop if year!=2014
-drop year
+drop year age_10
 collapse (sum) pop_bss, by(age5 sex)
 label data "BSS Population data 2014: 5-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2014-5" , replace
@@ -721,7 +721,7 @@ restore
 
 preserve
 drop if year!=2014
-drop year
+drop year age5
 collapse (sum) pop_bss, by(age_10 sex)
 label data "BSS Population data 2014: 10-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2014-10" , replace
@@ -730,7 +730,7 @@ restore
 
 preserve
 drop if year!=2015
-drop year
+drop year age_10
 collapse (sum) pop_bss, by(age5 sex)
 label data "BSS Population data 2015: 5-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2015-5" , replace
@@ -739,7 +739,7 @@ restore
 
 preserve
 drop if year!=2015
-drop year
+drop year age5
 collapse (sum) pop_bss, by(age_10 sex)
 label data "BSS Population data 2015: 10-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2015-10" , replace
@@ -748,7 +748,7 @@ restore
 
 preserve
 drop if year!=2016
-drop year
+drop year age_10
 collapse (sum) pop_bss, by(age5 sex)
 label data "BSS Population data 2016: 5-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2016-5" , replace
@@ -757,7 +757,7 @@ restore
 
 preserve
 drop if year!=2016
-drop year
+drop year age5
 collapse (sum) pop_bss, by(age_10 sex)
 label data "BSS Population data 2016: 10-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2016-10" , replace
@@ -766,7 +766,7 @@ restore
 
 preserve
 drop if year!=2017
-drop year
+drop year age_10
 collapse (sum) pop_bss, by(age5 sex)
 label data "BSS Population data 2017: 5-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2017-5" , replace
@@ -775,7 +775,7 @@ restore
 
 preserve
 drop if year!=2017
-drop year
+drop year age5
 collapse (sum) pop_bss, by(age_10 sex)
 label data "BSS Population data 2017: 10-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2017-10" , replace
@@ -784,7 +784,7 @@ restore
 
 preserve
 drop if year!=2018
-drop year
+drop year age_10
 collapse (sum) pop_bss, by(age5 sex)
 label data "BSS Population data 2018: 5-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2018-5" , replace
@@ -793,7 +793,7 @@ restore
 
 preserve
 drop if year!=2018
-drop year
+drop year age5
 collapse (sum) pop_bss, by(age_10 sex)
 label data "BSS Population data 2018: 10-year age bands"
 save "`datapath'\version02\2-working\pop_bss_2018-10" , replace
@@ -867,7 +867,7 @@ label values age_10 age_10_lab
 ** Create datasets by year
 preserve
 drop if year!=2008
-drop year
+drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2008: 5-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2008-5" , replace
@@ -876,7 +876,7 @@ restore
 
 preserve
 drop if year!=2008
-drop year
+drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2008: 10-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2008-10" , replace
@@ -885,7 +885,7 @@ restore
 
 preserve
 drop if year!=2013
-drop year
+drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2013: 5-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2013-5" , replace
@@ -894,7 +894,7 @@ restore
 
 preserve
 drop if year!=2013
-drop year
+drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2013: 10-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2013-10" , replace
@@ -903,7 +903,7 @@ restore
 
 preserve
 drop if year!=2014
-drop year
+drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2014: 5-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2014-5" , replace
@@ -912,7 +912,7 @@ restore
 
 preserve
 drop if year!=2014
-drop year
+drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2014: 10-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2014-10" , replace
@@ -921,7 +921,7 @@ restore
 
 preserve
 drop if year!=2015
-drop year
+drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2015: 5-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2015-5" , replace
@@ -930,7 +930,7 @@ restore
 
 preserve
 drop if year!=2015
-drop year
+drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2015: 10-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2015-10" , replace
@@ -939,7 +939,7 @@ restore
 
 preserve
 drop if year!=2016
-drop year
+drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2016: 5-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2016-5" , replace
@@ -948,7 +948,7 @@ restore
 
 preserve
 drop if year!=2016
-drop year
+drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2016: 10-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2016-10" , replace
@@ -957,7 +957,7 @@ restore
 
 preserve
 drop if year!=2017
-drop year
+drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2017: 5-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2017-5" , replace
@@ -966,7 +966,7 @@ restore
 
 preserve
 drop if year!=2017
-drop year
+drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2017: 10-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2017-10" , replace
@@ -975,7 +975,7 @@ restore
 
 preserve
 drop if year!=2018
-drop year
+drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2018: 5-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2018-5" , replace
@@ -984,7 +984,7 @@ restore
 
 preserve
 drop if year!=2018
-drop year
+drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2018: 10-year age bands"
 save "`datapath'\version02\2-working\pop_wpp_2018-10" , replace
