@@ -635,7 +635,7 @@ clear
 ***************
 ** LOAD the BSS 2010-2018 excel dataset, multiple sheets at once
 import excel using "`datapath'\version02\1-input\BSS.xlsx" , describe
-forvalues i=6(-1)1 {  
+forvalues i=7(-1)1 {  
 import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D38) clear
 import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
@@ -648,7 +648,9 @@ import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D38) clear
 import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D38) clear
-if `i'==6 {
+import excel using "`datapath'\version02\1-input\BSS.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D38) clear
+if `i'==7 {
     save "`datapath'\version02\2-working\pop_bss", replace
   }
   else {
@@ -692,6 +694,24 @@ label define age_10_lab 	1 "0-14"   2 "15-24"  3 "25-34"	///
 label values age_10 age_10_lab
 
 ** Create datasets by year
+preserve
+drop if year!=2008
+drop year age_10
+collapse (sum) pop_bss, by(age5 sex)
+label data "BSS Population data 2013: 5-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2008-5" , replace
+note: TS This dataset prepared using 2000-2009 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
+preserve
+drop if year!=2008
+drop year age5
+collapse (sum) pop_bss, by(age_10 sex)
+label data "BSS Population data 2013: 10-year age bands"
+save "`datapath'\version02\2-working\pop_bss_2008-10" , replace
+note: TS This dataset prepared using 2000-2009 census & estimate populations emailed from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+restore
+
 preserve
 drop if year!=2013
 drop year age_10

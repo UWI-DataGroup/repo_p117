@@ -292,6 +292,7 @@ replace results_2014=2014 if id==1
 replace results_2013=2013 if id==1
 replace results_2008=2008 if id==1
 
+preserve
 				****************************
 				*	   MS WORD REPORT      *
 				* ANNUAL REPORT STATISTICS *
@@ -359,43 +360,58 @@ putdocx table tbl1(10,2), nformat(%2.1f)
 putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2019-12-02_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2019-12-04_annual_report_stats.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_summstats" ,replace
-clear
-/*
-**************************
-**  SURVIVAL STATISTICS **
-**************************
-** Annual report: Table 1 (executive summary)
-use "`datapath'\version02\3-output\2008_2013_2014_cancer_survival", replace
-//local tab = r(N)
-tab surv1yr_2008 ,matcell(freq), if dxyr==2008
-mat li freq
-/*
-matrix input one = freq[2,1]
-matrix rowtot=freq*one
-matrix rowpct = inv(diag(rowtot))*freq
-matrix list rowpct
-*/
-mata: st_matrix("freq", (st_matrix("freq")  :/ rowsum(st_matrix("freq"))))
-mat li freq 
-, format("%3.2f")
-freq[2,1]
+restore
 
-tab surv1yr_2008 if dxyr==2008 , matcell(percent)
-mat li percent
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *           ASMRs          *
+				****************************
 
-egen results1_surv1yr=total(surv1yr_2008), by(surv1yr_2008)
-gen results1_surv1yr = r(percent)
-putdocx textblock append
-survival at 1yr - 2008 <<dd_docx_display
-tab surv3yr_2008 if dxyr==2008 ,m
-tab surv5yr_2008 if dxyr==2008 ,m
-tab surv1yr_2013 if dxyr==2013 ,m
-tab surv3yr_2013 if dxyr==2013 ,m
-tab surv5yr_2013 if dxyr==2013 ,m
-tab surv1yr_2014 if dxyr==2014 ,m
-tab surv3yr_2014 if dxyr==2014 ,m
+** Output for above ASIRs comparison using BSS vs WPP populations
+use "`datapath'\version02\2-working\ASMRs", clear
+//format asmr %04.2f
+//format percentage %04.1f
+sort cancer_site year asmr
 
+preserve
+putdocx clear
+putdocx begin, footer(foot1)
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
+putdocx paragraph, halign(center)
+putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=276,633)"), bold font(Helvetica,10,"blue")
+putdocx textblock begin
+Date Prepared: 04-Dec-2019. 
+Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
+Generated using Dofile: 25_analysis mort.do
+putdocx textblock end
+putdocx paragraph
+putdocx text ("Methods"), bold
+putdocx textblock begin
+(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version02\3-output\2015_prep mort")
+putdocx textblock end
+putdocx textblock begin
+(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using barbados population: pop_bss_2015-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version02\3-output\2015 prep mort")
+putdocx textblock end
+//putdocx pagebreak
+putdocx table tbl1 = data(cancer_site year number percentage asmr ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx table tbl1(1,7), bold shading(lightgray)
+putdocx table tbl1(9,1), width(4)
+putdocx table tbl1(12,1), width(4)
+putdocx save "`datapath'\version02\3-output\2019-12-04_annual_report_stats.docx", append
+putdocx clear
+
+save "`datapath'\version02\3-output\2008_2013_2014_2015_summstats" ,replace
+restore
