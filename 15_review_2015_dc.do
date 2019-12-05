@@ -36,23 +36,24 @@
 
 STOP - add cancer API dofile to this dofile and run after first set of code is run
 ** Import BNR-Cancer log that was filtered with username=shellyann.forde and events=created(only)
+** L:\ is on DG laptop 2
 clear
-import delimited "C:\Users\20004087\Downloads\BNRCancer_Logging_2019-12-05_1326.csv"
+import delimited "L:\BNRCancer_Logging_2019-12-05_1326.csv"
 rename v2 username
 drop if username!="shellyann.forde"
-egen temp=sieve(v3), char(0123456789) //ssc install egenmore
+egen temp=sieve(v3), char(0123456789)
 gen rec_id=substr(temp,1,3)
 rename v1 rvdate
 drop temp v3 v4
-save "C:\Users\20004087\Downloads\BNRCancer_Log.dta",replace
+save "L:\BNRCancer_Log.dta",replace
 clear
 ** Import Incorrect Reviewer report
-import delimited "C:\Users\20004087\Downloads\BNRCancer_DATA_2019-12-05_1321.csv"
+import delimited "L:\BNRCancer_DATA_2019-12-05_1321.csv"
 tostring record_id, gen(rec_id)
-save "C:\Users\20004087\Downloads\BNRCancer_Reviewer.dta",replace
+save "L:\BNRCancer_Reviewer.dta",replace
 clear
-use "C:\Users\20004087\Downloads\BNRCancer_Log.dta", replace
-merge m:1 rec_id using "C:\Users\20004087\Downloads\BNRCancer_Reviewer.dta"
+use "L:\BNRCancer_Log.dta", replace
+merge m:1 rec_id using "L:\BNRCancer_Reviewer.dta"
 /*
     Result                           # of obs.
     -----------------------------------------
@@ -63,8 +64,8 @@ merge m:1 rec_id using "C:\Users\20004087\Downloads\BNRCancer_Reviewer.dta"
     matched                               410  (_merge==3)
     -----------------------------------------
 */
+list rec_id _merge if rvreviewer==13 //all matched
 count if rvreviewer==13 & _merge!=3 //0
-list rec_id _merge if rvreviewer==13 //all matched SF
 
 Update BNR-Cancer redcap via API, see below dofile:
 
