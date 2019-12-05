@@ -408,8 +408,6 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
-putdocx table tbl1(9,1), width(4)
-putdocx table tbl1(12,1), width(4)
 putdocx save "`datapath'\version02\3-output\2019-12-04_annual_report_stats.docx", append
 putdocx clear
 

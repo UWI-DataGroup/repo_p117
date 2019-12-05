@@ -34,6 +34,108 @@
     log using "`logpath'\15_review_2015_dc.smcl", replace
 ** HEADER -----------------------------------------------------
 
+STOP - add cancer API dofile to this dofile and run after first set of code is run
+** Import BNR-Cancer log that was filtered with username=shellyann.forde and events=created(only)
+clear
+import delimited "C:\Users\20004087\Downloads\BNRCancer_Logging_2019-12-05_1326.csv"
+rename v2 username
+drop if username!="shellyann.forde"
+egen temp=sieve(v3), char(0123456789) //ssc install egenmore
+gen rec_id=substr(temp,1,3)
+rename v1 rvdate
+drop temp v3 v4
+save "C:\Users\20004087\Downloads\BNRCancer_Log.dta",replace
+clear
+** Import Incorrect Reviewer report
+import delimited "C:\Users\20004087\Downloads\BNRCancer_DATA_2019-12-05_1321.csv"
+tostring record_id, gen(rec_id)
+save "C:\Users\20004087\Downloads\BNRCancer_Reviewer.dta",replace
+clear
+use "C:\Users\20004087\Downloads\BNRCancer_Log.dta", replace
+merge m:1 rec_id using "C:\Users\20004087\Downloads\BNRCancer_Reviewer.dta"
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         2,046
+        from master                     2,046  (_merge==1)
+        from using                          0  (_merge==2)
+
+    matched                               410  (_merge==3)
+    -----------------------------------------
+*/
+list rec_id _merge if rvreviewer==13 //all matched SF
+
+Update BNR-Cancer redcap via API, see below dofile:
+
+
+Update below flag names to match BNR-Cancer redcap db reviewer instruments
+
+*****************
+** DATA QUALITY  
+*****************
+** Create quality report - corrections per reviewer
+forvalues j=1/55 {
+	gen flag`j'=0
+}
+
+label var flag1 "Record ID"
+label var flag2 "Redcap Event"
+label var flag3 "ABS DateTime"
+label var flag4 "ABS DA"
+label var flag5 "ABS Other DA"
+label var flag6 "Certificate Type"
+label var flag7 "ABS Reg Dept #"
+label var flag8 "ABS District"
+label var flag9 "Pt Name"
+label var flag10 "Pt Address"
+label var flag11 "Pt Parish"
+label var flag12 "Sex"
+label var flag13 "Age"
+label var flag14 "Age (time period)"
+label var flag15 "Date of Death"
+label var flag16 "Death Year"
+label var flag17 "NRN documented?"
+label var flag18 "NRN"
+label var flag19 "Marital Status"
+label var flag20 "Occupation"
+label var flag21 "Duration"
+label var flag22 "Duration (time period)"
+label var flag23 "COD 1a"
+label var flag24 "Onset 1a"
+label var flag25 "Onset 1a (time period)"
+label var flag26 "COD 1b"
+label var flag27 "Onset 1b"
+label var flag28 "Onset 1b (time period)"
+label var flag29 "COD 1c"
+label var flag30 "Onset 1c"
+label var flag31 "Onset 1c (time period)"
+label var flag32 "COD 1d"
+label var flag33 "Onset 1d"
+label var flag34 "Onset 1d (time period)"
+label var flag35 "COD 2a"
+label var flag36 "Onset 2a"
+label var flag37 "Onset 2a (time period)"
+label var flag38 "COD 2b"
+label var flag39 "Onset 2b"
+label var flag40 "Onset 2b (time period)"
+label var flag41 "Place of Death"
+label var flag42 "Death Parish"
+label var flag43 "Reg Date"
+label var flag44 "Certifier"
+label var flag45 "Certifer Address"
+label var flag46 "Name Match"
+label var flag47 "ABS Complete?"
+label var flag48 "TF DateTime"
+label var flag49 "TF DA"
+label var flag50 "TF Reg # START"
+label var flag51 "TF District START"
+label var flag52 "TF Reg # END"
+label var flag53 "TF District END"
+label var flag54 "TF Comments"
+label var flag55 "TF Complete?"
+
+replace flag1=flag1+1 if record_id==...|rvreviewer==...
+
 * ************************************************************************
 * PROGRESS REPORT: REVIEWING 2015 ABS
 * Using Redcap BNR-Cancer database
