@@ -63,6 +63,7 @@ merge m:1 rec_id using "C:\Users\20004087\Downloads\BNRCancer_Reviewer.dta"
     matched                               410  (_merge==3)
     -----------------------------------------
 */
+count if rvreviewer==13 & _merge!=3 //0
 list rec_id _merge if rvreviewer==13 //all matched SF
 
 Update BNR-Cancer redcap via API, see below dofile:
