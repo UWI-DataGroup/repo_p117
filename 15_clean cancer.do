@@ -38,3 +38,8 @@ CLEAN IN 2015 DOFILE: 20150037 missed 2014 case abs as 2015 (see MasterDb frmCF_
 APPEND AND RE-GENERATE 30_report.do based on this combined ds (2008, 2013, 2014, 2015)
 
 Missed abstracted 2008 case 20150569.
+Missed abstracted 2013 case 20155220.
+Missed merge 2013 case 20155202 - drop from dataset (see 20141130)
+
+Check top=619 and comments=PSA to see if to change BOD=4(lab test) if BOD>3 and !=9
+Check top=ovary and morph=8000-8799 and laterality!=4
