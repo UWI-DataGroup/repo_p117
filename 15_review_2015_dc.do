@@ -67,7 +67,68 @@ merge m:1 rec_id using "L:\BNRCancer_Reviewer.dta"
 list rec_id _merge if rvreviewer==13 //all matched
 count if rvreviewer==13 & _merge!=3 //0
 
-Update BNR-Cancer redcap via API, see below dofile:
+STOP Update BNR-Cancer redcap via API, see below dofile:
+/*
+	(1) This dofile saved in PROJECTS p_117
+	(2) Import data from REDCap into Stata via redcap API using project called 'BNR-CVD'
+	(3) A user must have API rights to the redcap project for this process to work
+*/
+version 16.0
+set more off
+clear 
+
+**********************
+** IMPORT DATA FROM **
+** REDCAP TO STATA  **
+**********************
+local token "4E70DFD2A50F62E535E12C53D14E41FB"
+local outfile "exported_cancer_reviewer_20190925.csv"
+
+shell curl		///
+	--output `outfile' 		///
+	--form token=`token'	///
+	--form content=record 	///
+	--form format=csv 		///
+	--form type=flat 		///
+	--form fields[]=record_id ///
+	--form fields[]=redcap_event_name ///
+	--form fields[]=rvreviewer "https://caribdata.org/redcap/api/"
+
+import delimited `outfile'
+
+keep if rvreviewer==13
+export delimited using "cancer_reviewer_20190925.csv", replace
+br
+
+**********************
+** EXPORT DATA FROM **
+** STATA TO REDCAP  **
+**********************
+version 16.0
+set more off
+clear 
+
+local token "4E70DFD2A50F62E535E12C53D14E41FB"
+local outfile "cancer_reviewer_20190925.csv"
+
+shell curl --output `outfile' --form token=`token' --form content=record --form format=csv --form type=flat --form fields[]=record_id --form fields[]=rvreviewer"https://caribdata.org/redcap/api/"
+import delimited `outfile'
+
+replace rvreviewer=09 // corrrect reviewer from KWG to SF
+local fileforimport "data_for_import_cancer_20190925.csv"
+export delimited using `fileforimport', nolabel replace
+
+
+local cmd="C:\Windows\System32\curl.exe" 			///
+          + " --form token=`token'" 	///
+          + " --form content=record" 	///
+          + " --form format=csv" 		///
+          + " --form type=flat" 		///
+          + " --form data="+char(34)+"<`fileforimport'"+char(34) /// The < is critical! It causes curl to read the contents of the file, not just send the file name.
+          + " https://caribdata.org/redcap/api/"
+
+shell `cmd'
+
 
 
 Update below flag names to match BNR-Cancer redcap db reviewer instruments
