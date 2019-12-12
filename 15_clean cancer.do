@@ -43,3 +43,6 @@ Missed merge 2013 case 20155202 - drop from dataset (see 20141130)
 
 Check top=619 and comments=PSA to see if to change BOD=4(lab test) if BOD>3 and !=9
 Check top=ovary and morph=8000-8799 and laterality!=4
+Check BOD=1  (look at comments to see if pt notes seen and pt admitted with dx then BOD=9)
+Check BOD=7 if top=421 (if bone marrow confirms leukemia then bod=7: see IARC manual pg.20)
+Check BOD=5 if top=421 (if no bone marrow or dx confirmed by blood results: see IARC manual pg. 19/20)
