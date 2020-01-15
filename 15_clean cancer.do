@@ -36,11 +36,15 @@
 
 CLEAN IN 2015 DOFILE: 20150037 missed 2014 case abs as 2015 (see MasterDb frmCF_2014 #3649.)
 20155112 missed 2014 case abs as 2015
+20150258 missed 2014 case abs as 2015
 APPEND AND RE-GENERATE 30_report.do based on this combined ds (2008, 2013, 2014, 2015)
 
 Missed abstracted 2008 case 20150569.
 Missed abstracted 2013 case 20155220.
 Missed merge 2013 case 20155202 - drop from dataset (see 20141130)
+Missed merge 2013 case 20150270 - drop from dataset (see 20130648)
+Missed merge 2013 case 20150396 - drop from dataset after updating mname ("I"), dlc ("20150519") (see pid 20130804)
+Missed merge 2013 case 20150399 - drop from dataset after updating dlc ("20150115") (see pid 20141129)
 
 Check top=619 and comments=PSA to see if to change BOD=4(lab test) if BOD>3 and !=9
 Check top=ovary and morph=8000-8799 and laterality!=4

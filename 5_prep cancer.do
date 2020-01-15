@@ -2360,18 +2360,21 @@ recode deceased 2=0 //849 changes
 gen deceased_1yr=deceased
 gen deceased_3yr=deceased
 gen deceased_5yr=deceased
+gen deceased_10yr=deceased
 label drop deceased_lab
 label define deceased_lab 0 "censored" 1 "dead", modify
-label values deceased deceased_1yr deceased_3yr deceased_5yr deceased_lab
+label values deceased deceased_1yr deceased_3yr deceased_5yr deceased_10yr deceased_lab
 label var deceased "Survival identifer"
 label var deceased_1yr "Survival identifer at 1yr"
 label var deceased_3yr "Survival identifer at 3yrs"
 label var deceased_5yr "Survival identifer at 5yrs"
+label var deceased_10yr "Survival identifer at 10yrs"
 
 tab deceased ,m //1402 dead; 849 censored
 tab deceased_1yr ,m //1402 dead; 849 censored
 tab deceased_3yr ,m //1402 dead; 849 censored
 tab deceased_5yr ,m //1402 dead; 849 censored
+tab deceased_10yr ,m //1402 dead; 849 censored
 count if dlc==. //0
 count if dod==. //849
 
@@ -2380,46 +2383,55 @@ count if deceased==1 & dod==. //0
 count if deceased_1yr==1 & dod==. //0
 count if deceased_3yr==1 & dod==. //0
 count if deceased_5yr==1 & dod==. //0
+count if deceased_10yr==1 & dod==. //0
 
 count if dot==. //0
 
-** Create end_date variables: 1 year, 3 years and 5 years from incidence
+** Create end_date variables: 1 year, 3 years, 5 years and 10 years from incidence
 gen enddate_1yr=(dot+(365.25*1)) if dot!=.
 gen enddate_3yr=(dot+(365.25*3)) if dot!=.
 gen enddate_5yr=(dot+(365.25*5)) if dot!=. & dxyr!=2014 //2019 death data not available as of 17nov2019
+gen enddate_10yr=(dot+(365.25*10)) if dot!=. & dxyr==2008
 
 format enddate* %dD_m_CY
 
 count if enddate_1yr==. //0
 count if enddate_3yr==. //0
 count if enddate_5yr==. & dxyr!=2014 //0
+count if enddate_10yr==. & dxyr==2008 //0
 
-** Since end_date is 1, 3, 5 years from incidence, reset deceased from dead to censored if pt died after end_date
+** Since end_date is 1, 3, 5, 10 years from incidence, reset deceased from dead to censored if pt died after end_date
 count if dod!=. & dod>dot+(365.25*1) //614
 //list pid deceased_1yr dot dod dlc enddate_1yr if dod!=. & dod>dot+(365.25*1)
 count if dod!=. & dod>dot+(365.25*3) //251
 //list pid deceased_3yr dot dod dlc enddate_3yr if dod!=. & dod>dot+(365.25*3)
 count if dod!=. & dod>dot+(365.25*5) & dxyr!=2014 //110
 //list pid deceased_5yr dot dod dlc enddate_5yr if dod!=. & dod>dot+(365.25*5)
+count if dod!=. & dod>dot+(365.25*10) & dxyr==2008 //5
+//list pid deceased_10yr dot dod dlc enddate_10yr if dod!=. & dod>dot+(365.25*10)
 
 replace deceased_1yr=0 if dod!=. & dod>dot+(365.25*1) //614 changes
 replace deceased_3yr=0 if dod!=. & dod>dot+(365.25*3) //251 changes
 replace deceased_5yr=0 if dod!=. & dod>dot+(365.25*5) & dxyr!=2014 //110 changes
+replace deceased_10yr=0 if dod!=. & dod>dot+(365.25*10) & dxyr==2008 //5 changes
 
 ** set to missing those who have dod>1 year from incidence date - but
 ** first create new variable for time to death/date last seen, called "time"
-** (1) use dod to define time to death if died within 1, 3, 5 yrs
+** (1) use dod to define time to death if died within 1, 3, 5, 10 yrs
 gen time_1yr=dod-dot if (dod!=. & deceased_1yr==1 & dod<dot+(365.25*1))
 gen time_3yr=dod-dot if (dod!=. & deceased_3yr==1 & dod<dot+(365.25*3))
 gen time_5yr=dod-dot if (dod!=. & deceased_5yr==1 & dod<dot+(365.25*5) & dxyr!=2014)
+gen time_10yr=dod-dot if (dod!=. & deceased_10yr==1 & dod<dot+(365.25*10) & dxyr==2008)
 
-** (2) next use 1, 3, 5 yrs as time, if died >1, >3, >5 yrs from incidence
+** (2) next use 1, 3, 5 yrs as time, if died >1, >3, >5, >10 yrs from incidence
 count if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0
 replace time_1yr=enddate_1yr-dot if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0 changes
 count if (enddate_3yr<dod & dod!=. & deceased_3yr==1) //0
 replace time_3yr=enddate_3yr-dot if (enddate_3yr<dod & dod!=. & deceased_3yr==1) //0 changes
 count if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr!=2014) //0
 replace time_5yr=enddate_5yr-dot if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr!=2014) //0 changes
+count if (enddate_10yr<dod & dod!=. & deceased_10yr==1 & dxyr==2008) //0
+replace time_10yr=enddate_10yr-dot if (enddate_10yr<dod & dod!=. & deceased_10yr==1 & dxyr==2008) //0 changes
 
 ** (2) next use dlc as end date, if alive and have date last seen (dlc)
 count if (dlc<enddate_1yr & deceased_1yr==0) //588
@@ -2428,38 +2440,47 @@ count if (dlc<enddate_3yr & deceased_3yr==0) //1171
 replace time_3yr=dlc-dot if (dlc<enddate_3yr & deceased_3yr==0) //1171 changes
 count if (dlc<enddate_5yr & deceased_5yr==0 & dxyr!=2014) //923
 replace time_5yr=dlc-dot if (dlc<enddate_5yr & deceased_5yr==0 & dxyr!=2014) //923 changes
+count if (dlc<enddate_10yr & deceased_10yr==0 & dxyr==2008) //229
+replace time_10yr=dlc-dot if (dlc<enddate_10yr & deceased_10yr==0 & dxyr==2008) //229 changes
 
 //tab time_1yr ,m //875=missing; 298=0
 //tab time_3yr ,m //292=missing; 298=0
 //tab time_5yr if dxyr!=2014 ,m //48=missing; 86=0
+//tab time_10yr if dxyr==2008 ,m //5=missing; 17=0
 //list time_1yr dot dlc enddate_1yr dod deceased_1yr if time_1yr==.
 replace time_1yr=enddate_1yr-dot if (enddate_1yr<dlc & deceased_1yr==0) & time_1yr==. & dlc!=. //875 changes
 replace time_3yr=enddate_3yr-dot if (enddate_3yr<dlc & deceased_3yr==0) & time_3yr==. & dlc!=. //292 changes
 replace time_5yr=enddate_5yr-dot if (enddate_5yr<dlc & deceased_5yr==0) & time_5yr==. & dlc!=. & dxyr!=2014 //48 changes
+replace time_10yr=enddate_10yr-dot if (enddate_10yr<dlc & deceased_10yr==0) & time_10yr==. & dlc!=. & dxyr==2008 //5 changes
 
 count if time_1yr==. //0
 count if time_3yr==. //0
 count if time_5yr==. & dxyr!=2014 //0
+count if time_10yr==. & dxyr==2008 //0
 
 replace time_1yr=dlc-dot if deceased_1yr==0 & time_1yr==. //0 changes
 replace time_3yr=dlc-dot if deceased_3yr==0 & time_3yr==. //0 changes
 replace time_5yr=dlc-dot if deceased_5yr==0 & time_5yr==. & dxyr!=2014 //0 changes
+replace time_10yr=dlc-dot if deceased_10yr==0 & time_10yr==. & dxyr==2008 //0 changes
 
 ** these are from above - change dod to missing (deceased already
-** set to 0 above) as they did not die within 1, 3, 5 years
+** set to 0 above) as they did not die within 1, 3, 5, 10 years
 gen dod_1yr=dod
 gen dod_3yr=dod
 gen dod_5yr=dod 
+gen dod_10yr=dod 
 format dod_* %tdCCYY-NN-DD
 
 replace dod_1yr=. if enddate_1yr<dod_1yr & dod_1yr!=. //614 changes
 replace dod_3yr=. if enddate_3yr<dod_3yr & dod_3yr!=. //215 changes
 replace dod_5yr=. if enddate_5yr<dod_5yr & dod_5yr!=. & dxyr!=2014 //110 changes
+replace dod_10yr=. if enddate_10yr<dod_10yr & dod_10yr!=. & dxyr==2008 //5 changes
 
 sort enddate_*
 tab enddate_1yr ,m 
 tab enddate_3yr ,m 
 tab enddate_5yr if dxyr!=2014 ,m
+tab enddate_10yr if dxyr==2008 ,m
 
 ** Now to set up dataset for survival analysis, we need each patient's date of
 ** entry to study (incidence date, or dot), and exit date from study which is end_date
@@ -2473,42 +2494,52 @@ sort pid
 count if (enddate_1yr>dod_1yr & dod_1yr!=. & deceased_1yr==1) //788
 count if (enddate_3yr>dod_3yr & dod_3yr!=. & deceased_3yr==1) //1151
 count if (enddate_5yr>dod_5yr & dod_5yr!=. & deceased_5yr==1 & dxyr!=2014) //854
+count if (enddate_10yr>dod_10yr & dod_10yr!=. & deceased_10yr==1 & dxyr==2008) //511
 gen newenddate_1yr=dod_1yr if (enddate_1yr>dod_1yr & dod_1yr!=. & deceased_1yr==1)
 gen newenddate_3yr=dod_3yr if (enddate_3yr>dod_3yr & dod_3yr!=. & deceased_3yr==1)
 gen newenddate_5yr=dod_5yr if (enddate_5yr>dod_5yr & dod_5yr!=. & deceased_5yr==1 & dxyr!=2014)
+gen newenddate_10yr=dod_10yr if (enddate_10yr>dod_10yr & dod_10yr!=. & deceased_10yr==1 & dxyr==2008)
 
 count if (dlc<enddate_1yr) & dod_1yr==. & deceased_1yr==0 //588
 count if (dlc<enddate_3yr) & dod_3yr==. & deceased_3yr==0 //808
 count if (dlc<enddate_5yr) & dod_5yr==. & deceased_5yr==0 & dxyr!=2014 //572
+count if (dlc<enddate_10yr) & dod_10yr==. & deceased_10yr==0 & dxyr==2008 //229
 replace newenddate_1yr=dlc if (dlc<enddate_1yr) & dod_1yr==. & deceased_1yr==0 //588 changes
 replace newenddate_3yr=dlc if (dlc<enddate_3yr) & dod_3yr==. & deceased_3yr==0 //808 changes
 replace newenddate_5yr=dlc if (dlc<enddate_5yr) & dod_5yr==. & deceased_5yr==0 & dxyr!=2014 //572 changes
+replace newenddate_10yr=dlc if (dlc<enddate_10yr) & dod_10yr==. & deceased_10yr==0 & dxyr==2008 //229 changes
 
 count if newenddate_1yr==. //875
 count if newenddate_3yr==. //655; 292
 count if newenddate_5yr==. & dxyr!=2014 //399; 48
+count if newenddate_10yr==. & dxyr==2008 //5
 
 //list dot deceased_1yr dod_1yr dlc enddate_1yr if newenddate_1yr==.
 replace newenddate_1yr=enddate_1yr if newenddate_1yr==. //875 changes
 replace newenddate_3yr=enddate_3yr if newenddate_3yr==. //655 changes
 replace newenddate_5yr=enddate_5yr if newenddate_5yr==. & dxyr!=2014 //399 changes
+replace newenddate_10yr=enddate_10yr if newenddate_10yr==. & dxyr==2008 //5 changes
 format newenddate_* %dD_m_CY
 
 sort dot
 tab time_1yr ,m //875=365.25
 tab time_3yr ,m //292=1095.75
 tab time_5yr if dxyr!=2014 ,m //48=1826.25
+tab time_10yr if dxyr==2008 ,m //5=3652.5
 
 replace time_1yr=365 if time_1yr==365.25 //875 changes
 replace time_3yr=1095 if time_3yr==1095.75 //292 changes
 replace time_5yr=1826 if time_5yr==1826.25 //48 changes
+replace time_10yr=3652 if time_10yr==3652.5 //5 changes
 
 count if time_1yr==0 //298
 count if time_3yr==0 //298; 287
 count if time_5yr==0 //86; 73
+count if time_10yr==0 //17
 //list basis deceased_1yr dot dod_1yr dlc enddate_1yr newenddate_1yr if time_1yr==0 ,noobs
 //list basis deceased_3yr dot dod_3yr dlc enddate_3yr newenddate_3yr if time_3yr==0 ,noobs
 //list basis deceased_5yr dot dod_5yr dlc enddate_5yr newenddate_5yr if time_5yr==0 ,noobs
+//list basis deceased_10yr dot dod_10yr dlc enddate_10yr newenddate_10yr if time_10yr==0 ,noobs
 
 ** Since DCOs have been removed from this dataset, all cases whether dead or censored
 ** should have at least a value of 1 day
@@ -2522,87 +2553,23 @@ replace newenddate_3yr=newenddate_3yr+1 if time_3yr==0 //298; 287 changes
 replace time_3yr=1 if time_3yr==0 //298; 287 changes
 replace newenddate_5yr=newenddate_5yr+1 if time_5yr==0 //86; 73 changes
 replace time_5yr=1 if time_5yr==0 //86; 73 changes
+replace newenddate_10yr=newenddate_10yr+1 if time_10yr==0 //17 changes
+replace time_10yr=1 if time_10yr==0 //17 changes
 
-tab deceased ,m //37.72% for all years
-/*
-   Survival |
-  identifer |      Freq.     Percent        Cum.
-------------+-----------------------------------
-   censored |        849       37.72       37.72
-       dead |      1,402       62.28      100.00
-------------+-----------------------------------
-      Total |      2,251      100.00
-*/
+tab deceased ,m 
 tab deceased_1yr ,m
-/*
-   Survival |
-  identifer |
-     at 1yr |      Freq.     Percent        Cum.
-------------+-----------------------------------
-   censored |      1,463       64.99       64.99
-       dead |        788       35.01      100.00
-------------+-----------------------------------
-      Total |      2,251      100.00
-*/
 tab deceased_3yr ,m 
-/*
-   Survival |
-  identifer |
-    at 3yrs |      Freq.     Percent        Cum.
-------------+-----------------------------------
-   censored |      1,100       48.87       48.87
-       dead |      1,151       51.13      100.00
-------------+-----------------------------------
-      Total |      2,251      100.00
-*/
 tab deceased_5yr ,m 
-/*
-   Survival |
-  identifer |
-    at 5yrs |      Freq.     Percent        Cum.
-------------+-----------------------------------
-   censored |        959       42.60       42.60
-       dead |      1,292       57.40      100.00
-------------+-----------------------------------
-      Total |      2,251      100.00
-*/
+tab deceased_10yr ,m 
+
 count //2251
 
 
 tab deceased_1yr dxyr ,m
-/*
-  Survival |
- identifer |          DiagnosisYear
-    at 1yr |      2008       2013       2014 |     Total
------------+---------------------------------+----------
-  censored |       509        462        492 |     1,463 
-      dead |       236        267        285 |       788 
------------+---------------------------------+----------
-     Total |       745        729        777 |     2,251 
-*/
 tab deceased_3yr dxyr ,m
-/*
-  Survival |
- identifer |          DiagnosisYear
-   at 3yrs |      2008       2013       2014 |     Total
------------+---------------------------------+----------
-  censored |       379        337        384 |     1,100 
-      dead |       366        392        393 |     1,151 
------------+---------------------------------+----------
-     Total |       745        729        777 |     2,251 
-*/
 tab deceased_5yr dxyr if dxyr!=2014 ,m
-/*
+tab deceased_10yr dxyr if dxyr==2008 ,m
 
-  Survival |
- identifer |     DiagnosisYear
-   at 5yrs |      2008       2013 |     Total
------------+----------------------+----------
-  censored |       326        294 |       620 
-      dead |       419        435 |       854 
------------+----------------------+----------
-     Total |       745        729 |     1,474
-*/
 
 ** Create survival variables by dxyr
 gen surv1yr_2008=1 if deceased_1yr==1 & dxyr==2008
@@ -2611,6 +2578,8 @@ gen surv3yr_2008=1 if deceased_3yr==1 & dxyr==2008
 replace surv3yr_2008=0 if deceased_3yr==0 & dxyr==2008
 gen surv5yr_2008=1 if deceased_5yr==1 & dxyr==2008
 replace surv5yr_2008=0 if deceased_5yr==0 & dxyr==2008
+gen surv10yr_2008=1 if deceased_10yr==1 & dxyr==2008
+replace surv10yr_2008=0 if deceased_10yr==0 & dxyr==2008
 gen surv1yr_2013=1 if deceased_1yr==1 & dxyr==2013
 replace surv1yr_2013=0 if deceased_1yr==0 & dxyr==2013
 gen surv3yr_2013=1 if deceased_3yr==1 & dxyr==2013
@@ -2622,10 +2591,11 @@ replace surv1yr_2014=0 if deceased_1yr==0 & dxyr==2014
 gen surv3yr_2014=1 if deceased_3yr==1 & dxyr==2014
 replace surv3yr_2014=0 if deceased_3yr==0 & dxyr==2014
 label define surv_lab 0 "censored" 1 "dead", modify
-label values surv1yr_2008 surv3yr_2008 surv5yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv_lab
+label values surv1yr_2008 surv3yr_2008 surv5yr_2008 surv10yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv_lab
 label var surv1yr_2008 "Survival at 1yr - 2008"
 label var surv3yr_2008 "Survival at 3yrs - 2008"
 label var surv5yr_2008 "Survival at 5yrs - 2008"
+label var surv10yr_2008 "Survival at 10yrs - 2008"
 label var surv1yr_2013 "Survival at 1yr - 2013"
 label var surv3yr_2013 "Survival at 3yrs - 2013"
 label var surv5yr_2013 "Survival at 5yrs - 2013"
@@ -2636,6 +2606,7 @@ tab dxyr ,m
 tab surv1yr_2008 if dxyr==2008 ,m
 tab surv3yr_2008 if dxyr==2008 ,m
 tab surv5yr_2008 if dxyr==2008 ,m
+tab surv10yr_2008 if dxyr==2008 ,m
 tab surv1yr_2013 if dxyr==2013 ,m
 tab surv3yr_2013 if dxyr==2013 ,m
 tab surv5yr_2013 if dxyr==2013 ,m
@@ -2650,10 +2621,12 @@ tab surv3yr_2014 if dxyr==2014 ,m
 tab surv1yr_2008 if siteiarc==29 //breast 1-yr survival
 tab surv3yr_2008 if siteiarc==29 //breast 3-yr survival
 tab surv5yr_2008 if siteiarc==29 //breast 5-yr survival
+tab surv10yr_2008 if siteiarc==29 //breast 10-yr survival
 ** PROSTATE
 tab surv1yr_2008 if siteiarc==39 //prostate 1-yr survival
 tab surv3yr_2008 if siteiarc==39 //prostate 3-yr survival
 tab surv5yr_2008 if siteiarc==39 //prostate 5-yr survival
+tab surv10yr_2008 if siteiarc==39 //prostate 10-yr survival
 
 **********
 ** 2013 **
@@ -2690,7 +2663,7 @@ save "`datapath'\version02\3-output\2008_2013_2014_cancer_survival", replace
 label data "2008 2013 2014 BNR-Cancer analysed data - Survival Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
-note: TS For survival analysis, use variables surv1yr_2008, surv1yr_2013, surv1yr_2014, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv5yr_2008, surv5yr_2013
+note: TS For survival analysis, use variables surv1yr_2008, surv1yr_2013, surv1yr_2014, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv5yr_2008, surv5yr_2013, surv10yr_2008
 
 STOP
 *******************************
