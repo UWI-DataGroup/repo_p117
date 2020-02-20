@@ -38,7 +38,7 @@
 *************************
 ** Annual report: Table 1 (executive summary)
 ** Load the NON-SURVIVAL dataset
-use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", clear
+use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival", clear
 //save "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , replace
 //use "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , clear
 
@@ -74,7 +74,7 @@ frame rename default nonsurv
 frame create surv 
 frame change surv
 ** Copy patient totals from survival dataset into this dataset by creating new frame for survival dataset
-use "`datapath'\version02\3-output\2008_2013_2014_cancer_survival", clear
+use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_survival", clear
 egen surv1yr_2014_censor=count(surv1yr_2014) if surv1yr_2014==0
 egen surv1yr_2014_dead=count(surv1yr_2014) if surv1yr_2014==1
 drop surv1yr_2014

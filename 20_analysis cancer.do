@@ -92,8 +92,8 @@ count if mppid_analysis>0 //70
 
 ** note: remember to check in situ vs malignant from behaviour (beh)
 tab beh ,m // 2417 malignant; 0 in-situ (excluded from this dataset)
-/*
-STOP - below applies to current data year only (2015)
+
+
 *************************************************
 ** (1.2) DCOs - patients identified only at death
 *************************************************
@@ -216,7 +216,7 @@ save "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers", replac
 
 ** Load the dataset
 use "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers", replace
-/*
+
 ***********************
 ** 3.1 CANCERS BY SITE
 ***********************
@@ -276,7 +276,6 @@ Stomach (C16)																21	2.98
 total count //705
 restore
 
-*/
 
 * *********************************************
 * ANALYSIS: SECTION 3 - cancer sites
