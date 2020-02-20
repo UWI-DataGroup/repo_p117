@@ -413,3 +413,67 @@ putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_2015_summstats" ,replace
 restore
+
+
+** Output for above ASIRs comparison using BSS vs WPP populations
+use "`datapath'\version02\2-working\ASIRs_BSS_WPP", clear
+format asir %04.2f
+sort cancer_site year asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+				****************************
+putdocx clear
+putdocx begin, footer(foot1)
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
+putdocx paragraph, style(Title)
+putdocx text ("CANCER Population Report: BSS vs WPP"), bold
+putdocx textblock begin
+Date Prepared: 02-Dec-2019. 
+Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
+Generated using Dofile: repo_p117\20_analysis cancer.do
+putdocx textblock end
+putdocx paragraph
+putdocx text ("Methods"), bold
+putdocx textblock begin
+(1) Dataset: Excludes ineligible case definition, non-residents, non-malignant tumours, IARC non-reportable MPs; cancer dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
+putdocx textblock end
+putdocx textblock begin
+(2) ASIR (BSS_2013): stata command distrate used with pop_bss_2013-10 for 2013 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_bss_2013-10")
+putdocx textblock end
+putdocx textblock begin
+(3) ASIR (WPP_2013): stata command distrate used with pop_wpp_2013-10 for 2013 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_wpp_2013-10")
+putdocx textblock end
+putdocx textblock begin
+(4) ASIR (BSS_2014): stata command distrate used with pop_bss_2014-10 for 2014 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_bss_2014-10")
+putdocx textblock end
+putdocx textblock begin
+(5) ASIR (WPP_2014): stata command distrate used with pop_wpp_2014-10 for 2014 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_wpp_2014-10")
+putdocx textblock end
+putdocx textblock begin
+(6) Population text files (BSS): saved in: "`datapath'\version02\2-working\BSS_population by sex_yyyy"
+putdocx textblock end
+putdocx textblock begin
+(7) Population text files (WPP): saved in: "`datapath'\version02\2-working\WPP_population by sex_yyyy"
+putdocx textblock end
+putdocx textblock begin
+(8) Population files (BSS): emailed to JCampbell from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
+putdocx textblock end
+putdocx textblock begin
+(9) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+putdocx textblock end
+putdocx pagebreak
+putdocx table tbl1 = data(population cancer_site year asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx save "`datapath'\version02\3-output\2019-12-02_population_comparison.docx", replace
+putdocx clear
+
+save "`datapath'\version02\3-output\population_comparison_BSS_WPP" ,replace

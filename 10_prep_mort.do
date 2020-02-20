@@ -558,6 +558,7 @@ replace cancer=1 if regexm(coddeath, "FUNGOIDES") &  cancer==. //2 change
 replace cancer=1 if regexm(coddeath, "HODGKIN") &  cancer==. //0 changes
 replace cancer=1 if regexm(coddeath, "MELANOMA") &  cancer==. //1 change
 replace cancer=1 if regexm(coddeath,"MYELODYS") &  cancer==. //3 changes
+//replace cancer=1 if regexm(coddeath,"GLIOMA") &  cancer==. //add in for next dc year
 
 ** Strip possible leading/trailing blanks in cod1a
 replace coddeath = rtrim(ltrim(itrim(coddeath))) //0 changes
@@ -645,6 +646,11 @@ format dds2dod %tdCCYY-NN-DD
 
 order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod
 
+label data "BNR MORTALITY data 2017-2018"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\3-output\2017-2018_deaths_for_matchingV02" ,replace
+note: TS This dataset can be used for matching 2017, 2018 deaths with incidence data
+
 rename regnum dds2regnum 
 rename pname dds2pname 
 rename age dds2age 
@@ -703,6 +709,7 @@ rename dupname dds2dupname
 rename dupdod dds2dupdod
 rename dodyear dds2dodyear 
 rename cod dds2cod
+
 /*    
 label copy recstattf_lab dds2recstattf_lab       
 label copy tfddda_lab dds2tfddda_lab
@@ -1231,6 +1238,12 @@ tab dodyear ,m
 count if dodyear!=year(dod) //0
 //list pid record_id dod dodyear if dodyear!=year(dod)
 replace dodyear=year(dod) if dodyear!=year(dod) //0 changes
+
+label data "BNR MORTALITY data 2015"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\3-output\2015_prep mort_ALL" ,replace
+note: TS This dataset is used for analysis of age-standardized mortality rates
+note: TS This dataset includes all 2015 CODs
 
 *******************
 ** Check for MPs **
@@ -1889,3 +1902,618 @@ notes _dta :These data prepared from BB national death register & Redcap deathda
 save "`datapath'\version02\3-output\2015_prep mort" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
+
+
+**************************
+**     	  Preparing     **
+** 		2016 Deaths 	**
+**************************
+***********************
+use "`datapath'\version02\3-output\2008-2018_deaths_tf" ,clear
+
+** Next we get rid of those who died pre- and post-2016 as 2015, 2017 and 2018 deaths prepared previously
+drop if dod<d(01jan2016) | dod>d(31dec2016) //24347 deleted
+** Remove Tracking Form info
+drop if event==2 //73 deleted
+
+count //2488
+
+*****************
+**  Formatting **
+**    Names    **
+*****************
+rename namematch nm
+
+** Need to check for duplicate death registrations
+** First split full name into first, middle and last names
+** Also - code to split full name into 2 variables fname and lname - else can't merge! 
+split pname, parse(", "" ") gen(name)
+order record_id pname name*
+sort record_id
+
+** Use Stata browse to view results as changes are made
+** (1) sort cases that contain only a first name and a last name
+count if name5=="" & name4=="" & name3=="" & name2=="" //1
+count if name5=="" & name4=="" & name3=="" //1862
+count if name5=="" //2486
+count if name5!="" & name4=="" & name3=="" & name2=="" //0
+count if name5!="" //2
+count if name4=="" & name3=="" & name2=="" //1
+count if name4!="" & name3=="" & name2=="" //0
+count if name4=="" //2437
+count if name4!="" //51
+count if name3=="" & name2=="" //1
+count if name3!="" & name2=="" //0
+count if name3=="" //1862
+count if name2=="" //1
+count if name2!="" //2487
+count if name1=="" //0
+replace name5="99" if record_id==19523 //1 change
+replace name5=name2 if name5=="" & name4=="" & name3=="" //1861 changes
+replace name2="" if name3=="" & name4=="" //1861 changes
+
+** (2) sort cases with name 'baby' or 'b/o' in name1 variable
+count if (regexm(name1,"BABY")|regexm(name1,"B/O")|regexm(name1,"MALE")|regexm(name1,"FEMALE")) //10
+gen tempvarn=1 if (regexm(name1,"BABY")|regexm(name1,"B/O")|regexm(name1,"MALE")|regexm(name1,"FEMALE"))
+//list record_id pname name1 name2 name3 name4 name5 if tempvarn==1
+replace name1=name1+" "+name2 if tempvarn==1 & record_id!=20375 //9 changes
+replace name2=name3 if tempvarn==1 & record_id!=20375 //9 changes
+replace name5=name4 if tempvarn==1 & record_id!=20375 //9 changes
+replace name3="" if tempvarn==1 & record_id!=20375 //9 changes
+replace name4="" if tempvarn==1 & record_id!=20375 //9 changes
+
+** (3)
+** Names containing 'ST' are being interpreted as 'ST'=name1/fname so correct
+count if name1=="ST" | name1=="ST." //5
+replace tempvarn=2 if name1=="ST" | name1=="ST."
+//list record_id pname name1 name2 name5 if tempvarn==2
+replace name1=name1+"."+""+name2 if tempvarn==2 //5 changes
+replace name2="" if tempvarn==2 //5 changes
+replace name5=name3 if tempvarn==2 & record_id!=20508 //4 changes
+replace name5=name4 if record_id==20508 //1 change
+replace name2=name3 if record_id==20508 //1 change
+replace name3="" if tempvarn==2 //4 changes
+replace name4="" if tempvarn==2 //1 change
+//replace name1 = subinstr(name1, ".", "",1) if record_id==24517|record_id==24774
+** Names containing 'ST' are being interpreted as 'ST'=name2/fname so correct
+count if name2=="ST" | name2=="ST." //14
+replace tempvarn=3 if name2=="ST" | name2=="ST."
+replace name2=name2+"."+""+name3 if tempvarn==3 //14 changes
+replace name2 = subinstr(name2, ".", "",1) if record_id==19323|record_id==19969
+replace name3="" if tempvarn==3 //14 changes
+replace name5=name4 if tempvarn==3 //6 changes
+replace name4="" if tempvarn==3 //6 changes
+replace name5=name2 if tempvarn==3 & name5=="" //8 changes
+replace name2="" if tempvarn==3 & name5==name2 //8 changes
+** Names containing 'ST' are being interpreted as 'ST'=name3/fname so correct
+count if name3=="ST" | name3=="ST." //1
+replace tempvarn=4 if name3=="ST" | name3=="ST."
+replace name5=name3+"."+""+name4 if tempvarn==4 //1 change
+replace name3="" if tempvarn==4 //1 change
+replace name4="" if tempvarn==4 //1 change
+** Names containing 'ST' are being interpreted as 'ST'=name3/fname so correct
+count if name4=="ST" | name4=="ST." //1
+replace tempvarn=5 if name4=="ST" | name4=="ST."
+replace name5=name4+"."+""+name5 if tempvarn==5 //1 change
+replace name4="" if tempvarn==5 //1 change
+
+** (4) sort cases with name in name4 variable
+count if name4!="" //33
+//list record_id *name* if name4!=""
+replace name5=name4 if name4!="" & name5==""
+replace name2=name2+" "+name3+" "+name4 if record_id==20877
+replace name4="" if name4==name5 //32 changes
+replace name3="" if record_id==20877
+replace name4="" if record_id==20877
+
+** (5) sort cases with name in name3 variable
+count if name3!="" //597
+//list record_id *name* if name5!=""
+replace name5=name3 if name3!="" & name4=="" & name5=="" //563 changes
+replace name3="" if name3==name5 //563 changes
+replace name2=name2+" "+name3+" " if name3!="" & record_id!=20249
+replace name3="" if name3!="" & record_id!=20249
+replace name5=name3+" "+name5 if record_id==20249
+replace name3="" if record_id==20249
+
+** (6) sort cases with NO name in name5 variable
+count if name5=="" //0
+//list record_id *name* if name3==""
+//replace name3=substr(name1,6,11) if record_id==25303
+
+** (7) sort cases with suffixes
+count if (name5!="" & name5!="99") & length(name5)<4 //18 - all correct
+//replace tempvarn=6 if (name5!="" & name5!="99") & length(name5)<4
+//list record_id pname fname mname lname if (lname!="" & lname!="99") & length(lname)<3
+
+** Now rename, check and remove unnecessary variables
+rename name1 fname
+rename name2 mname
+rename name5 lname
+count if fname=="" //0
+count if lname=="" //0
+drop name4 name3 tempvarn
+
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //2488 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //612 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //2487 changes
+
+rename nm namematch
+order record_id pname fname mname lname namematch
+
+*************************
+** Checking & Removing ** 
+**   Duplicate Death   **
+**    Registrations    **
+*************************
+/* 
+NB: These deaths were cleaned previously for importing into DeathData REDCapdb 
+so the field namematch can be used as a guide for checking duplicates
+	1=names match but different person
+	2=no name match
+*/
+//label define namematch_lab 1 "deaths only namematch,diff.pt" 2 "no namematch" 3 "cr5 & death namematch,diff.pt" 4 "slc=2/9,not in deathdata", modify
+//label values namematch namematch_lab
+sort lname fname record_id
+quietly by lname fname : gen dupname = cond(_N==1,0,_n)
+sort lname fname record_id
+count if dupname>0 //32
+//list record_id fname lname nrn dod addr namematch if dupname>0
+replace namematch=1 if dupname>0 & namematch!=1
+/* 
+Check below list for cases where namematch=no match but 
+there is a pt with same name then:
+ (1) check if same pt and remove duplicate pt;
+ (2) check if same name but different pt and
+	 update namematch variable to reflect this, i.e.
+	 namematch=1
+*/
+
+preserve
+drop if nrn==.
+sort nrn 
+quietly by nrn : gen dupnrn = cond(_N==1,0,_n)
+sort nrn record_id lname fname
+count if dupnrn>0 //0
+list record_id namematch fname lname nrn dod sex age if dupnrn>0
+//replace namematch=1 if dupnrn>0 //3 changes
+restore
+
+** Final check for duplicates by name and dod 
+sort lname fname dod
+quietly by lname fname dod: gen dupdod = cond(_N==1,0,_n)
+sort lname fname dod record_id
+count if dupdod>0 //2 - diff.pt & namematch already=1
+//list record_id namematch fname lname nrn dod sex age if dupdod>0
+count if dupdod>0 & namematch!=1 //0
+
+count //2488
+
+** Now generate a new variable which will select out all the potential cancers
+gen cancer=.
+label define cancer_lab 1 "cancer" 2 "not cancer", modify
+label values cancer cancer_lab
+label var cancer "cancer diagnoses"
+label var record_id "Event identifier for registry deaths"
+
+** searching cod1a for these terms
+replace cod1a="99" if cod1a=="999" //0 changes
+replace cod1b="99" if cod1b=="999" //0 changes
+replace cod1c="99" if cod1c=="999" //0 changes
+replace cod1d="99" if cod1d=="999" //0 changes
+replace cod2a="99" if cod2a=="999" //0 changes
+replace cod2b="99" if cod2b=="999" //0 changes
+count if cod1c!="99" //0
+count if cod1d!="99" //0
+count if cod2a!="99" //0
+count if cod2b!="99" //0
+//ssc install unique
+//ssc install distinct
+** Create variable with combined CODs
+gen coddeath=cod1a+" "+cod1b+" "+cod1c+" "+cod1d+" "+cod2a+" "+cod2b
+replace coddeath=subinstr(coddeath,"99 ","",.) //2488
+replace coddeath=subinstr(coddeath," 99","",.) //2488
+** Identify cancer deaths using variable called 'cancer'
+replace cancer=1 if regexm(coddeath, "CANCER") & cancer==. //311 changes
+replace cancer=1 if regexm(coddeath, "TUMOUR") &  cancer==. //12 changes
+replace cancer=1 if regexm(coddeath, "TUMOR") &  cancer==. //6 changes
+replace cancer=1 if regexm(coddeath, "MALIGNANT") &  cancer==. //6 changes
+replace cancer=1 if regexm(coddeath, "MALIGNANCY") &  cancer==. //36 changes
+replace cancer=1 if regexm(coddeath, "NEOPLASM") &  cancer==. //4 changes
+replace cancer=1 if regexm(coddeath, "CARCINOMA") &  cancer==. //196 changes
+replace cancer=1 if regexm(coddeath, "CARCIMONA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CARINOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MYELOMA") &  cancer==. //25 changes
+replace cancer=1 if regexm(coddeath, "LYMPHOMA") &  cancer==. //16 changes
+replace cancer=1 if regexm(coddeath, "LYMPHOMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "LYMPHONA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "SARCOMA") &  cancer==. //4 changes
+replace cancer=1 if regexm(coddeath, "TERATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "LEUKEMIA") &  cancer==. //17 changes
+replace cancer=1 if regexm(coddeath, "LEUKAEMIA") &  cancer==. //3 changes
+replace cancer=1 if regexm(coddeath, "HEPATOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CARANOMA PROSTATE") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MENINGIOMA") &  cancer==. //4 changes
+replace cancer=1 if regexm(coddeath, "MYELOSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MYELOFIBROSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CYTHEMIA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "CYTOSIS") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "BLASTOMA") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "METASTATIC") &  cancer==. //4 changes
+replace cancer=1 if regexm(coddeath, "MASS") &  cancer==. //18 changes
+replace cancer=1 if regexm(coddeath, "METASTASES") &  cancer==. //2 changes
+replace cancer=1 if regexm(coddeath, "METASTASIS") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath, "REFRACTORY") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "FUNGOIDES") &  cancer==. //0 change
+replace cancer=1 if regexm(coddeath, "HODGKIN") &  cancer==. //0 changes
+replace cancer=1 if regexm(coddeath, "MELANOMA") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath,"MYELODYS") &  cancer==. //2 changes
+replace cancer=1 if regexm(coddeath,"ASTROCYTOMA") &  cancer==. //2 changes
+replace cancer=1 if regexm(coddeath,"CARCINOME") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath,"MALIGANCY") &  cancer==. //1 change
+replace cancer=1 if regexm(coddeath,"MULTIFORME") &  cancer==. //1 change
+//replace cancer=1 if regexm(coddeath,"GLIOMA") &  cancer==. //add in for next dc year
+
+** Strip possible leading/trailing blanks in cod1a
+replace coddeath = rtrim(ltrim(itrim(coddeath))) //0 changes
+
+tab cancer, missing //1820 missing
+
+drop dodyear
+gen dodyear=year(dod)
+tab dodyear cancer,m
+
+** Check that all cancer CODs for 2016 are eligible
+sort coddeath record_id
+order record_id coddeath
+//list coddeath if cancer==1 & inrange(record_id, 0, 24000)
+** 588
+//list coddeath if cancer==1 & inrange(record_id, 24001, 27000)
+** 778
+
+** Replace 2014 cases that are not cancer according to eligibility SOP:
+/*
+	(1) After merge with CR5 data then may need to reassign some of below 
+		deaths as CR5 data may indicate eligibility while COD may exclude
+		(e.g. see record_id==15458)
+	(2) use obsid to check for CODs that incomplete in Results window with 
+		Data Editor in browse mode-copy and paste record_id below from here
+*/
+replace cancer=2 if ///
+record_id==20185|record_id==19919|record_id==19843|record_id==20148|record_id==20393| ///
+record_id==20591|record_id==19735|record_id==19559|record_id==20315|record_id==20142| ///
+record_id==19561|record_id==20137|record_id==20974|record_id==19403|record_id==20492| ///
+record_id==21145|record_id==19954|record_id==19608|record_id==21301|record_id==20599| ///
+record_id==20027|record_id==19417|record_id==19322|record_id==19987|record_id==21677| ///
+record_id==20385|record_id==20885|record_id==21071|record_id==20878|record_id==21652| ///
+record_id==20956|record_id==20402|record_id==20796|record_id==21251|record_id==20570
+//replace coddeath=subinstr(coddeath,"GLIORRIA","GLIOMA",.) //1 change
+//35 changes
+
+** Check that all 2014 CODs that are not cancer for eligibility
+tab dodyear cancer,m
+count if cancer==. & inrange(record_id, 0, 23000) //873
+count if cancer==. & inrange(record_id, 23001, 24000) //761
+count if cancer==. & inrange(record_id, 24001, 2000) //725
+//list coddeath if cancer==. & inrange(record_id, 0, 24000)
+//list coddeath if cancer==. & inrange(record_id, 24001, 27000)
+
+** No updates needed from above list
+replace cancer=1 if ///
+record_id==19812|record_id==20473
+
+
+replace cancer=2 if cancer==. //1813 changes
+
+** Create cod variable 
+gen cod=.
+label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known" 4 "NA", modify
+label values cod cod_lab
+label var cod "COD categories"
+replace cod=1 if cancer==1 //640 changes
+replace cod=2 if cancer==2 //1848 changes
+** one unknown causes of death in 2014 data - record_id 12323
+replace cod=3 if coddeath=="99"|(regexm(coddeath,"INDETERMINATE")|regexm(coddeath,"UNDETERMINED")) //11 changes
+
+** Change sex to match cancer dataset
+tab sex ,m
+rename sex sex_old
+gen sex=1 if sex_old==2 //2467 changes
+replace sex=2 if sex_old==1 //2587 changes
+drop sex_old
+label define sex_lab 1 "Female" 2 "Male", modify
+label values sex sex_lab
+label var sex "Sex"
+tab sex ,m
+
+** Remove, relabel certain variables for merging with cancer ds
+gen dds2dod=dod
+format dds2dod %tdCCYY-NN-DD
+
+order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod
+/*
+rename regnum dds2regnum 
+rename pname dds2pname 
+rename age dds2age 
+rename cancer dds2cancer 
+rename cod1a dds2cod1a 
+rename address dds2address 
+rename parish dds2parish 
+rename pod dds2pod 
+rename coddeath dds2coddeath
+rename mname dds2mname 
+rename namematch dds2namematch 
+rename event dds2event 
+rename dddoa dds2dddoa 
+rename ddda dds2ddda 
+rename odda dds2odda 
+rename certtype dds2certtype 
+rename district dds2district 
+rename agetxt dds2agetxt 
+rename nrnnd dds2nrnnd
+rename mstatus dds2mstatus 
+rename occu dds2occu 
+rename durationnum dds2durationnum 
+rename durationtxt dds2durationtxt 
+rename onsetnumcod1a dds2onsetnumcod1a 
+rename onsettxtcod1a dds2onsettxtcod1a 
+rename cod1b dds2cod1b
+rename onsetnumcod1b dds2onsetnumcod1b 
+rename onsettxtcod1b dds2onsettxtcod1b 
+rename cod1c dds2cod1c 
+rename onsetnumcod1c dds2onsetnumcod1c 
+rename onsettxtcod1c dds2onsettxtcod1c 
+rename cod1d dds2cod1d 
+rename onsetnumcod1d dds2onsetnumcod1d
+rename onsettxtcod1d dds2onsettxtcod1d 
+rename cod2a dds2cod2a 
+rename onsetnumcod2a dds2onsetnumcod2a 
+rename onsettxtcod2a dds2onsettxtcod2a 
+rename cod2b dds2cod2b 
+rename onsetnumcod2b dds2onsetnumcod2b 
+rename onsettxtcod2b dds2onsettxtcod2b
+rename deathparish dds2deathparish 
+rename regdate dds2regdate 
+rename certifier dds2certifier 
+rename certifieraddr dds2certifieraddr 
+rename recstatdc dds2recstatdc 
+rename tfdddoa dds2tfdddoa 
+rename tfddda dds2tfddda 
+rename tfregnumstart dds2tfregnumstart
+rename tfdistrictstart dds2tfdistrictstart 
+rename tfregnumend dds2tfregnumend 
+rename tfdistrictend dds2tfdistrictend 
+rename tfddtxt dds2tfddtxt 
+rename recstattf dds2recstattf 
+rename duprec dds2duprec 
+rename dupname dds2dupname 
+rename dupdod dds2dupdod
+rename dodyear dds2dodyear 
+rename cod dds2cod
+*/
+count //2488
+
+label data "BNR MORTALITY data 2016"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\3-output\2016_deaths_for_matching" ,replace
+note: TS This dataset can be used for matching 2016 deaths with incidence data
+
+clear
+
+**********************
+** Create 2015		**
+**  Death Dataset	**
+**	For Matching    **	
+**********************
+use "`datapath'\version02\3-output\2015_prep mort_ALL" ,clear
+/*
+** Remove, relabel certain variables for merging with cancer ds
+gen dds2dod=dod
+format dds2dod %tdCCYY-NN-DD
+drop dod
+*/
+order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod
+/*
+rename regnum dds2regnum 
+rename pname dds2pname 
+rename age dds2age 
+rename cancer dds2cancer 
+rename cod1a dds2cod1a 
+rename address dds2address 
+rename parish dds2parish 
+rename pod dds2pod 
+rename coddeath dds2coddeath
+rename mname dds2mname 
+rename namematch dds2namematch 
+rename event dds2event 
+rename dddoa dds2dddoa 
+rename ddda dds2ddda 
+rename odda dds2odda 
+rename certtype dds2certtype 
+rename district dds2district 
+rename agetxt dds2agetxt 
+rename nrnnd dds2nrnnd
+rename mstatus dds2mstatus 
+rename occu dds2occu 
+rename durationnum dds2durationnum 
+rename durationtxt dds2durationtxt 
+rename onsetnumcod1a dds2onsetnumcod1a 
+rename onsettxtcod1a dds2onsettxtcod1a 
+rename cod1b dds2cod1b
+rename onsetnumcod1b dds2onsetnumcod1b 
+rename onsettxtcod1b dds2onsettxtcod1b 
+rename cod1c dds2cod1c 
+rename onsetnumcod1c dds2onsetnumcod1c 
+rename onsettxtcod1c dds2onsettxtcod1c 
+rename cod1d dds2cod1d 
+rename onsetnumcod1d dds2onsetnumcod1d
+rename onsettxtcod1d dds2onsettxtcod1d 
+rename cod2a dds2cod2a 
+rename onsetnumcod2a dds2onsetnumcod2a 
+rename onsettxtcod2a dds2onsettxtcod2a 
+rename cod2b dds2cod2b 
+rename onsetnumcod2b dds2onsetnumcod2b 
+rename onsettxtcod2b dds2onsettxtcod2b
+rename deathparish dds2deathparish 
+rename regdate dds2regdate 
+rename certifier dds2certifier 
+rename certifieraddr dds2certifieraddr 
+//rename recstatdc dds2recstatdc 
+//rename tfdddoa dds2tfdddoa 
+//rename tfddda dds2tfddda 
+//rename tfregnumstart dds2tfregnumstart
+//rename tfdistrictstart dds2tfdistrictstart 
+//rename tfregnumend dds2tfregnumend 
+//rename tfdistrictend dds2tfdistrictend 
+//rename tfddtxt dds2tfddtxt 
+//rename recstattf dds2recstattf 
+rename duprec dds2duprec 
+rename dupname dds2dupname 
+rename dupdod dds2dupdod
+//rename dodyear dds2dodyear 
+//rename cod dds2cod
+//rename record_id dds2record_id
+//rename nrn dds2nrn
+*/
+count //2482
+
+label data "BNR MORTALITY data 2015"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\3-output\2015_deaths_for_matching" ,replace
+note: TS This dataset can be used for matching 2015 deaths with incidence data
+
+clear
+
+**********************
+** Create 2015-2018 **
+**  Death Dataset	**
+**	For Matching    **	
+**********************
+use "`datapath'\version02\3-output\2017-2018_deaths_for_matchingV02" ,clear
+count //5054
+append using "`datapath'\version02\3-output\2016_deaths_for_matching"
+count //7542
+
+** Create natregno to match with cancer dataset
+gen double nrn2=nrn
+format nrn2 %15.0g
+rename nrn2 natregno
+tostring natregno ,replace
+//gen nrn4=mod(nrn,10000) - extracting digits from NRN(number)
+count if natregno!="" & natregno!="." & length(natregno)!=10 //36
+gen nrnyear=dodyear-age if natregno!="" & natregno!="." & length(natregno)!=10
+list record_id fname lname dod age agetxt nrn natregno nrnyear if natregno!="" & natregno!="." & length(natregno)!=10
+replace natregno=subinstr(natregno,"1","01",.) if record_id==23433
+replace natregno=subinstr(natregno,"204","0204",.) if record_id==24773
+replace natregno=subinstr(natregno,"70","070",.) if record_id==22783
+replace natregno=subinstr(natregno,"1","01",.) if record_id==24567
+replace natregno=subinstr(natregno,"7","07",.) if record_id==25005
+replace natregno=subinstr(natregno,"3","03",.) if record_id==23734
+replace natregno=subinstr(natregno,"801","0801",.) if record_id==26779
+replace natregno=subinstr(natregno,"40","00040",.) if record_id==23396
+replace natregno=subinstr(natregno,"201","0201",.) if record_id==25898
+replace natregno=subinstr(natregno,"1","01",.) if record_id==23952
+replace natregno=subinstr(natregno,"1","01",.) if record_id==23475
+replace natregno=subinstr(natregno,"3","0003",.) if record_id==24943
+replace natregno=subinstr(natregno,"5","0005",.) if record_id==22031
+replace natregno=subinstr(natregno,"4","04",.) if record_id==22104
+replace natregno=subinstr(natregno,"40","040",.) if record_id==23677
+replace natregno=subinstr(natregno,"903","0903",.) if record_id==26175
+replace natregno=subinstr(natregno,"1","01",.) if record_id==23702
+replace natregno=subinstr(natregno,"51","051",.) if record_id==25973
+replace natregno=subinstr(natregno,"40","040",.) if record_id==24205
+replace natregno=subinstr(natregno,"80","080",.) if record_id==24418
+replace natregno=subinstr(natregno,"3","03",.) if record_id==24273
+replace natregno=subinstr(natregno,"1","001",.) if record_id==26686
+replace natregno=subinstr(natregno,"30","030",.) if record_id==26788
+replace natregno=subinstr(natregno,"4","04",.) if record_id==22552
+replace natregno=subinstr(natregno,"4","04",.) if record_id==22692
+replace natregno=subinstr(natregno,"606","0606",.) if record_id==22449
+replace natregno=subinstr(natregno,"12","0012",.) if record_id==24509
+replace natregno=subinstr(natregno,"8","0008",.) if record_id==21416
+replace natregno=subinstr(natregno,"9","09",.) if record_id==20866
+replace natregno=subinstr(natregno,"20","020",.) if record_id==21274
+replace natregno=subinstr(natregno,"1","001",.) if record_id==19509
+replace natregno=subinstr(natregno,"9","09",.) if record_id==20944
+replace natregno=subinstr(natregno,"81","081",.) if record_id==21017
+replace natregno=subinstr(natregno,"4","04",.) if record_id==19629
+replace natregno=subinstr(natregno,"9","09",.) if record_id==21361
+replace natregno=subinstr(natregno,"7","007",.) if record_id==20583
+
+append using "`datapath'\version02\3-output\2015_deaths_for_matching", force
+count //10024
+
+format dod %tdCCYY-NN-DD
+drop dodyear
+gen dodyear=year(dod)
+replace natregno="" if natregno=="." //492 changes
+drop dds2dod
+
+rename dod dds2dod
+rename natregno dds2natregno
+rename regnum dds2regnum 
+rename pname dds2pname 
+rename age dds2age 
+rename cancer dds2cancer 
+rename cod1a dds2cod1a 
+rename address dds2address 
+rename parish dds2parish 
+rename pod dds2pod 
+rename coddeath dds2coddeath
+rename mname dds2mname 
+rename namematch dds2namematch 
+rename event dds2event 
+rename dddoa dds2dddoa 
+rename ddda dds2ddda 
+rename odda dds2odda 
+rename certtype dds2certtype 
+rename district dds2district 
+rename agetxt dds2agetxt 
+rename nrnnd dds2nrnnd
+rename mstatus dds2mstatus 
+rename occu dds2occu 
+rename durationnum dds2durationnum 
+rename durationtxt dds2durationtxt 
+rename onsetnumcod1a dds2onsetnumcod1a 
+rename onsettxtcod1a dds2onsettxtcod1a 
+rename cod1b dds2cod1b
+rename onsetnumcod1b dds2onsetnumcod1b 
+rename onsettxtcod1b dds2onsettxtcod1b 
+rename cod1c dds2cod1c 
+rename onsetnumcod1c dds2onsetnumcod1c 
+rename onsettxtcod1c dds2onsettxtcod1c 
+rename cod1d dds2cod1d 
+rename onsetnumcod1d dds2onsetnumcod1d
+rename onsettxtcod1d dds2onsettxtcod1d 
+rename cod2a dds2cod2a 
+rename onsetnumcod2a dds2onsetnumcod2a 
+rename onsettxtcod2a dds2onsettxtcod2a 
+rename cod2b dds2cod2b 
+rename onsetnumcod2b dds2onsetnumcod2b 
+rename onsettxtcod2b dds2onsettxtcod2b
+rename deathparish dds2deathparish 
+rename regdate dds2regdate 
+rename certifier dds2certifier 
+rename certifieraddr dds2certifieraddr 
+//rename recstatdc dds2recstatdc 
+//rename tfdddoa dds2tfdddoa 
+//rename tfddda dds2tfddda 
+//rename tfregnumstart dds2tfregnumstart
+//rename tfdistrictstart dds2tfdistrictstart 
+//rename tfregnumend dds2tfregnumend 
+//rename tfdistrictend dds2tfdistrictend 
+//rename tfddtxt dds2tfddtxt 
+//rename recstattf dds2recstattf 
+rename duprec dds2duprec 
+rename dupname dds2dupname 
+rename dupdod dds2dupdod
+//rename dodyear dds2dodyear 
+//rename cod dds2cod
+//rename record_id dds2record_id
+//rename nrn dds2nrn
+
+label data "BNR MORTALITY data 2015-2018"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\3-output\2015-2018_deaths_for_matching" ,replace
+note: TS This dataset can be used for matching 2015-2018 deaths with incidence data

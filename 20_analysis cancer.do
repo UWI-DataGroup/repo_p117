@@ -42,7 +42,7 @@
 **************************************************************************
  
 ** LOAD cancer incidence dataset INCLUDING DCOs
-use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival" ,clear
+use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival" ,clear
 
 ** CASE variable
 drop case
@@ -2497,65 +2497,268 @@ restore
 
 clear
 
-** Output for above ASIRs comparison using BSS vs WPP populations
-use "`datapath'\version02\2-working\ASIRs_BSS_WPP", clear
-format asir %04.2f
-sort cancer_site year asir
 
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-				****************************
-putdocx clear
-putdocx begin, footer(foot1)
-putdocx paragraph, tofooter(foot1)
-putdocx text ("Page ")
-putdocx pagenumber
-putdocx paragraph, style(Title)
-putdocx text ("CANCER Population Report: BSS vs WPP"), bold
-putdocx textblock begin
-Date Prepared: 02-Dec-2019. 
-Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
-Generated using Dofile: repo_p117\20_analysis cancer.do
-putdocx textblock end
-putdocx paragraph
-putdocx text ("Methods"), bold
-putdocx textblock begin
-(1) Dataset: Excludes ineligible case definition, non-residents, non-malignant tumours, IARC non-reportable MPs; cancer dataset used: "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival")
-putdocx textblock end
-putdocx textblock begin
-(2) ASIR (BSS_2013): stata command distrate used with pop_bss_2013-10 for 2013 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_bss_2013-10")
-putdocx textblock end
-putdocx textblock begin
-(3) ASIR (WPP_2013): stata command distrate used with pop_wpp_2013-10 for 2013 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_wpp_2013-10")
-putdocx textblock end
-putdocx textblock begin
-(4) ASIR (BSS_2014): stata command distrate used with pop_bss_2014-10 for 2014 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_bss_2014-10")
-putdocx textblock end
-putdocx textblock begin
-(5) ASIR (WPP_2014): stata command distrate used with pop_wpp_2014-10 for 2014 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version02\2-working\pop_wpp_2014-10")
-putdocx textblock end
-putdocx textblock begin
-(6) Population text files (BSS): saved in: "`datapath'\version02\2-working\BSS_population by sex_yyyy"
-putdocx textblock end
-putdocx textblock begin
-(7) Population text files (WPP): saved in: "`datapath'\version02\2-working\WPP_population by sex_yyyy"
-putdocx textblock end
-putdocx textblock begin
-(8) Population files (BSS): emailed to JCampbell from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
-putdocx textblock end
-putdocx textblock begin
-(9) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
-putdocx textblock end
-putdocx pagebreak
-putdocx table tbl1 = data(population cancer_site year asir ci_lower ci_upper), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2019-12-02_population_comparison.docx", replace
-putdocx clear
 
-save "`datapath'\version02\3-output\population_comparison_BSS_WPP" ,replace
+***********************
+**  2008 2013 2014   **
+** Survival Datasets **
+***********************
+/*
+Data ineligible/excluded from survival analysis - taken from IARC 2012 summer school presented by Manuela Quaresma
+Ineligible Criteria:
+- Incomplete data
+- Beh not=/3
+- Not resident
+- Inappropriate morph code
+
+Excluded Criteria:
+- Age 100+
+- SLC unknown
+- Duplicate
+- Synchronous tumour
+- Sex incompatible with site
+- Dates invalid
+- Inconsistency between dob, dot and dlc
+- Multiple primary
+- DCO / zero survival (true zero survival included i.e. dot=dod but not a DCO)
+*/
+
+**************************************************************************
+* SURVIVAL ANALYSIS
+* Survival analysis to 1 year, 3 years and 5 years
+**************************************************************************
+** Load the dataset
+"`datapath'\version02\3-output\2008_2013_2014_2015_cancer_survival"
+
+*************************************************************
+** IRH (12feb2019)
+** SURVIVAL WORK FROM HERE
+*************************************************************
+
+** Now survival time set the dataset using newend_date as the time variable and deceased
+** as the failure variable
+stset newend_date , failure(deceased) origin(dot) scale(365.25)
+** IRH (12feb2019) tab _st // 1049 observations contribute to analysis
+stdes
+
+** GRAPH 1
+** K-M unstratified
+#delimit ;
+sts graph
+        ,
+        plotregion(c(gs16) lw(vthin) ic(gs16) ilw(vthin) )
+        graphregion(color(gs16) ic(gs16) ilw(vthin) lw(vthin))
+        ysize(10) xsize(7.5)
+
+	    xtitle(Years since Diagnosis, margin(t=4) size(3))
+        ytitle(% Participants, margin(r=4) size(3))
+        ylab( 0(0.2)1, labs(3)  nogrid angle(0) format(%9.1f))
+        ymtick(0(0.1)1)
+        xlab(0(1)5, labs(3)  nogrid angle(0) format(%9.1f))
+        xmtick(0(0.5)5)
+
+        title("")
+        plotopts(lp("l") lc(gs0))
+        legend(size(3) position(12) bm(t=0 b=5 l=0 r=0) colf cols(1) order(1 2)
+        region(fcolor(gs16) lw(vthin) margin(l=1 r=1 t=1 b=1))
+        lab(1 "Male")
+        lab(2 "Female")
+        )
+        name(figure1)
+        ;
+#delimit cr
+
+
+** GRAPH 2
+** K-M stratified by sex
+** IRH - example of a publication-quality formatted graphic...
+#delimit ;
+sts graph
+        ,
+        by(sex)
+        plotregion(c(gs16) lw(vthin) ic(gs16) ilw(vthin) )
+        graphregion(color(gs16) ic(gs16) ilw(vthin) lw(vthin))
+        ysize(10) xsize(7.5)
+
+	    xtitle(Years since Diagnosis, margin(t=4) size(3))
+        ytitle(% Participants, margin(r=4) size(3))
+        ylab( 0(0.2)1, labs(3)  nogrid angle(0) format(%9.1f))
+        ymtick(0(0.1)1)
+        xlab(0(1)5, labs(3)  nogrid angle(0) format(%9.1f))
+        xmtick(0(0.5)5)
+
+        title("")
+        plot1opts(lp("l") lc(gs0))
+        plot2opts(lp("l") lc(gs10))
+
+        legend(size(3) position(12) bm(t=0 b=5 l=0 r=0) colf cols(1) order(1 2)
+        region(fcolor(gs16) lw(vthin) margin(l=1 r=1 t=1 b=1))
+        lab(1 "Male")
+        lab(2 "Female")
+        )
+        name(figure2)
+        ;
+#delimit cr
+
+
+
+gen newtime=int(time/365.25)
+** IRH (12feb2019) tab newtime deceased ,m
+
+
+
+** BY THREE broad age groups
+** Unstratified K-M
+preserve
+    gen age_3="0-54 years" if age_10<6
+    replace age_3="55-74 years" if age_10>5 & age_10<8
+    replace age_3="75 years & over" if age_10>7 & age_10!=.
+
+    #delimit ;
+    sts graph
+            ,
+            by(age_3)
+            plotregion(c(gs16) lw(vthin) ic(gs16) ilw(vthin) )
+            graphregion(color(gs16) ic(gs16) ilw(vthin) lw(vthin))
+            ysize(10) xsize(7.5)
+
+    	    xtitle(Years since Diagnosis, margin(t=4) size(3))
+            ytitle(% Participants, margin(r=4) size(3))
+            ylab( 0(0.2)1, labs(3)  nogrid angle(0) format(%9.1f))
+            ymtick(0(0.1)1)
+            xlab(0(1)5, labs(3)  nogrid angle(0) format(%9.1f))
+            xmtick(0(0.5)5)
+
+            title("")
+            plot1opts(lp("l") lc(gs0))
+            plot2opts(lp("l") lc(gs5))
+            plot3opts(lp("l") lc(gs10))
+
+            legend(size(3) position(12) bm(t=0 b=5 l=0 r=0) colf cols(1) order(1 2 3)
+            region(fcolor(gs16) lw(vthin) margin(l=1 r=1 t=1 b=1))
+            lab(1 "0-54 yrs")
+            lab(2 "55-74 yrs")
+            lab(3 "75+ yrs")
+            )
+            name(figure3)
+            ;
+    #delimit cr
+restore
+
+
+** MERGE WITH 2010 BARBADOS POPULATION
+drop _merge
+merge m:m sex age_10 using "`datapath'\version01\1-input\bb2010_10-2"
+
+** MORTALITY RATE RATES
+** Comparing gender
+stmh sex
+** Comparing Age (to nearest year)
+stmh age
+** Comparing Age (10-year bands?)
+stmh age_10
+
+** MORTALITY RATES (per  1000 person years)
+strate
+strate , per(1000) // per 1000 py
+strate sex, per(1000) // per 1000 py by sex NS
+strate age_10, per(1000) // per 1000 py by age-group SS!
+
+** INFORMALLY (VISUALLY) ...
+** How do rates change with age?
+tab age_10 _d
+recode age_10 1=2
+gen age_group=24 if age_10==2
+replace age_group=34 if age_10==3
+replace age_group=44 if age_10==4
+replace age_group=54 if age_10==5
+replace age_group=64 if age_10==6
+replace age_group=74 if age_10==7
+replace age_group=84 if age_10==8
+replace age_group=94 if age_10==9
+
+** GRAPHIC OF RATES
+#delimit ;
+    strate age_group , per(1000) graph yscale(log)
+        mc(gs0)
+        plotregion(c(gs16) lw(vthin) ic(gs16) ilw(vthin) )
+        graphregion(color(gs16) ic(gs16) ilw(vthin) lw(vthin))
+        ysize(7.5) xsize(7.5)
+
+        title("")
+        xtitle(Age, margin(t=4) size(3))
+        ytitle(Mortality rate (per 1000 py), margin(r=4) size(3))
+        ylab(50 100 200 400 600 800, labs(3)  nogrid angle(0) format(%9.1f))
+        ymtick(150 250 350 450 550 650 750)
+        xlab(24 "0-24" 34 "25-34"  44 "35-44" 54 "45-54" 64 "55-64" 74 "65-74" 84 "75-84" 94 "85+", labs(3)  nogrid angle(0) format(%9.1f))
+        xmtick(24(10)94)
+
+        legend(size(3) position(6) bm(t=0 b=5 l=0 r=0) colf cols(1) order(1 2)
+        region(fcolor(gs16) lw(vthin) margin(l=1 r=1 t=1 b=1))
+        lab(1 "XX")
+        lab(2 "YY")
+        )
+        name(figure4)
+        ;
+#delimit cr
+
+** TO THIS POINT - WE HAVE USED ALL DEATHS
+** CAN ALSO LOOK AT deaths ONLY FROM CANCER
+** and the other deaths will count as COMPETING RISKS
+** first create new variable called event
+gen event=1 if cod==1 // cancer death
+replace event=2 if cod==2 // non-cancer death
+replace event=3 if cod==. & deceased==0 // survived
+label define event 1 "cancer death" 2 "non-cancer death" 3 "survived"
+
+** first stset data with cancer death as event of interest
+stset time , failure(event=1) scale(365.25)
+** IRH (12feb2019) sts graph ,f
+** IRH (12feb2019) sts list ,f // shows us that 73.1% appear to have died from cancer by end of follow-up
+
+** next stset data with non-cancer death as event of interest
+stset time , failure(event=2) scale(365.25)
+** IRH (12feb2019) sts graph ,f
+** IRH (12feb2019) sts list ,f // shows us that 19.5% appear to have died from non-cancer causes by end of follow-up
+
+
+
+** Cumulative incidence function (CIF)
+** Event #2  (non-cancer deaths) is the competing event
+stset time , failure(event==1) scale(365.25)
+
+** generate the CIF for event 1 (cancer death), taking into account competing event 2 (non-cancer death)
+stcompet cif = ci , compet(2)
+gen cif1 = cif if event==1
+label var cif1 "CIF for cancer deaths"
+
+** generate the CIP for event 2 (non-cancer death), taking into account competing event 1 (cancer death)
+gen cif2=cif if event==2
+label var cif2 "CIF for non-cancer deaths"
+
+** graph the 2 CIFs together
+sort _t
+#delimit ;
+    graph twoway line cif1 cif2 _t, lp("l" "l") lc(gs0 gs10)
+        ,
+        plotregion(c(gs16) lw(vthin) ic(gs16) ilw(vthin) )
+        graphregion(color(gs16) ic(gs16) ilw(vthin) lw(vthin))
+        ysize(7.5) xsize(7.5)
+
+        title("")
+        xtitle(Years since Diagnosis, margin(t=4) size(3))
+        ytitle(% Participants, margin(r=4) size(3))
+        ylab( 0(0.2)1, labs(3)  nogrid angle(0) format(%9.1f))
+        ymtick(0(0.1)1)
+        xlab(0(1)5, labs(3)  nogrid angle(0) format(%9.1f))
+        xmtick(0(0.5)5)
+
+        legend(size(3) position(12) bm(t=0 b=5 l=0 r=0) colf cols(1) order(1 2)
+        region(fcolor(gs16) lw(vthin) margin(l=1 r=1 t=1 b=1))
+        lab(1 "Cancer deaths")
+        lab(2 "Non-cancer deaths")
+        )
+        name(figure5)
+        ;
+#delimit cr
+

@@ -1,13 +1,13 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name			15_review_2015_dc.do
+    //  algorithm name			35_review cancer.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
-    //  date first created      26-SEP-2019
-    // 	date last modified	    26-SEP-2019
+    //  date first created                26-SEP-2019
+    //  date last modified	              06-FEB-2020
     //  algorithm task			Reporting on review process
-    //  status                  Completed
-    //  objectve                To check accuracy and efficiency of manual reviewing vs code only cleaning.
+    //  status                            Completed
+    //  objectve                          To check accuracy and efficiency of manual reviewing vs code only cleaning.
 
 
     ** General algorithm set-up
@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\15_review_2015_dc.smcl", replace
+    log using "`logpath'\35_review cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
 STOP - add cancer API dofile to this dofile and run after first set of code is run
@@ -204,8 +204,8 @@ replace flag1=flag1+1 if record_id==...|rvreviewer==...
 * Using Redcap BNR-Cancer database
 **************************************************************************
 
-** LOAD the dataset with recently matched death data
-import excel using "`datapath'\version01\1-input\BNRCancer_DATA_2019-09-26_0456_excel.xlsx", firstrow
+** LOAD the review dataset
+import excel using "`datapath'\version02\1-input\BNRCancer_DATA_2020-02-06_1344_excel.xlsx", firstrow
 
 count //1,388 at 20190926 08:00
 
@@ -1069,14 +1069,14 @@ gen rvtime_wks=rvtime_days/2
 format rvtime_wks %4.0g
 
 
-save "`datapath'\version01\2-working\2015_review_dc" ,replace
+save "`datapath'\version02\2-working\2015_review_dc" ,replace
 
 ** CREATE progress report
 ** CREATE dataset with results to be used in pdf report
 preserve
 collapse rvtotpendingper rvtotal rverrtotal rverrtotal_iarc rverrtotal_major rverrtotalper_major rverrtotalper_major_all rverrtotal_minor rverrtotalper_minor_all rverrtotalper_minor rvtime_wks
 format rverrtotalper_major rverrtotalper_major_all rverrtotalper_minor rverrtotalper_minor_all %9.0f
-save "`datapath'\version01\3-output\2015_review_dqi_da" ,replace
+save "`datapath'\version02\3-output\2015_review_dqi_da" ,replace
 
 				****************************
 				*	  PDF REPORT        *
@@ -1134,7 +1134,7 @@ qui sum rverrtotalper_minor
 local sum : display %2.0f `r(sum)'
 putdocx text ("TOTAL errors MINOR: `sum'%"), bold shading("yellow")
 
-putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", replace
+putdocx save "`datapath'\version02\3-output\2019-10-24_review_quality_report.docx", replace
 putdocx clear
 restore
 
@@ -1181,7 +1181,7 @@ putdocx table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
        border(start, nil) border(insideV, nil) border(end, nil)
 
 
-putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
+putdocx save "`datapath'\version02\3-output\2019-10-24_review_quality_report.docx", append
 putdocx clear
 restore
 
@@ -1228,14 +1228,14 @@ putdocx table tbl_major = data("Variable Total_Errors Percentage"), varnames ///
        border(start, nil) border(insideV, nil) border(end, nil)
 
 
-putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
+putdocx save "`datapath'\version02\3-output\2019-10-24_review_quality_report.docx", append
 putdocx clear
 restore
 
 preserve
 collapse rvtotpendingper rvtotal rverrtotal rverrtotal_iarc rverrtotal_major rverrtotalper_major rverrtotalper_major_all rverrtotal_minor rverrtotalper_minor_all rverrtotalper_minor rvtime_wks
 format rverrtotalper_major rverrtotalper_major_all rverrtotalper_minor rverrtotalper_minor_all %9.0f
-save "`datapath'\version01\3-output\2015_review_dqi_da" ,replace
+save "`datapath'\version02\3-output\2015_review_dqi_da" ,replace
 
 				****************************
 				*	  PDF REPORT        *
@@ -1274,7 +1274,7 @@ local sum : display %2.0f `r(sum)'
 putdocx text ("TOTAL errors MINOR: `sum'%"), bold shading("yellow")
 putdocx paragraph
 
-putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
+putdocx save "`datapath'\version02\3-output\2019-10-24_review_quality_report.docx", append
 putdocx clear
 restore
 
@@ -1405,6 +1405,6 @@ putdocx table tbl_all(24,.), bold
 putdocx table tbl_all(38,.), bold
 putdocx table tbl_all(43,.), bold
 */
-putdocx save "`datapath'\version01\3-output\2019-10-24_review_quality_report.docx", append
+putdocx save "`datapath'\version02\3-output\2019-10-24_review_quality_report.docx", append
 putdocx clear
 restore
