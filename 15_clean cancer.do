@@ -5402,6 +5402,7 @@ note: TS This dataset can be used for quality parameter of completeness in asses
 *****************************
 use "`datapath'\version02\2-working\2015_cancer_nodups" ,clear
 
+
 ** Create variable called "deceased" - same as AR's 2008 dofile called '3_merge_cancer_deaths.do'
 tab slc ,m
 count if slc!=2 & dod!=. //0
@@ -5987,7 +5988,47 @@ clear
 ** Load the dataset (2008-2013-2014)
 use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", replace
 count //2417
+** 20130414 didn't merge with death 18963 from previous merge when 2014 annual report was done
+preserve
+drop if pid!="20130414"
+replace record_id=18963 if pid=="20130414"
+save "`datapath'\version02\2-working\20130414_18963_deathmatching" ,replace
+restore
+
+preserve
+use "`datapath'\version02\3-output\2015-2018_deaths_for_matching", replace
+drop if record_id!=18963
+gen pid="20130414"
+gen double nrn2=nrn
+format nrn2 %15.0g
+rename nrn2 natregno
+tostring natregno ,replace
+save "`datapath'\version02\2-working\18963_20130414_deathmatching" ,replace
+restore
+
+preserve
+use "`datapath'\version02\2-working\20130414_18963_deathmatching", clear
+drop dds2regnum dds2pname dds2age dds2cancer dds2cod1a dds2address dds2parish dds2pod dds2coddeath dds2mname dds2namematch dds2event dds2dddoa dds2ddda dds2odda dds2certtype dds2district dds2agetxt dds2nrnnd dds2mstatus dds2occu dds2durationnum dds2durationtxt dds2onsetnumcod1a dds2onsettxtcod1a dds2cod1b dds2onsetnumcod1b dds2onsettxtcod1b dds2cod1c dds2onsetnumcod1c dds2onsettxtcod1c dds2cod1d dds2onsetnumcod1d dds2onsettxtcod1d dds2cod2a dds2onsetnumcod2a dds2onsettxtcod2a dds2cod2b dds2onsetnumcod2b dds2onsettxtcod2b dds2deathparish dds2regdate dds2certifier dds2certifieraddr dds2cod dds2dod
+drop _merge
+merge 1:1 natregno using "`datapath'\version02\2-working\18963_20130414_deathmatching"
+save "`datapath'\version02\2-working\18963_20130414_deathmatched" ,replace
+restore
+
+drop if pid=="20130414"
+append using "`datapath'\version02\2-working\18963_20130414_deathmatched"
+
 rename dds2* dd_*
+
+format dd_dod %dD_m_CY
+replace slc=2 if pid=="20130414"
+replace deceased=1 if pid=="20130414"
+replace dod=dd_dod if pid=="20130414"
+replace cr5cod=dd_coddeath if pid=="20130414"
+replace cod1a_cancer=dd_coddeath if pid=="20130414"
+replace cancer=dd_cancer if pid=="20130414"
+replace dcostatus=5 if pid=="20130414"
+
+format dd_dod %tdCCYY-NN-DD
 
 append using "`datapath'\version02\2-working\2008_cancer_nonsurvival_2015extras" ,force
 count //2421
