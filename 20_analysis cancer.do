@@ -2054,7 +2054,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=1 if cancer_site==.
-replace year=2 if year==.
+replace year=2014 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2136,7 +2136,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=2 if cancer_site==.
-replace year=2 if year==.
+replace year=2014 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2263,7 +2263,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=3 if cancer_site==.
-replace year=2 if year==.
+replace year=2014 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2348,7 +2348,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=4 if cancer_site==.
-replace year=2 if year==.
+replace year=2014 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2418,7 +2418,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=5 if cancer_site==.
-replace year=2 if year==.
+replace year=2014 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2497,7 +2497,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=6 if cancer_site==.
-replace year=2 if year==.
+replace year=2014 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2598,7 +2598,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=1 if cancer_site==.
-replace year=2 if year==.
+replace year=2015 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2680,7 +2680,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=2 if cancer_site==.
-replace year=2 if year==.
+replace year=2015 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2811,7 +2811,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=3 if cancer_site==.
-replace year=2 if year==.
+replace year=2015 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2896,7 +2896,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=4 if cancer_site==.
-replace year=2 if year==.
+replace year=2015 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -2975,7 +2975,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=5 if cancer_site==.
-replace year=2 if year==.
+replace year=2015 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
@@ -3055,7 +3055,7 @@ replace ci_upper=round(ci_upper,0.01)
 append using "`datapath'\version02\2-working\ASIRs_BSS_WPP" 
 replace population=2 if population==.
 replace cancer_site=6 if cancer_site==.
-replace year=2 if year==.
+replace year=2015 if year==.
 order population cancer_site year asir ci_lower ci_upper
 sort cancer_site asir
 format asir 
