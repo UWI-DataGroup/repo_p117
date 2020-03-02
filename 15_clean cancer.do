@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\15_clean cancer.smcl", replace
+   * log using "`logpath'\15_clean cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /*
@@ -6652,7 +6652,7 @@ label var dd_dod "DeathData-date of death"
 label var dotyear "Year of incidence"
 
 ** Remove unnecessary variables
-drop cod1a_cancer tumouridsourcetable sid2 eid2 patientidtumourtable PatientRecordIDTumourTable ObsoleteFlagTumourTable TumourUnduplicationStatus ObsoleteFlagPatientTable pid2 str_sourcerecordid str_pid2 patienttotal patienttot str_patientidtumourtable mpseq2 sourceseq tumseq tumsourceseq str_sourcerecordid2 eidcorrect tumourtot sourcetot dobyear dobmonth dobday rx1year rx1month rx1day rx2year rx2month rx2day rx3year rx3month rx3day rx4year rx4month rx4day stdyear stdmonth stdday rdyear rdmonth rdday rptyear rptmonth rptday admyear admmonth admday dfcyear dfcmonth dfcday rtyear rtmonth rtday sname dotyear2 dupnrn duppt checkage2 redcap_event_name dddoa ddda odda certtype district address_cancer ddparish ddsex ddage ddagetxt mstatus occu pod deathparish regdate ddcertifier ddnamematch dcstatus duprec pnameextra duppid duppid_all case mppid monset age5 age_10 mname pfu age45 age55 age65 pop_bb site _merge_icd10 notiftype durationnum durationtxt deathyear onsetnumcod1a onsettxtcod1a certifieraddr record_id _merge dotyear2 nrnday dob_yr dob_year year2 dobchk nrnid morphology laterality behaviour str_grade bas diagyr dup_pid dd_dupname dd_dupdod placeofdeath _merge_org dupst obsid pidobsid pidobstot duppidcr5id dup_cr5id dupnrn duppt checkage2 dodyear_cancer dup_id othtreat1 notreat1 notreat2
+drop cod1a_cancer tumouridsourcetable sid2 eid2 patientidtumourtable PatientRecordIDTumourTable ObsoleteFlagTumourTable TumourUnduplicationStatus ObsoleteFlagPatientTable pid2 str_sourcerecordid str_pid2 patienttotal patienttot str_patientidtumourtable mpseq2 sourceseq tumseq tumsourceseq str_sourcerecordid2 eidcorrect tumourtot sourcetot dobyear dobmonth dobday rx1year rx1month rx1day rx2year rx2month rx2day rx3year rx3month rx3day rx4year rx4month rx4day stdyear stdmonth stdday rdyear rdmonth rdday rptyear rptmonth rptday admyear admmonth admday dfcyear dfcmonth dfcday rtyear rtmonth rtday sname dotyear2 dupnrn duppt checkage2 redcap_event_name dddoa ddda odda certtype district address_cancer ddparish ddsex ddage ddagetxt mstatus occu pod deathparish regdate ddcertifier ddnamematch dcstatus duprec pnameextra duppid duppid_all case mppid monset age5 age_10 mname pfu age45 age55 age65 site _merge_icd10 notiftype durationnum durationtxt deathyear onsetnumcod1a onsettxtcod1a certifieraddr record_id _merge dotyear2 nrnday dob_yr dob_year year2 dobchk nrnid morphology laterality behaviour str_grade bas diagyr dup_pid dd_dupname dd_dupdod placeofdeath _merge_org dupst obsid pidobsid pidobstot duppidcr5id dup_cr5id dupnrn duppt checkage2 dodyear_cancer dup_id othtreat1 notreat1 notreat2
 
 count //3336
 
