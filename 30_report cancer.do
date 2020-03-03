@@ -446,12 +446,12 @@ putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2019-12-04_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-03-03_annual_report_stats.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_2015summstats" ,replace
 restore
-
+/* JC 03mar20: neither of the below reports will be used in the 2015 annual report so code has been disabled
 				****************************
 				*	   MS WORD REPORT      *
 				* ANNUAL REPORT STATISTICS *

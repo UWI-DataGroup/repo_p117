@@ -35,6 +35,7 @@ cls
     *log using "`logpath'/20_analysis cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
+
 ************************************************************************* 
 * SECTION 1: NUMBERS 
 *        (1.1) total number & number of multiple events
@@ -122,41 +123,142 @@ Lab test (biochem/imm |        15 |        15
 
 */
 
-tab basis ,m
+tab basis dxyr ,m
 /*
-           BasisOfDiagnosis |      Freq.     Percent        Cum.
----------------------------+-----------------------------------
-                       DCO |        145        4.35        4.35
-             Clinical only |        106        3.18        7.53
-Clinical Invest./Ult Sound |        149        4.47       11.99
- Exploratory surg./autopsy |         26        0.78       12.77
-Lab test (biochem/immuno.) |         15        0.45       13.22
-             Cytology/Haem |        131        3.93       17.15
-                Hx of mets |         68        2.04       19.19
-             Hx of primary |      2,557       76.67       95.86
-             Autopsy w/ Hx |         23        0.69       96.55
-                   Unknown |        115        3.45      100.00
----------------------------+-----------------------------------
-                     Total |      3,335      100.00
 
+                      |                DiagnosisYear
+     BasisOfDiagnosis |      2008       2013       2014       2015 |     Total
+----------------------+--------------------------------------------+----------
+                  DCO |        51         43         38         13 |       145 
+        Clinical only |        16         18         35         37 |       106 
+Clinical Invest./Ult  |        38         50         29         32 |       149 
+Exploratory surg./aut |         7          9          5          5 |        26 
+Lab test (biochem/imm |         6          3          3          3 |        15 
+        Cytology/Haem |        31         30         43         27 |       131 
+           Hx of mets |        24         13         13         18 |        68 
+        Hx of primary |       629        582        613        734 |     2,558 
+        Autopsy w/ Hx |         4          6          9          4 |        23 
+              Unknown |         1         43         52         19 |       115 
+----------------------+--------------------------------------------+----------
+                Total |       807        797        840        892 |     3,336
+//total for hx of prim changed after I ran the dofile a 2nd time after running 15_clean cancer.do
+
+                      |                DiagnosisYear
+     BasisOfDiagnosis |      2008       2013       2014       2015 |     Total
+----------------------+--------------------------------------------+----------
+                  DCO |        51         43         38         13 |       145 
+        Clinical only |        16         18         35         37 |       106 
+Clinical Invest./Ult  |        38         50         29         32 |       149 
+Exploratory surg./aut |         7          9          5          5 |        26 
+Lab test (biochem/imm |         6          3          3          3 |        15 
+        Cytology/Haem |        31         30         43         27 |       131 
+           Hx of mets |        24         13         13         18 |        68 
+        Hx of primary |       629        582        613        733 |     2,557 
+        Autopsy w/ Hx |         4          6          9          4 |        23 
+              Unknown |         1         43         52         19 |       115 
+----------------------+--------------------------------------------+----------
+                Total |       807        797        840        891 |     3,335
+*/
+/* JC 03mar20 checked to see if any duplicated observations occurred but no, seems like a legitimate new prostate case
+preserve
+drop if dxyr!=2015 & siteiarc!=39
+sort pid cr5id
+quietly by pid cr5id :  gen duppidcr5id = cond(_N==1,0,_n)
+sort pid cr5id
+count if duppidcr5id>0 //0
+list pid cr5id deathid eidmp ptrectot primarysite duppidcr5id if duppidcr5id>0
+restore
+*/
+tab basis dxyr if patient==1
+/*
+                      |                DiagnosisYear
+     BasisOfDiagnosis |      2008       2013       2014       2015 |     Total
+----------------------+--------------------------------------------+----------
+                  DCO |        51         43         35         12 |       141 
+        Clinical only |        16         18         33         37 |       104 
+Clinical Invest./Ult  |        38         49         28         31 |       146 
+Exploratory surg./aut |         7          9          5          5 |        26 
+Lab test (biochem/imm |         6          3          3          3 |        15 
+        Cytology/Haem |        31         29         43         27 |       130 
+           Hx of mets |        24         13         13         18 |        68 
+        Hx of primary |       622        572        604        716 |     2,514 
+        Autopsy w/ Hx |         4          6          9          4 |        23 
+              Unknown |         1         43         50         19 |       113 
+----------------------+--------------------------------------------+----------
+                Total |       800        785        823        872 |     3,280 
+
+                      |                DiagnosisYear
+     BasisOfDiagnosis |      2008       2013       2014       2015 |     Total
+----------------------+--------------------------------------------+----------
+                  DCO |        51         43         35         12 |       141 
+        Clinical only |        16         18         33         37 |       104 
+Clinical Invest./Ult  |        38         49         28         31 |       146 
+Exploratory surg./aut |         7          9          5          5 |        26 
+Lab test (biochem/imm |         6          3          3          3 |        15 
+        Cytology/Haem |        31         29         43         27 |       130 
+           Hx of mets |        24         13         13         18 |        68 
+        Hx of primary |       622        572        604        715 |     2,513 
+        Autopsy w/ Hx |         4          6          9          4 |        23 
+              Unknown |         1         43         50         19 |       113 
+----------------------+--------------------------------------------+----------
+                Total |       800        785        823        871 |     3,279
 */
 
 //CHECK THIS section with Jacqui
+**********
+** 2015 **
+**********
+** As a percentage of all events: 1.46%
+//cii proportions 891 13
+cii proportions 892 13
 
-** As a percentage of all events: 14.24%
-cii proportions 927 145
+** As a percentage of all events with known basis: 1.49%
+//cii proportions 872 13
+cii proportions 873 13
 
-** As a percentage of all events with known basis: 14.6%
-cii proportions 904 132
- 
-** As a percentage of all patients: 14.47%
-cii proportions 912 132
+** As a percentage of all patients: 1.38%
+//cii proportions 871 12
+cii proportions 872 12
 
 ** As a percentage for all those which were non-malignant - JC: there were none for 2014 // 0%
-cii proportions 24 0
+//cii proportions 24 0
  
 ** As a percentage of all malignant tumours: 14.62%
-cii proportions 903 132 
+//cii proportions 891 13 
+**********
+** 2014 **
+**********
+** As a percentage of all events: 4.52%
+cii proportions 840 38
+
+** As a percentage of all events with known basis: 4.82%
+cii proportions 788 38
+ 
+** As a percentage of all patients: 4.25%
+cii proportions 823 35
+**********
+** 2013 **
+**********
+** As a percentage of all events: 5.40%
+cii proportions 797 43
+
+** As a percentage of all events with known basis: 5.70%
+cii proportions 754 43
+ 
+** As a percentage of all patients: 5.48%
+cii proportions 785 43
+**********
+** 2008 **
+**********
+** As a percentage of all events: 6.32%
+cii proportions 807 51
+
+** As a percentage of all events with known basis: 6.33%
+cii proportions 806 51
+ 
+** As a percentage of all patients: 6.38%
+cii proportions 800 51
+
 
 *************************
 ** Number of cases by sex
@@ -226,6 +328,9 @@ save "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers", replac
 ** Load the dataset
 use "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers", clear
 
+****************************************************************************** 2015 ****************************************************************************************
+drop if dxyr!=2015 //2444 deleted
+
 ***********************
 ** 3.1 CANCERS BY SITE
 ***********************
@@ -235,6 +340,7 @@ tab icd10 ,m //0 missing
 
 tab siteiarc ,m //0 missing
 
+tab sex ,m
 
 ** Note: O&U, NMSCs (non-reportable skin cancers) and in-situ tumours excluded from top ten analysis
 tab siteiarc if siteiarc!=25 & siteiarc!=64
@@ -247,12 +353,11 @@ display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}
 
 
 ** For annual report - Section 1: Incidence - Table 2a
-** Below top 10 code added by JC for 2014
-** All sites excl. O&U, non-reportable skin cancers - using IARC CI5's site groupings COMBINE cervix & CIN 3
+** Below top 10 code added by JC for 2015
+** All sites excl. in-situ, O&U, non-reportable skin cancers
 ** THIS USED IN ANNUAL REPORT TABLE 1
 preserve
-drop if siteiarc==25|siteiarc==61 //137 obs deleted
-replace siteiarc=32 if siteiarc==32|siteiarc==64 //0 changes
+drop if siteiarc==25 | siteiarc>60 //30 deleted
 tab siteiarc ,m
 bysort siteiarc: gen n=_N
 bysort n siteiarc: gen tag=(_n==1)
@@ -268,23 +373,214 @@ describe
 gsort -count
 drop top10
 /*
-siteiarc																	count	percentage
-Prostate (C61)																688	28.22
-Breast (C50)																602	24.69
-Colon (C18)																	405	16.61
-Corpus uteri (C54)															148	6.07
-Rectum (C19-20)																140	5.74
-Lung (incl. trachea and bronchus) (C33-34)									114	4.68
-Stomach (C16)																97	3.98
-Cervix uteri (C53)															85	3.49
-Multiple myeloma (C90)														83	3.40
-Non-Hodgkin lymphoma														76	3.12
-
+siteiarc									count	percentage
+Breast (C50)								182		27.00
+Prostate (C61)								180		26.71
+Colon (C18)									 98		14.54
+Rectum (C19-20)								 43		6.38
+Corpus uteri (C54)							 42		6.23
+Stomach (C16)								 28		4.15
+Lung (incl. trachea and bronchus) (C33-34)	 24		3.56
+Non-Hodgkin lymphoma (C82-86,C96)			 23		3.41
+Multiple myeloma (C90)						 22		3.26
+Kidney (C64)								 16		2.37
+Ovary (C56)									 16		2.37
 */
-total count //2438
+total count //673; 674
 restore
 
+labelbook sex_lab
+tab sex ,m
 
+** For annual report - Section 1: Incidence - Table 1
+** FEMALE - using IARC's site groupings (excl. in-situ)
+preserve
+drop if sex==2 //421 deleted
+drop if siteiarc>60 //14 deleted
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag5=(_n==1)
+replace tag5 = sum(tag5)
+sum tag5 , meanonly
+gen top5 = (tag5>=(`r(max)'-4))
+sum n if tag5==(`r(max)'-4), meanonly
+replace top5 = 1 if n==`r(max)'
+gsort -top5
+tab siteiarc top5 if top5!=0
+contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
+gsort -count
+drop top5
+
+gen totpercent=(count/471)*100 //all cancers excl. male(421)
+gen alltotpercent=(count/892)*100 //all cancers
+/*
+siteiarc			count	percentage	totpercent	alltotpercent
+Breast (C50)		181		58.96		38.42887	20.31425
+Colon (C18)			 44		14.33		9.341825	4.938272
+Corpus uteri (C54)	 42		13.68		8.917197	4.713805
+Rectum (C19-20)		 24		7.82		5.095541	2.693603
+Ovary (C56)			 16		5.21		3.397027	1.795735
+*/
+total count //307
+restore
+
+** For annual report - Section 1: Incidence - Table 1
+** Below top 5 code added by JC for 2015
+** MALE - using IARC's site groupings
+preserve
+drop if sex==1 //471 deleted
+drop if siteiarc==25 | siteiarc>60 //16 deleted
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag5=(_n==1)
+replace tag5 = sum(tag5)
+sum tag5 , meanonly
+gen top5 = (tag5>=(`r(max)'-4))
+sum n if tag5==(`r(max)'-4), meanonly
+replace top5 = 1 if n==`r(max)'
+gsort -top5
+tab siteiarc top5 if top5!=0
+contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
+gsort -count
+drop top5
+
+gen totpercent=(count/421)*100 //all cancers excl. female(471)
+gen alltotpercent=(count/892)*100 //all cancers
+/*
+siteiarc									count	percentage	totpercent	alltotpercent
+Prostate (C61)								180		63.60		42.75534	20.17937
+Colon (C18)									 54		19.08		12.8266		6.053812
+Rectum (C19-20)								 19		6.71		4.513064	2.130045
+Lung (incl. trachea and bronchus) (C33-34)	 16		5.65		3.800475	1.793722
+Stomach (C16)								 14		4.95		3.325416	1.569507
+*/
+total count //283
+restore
+
+*****************************
+**   Data Quality Indices  **
+*****************************
+** Added on 04-June-2019 by JC as requested by NS for 2014 cancer annual report
+
+*****************************
+** Identifying & Reporting **
+** 	 Data Quality Index	   **
+** MV,DCO,O+U,UnkAge,CLIN  **
+*****************************
+tab basis ,m
+tab siteicd10 basis ,m 
+tab sex ,m //0 missing
+tab age ,m //3 missing=999
+tab sex age if age==.|age==999 //used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+tab sex if sitecr5db==20 //used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+/*
+gen boddqi=1 if basis>4 & basis <9 //782 changes; 
+replace boddqi=2 if basis==0 //13 changes
+replace boddqi=3 if basis>0 & basis<5 //77 changes
+replace boddqi=4 if basis==9 //19 changes
+label define boddqi_lab 1 "MV" 2 "DCO"  3 "CLIN" 4 "UNK.BASIS" , modify
+label var boddqi "basis DQI"
+label values boddqi boddqi_lab
+
+tab boddqi ,m
+tab siteicd10 boddqi ,m
+tab siteicd10 ,m //9 missing site - MPDs/MDS
+//list pid top morph beh basis siteiarc icd10 if siteicd10==. //these are MPDs/MDS so exclude
+tab siteicd10 boddqi if siteicd10!=.
+** Use CanReg5 site groupings for basis DQI
+tab sitecr5db ,m
+tab sitecr5db boddqi if sex==1 & boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=20 //male: used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+tab sitecr5db boddqi if sex==2 & boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=20 //female: used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+tab sitecr5db boddqi if boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=20
+*/
+
+tab basis ,m
+gen boddqi=1 if basis>4 & basis <9 //782 changes; 
+replace boddqi=2 if basis==0 //13 changes
+replace boddqi=3 if basis>0 & basis<5 //77 changes
+replace boddqi=4 if basis==9 //19 changes
+label define boddqi_lab 1 "MV" 2 "DCO"  3 "CLIN" 4 "UNK.BASIS" , modify
+label var boddqi "basis DQI"
+label values boddqi boddqi_lab
+
+gen siteagedqi=1 if siteiarc==61 //30 changes
+replace siteagedqi=2 if age==.|age==999 //0 changes
+replace siteagedqi=3 if dob==. & siteagedqi!=2 //2 changes
+replace siteagedqi=4 if siteiarc==61 & siteagedqi!=1 //0 changes
+replace siteagedqi=5 if sex==.|sex==99 //0 changes
+label define siteagedqi_lab 1 "O&U SITE" 2 "UNK.AGE" 3 "UNK.DOB" 4 "O&U+UNK.AGE/DOB" 5 "UNK.SEX", modify
+label var siteagedqi "site/age DQI"
+label values siteagedqi siteagedqi_lab
+
+tab boddqi ,m
+generate rectot=_N //892
+tab boddqi rectot,m
+
+tab siteagedqi ,m
+tab siteagedqi rectot,m
+
+preserve
+** Append to above .docx for NS of basis,site,age but want to retain this dataset
+** % tumours - basis by siteicd10
+tab boddqi
+contract boddqi siteicd10, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Basis"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=892)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename siteicd10 Site
+rename boddqi Total_DQI
+rename count Total_Records
+rename percentage Pct_DQI
+putdocx table tbl_bod = data("Site Total_DQI Total_Records Pct_DQI"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_bod(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2020-03-03_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_basis.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Basis"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+
+preserve
+** % tumours - site,age
+tab siteagedqi
+contract siteagedqi, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Unknown - Site, DOB & Age"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Site,DOB,Age (# tumours/n=892)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename siteagedqi Total_DQI
+rename count Total_Records
+rename percentage Pct_DQI
+putdocx table tbl_site = data("Total_DQI Total_Records Pct_DQI"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2020-03-03_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_siteage.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Site,Age"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+** Missing sex %
+** Missing age %
+
+stop
 * *********************************************
 * ANALYSIS: SECTION 3 - cancer sites
 * Covering:
