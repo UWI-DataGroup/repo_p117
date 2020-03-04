@@ -1338,6 +1338,12 @@ replace lname = lower(rtrim(ltrim(itrim(lname)))) //1208 changes
 ** Check no missing dxyr so this can be used in analysis
 tab dxyr ,m //0 missing
 
+** JC 04mar2020: at ASIR analysis I discovered error in pid 20080695 so corrected below:
+replace beh=3 if pid=="20080695" //0 changes
+replace siteiarc=45 if pid=="20080695" //1 change
+replace icd10="C679" if pid=="20080695" //1 change
+replace siteicd10=12 if pid=="20080695" //1 change
+
 count //1211
 
 ** Save this corrected dataset with non-reportable cases

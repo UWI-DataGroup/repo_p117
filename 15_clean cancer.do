@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-   * log using "`logpath'\15_clean cancer.smcl", replace
+    log using "`logpath'\15_clean cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /*
@@ -5287,7 +5287,10 @@ tab dupsource dupdqi ,m
 contract dupdqi, freq(count) percent(percentage)
 
 putdocx clear
-putdocx begin
+putdocx begin, footer(foot1)
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
 //stop - update totals after 163 DCO trace-back was completed
 // Create a paragraph
 putdocx paragraph, style(Heading1)
@@ -5311,7 +5314,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-03-03_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-03-04_DQI_v02.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -5352,7 +5355,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-03-03_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-04_DQI_v02.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace

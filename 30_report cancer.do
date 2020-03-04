@@ -32,7 +32,7 @@ cls
 
     ** Close any open log file and open a new log file
     capture log close
-    *log using "`logpath'\30_report cancer.smcl", replace // error r(603)
+    log using "`logpath'\30_report cancer.smcl", replace // error r(603)
 ** HEADER -----------------------------------------------------
 *************************
 **  SUMMARY STATISTICS **
@@ -43,26 +43,43 @@ use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival", clea
 //save "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , replace
 //use "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , clear
 
+/* JC 04mar20 - not going to use this code as using WPP pops by year
+** Create population totals for each pop/incidence year
+preserve
+clear
+use "`datapath'\version02\2-working\pop_wpp_2015-10"
+unique pop_wpp, by(pop_wpp) gen(poptotal_2015)
+egen poptot_2015=total(pop_wpp) if poptotal_2015==1
+keep poptot_2015
+restore
+*/
+
 ** POPULATION
+/* 2014 annual rpt code
 tab dxyr ,m 
 unique pop_bb, by(pop_bb) gen(poptotal) //ssc install unique
 egen poptot=total(pop_bb) if poptotal==1
+*/
+gen poptot_2015=285327
+gen poptot_2014=284825
+gen poptot_2013=284294
+gen poptot_2008=279946
+
 ** TUMOURS
 egen tumourtot_2008=count(pid) if dxyr==2008
 egen tumourtot_2013=count(pid) if dxyr==2013
 egen tumourtot_2014=count(pid) if dxyr==2014
 egen tumourtot_2015=count(pid) if dxyr==2015
-gen tumourtotper_2008=tumourtot_2008/poptot*100
-gen tumourtotper_2013=tumourtot_2013/poptot*100
-gen tumourtotper_2014=tumourtot_2014/poptot*100
-gen tumourtotper_2015=tumourtot_2015/poptot*100
+gen tumourtotper_2008=tumourtot_2008/poptot_2008*100
+gen tumourtotper_2013=tumourtot_2013/poptot_2013*100
+gen tumourtotper_2014=tumourtot_2014/poptot_2014*100
+gen tumourtotper_2015=tumourtot_2015/poptot_2015*100
 format tumourtotper_2008 tumourtotper_2013 tumourtotper_2014 tumourtotper_2015 %04.2f
 ** PATIENTS
 egen patienttot_2008=count(pid) if patient==1 & dxyr==2008
 egen patienttot_2013=count(pid) if patient==1 & dxyr==2013
 egen patienttot_2014=count(pid) if patient==1 & dxyr==2014
 egen patienttot_2015=count(pid) if patient==1 & dxyr==2015
-** ASIRs
 ** DCOs
 egen dco_2008=count(pid) if basis==0 &  dxyr==2008
 egen dco_2013=count(pid) if basis==0 &  dxyr==2013
@@ -125,8 +142,16 @@ egen surv5yr_2008_censor=count(surv5yr_2008) if surv5yr_2008==0
 egen surv5yr_2008_dead=count(surv5yr_2008) if surv5yr_2008==1
 drop surv5yr_2008
 gen surv5yr_2008=surv5yr_2008_censor/pttotsurv_2008*100
-format surv1yr_2015 surv1yr_2014 surv1yr_2013 surv1yr_2008 surv3yr_2015 surv3yr_2014 surv3yr_2013 surv3yr_2008 surv5yr_2015 surv5yr_2014 surv5yr_2013 surv5yr_2008 %2.1f
-** Input 1yr, 3yr, 5yr survival variables from survival ds to nonsurvival ds
+** 10-yr survival
+gen surv10yr_2015=.
+gen surv10yr_2014=.
+gen surv10yr_2013=.
+egen surv10yr_2008_censor=count(surv10yr_2008) if surv10yr_2008==0
+egen surv10yr_2008_dead=count(surv10yr_2008) if surv10yr_2008==1
+drop surv10yr_2008
+gen surv10yr_2008=surv10yr_2008_censor/pttotsurv_2008*100
+format surv1yr_2015 surv1yr_2014 surv1yr_2013 surv1yr_2008 surv3yr_2015 surv3yr_2014 surv3yr_2013 surv3yr_2008 surv5yr_2015 surv5yr_2014 surv5yr_2013 surv5yr_2008 surv10yr_2008 %2.1f
+** Input 1yr, 3yr, 5yr, 10yr survival variables from survival ds to nonsurvival ds
 frame change nonsurv
 **remove duplicates
 frame nonsurv: duplicates drop pid, force
@@ -147,13 +172,25 @@ frget surv5yr_2015 = surv5yr_2015, from(surv)
 frget surv5yr_2014 = surv5yr_2014, from(surv)
 frget surv5yr_2013 = surv5yr_2013, from(surv)
 frget surv5yr_2008 = surv5yr_2008, from(surv)
+frget surv10yr_2015 = surv10yr_2015, from(surv)
+frget surv10yr_2014 = surv10yr_2014, from(surv)
+frget surv10yr_2013 = surv10yr_2013, from(surv)
+frget surv10yr_2008 = surv10yr_2008, from(surv)
+
+** ASIRs
+** Copy ASIR totals from ASIRs dataset into this dataset by creating new frame for ASIRs dataset
+append using "`datapath'\version02\2-working\ASIRs"
+gen asir_2015=asir if cancer_site==1 & year==1
+gen asir_2014=asir if cancer_site==1 & year==2
+gen asir_2013=asir if cancer_site==1 & year==3
+gen asir_2008=asir if cancer_site==1 & year==4
 
 ** Re-arrange dataset
 gen id=_n
-keep id tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* surv*yr_*
+keep id tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv*yr_*
 gen title=1 if id==1
 order id title
-label define title_lab 1 "Year" 2 "No.registrations(tumours)" 3 "% of entire population" 4 "No.registrations(patients)" 5 "Age-standardized Incidence Rate (ASIR) per 100,000" 6 "No.registered by death certificate only" 7 "% of tumours registered" 8 "1-year survival (%)" 9 "3-year survival (%)" 10 "5-year survival (%)",modify
+label define title_lab 1 "Year" 2 "No.registrations(tumours)" 3 "% of entire population" 4 "No.registrations(patients)" 5 "Age-standardized Incidence Rate (ASIR) per 100,000" 6 "No.registered by death certificate only" 7 "% of tumours registered" 8 "1-year survival (%)" 9 "3-year survival (%)" 10 "5-year survival (%)" 11 "10-year survival (%)",modify
 label values title title_lab
 label var title "Title"
 
@@ -169,6 +206,10 @@ replace title=4 if patienttot_2015!=.
 replace title=4 if patienttot_2014!=.
 replace title=4 if patienttot_2013!=.
 replace title=4 if patienttot_2008!=.
+replace title=5 if asir_2015!=.
+replace title=5 if asir_2014!=.
+replace title=5 if asir_2013!=.
+replace title=5 if asir_2008!=.
 replace title=6 if dco_2015!=.
 replace title=6 if dco_2014!=.
 replace title=6 if dco_2013!=.
@@ -189,6 +230,10 @@ replace title=10 if surv5yr_2015!=.
 replace title=10 if surv5yr_2014!=.
 replace title=10 if surv5yr_2013!=.
 replace title=10 if surv5yr_2008!=.
+replace title=11 if surv10yr_2015!=.
+replace title=11 if surv10yr_2014!=.
+replace title=11 if surv10yr_2013!=.
+replace title=11 if surv10yr_2008!=.
 
 *-------------------------------------------------------------------------------
 
@@ -212,23 +257,24 @@ expand=2 in 303, gen (tumtotper_2015) // Note to change the in input
 replace id=9006 if tumtotper_2015==1
 replace title=3 if tumtotper_2015!=0
 
+/*
 ** Add in ASIR observations
 expand=2 in 1, gen (asir_2008)
-replace id=9007 if asir_2008==1
+replace id=9007 if asirtot_2008!=.
 expand=2 in 1, gen (asir_2013)
-replace id=9008 if asir_2013==1
+replace id=9008 if asirtot_2013!=.
 expand=2 in 1, gen (asir_2014)
-replace id=9009 if asir_2014==1
+replace id=9009 if asirtot_2014!=.
 replace title=5 if asir_2014!=0
 replace title=5 if asir_2013!=0
 replace title=5 if asir_2008!=0
 expand=2 in 1, gen (asir_2015)
-replace id=9010 if asir_2015==1
+replace id=9010 if asirtot_2015!=.
 replace title=6 if asir_2015!=0
 replace title=6 if asir_2014!=0
 replace title=6 if asir_2013!=0
 replace title=6 if asir_2008!=0
-
+*/
 ** No.registered by death certificate only needs to be added in
 list id dco_2008 if dco_2008!=.
 expand=2 in 2, gen (dcotot_2008)
@@ -298,12 +344,34 @@ egen surv5yrtot_2015=max(surv5yr_2015)
 egen surv5yrtot_2014=max(surv5yr_2014)
 egen surv5yrtot_2013=max(surv5yr_2013)
 egen surv5yrtot_2008=max(surv5yr_2008)
-format dcototper_2008 dcototper_2013 dcototper_2014 dcototper_2015 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2013 surv5yrtot_2008 %2.1f
 
+egen surv10yrtot_2015=max(surv10yr_2015)
+egen surv10yrtot_2014=max(surv10yr_2014)
+egen surv10yrtot_2013=max(surv10yr_2013)
+egen surv10yrtot_2008=max(surv10yr_2008)
+
+**  Useusing format below displays all correctly but this one as it need rounding up first
+//replace dcototper_2008=round(dcototper_2008, 0.15)
+//replace dcototper_2013=round(dcototper_2013, 0.15)
+//replace dcototper_2014=round(dcototper_2014, 0.15)
+//replace dcototper_2015=round(dcototper_2015, 0.15)
+//replace surv1yrtot_2015=round(surv1yrtot_2015, 0.15)
+//replace surv1yrtot_2014=round(surv1yrtot_2014, 0.15)
+//replace surv1yrtot_2013=round(surv1yrtot_2013, 0.15)
+//replace surv1yrtot_2008=round(surv1yrtot_2008, 0.15)
+//replace surv3yrtot_2015=round(surv3yrtot_2015, 0.15)
+//replace surv3yrtot_2014=round(surv3yrtot_2014, 0.15)
+replace surv3yrtot_2013=round(surv3yrtot_2013, 0.15)
+replace surv3yrtot_2008=round(surv3yrtot_2008, 0.15)
+//replace surv5yrtot_2013=round(surv5yrtot_2013, 0.15)
+//replace surv5yrtot_2008=round(surv5yrtot_2008, 0.15)
+//replace surv10yrtot_2008=round(surv10yrtot_2008, 0.15)
+format dcototper_2008 dcototper_2013 dcototper_2014 dcototper_2015 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2013 surv5yrtot_2008 surv10yrtot_2008 %2.1f
+//stop
 *-------------------------------------------------------------------------------
 
-drop tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv1yr_* surv3yr_* surv5yr_*
-order id title tumtot_2015 tumtot_2014 tumtot_2013 tumtot_2008 tumtotper_2015 tumtotper_2014 tumtotper_2013 tumtotper_2008 pttot_2015 pttot_2014 pttot_2013 pttot_2008 asirtot_2015 asirtot_2014 asirtot_2013 asirtot_2008 dcotot_2015 dcotot_2014 dcotot_2013 dcotot_2008 dcototper_2015 dcototper_2014 dcototper_2013 dcototper_2008 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2015 surv5yrtot_2014 surv5yrtot_2013 surv5yrtot_2008
+drop tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv1yr_* surv3yr_* surv5yr_* surv10yr_*
+order id title tumtot_2015 tumtot_2014 tumtot_2013 tumtot_2008 tumtotper_2015 tumtotper_2014 tumtotper_2013 tumtotper_2008 pttot_2015 pttot_2014 pttot_2013 pttot_2008 asirtot_2015 asirtot_2014 asirtot_2013 asirtot_2008 dcotot_2015 dcotot_2014 dcotot_2013 dcotot_2008 dcototper_2015 dcototper_2014 dcototper_2013 dcototper_2008 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2015 surv5yrtot_2014 surv5yrtot_2013 surv5yrtot_2008 surv10yrtot_2008
 
 replace title=1 if id==1
 replace title=2 if id==2
@@ -315,6 +383,7 @@ replace title=7 if id==7
 replace title=8 if id==8
 replace title=9 if id==9
 replace title=10 if id==10
+replace title=11 if id==11
 
 drop if id>10
 rename tumtot_2015 results_2015
@@ -366,7 +435,12 @@ replace results_2015=surv5yrtot_2015 if id==10
 replace results_2014=surv5yrtot_2014 if id==10
 replace results_2013=surv5yrtot_2013 if id==10
 replace results_2008=surv5yrtot_2008 if id==10
-drop surv1yrtot_* surv3yrtot_* surv5yrtot_*
+
+replace results_2015=surv10yrtot_2015 if id==11
+replace results_2014=surv10yrtot_2014 if id==11
+replace results_2013=surv10yrtot_2013 if id==11
+replace results_2008=surv10yrtot_2008 if id==11
+drop surv1yrtot_* surv3yrtot_* surv5yrtot_* surv10yrtot_*
 
 replace results_2015=2015 if id==1
 replace results_2014=2014 if id==1
@@ -386,12 +460,12 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2015 Annual Report: Stata Results"), bold
 putdocx textblock begin
-Date Prepared: 1-MAR-2020. 
+Date Prepared: 04-MAR-2020. 
 Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
 Generated using Dofile: 30_report cancer.do
 putdocx textblock end
 putdocx paragraph, halign(center)
-putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2015 (Population=285,327))"), bold font(Helvetica,10,"blue")
+putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294), 2008 (Population=279,946))"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 putdocx text ("Standards"), bold
 putdocx paragraph, halign(center)
@@ -408,16 +482,28 @@ putdocx textblock begin
 (3) No.(patients): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(4) ASIR: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (distrate using barbados population: bb2010_10-2 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+(4) ASIR: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs; stata command distrate used with pop_wpp_2015-10, pop_wpp_2014-10, pop_wpp_2013-10, pop_wpp_2008-10 for 2015,2014,2013,2008 cancer incidence, respectively, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10;pop_wpp_2014-10;pop_wpp_2013-10;pop_wpp_2008-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
-(5) No.(DCOs): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+(5) Site Order: These tables show where the order of 2015 top 10 sites in 2014,2013,2008, respectively; site order datasets used: "`datapath'\version02\2-working\siteorder_2014; siteorder_2013; siteorder_2008")
 putdocx textblock end
 putdocx textblock begin
-(6) % of tumours: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+(6) ASIR by sex: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
-(7) 1-yr, 3-yr, 5-yr survival (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2008, surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2008, surv5yr_2013; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_survival")
+(7) Population text files (WPP): saved in: "`datapath'\version02\2-working\WPP_population by sex_yyyy"
+putdocx textblock end
+putdocx textblock begin
+(8) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+putdocx textblock end
+putdocx textblock begin
+(9) No.(DCOs): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs. NB: 2015 DCO trace-back for 176 cases still pending completion so 163 of these, found in death data and not previously abstracted, have been excluded from the dataset until trace-back completed. (variable used: basis. dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+putdocx textblock end
+putdocx textblock begin
+(10) % of tumours: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+putdocx textblock end
+putdocx textblock begin
+(11) 1-yr, 3-yr, 5-yr, 10-yr survival (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2008, surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2008, surv5yr_2013, surv10yr_2008; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_survival")
 putdocx textblock end
 //putdocx pagebreak
 putdocx table tbl1 = data(title results_2015 results_2014 results_2013 results_2008), halign(center)
@@ -446,11 +532,236 @@ putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2020-03-03_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_2015summstats" ,replace
 restore
+
+clear
+
+** Output for above ASIRs
+preserve
+use "`datapath'\version02\2-working\ASIRs", clear
+format asir %04.2f
+sort cancer_site year asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASIRs - ALL        *
+				****************************
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("ASIRs"), bold
+putdocx paragraph, halign(center)
+putdocx text ("All Sites by Year"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(cancer_site year asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx table tbl1(1,7), bold shading(lightgray)
+putdocx table tbl1(1,8), bold shading(lightgray)
+putdocx table tbl1(1,9), bold shading(lightgray)
+putdocx table tbl1(1,10), bold shading(lightgray)
+putdocx table tbl1(1,11), bold shading(lightgray)
+putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above Site Order tables
+preserve
+use "`datapath'\version02\2-working\siteorder_2014", clear
+sort order_id siteiarc
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *     SITE ORDER - 2014    *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Site Order Tables"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2014"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(order_id siteiarc), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(2,.), bold shading("yellow")
+putdocx table tbl1(3,.), bold shading("yellow")
+putdocx table tbl1(4,.), bold shading("yellow")
+putdocx table tbl1(5,.), bold shading("yellow")
+putdocx table tbl1(6,.), bold shading("yellow")
+putdocx table tbl1(7,.), bold shading("yellow")
+putdocx table tbl1(8,.), bold shading("yellow")
+putdocx table tbl1(10,.), bold shading("yellow")
+putdocx table tbl1(12,.), bold shading("yellow")
+putdocx table tbl1(16,.), bold shading("yellow")
+putdocx table tbl1(17,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above Site Order tables
+preserve
+use "`datapath'\version02\2-working\siteorder_2013", clear
+sort order_id siteiarc
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *     SITE ORDER - 2013    *
+				****************************
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, halign(center)
+putdocx text ("2013"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(order_id siteiarc), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(2,.), bold shading("yellow")
+putdocx table tbl1(3,.), bold shading("yellow")
+putdocx table tbl1(4,.), bold shading("yellow")
+putdocx table tbl1(5,.), bold shading("yellow")
+putdocx table tbl1(7,.), bold shading("yellow")
+putdocx table tbl1(8,.), bold shading("yellow")
+putdocx table tbl1(9,.), bold shading("yellow")
+putdocx table tbl1(10,.), bold shading("yellow")
+putdocx table tbl1(12,.), bold shading("yellow")
+putdocx table tbl1(14,.), bold shading("yellow")
+putdocx table tbl1(15,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above Site Order tables
+preserve
+use "`datapath'\version02\2-working\siteorder_2008", clear
+sort order_id siteiarc
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *     SITE ORDER - 2008    *
+				****************************
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, halign(center)
+putdocx text ("2008"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(order_id siteiarc), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(2,.), bold shading("yellow")
+putdocx table tbl1(3,.), bold shading("yellow")
+putdocx table tbl1(4,.), bold shading("yellow")
+putdocx table tbl1(5,.), bold shading("yellow")
+putdocx table tbl1(6,.), bold shading("yellow")
+putdocx table tbl1(7,.), bold shading("yellow")
+putdocx table tbl1(8,.), bold shading("yellow")
+putdocx table tbl1(10,.), bold shading("yellow")
+putdocx table tbl1(12,.), bold shading("yellow")
+putdocx table tbl1(13,.), bold shading("yellow")
+putdocx table tbl1(14,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above ASIRs by sex
+preserve
+use "`datapath'\version02\2-working\ASIRs_female", clear
+format asir %04.2f
+sort cancer_site asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASIRs - FEMALE        *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("ASIRs"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(cancer_site asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above ASIRs by sex
+preserve
+use "`datapath'\version02\2-working\ASIRs_male", clear
+format asir %04.2f
+sort cancer_site asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASIRs - MALE        *
+				****************************
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("ASIRs"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(cancer_site asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx clear
+restore
+
 /* JC 03mar20: neither of the below reports will be used in the 2015 annual report so code has been disabled
 				****************************
 				*	   MS WORD REPORT      *
