@@ -580,7 +580,6 @@ restore
 ** Missing sex %
 ** Missing age %
 
-stop
 * *********************************************
 * ANALYSIS: SECTION 3 - cancer sites
 * Covering:
