@@ -541,7 +541,7 @@ putdocx table tbl_bod = data("Site Total_DQI Total_Records Pct_DQI"), varnames  
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_bod(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-03-04_DQI_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_basis.dta" ,replace
@@ -570,7 +570,7 @@ putdocx table tbl_site = data("Total_DQI Total_Records Pct_DQI"), varnames  ///
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-03-04_DQI_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_siteage.dta" ,replace
@@ -594,6 +594,85 @@ use "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers", clear
 
 ****************************************************************************** 2015 ****************************************************************************************
 drop if dxyr!=2015 //2444 deleted
+
+** Determine sequential order of 2014 sites from 2015 top 10
+tab siteiarc ,m
+
+preserve
+drop if siteiarc==25 | siteiarc>60 // deleted
+contract siteiarc, freq(count) percent(percentage)
+summ 
+describe
+gsort -count
+gen order_id=_n
+list order_id siteiarc
+/*
+     +-------------------------------------------------------+
+     | order_id                                     siteiarc |
+     |-------------------------------------------------------|
+  1. |        1                                 Breast (C50) |
+  2. |        2                               Prostate (C61) |
+  3. |        3                                  Colon (C18) |
+  4. |        4                              Rectum (C19-20) |
+  5. |        5                           Corpus uteri (C54) |
+     |-------------------------------------------------------|
+  6. |        6                                Stomach (C16) |
+  7. |        7   Lung (incl. trachea and bronchus) (C33-34) |
+  8. |        8            Non-Hodgkin lymphoma (C82-86,C96) |
+  9. |        9                       Multiple myeloma (C90) |
+ 10. |       10                                 Kidney (C64) |
+     |-------------------------------------------------------|
+ 11. |       11                                  Ovary (C56) |
+ 12. |       12                               Pancreas (C25) |
+ 13. |       13                           Cervix uteri (C53) |
+ 14. |       14                                Bladder (C67) |
+ 15. |       15                                Thyroid (C73) |
+     |-------------------------------------------------------|
+ 16. |       16                             Oesophagus (C15) |
+ 17. |       17                       Melanoma of skin (C43) |
+ 18. |       18                    Gallbladder etc. (C23-24) |
+ 19. |       19               Brain, nervous system (C70-72) |
+ 20. |       20                        Small intestine (C17) |
+     |-------------------------------------------------------|
+ 21. |       21                                 Larynx (C32) |
+ 22. |       22                   Myeloid leukaemia (C92-94) |
+ 23. |       23                                   Anus (C21) |
+ 24. |       24                              Tongue (C01-02) |
+ 25. |       25                     Lymphoid leukaemia (C91) |
+     |-------------------------------------------------------|
+ 26. |       26                     Uterus unspecified (C55) |
+ 27. |       27                            Nasopharynx (C11) |
+ 28. |       28           Myeloproliferative disorders (MPD) |
+ 29. |       29                       Hodgkin lymphoma (C81) |
+ 30. |       30                               Mouth (C03-06) |
+     |-------------------------------------------------------|
+ 31. |       31                                 Tonsil (C09) |
+ 32. |       32         Connective and soft tissue (C47+C49) |
+ 33. |       33              Myelodysplastic syndromes (MDS) |
+ 34. |       34                                  Liver (C22) |
+ 35. |       35                                 Vagina (C52) |
+     |-------------------------------------------------------|
+ 36. |       36                  Leukaemia unspecified (C95) |
+ 37. |       37                       Other oropharynx (C10) |
+ 38. |       38                      Salivary gland (C07-08) |
+ 39. |       39            Other female genital organs (C57) |
+ 40. |       40                                  Vulva (C51) |
+     |-------------------------------------------------------|
+ 41. |       41                                Bone (C40-41) |
+ 42. |       42                  Nose, sinuses etc. (C30-31) |
+ 43. |       43                                 Testis (C62) |
+ 44. |       44               Other thoracic organs (C37-38) |
+ 45. |       45                                  Penis (C60) |
+     |-------------------------------------------------------|
+ 46. |       46                    Pharynx unspecified (C14) |
+ 47. |       47                                    Eye (C69) |
+ 48. |       48                   Other urinary organs (C68) |
+ 49. |       49                                 Ureter (C66) |
+     +-------------------------------------------------------+
+*/
+drop if order_id>20
+save "`datapath'\version02\2-working\siteorder_2015" ,replace
+restore
 
 **********************************************************************************
 ** ASIR and 95% CI for Table 1 using AR's site groupings - using WHO World popn **
@@ -2799,7 +2878,6 @@ list order_id siteiarc
  46. |       46                        Other endocrine (C75) |
      +-------------------------------------------------------+
 */
-drop count percentage
 drop if order_id>20
 save "`datapath'\version02\2-working\siteorder_2014" ,replace
 restore
@@ -4113,7 +4191,6 @@ list order_id siteiarc
  46. |       46                           Mesothelioma (C45) |
      +-------------------------------------------------------+
 */
-drop count percentage
 drop if order_id>20
 save "`datapath'\version02\2-working\siteorder_2013" ,replace
 restore
@@ -5396,7 +5473,6 @@ list order_id siteiarc
  49. |       49                    Pharynx unspecified (C14) |
      +-------------------------------------------------------+
 */
-drop count percentage
 drop if order_id>20
 save "`datapath'\version02\2-working\siteorder_2008" ,replace
 restore

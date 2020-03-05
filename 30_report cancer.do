@@ -532,7 +532,7 @@ putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_2015summstats" ,replace
@@ -573,7 +573,49 @@ putdocx table tbl1(1,8), bold shading(lightgray)
 putdocx table tbl1(1,9), bold shading(lightgray)
 putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above Site Order tables
+preserve
+use "`datapath'\version02\2-working\siteorder_2015", clear
+sort order_id siteiarc
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *     SITE ORDER - 2015    *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Site Order Tables"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2015"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(order_id siteiarc count percentage), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(2,.), bold shading("yellow")
+putdocx table tbl1(3,.), bold shading("yellow")
+putdocx table tbl1(4,.), bold shading("yellow")
+putdocx table tbl1(5,.), bold shading("yellow")
+putdocx table tbl1(6,.), bold shading("yellow")
+putdocx table tbl1(7,.), bold shading("yellow")
+putdocx table tbl1(8,.), bold shading("yellow")
+putdocx table tbl1(9,.), bold shading("yellow")
+putdocx table tbl1(10,.), bold shading("yellow")
+putdocx table tbl1(11,.), bold shading("yellow")
+putdocx table tbl1(12,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -599,9 +641,11 @@ putdocx text ("Site Order Tables"), bold
 putdocx paragraph, halign(center)
 putdocx text ("2014"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx table tbl1 = data(order_id siteiarc), halign(center) varnames
+putdocx table tbl1 = data(order_id siteiarc count percentage), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(2,.), bold shading("yellow")
 putdocx table tbl1(3,.), bold shading("yellow")
 putdocx table tbl1(4,.), bold shading("yellow")
@@ -613,7 +657,7 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(12,.), bold shading("yellow")
 putdocx table tbl1(16,.), bold shading("yellow")
 putdocx table tbl1(17,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -632,14 +676,17 @@ sort order_id siteiarc
 
 putdocx clear
 putdocx begin
+putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, halign(center)
 putdocx text ("2013"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx table tbl1 = data(order_id siteiarc), halign(center) varnames
+putdocx table tbl1 = data(order_id siteiarc count percentage), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(2,.), bold shading("yellow")
 putdocx table tbl1(3,.), bold shading("yellow")
 putdocx table tbl1(4,.), bold shading("yellow")
@@ -651,7 +698,7 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(12,.), bold shading("yellow")
 putdocx table tbl1(14,.), bold shading("yellow")
 putdocx table tbl1(15,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -670,14 +717,17 @@ sort order_id siteiarc
 
 putdocx clear
 putdocx begin
+putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, halign(center)
 putdocx text ("2008"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx table tbl1 = data(order_id siteiarc), halign(center) varnames
+putdocx table tbl1 = data(order_id siteiarc count percentage), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(2,.), bold shading("yellow")
 putdocx table tbl1(3,.), bold shading("yellow")
 putdocx table tbl1(4,.), bold shading("yellow")
@@ -689,7 +739,7 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(12,.), bold shading("yellow")
 putdocx table tbl1(13,.), bold shading("yellow")
 putdocx table tbl1(14,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -724,7 +774,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -758,7 +808,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2020-03-04_annual_report_stats_v02.docx", append
+putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
