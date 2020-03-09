@@ -4555,7 +4555,9 @@ format dd_dod %dD_m_CY
 rename dd_natregno nationalID
 rename dd_dod deathdate
 rename dd_coddeath cods
-capture export_excel record_id fname lname nationalID deathdate cods dd_certifier placeofdeath if cancer==1 & dodyear==2015 & _merge_org==2 & cr5db!=1 using "`datapath'\version02\2-working\DCO2015V02.xlsx", sheet("2015 DCOs_deathdata_20200218") firstrow(variables) replace
+rename dd_regnum regnum
+rename dd_district district
+capture export_excel record_id fname lname nationalID deathdate cods dd_certifier placeofdeath regnum district if cancer==1 & dodyear==2015 & _merge_org==2 & cr5db!=1 using "`datapath'\version02\2-working\DCO2015V03.xlsx", sheet("2015 DCOs_deathdata_20200218") firstrow(variables) replace
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 **stop - cancer team needs to check these 163 DCOs before continuing with cleaning and analysis
@@ -5459,7 +5461,7 @@ replace cancer=1 if pid=="20151113"|pid=="20151278"|pid=="20155201" //3 changes
 preserve
 drop if basis!=0
 keep pid fname lname natregno dod cr5cod doctor docaddr certifier
-capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier using "`datapath'\version02\2-working\DCO2015V02.xlsx", sheet("2015 DCOs_cr5data_20200218") firstrow(variables)
+capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier using "`datapath'\version02\2-working\DCO2015V03.xlsx", sheet("2015 DCOs_cr5data_20200218") firstrow(variables)
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 
