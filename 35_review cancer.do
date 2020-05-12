@@ -129,6 +129,68 @@ local cmd="C:\Windows\System32\curl.exe" 			///
 
 shell `cmd'
 
+STOP - update BNR-C Reviewer REDCap db for reviewer=SF; Update performed on 12-May-2020
+/*
+	(1) This dofile saved in PROJECTS p_117
+	(2) Import data from REDCap into Stata via redcap API using project called 'BNR-CVD'
+	(3) A user must have API rights to the redcap project for this process to work
+*/
+version 16.0
+set more off
+clear 
+
+**********************
+** IMPORT DATA FROM **
+** REDCAP TO STATA  **
+**********************
+local token "B9E9C58B906AC5D690E674FD62CA1BE5"
+local outfile "exported_cancer_reviewer_20200512.csv"
+
+shell curl		///
+	--output `outfile' 		///
+	--form token=`token'	///
+	--form content=record 	///
+	--form format=csv 		///
+	--form type=flat 		///
+	--form fields[]=record_id ///
+	--form fields[]=rvreviewer "https://caribdata.org/redcap/api/"
+
+import delimited using `outfile'
+
+export delimited using "cancer_reviewer_20200512.csv", replace
+br
+
+**********************
+** EXPORT DATA FROM **
+** STATA TO REDCAP  **
+**********************
+version 16.0
+set more off
+clear 
+
+local token "B9E9C58B906AC5D690E674FD62CA1BE5"
+local outfile "cancer_reviewer_20200512.csv"
+
+shell curl --output `outfile' --form token=`token' --form content=record --form format=csv --form type=flat --form fields[]=record_id --form fields[]=rvreviewer"https://caribdata.org/redcap/api/"
+import delimited `outfile'
+
+tostring rvreviewer ,replace
+replace rvreviewer="09" if rvreviewer=="1"|rvreviewer=="9"|rvreviewer=="." // corrrect reviewer from blank to SF
+//replace rvreviewer=09 if rvreviewer==1|rvreviewer==9|rvreviewer==. // corrrect reviewer from blank to SF
+local fileforimport "data_for_import_cancer_20200512.csv"
+export delimited using `fileforimport', nolabel replace
+
+
+local cmd="C:\Windows\System32\curl.exe" 			///
+          + " --form token=`token'" 	///
+          + " --form content=record" 	///
+          + " --form format=csv" 		///
+          + " --form type=flat" 		///
+          + " --form data="+char(34)+"<`fileforimport'"+char(34) /// The < is critical! It causes curl to read the contents of the file, not just send the file name.
+          + " https://caribdata.org/redcap/api/"
+
+shell `cmd'
+
 
 
 Update below flag names to match BNR-Cancer redcap db reviewer instruments
