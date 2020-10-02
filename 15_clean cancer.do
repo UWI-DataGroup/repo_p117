@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      02-DEC-2019
-    // 	date last modified      13-FEB-2020
+    // 	date last modified      01-OCT-2020
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -4557,16 +4557,3085 @@ rename dd_dod deathdate
 rename dd_coddeath cods
 rename dd_regnum regnum
 rename dd_district district
-capture export_excel record_id fname lname nationalID deathdate cods dd_certifier placeofdeath regnum district if cancer==1 & dodyear==2015 & _merge_org==2 & cr5db!=1 using "`datapath'\version02\2-working\DCO2015V03.xlsx", sheet("2015 DCOs_deathdata_20200218") firstrow(variables) replace
+capture export_excel record_id fname lname nationalID deathdate cods dd_certifier placeofdeath regnum district if cancer==1 & dodyear==2015 & _merge_org==2 & cr5db!=1 using "`datapath'\version02\2-working\DCO2015V04.xlsx", sheet("2015 DCOs_deathdata_20200218") firstrow(variables) replace
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 **stop - cancer team needs to check these 163 DCOs before continuing with cleaning and analysis
 ** Then for those pt notes that cannot be found - assign a pid then abstract then check for MP in CODs and expand obs!
 
 ** Remove unmatched death data
-drop if _merge==2 //9540
+//drop if _merge==2 //9540
+** 31aug20 JC: update for traced-back + true DCOs
+drop if pid=="" & (record_id!=16819 & record_id!=16823 & record_id!=16852 & record_id!=16887 & record_id!=16888 ///
+		& record_id!=16893 & record_id!=16909 & record_id!=16914 & record_id!=16936 & record_id!=16984 & record_id!=17000 ///
+		& record_id!=17024 & record_id!=17029 & record_id!=17046 & record_id!=17069 & record_id!=17099 & record_id!=17101 ///
+		& record_id!=17124 & record_id!=17134 & record_id!=17244 & record_id!=17281 & record_id!=17282 & record_id!=17297 ///
+		& record_id!=17310 & record_id!=17311 & record_id!=17333 & record_id!=17336 & record_id!=17375 & record_id!=17385 ///
+		& record_id!=17461 & record_id!=17473 & record_id!=17477 & record_id!=17489 & record_id!=17503 ///
+		& record_id!=17505 & record_id!=17524 & record_id!=17564 & record_id!=17591 & record_id!=17607 & record_id!=17617 ///
+		& record_id!=17635 & record_id!=17640 & record_id!=17644 & record_id!=17654 & record_id!=17663 & record_id!=17678 ///
+		& record_id!=17699 & record_id!=17714 & record_id!=17728 & record_id!=17729 & record_id!=17741 & record_id!=17761 ///
+		& record_id!=17789 & record_id!=17804 & record_id!=17809 & record_id!=17829 & record_id!=17842 ///
+		& record_id!=17846 & record_id!=17848 & record_id!=17865 & record_id!=17868 & record_id!=17886 & record_id!=17891 ///
+		& record_id!=17894 & record_id!=17915 & record_id!=17930 & record_id!=17942 & record_id!=17945 ///
+		& record_id!=17948 & record_id!=17966 & record_id!=17973 & record_id!=17998 & record_id!=17999 ///
+		& record_id!=18014 & record_id!=18059 & record_id!=18063 & record_id!=18089 & record_id!=18094 & record_id!=18109 ///
+		& record_id!=18116 & record_id!=18119 & record_id!=18129 & record_id!=18132 & record_id!=18149 & record_id!=18172 ///
+		& record_id!=18183 & record_id!=18203 & record_id!=18225 & record_id!=18238 & record_id!=18267 & record_id!=18270 ///
+		& record_id!=18272 & record_id!=18299 & record_id!=18304 & record_id!=18341 & record_id!=18342 ///
+		& record_id!=18375 & record_id!=18381 & record_id!=18399 & record_id!=18451 & record_id!=18468 & record_id!=18472 ///
+		& record_id!=18476 & record_id!=18482 & record_id!=18557 & record_id!=18562 & record_id!=18567 & record_id!=18571 ///
+		& record_id!=18585 & record_id!=18596 & record_id!=18619 & record_id!=18650 & record_id!=18693 & record_id!=18700 ///
+		& record_id!=18707 & record_id!=18710 & record_id!=18730 & record_id!=18744 & record_id!=18746 & record_id!=18801 ///
+		& record_id!=18805 & record_id!=18818 & record_id!=18834 & record_id!=18835 & record_id!=18849 & record_id!=18854 ///
+		& record_id!=18863 & record_id!=18892 & record_id!=18943 & record_id!=18945 ///
+		& record_id!=18950 & record_id!=18963 & record_id!=18987 & record_id!=18989 & record_id!=19018 & record_id!=19023 ///
+		& record_id!=19062 & record_id!=19077 & record_id!=19107 & record_id!=19135 & record_id!=19149 & record_id!=19210 ///
+		& record_id!=19230 & record_id!=19245 & record_id!=19246 & record_id!=19256 & record_id!=19278)
+//9.393 deleted
+//record_id 17432, 17989 - ineligible COD so dropped
 
 count //2047 - merge duplicated obs when >1 death record matched cancer record
+
+** Create dataset so you don't have to run entire dofile each time
+save "`datapath'\version02\2-working\2015_DCOs" ,replace
+clear
+use "`datapath'\version02\2-working\2015_DCOs" ,clear
+
+** Update traced-back + true DCOs from death data above
+replace natregno=dd_natregno if natregno=="" & dd_natregno!=""
+replace age=dd_age if age==. & dd_age!=.
+replace slc=2 if pid==""
+replace dlc=dd_dod if pid==""
+replace dod=dd_dod if pid==""
+replace recstatus=1 if pid==""
+replace resident=1 if pid==""
+replace parish=dd_parish if pid==""
+replace mpseq=0 if pid==""
+replace mptot=1 if pid==""
+replace addr=dd_address if pid==""
+replace staging=8 if pid==""
+replace cr5id="T1S1" if pid==""
+
+replace pid="20159000" if record_id==16819
+replace pid="20159001" if record_id==16823
+replace pid="20159002" if record_id==16852
+replace pid="20159003" if record_id==16887
+replace pid="20159004" if record_id==16888
+replace pid="20159005" if record_id==16893
+replace pid="20159006" if record_id==16909
+replace pid="20159007" if record_id==16914
+replace pid="20159008" if record_id==16936
+replace pid="20159009" if record_id==16984
+replace pid="20159010" if record_id==17000
+replace pid="20159011" if record_id==17024
+replace pid="20159012" if record_id==17029
+replace pid="20159013" if record_id==17046
+replace pid="20159014" if record_id==17069
+replace pid="20159015" if record_id==17099
+replace pid="20159016" if record_id==17101
+replace pid="20159017" if record_id==17124
+replace pid="20159018" if record_id==17134
+replace pid="20159019" if record_id==17244
+replace pid="20159020" if record_id==17281
+replace pid="20159021" if record_id==17282
+replace pid="20159022" if record_id==17297
+replace pid="20159023" if record_id==17310
+replace pid="20159024" if record_id==17311
+replace pid="20159025" if record_id==17333
+replace pid="20159026" if record_id==17336
+replace pid="20159027" if record_id==17375
+replace pid="20159028" if record_id==17385
+replace pid="20159029" if record_id==17461
+replace pid="20159030" if record_id==17473
+replace pid="20159031" if record_id==17477
+replace pid="20159032" if record_id==17489
+replace pid="20159033" if record_id==17503
+replace pid="20159034" if record_id==17505
+replace pid="20159035" if record_id==17524
+replace pid="20159036" if record_id==17564
+replace pid="20159037" if record_id==17591
+replace pid="20159038" if record_id==17607
+replace pid="20159039" if record_id==17617
+replace pid="20159040" if record_id==17635
+replace pid="20159041" if record_id==17640
+replace pid="20159042" if record_id==17644
+replace pid="20159043" if record_id==17654
+replace pid="20159044" if record_id==17663
+replace pid="20159045" if record_id==17678
+replace pid="20159046" if record_id==17699
+replace pid="20159047" if record_id==17714
+replace pid="20159048" if record_id==17728
+replace pid="20159049" if record_id==17729
+replace pid="20159050" if record_id==17741
+replace pid="20159051" if record_id==17761
+//replace pid="20159052" if record_id==17778
+replace pid="20159053" if record_id==17789
+replace pid="20159054" if record_id==17804
+replace pid="20159055" if record_id==17809
+replace pid="20159056" if record_id==17829
+replace pid="20159057" if record_id==17842
+replace pid="20159058" if record_id==17846
+replace pid="20159059" if record_id==17848
+replace pid="20159060" if record_id==17865
+replace pid="20159061" if record_id==17868
+replace pid="20159062" if record_id==17886
+replace pid="20159063" if record_id==17891
+replace pid="20159064" if record_id==17894
+replace pid="20159065" if record_id==17915
+//replace pid="20159066" if record_id==17916
+replace pid="20159067" if record_id==17930
+replace pid="20159068" if record_id==17942
+replace pid="20159069" if record_id==17945
+replace pid="20159070" if record_id==17948
+replace pid="20159071" if record_id==17966
+replace pid="20159072" if record_id==17973
+//replace pid="20159073" if record_id==17989
+replace pid="20159074" if record_id==17998
+replace pid="20159075" if record_id==17999
+replace pid="20159076" if record_id==18014
+replace pid="20159077" if record_id==18059
+replace pid="20159078" if record_id==18063
+replace pid="20159079" if record_id==18089
+replace pid="20159080" if record_id==18094
+replace pid="20159081" if record_id==18109
+replace pid="20159082" if record_id==18116
+replace pid="20159083" if record_id==18119
+replace pid="20159084" if record_id==18129
+replace pid="20159085" if record_id==18132
+replace pid="20159086" if record_id==18149
+replace pid="20159087" if record_id==18172
+replace pid="20159088" if record_id==18183
+replace pid="20159089" if record_id==18203
+replace pid="20159090" if record_id==18225
+replace pid="20159091" if record_id==18238
+replace pid="20159092" if record_id==18267
+replace pid="20159093" if record_id==18270
+replace pid="20159094" if record_id==18272
+replace pid="20159095" if record_id==18299
+replace pid="20159096" if record_id==18304
+replace pid="20159097" if record_id==18341
+replace pid="20159098" if record_id==18342
+//replace pid="20159099" if record_id==18357
+replace pid="20159100" if record_id==18375
+replace pid="20159101" if record_id==18381
+replace pid="20159102" if record_id==18399
+replace pid="20159103" if record_id==18451
+replace pid="20159104" if record_id==18468
+replace pid="20159105" if record_id==18472
+replace pid="20159106" if record_id==18476
+replace pid="20159107" if record_id==18482
+replace pid="20159108" if record_id==18557
+replace pid="20159109" if record_id==18562
+replace pid="20159110" if record_id==18567
+replace pid="20159111" if record_id==18571
+replace pid="20159112" if record_id==18585
+replace pid="20159113" if record_id==18596
+replace pid="20159114" if record_id==18619
+replace pid="20159115" if record_id==18650
+replace pid="20159116" if record_id==18693
+replace pid="20159117" if record_id==18700
+replace pid="20159118" if record_id==18707
+replace pid="20159119" if record_id==18710
+replace pid="20159120" if record_id==18730
+replace pid="20159121" if record_id==18744
+replace pid="20159122" if record_id==18746
+replace pid="20159123" if record_id==18801
+replace pid="20159124" if record_id==18805
+replace pid="20159125" if record_id==18818
+replace pid="20159126" if record_id==18834
+replace pid="20159127" if record_id==18835
+replace pid="20159128" if record_id==18849
+replace pid="20159129" if record_id==18854
+//replace pid="20159130" if record_id==18861
+replace pid="20159131" if record_id==18863
+replace pid="20159132" if record_id==18892
+//replace pid="20159133" if record_id==18893
+replace pid="20159134" if record_id==18943
+replace pid="20159135" if record_id==18945
+replace pid="20159136" if record_id==18950
+replace pid="20159137" if record_id==18963
+replace pid="20159138" if record_id==18987
+replace pid="20159139" if record_id==18989
+replace pid="20159140" if record_id==19018
+replace pid="20159141" if record_id==19023
+replace pid="20159142" if record_id==19062
+replace pid="20159143" if record_id==19077
+replace pid="20159144" if record_id==19107
+replace pid="20159145" if record_id==19135
+replace pid="20159146" if record_id==19149
+replace pid="20159147" if record_id==19210
+replace pid="20159148" if record_id==19230
+replace pid="20159149" if record_id==19245
+replace pid="20159150" if record_id==19246
+replace pid="20159151" if record_id==19256
+replace pid="20159152" if record_id==19278
+
+** Abstract traced-back + true DCOs
+replace top="809" if record_id==16819
+replace topography=809 if record_id==16819
+replace topcat=70 if record_id==16819
+replace primarysite="99" if record_id==16819
+replace morphology="8000" if record_id==16819
+replace morph=8000 if record_id==16819
+replace morphcat=1 if record_id==16819
+replace hx="METASTATIC CANCER" if record_id==16819
+replace lat=0 if record_id==16819
+replace latcat=0 if record_id==16819
+replace beh=3 if record_id==16819
+replace grade=9 if record_id==16819
+replace basis=0 if record_id==16819
+replace dot=dod if record_id==16819
+replace dotyear=year(dot) if record_id==16819
+replace dxyr=2015 if record_id==16819
+replace ICD10="C80" if record_id==16819
+replace ICCCcode="12b" if record_id==16819
+
+replace top="259" if record_id==16823
+replace topography=259 if record_id==16823
+replace topcat=26 if record_id==16823
+replace primarysite="PANCREAS" if record_id==16823
+replace morphology="8000" if record_id==16823
+replace morph=8000 if record_id==16823
+replace morphcat=1 if record_id==16823
+replace hx="METASTATIC PANCREATIC CARCINOMA" if record_id==16823
+replace lat=0 if record_id==16823
+replace latcat=0 if record_id==16823
+replace beh=3 if record_id==16823
+replace grade=9 if record_id==16823
+replace basis=0 if record_id==16823
+replace dot=dod if record_id==16823
+replace dotyear=year(dot) if record_id==16823
+replace dxyr=2015 if record_id==16823
+replace ICD10="C259" if record_id==16823
+replace ICCCcode="12b" if record_id==16823
+
+replace top="189" if record_id==16852
+replace topography=189 if record_id==16852
+replace topcat=19 if record_id==16852
+replace primarysite="COLON" if record_id==16852
+replace morphology="8000" if record_id==16852
+replace morph=8000 if record_id==16852
+replace morphcat=1 if record_id==16852
+replace hx="METASTATIC COLON CANCER" if record_id==16852
+replace lat=0 if record_id==16852
+replace latcat=0 if record_id==16852
+replace beh=3 if record_id==16852
+replace grade=9 if record_id==16852
+replace basis=0 if record_id==16852
+replace dot=dod if record_id==16852
+replace dotyear=year(dot) if record_id==16852
+replace dxyr=2015 if record_id==16852
+replace ICD10="C189" if record_id==16852
+replace ICCCcode="12b" if record_id==16852
+
+replace top="509" if record_id==16887
+replace topography=509 if record_id==16887
+replace topcat=43 if record_id==16887
+replace primarysite="BREAST" if record_id==16887
+replace morphology="8000" if record_id==16887
+replace morph=8000 if record_id==16887
+replace morphcat=1 if record_id==16887
+replace hx="CARCINOMA OF THE BREAST" if record_id==16887
+replace lat=3 if record_id==16887
+replace latcat=31 if record_id==16887
+replace beh=3 if record_id==16887
+replace grade=9 if record_id==16887
+replace basis=0 if record_id==16887
+replace dot=dod if record_id==16887
+replace dotyear=year(dot) if record_id==16887
+replace dxyr=2015 if record_id==16887
+replace ICD10="C509" if record_id==16887
+replace ICCCcode="12b" if record_id==16887
+
+replace top="259" if record_id==16888
+replace topography=259 if record_id==16888
+replace topcat=26 if record_id==16888
+replace primarysite="PANCREAS" if record_id==16888
+replace morphology="8000" if record_id==16888
+replace morph=8000 if record_id==16888
+replace morphcat=1 if record_id==16888
+replace hx="CARCINOMA OF THE PANCREAS" if record_id==16888
+replace lat=0 if record_id==16888
+replace latcat=0 if record_id==16888
+replace beh=3 if record_id==16888
+replace grade=9 if record_id==16888
+replace basis=0 if record_id==16888
+replace dot=dod if record_id==16888
+replace dotyear=year(dot) if record_id==16888
+replace dxyr=2015 if record_id==16888
+replace ICD10="C259" if record_id==16888
+replace ICCCcode="12b" if record_id==16888
+
+replace top="349" if record_id==16893
+replace topography=349 if record_id==16893
+replace topcat=32 if record_id==16893
+replace primarysite="LUNG" if record_id==16893
+replace morphology="8000" if record_id==16893
+replace morph=8000 if record_id==16893
+replace morphcat=1 if record_id==16893
+replace hx="METASTATIC LUNG CARCINOMA" if record_id==16893
+replace lat=3 if record_id==16893
+replace latcat=13 if record_id==16893
+replace beh=3 if record_id==16893
+replace grade=9 if record_id==16893
+replace basis=0 if record_id==16893
+replace dot=dod if record_id==16893
+replace dotyear=year(dot) if record_id==16893
+replace dxyr=2015 if record_id==16893
+replace ICD10="C349" if record_id==16893
+replace ICCCcode="12b" if record_id==16893
+
+replace top="509" if record_id==16909
+replace topography=509 if record_id==16909
+replace topcat=43 if record_id==16909
+replace primarysite="BREAST" if record_id==16909
+replace morphology="8000" if record_id==16909
+replace morph=8000 if record_id==16909
+replace morphcat=1 if record_id==16909
+replace hx="BREAST CANCER" if record_id==16909
+replace lat=2 if record_id==16909
+replace latcat=31 if record_id==16909
+replace beh=3 if record_id==16909
+replace grade=9 if record_id==16909
+replace basis=0 if record_id==16909
+replace dot=dod if record_id==16909
+replace dotyear=year(dot) if record_id==16909
+replace dxyr=2015 if record_id==16909
+replace ICD10="C509" if record_id==16909
+replace ICCCcode="12b" if record_id==16909
+
+replace top="809" if record_id==16914
+replace topography=809 if record_id==16914
+replace topcat=70 if record_id==16914
+replace primarysite="99" if record_id==16914
+replace morphology="8000" if record_id==16914
+replace morph=8000 if record_id==16914
+replace morphcat=1 if record_id==16914
+replace hx="MALIGNANCY" if record_id==16914
+replace lat=0 if record_id==16914
+replace latcat=0 if record_id==16914
+replace beh=3 if record_id==16914
+replace grade=9 if record_id==16914
+replace basis=0 if record_id==16914
+replace dot=dod if record_id==16914
+replace dotyear=year(dot) if record_id==16914
+replace dxyr=2015 if record_id==16914
+replace ICD10="C80" if record_id==16914
+replace ICCCcode="12b" if record_id==16914
+
+replace top="619" if record_id==16936
+replace topography=619 if record_id==16936
+replace topcat=53 if record_id==16936
+replace primarysite="PROSTATE" if record_id==16936
+replace morphology="8000" if record_id==16936
+replace morph=8000 if record_id==16936
+replace morphcat=1 if record_id==16936
+replace hx="PROSTATE CARCINOMA" if record_id==16936
+replace lat=0 if record_id==16936
+replace latcat=0 if record_id==16936
+replace beh=3 if record_id==16936
+replace grade=9 if record_id==16936
+replace basis=0 if record_id==16936
+replace dot=dod if record_id==16936
+replace dotyear=year(dot) if record_id==16936
+replace dxyr=2015 if record_id==16936
+replace ICD10="C61" if record_id==16936
+replace ICCCcode="12b" if record_id==16936
+
+replace top="421" if record_id==16984
+replace topography=421 if record_id==16984
+replace topcat=38 if record_id==16984
+replace primarysite="BONE MARROW" if record_id==16984
+replace morphology="9732" if record_id==16984
+replace morph=9732 if record_id==16984
+replace morphcat=46 if record_id==16984
+replace hx="MULTIPLE MYELOMA" if record_id==16984
+replace lat=0 if record_id==16984
+replace latcat=0 if record_id==16984
+replace beh=3 if record_id==16984
+replace grade=9 if record_id==16984
+replace basis=0 if record_id==16984
+replace dot=dod if record_id==16984
+replace dotyear=year(dot) if record_id==16984
+replace dxyr=2015 if record_id==16984
+replace ICD10="C900" if record_id==16984
+replace ICCCcode="2b" if record_id==16984
+
+replace top="421" if record_id==17000
+replace topography=421 if record_id==17000
+replace topcat=38 if record_id==17000
+replace primarysite="BONE MARROW" if record_id==17000
+replace morphology="9989" if record_id==17000
+replace morph=9989 if record_id==17000
+replace morphcat=56 if record_id==17000
+replace hx="MYELODYSPLASTIC SYNDROME" if record_id==17000
+replace lat=0 if record_id==17000
+replace latcat=0 if record_id==17000
+replace beh=3 if record_id==17000
+replace grade=9 if record_id==17000
+replace basis=0 if record_id==17000
+replace dot=d(30jun2008) if record_id==17000
+replace dotyear=year(dot) if record_id==17000
+replace dxyr=2008 if record_id==17000
+replace ICD10="D469" if record_id==17000
+replace ICCCcode="1d" if record_id==17000
+replace comments="Trace back: Dx in 2008." if record_id==17000
+
+replace top="189" if record_id==17024
+replace topography=189 if record_id==17024
+replace topcat=19 if record_id==17024
+replace primarysite="COLON" if record_id==17024
+replace morphology="8000" if record_id==17024
+replace morph=8000 if record_id==17024
+replace morphcat=1 if record_id==17024
+replace hx="COLON CANCER" if record_id==17024
+replace lat=0 if record_id==17024
+replace latcat=0 if record_id==17024
+replace beh=3 if record_id==17024
+replace grade=9 if record_id==17024
+replace basis=0 if record_id==17024
+replace dot=dod if record_id==17024
+replace dotyear=year(dot) if record_id==17024
+replace dxyr=2015 if record_id==17024
+replace ICD10="C189" if record_id==17024
+replace ICCCcode="12b" if record_id==17024
+
+replace top="239" if record_id==17029
+replace topography=239 if record_id==17029
+replace topcat=24 if record_id==17029
+replace primarysite="GALLBLADDER" if record_id==17029
+replace morphology="8000" if record_id==17029
+replace morph=8000 if record_id==17029
+replace morphcat=1 if record_id==17029
+replace hx="GALLBLADDER CANCER" if record_id==17029
+replace lat=0 if record_id==17029
+replace latcat=0 if record_id==17029
+replace beh=3 if record_id==17029
+replace grade=9 if record_id==17029
+replace basis=2 if record_id==17029
+replace dot=d(15jan2015) if record_id==17029
+replace dotyear=year(dot) if record_id==17029
+replace dxyr=2015 if record_id==17029
+replace ICD10="C23" if record_id==17029
+replace ICCCcode="12b" if record_id==17029
+replace comments="Trace back: Diagnosed January 2015. Clinical diagnosis- CT scan." if record_id==17029
+
+replace top="509" if record_id==17046
+replace topography=509 if record_id==17046
+replace topcat=43 if record_id==17046
+replace primarysite="BREAST" if record_id==17046
+replace morphology="8000" if record_id==17046
+replace morph=8000 if record_id==17046
+replace morphcat=1 if record_id==17046
+replace hx="BREAST CANCER" if record_id==17046
+replace lat=3 if record_id==17046
+replace latcat=31 if record_id==17046
+replace beh=3 if record_id==17046
+replace grade=9 if record_id==17046
+replace basis=1 if record_id==17046
+replace dot=dod if record_id==17046
+replace dotyear=year(dot) if record_id==17046
+replace dxyr=2015 if record_id==17046
+replace ICD10="C509" if record_id==17046
+replace ICCCcode="12b" if record_id==17046
+replace comments="Trace back: No Path Rpt. Pt died at home." if record_id==17046
+
+replace top="220" if record_id==17069
+replace topography=220 if record_id==17069
+replace topcat=23 if record_id==17069
+replace primarysite="LIVER" if record_id==17069
+replace morphology="8000" if record_id==17069
+replace morph=8000 if record_id==17069
+replace morphcat=1 if record_id==17069
+replace hx="METASTATIC CANCER LIVER" if record_id==17069
+replace lat=0 if record_id==17069
+replace latcat=0 if record_id==17069
+replace beh=3 if record_id==17069
+replace grade=9 if record_id==17069
+replace basis=1 if record_id==17069
+replace dot=d(15jan2015) if record_id==17069
+replace dotyear=year(dot) if record_id==17069
+replace dxyr=2015 if record_id==17069
+replace ICD10="C229" if record_id==17069
+replace ICCCcode="7c" if record_id==17069
+replace comments="Trace back: Saw Pt 5-6 weeks before died, so was Dx before that time not sure of date." if record_id==17069
+
+replace top="539" if record_id==17099
+replace topography=539 if record_id==17099
+replace topcat=46 if record_id==17099
+replace primarysite="CERVIX" if record_id==17099
+replace morphology="8000" if record_id==17099
+replace morph=8000 if record_id==17099
+replace morphcat=1 if record_id==17099
+replace hx="CERVICAL CARCINOMA METASTATIC" if record_id==17099
+replace lat=0 if record_id==17099
+replace latcat=0 if record_id==17099
+replace beh=3 if record_id==17099
+replace grade=9 if record_id==17099
+replace basis=0 if record_id==17099
+replace dot=dod if record_id==17099
+replace dotyear=year(dot) if record_id==17099
+replace dxyr=2015 if record_id==17099
+replace ICD10="C539" if record_id==17099
+replace ICCCcode="12b" if record_id==17099
+
+replace top="559" if record_id==17101
+replace topography=559 if record_id==17101
+replace topcat=48 if record_id==17101
+replace primarysite="UTERUS" if record_id==17101
+replace morphology="8000" if record_id==17101
+replace morph=8000 if record_id==17101
+replace morphcat=1 if record_id==17101
+replace hx="UTERINE LEIOMYOSARCOMA METASTATIC" if record_id==17101
+replace lat=0 if record_id==17101
+replace latcat=0 if record_id==17101
+replace beh=3 if record_id==17101
+replace grade=9 if record_id==17101
+replace basis=0 if record_id==17101
+replace dot=dod if record_id==17101
+replace dotyear=year(dot) if record_id==17101
+replace dxyr=2015 if record_id==17101
+replace ICD10="C55" if record_id==17101
+replace ICCCcode="12b" if record_id==17101
+
+replace top="619" if record_id==17124
+replace topography=619 if record_id==17124
+replace topcat=53 if record_id==17124
+replace primarysite="PROSTATE" if record_id==17124
+replace morphology="8000" if record_id==17124
+replace morph=8000 if record_id==17124
+replace morphcat=1 if record_id==17124
+replace hx="PROSTATE CANCER" if record_id==17124
+replace lat=0 if record_id==17124
+replace latcat=0 if record_id==17124
+replace beh=3 if record_id==17124
+replace grade=9 if record_id==17124
+replace basis=0 if record_id==17124
+replace dot=dod if record_id==17124
+replace dotyear=year(dot) if record_id==17124
+replace dxyr=2015 if record_id==17124
+replace ICD10="C61" if record_id==17124
+replace ICCCcode="12b" if record_id==17124
+
+replace top="619" if record_id==17134
+replace topography=619 if record_id==17134
+replace topcat=53 if record_id==17134
+replace primarysite="PROSTATE" if record_id==17134
+replace morphology="8000" if record_id==17134
+replace morph=8000 if record_id==17134
+replace morphcat=1 if record_id==17134
+replace hx="PROSTATE CANCER" if record_id==17134
+replace lat=0 if record_id==17134
+replace latcat=0 if record_id==17134
+replace beh=3 if record_id==17134
+replace grade=9 if record_id==17134
+replace basis=0 if record_id==17134
+replace dot=dod if record_id==17134
+replace dotyear=year(dot) if record_id==17134
+replace dxyr=2015 if record_id==17134
+replace ICD10="C61" if record_id==17134
+replace ICCCcode="12b" if record_id==17134
+
+replace top="619" if record_id==17244
+replace topography=619 if record_id==17244
+replace topcat=53 if record_id==17244
+replace primarysite="PROSTATE" if record_id==17244
+replace morphology="8000" if record_id==17244
+replace morph=8000 if record_id==17244
+replace morphcat=1 if record_id==17244
+replace hx="CARCINOMA OF THE PROSTATE" if record_id==17244
+replace lat=0 if record_id==17244
+replace latcat=0 if record_id==17244
+replace beh=3 if record_id==17244
+replace grade=9 if record_id==17244
+replace basis=0 if record_id==17244
+replace dot=dod if record_id==17244
+replace dotyear=year(dot) if record_id==17244
+replace dxyr=2015 if record_id==17244
+replace ICD10="C61" if record_id==17244
+replace ICCCcode="12b" if record_id==17244
+
+replace top="509" if record_id==17281
+replace topography=509 if record_id==17281
+replace topcat=43 if record_id==17281
+replace primarysite="BREAST" if record_id==17281
+replace morphology="8000" if record_id==17281
+replace morph=8000 if record_id==17281
+replace morphcat=1 if record_id==17281
+replace hx="CARCINOMA BREAST" if record_id==17281
+replace lat=3 if record_id==17281
+replace latcat=31 if record_id==17281
+replace beh=3 if record_id==17281
+replace grade=9 if record_id==17281
+replace basis=0 if record_id==17281
+replace dot=dod if record_id==17281
+replace dotyear=year(dot) if record_id==17281
+replace dxyr=2015 if record_id==17281
+replace ICD10="C509" if record_id==17281
+replace ICCCcode="12b" if record_id==17281
+
+replace top="421" if record_id==17282
+replace topography=421 if record_id==17282
+replace topcat=38 if record_id==17282
+replace primarysite="BONE MARROW" if record_id==17282
+replace morphology="9800" if record_id==17282
+replace morph=9800 if record_id==17282
+replace morphcat=50 if record_id==17282
+replace hx="LEUKAEMIA" if record_id==17282
+replace lat=0 if record_id==17282
+replace latcat=0 if record_id==17282
+replace beh=3 if record_id==17282
+replace grade=9 if record_id==17282
+replace basis=0 if record_id==17282
+replace dot=dod if record_id==17282
+replace dotyear=year(dot) if record_id==17282
+replace dxyr=2015 if record_id==17282
+replace ICD10="C959" if record_id==17282
+replace ICCCcode="1e" if record_id==17282
+
+replace top="619" if record_id==17297
+replace topography=619 if record_id==17297
+replace topcat=53 if record_id==17297
+replace primarysite="PROSTATE" if record_id==17297
+replace morphology="8000" if record_id==17297
+replace morph=8000 if record_id==17297
+replace morphcat=1 if record_id==17297
+replace hx="PROSTATE CANCER" if record_id==17297
+replace lat=0 if record_id==17297
+replace latcat=0 if record_id==17297
+replace beh=3 if record_id==17297
+replace grade=9 if record_id==17297
+replace basis=0 if record_id==17297
+replace dot=dod if record_id==17297
+replace dotyear=year(dot) if record_id==17297
+replace dxyr=2015 if record_id==17297
+replace ICD10="C61" if record_id==17297
+replace ICCCcode="12b" if record_id==17297
+
+replace top="172" if record_id==17310
+replace topography=172 if record_id==17310
+replace topcat=18 if record_id==17310
+replace primarysite="SMALL INTESTINE-ILEUM" if record_id==17310
+replace morphology="8000" if record_id==17310
+replace morph=8000 if record_id==17310
+replace morphcat=1 if record_id==17310
+replace hx="CARCINOID TUMOUR OF THE ILEUM" if record_id==17310
+replace lat=0 if record_id==17310
+replace latcat=0 if record_id==17310
+replace beh=3 if record_id==17310
+replace grade=9 if record_id==17310
+replace basis=0 if record_id==17310
+replace dot=dod if record_id==17310
+replace dotyear=year(dot) if record_id==17310
+replace dxyr=2015 if record_id==17310
+replace ICD10="C172" if record_id==17310
+replace ICCCcode="12b" if record_id==17310
+
+replace top="509" if record_id==17311
+replace topography=509 if record_id==17311
+replace topcat=43 if record_id==17311
+replace primarysite="BREAST" if record_id==17311
+replace morphology="8000" if record_id==17311
+replace morph=8000 if record_id==17311
+replace morphcat=1 if record_id==17311
+replace hx="METASTATIC BREAST CANCER" if record_id==17311
+replace lat=3 if record_id==17311
+replace latcat=31 if record_id==17311
+replace beh=3 if record_id==17311
+replace grade=9 if record_id==17311
+replace basis=9 if record_id==17311
+replace dot=d(06mar2015) if record_id==17311
+replace dotyear=year(dot) if record_id==17311
+replace dxyr=2015 if record_id==17311
+replace ICD10="C509" if record_id==17311
+replace ICCCcode="12b" if record_id==17311
+replace comments="Trace back: Seen at QEH- Mar 6, 2015. Secondary malignant neoplasm of liver and intrahepatic bile duct. Secondary malignant neoplasm of bone and bone marrow. Primary diagnosis- malignant neoplasm breast; unspecified. CHECK RT or Ward C12 seems like patient wa admistted there." if record_id==17311
+
+replace top="719" if record_id==17333
+replace topography=719 if record_id==17333
+replace topcat=63 if record_id==17333
+replace primarysite="BRAIN" if record_id==17333
+replace morphology="8000" if record_id==17333
+replace morph=8000 if record_id==17333
+replace morphcat=1 if record_id==17333
+replace hx="CANCER OF BRAIN" if record_id==17333
+replace lat=0 if record_id==17333
+replace latcat=0 if record_id==17333
+replace beh=3 if record_id==17333
+replace grade=9 if record_id==17333
+replace basis=0 if record_id==17333
+replace dot=dod if record_id==17333
+replace dotyear=year(dot) if record_id==17333
+replace dxyr=2015 if record_id==17333
+replace ICD10="C719" if record_id==17333
+replace ICCCcode="12b" if record_id==17333
+
+replace top="421" if record_id==17336
+replace topography=421 if record_id==17336
+replace topcat=38 if record_id==17336
+replace primarysite="BONE MARROW" if record_id==17336
+replace morphology="9732" if record_id==17336
+replace morph=9732 if record_id==17336
+replace morphcat=46 if record_id==17336
+replace hx="MULTIPLE MYELOMA" if record_id==17336
+replace lat=0 if record_id==17336
+replace latcat=0 if record_id==17336
+replace beh=3 if record_id==17336
+replace grade=9 if record_id==17336
+replace basis=0 if record_id==17336
+replace dot=dod if record_id==17336
+replace dotyear=year(dot) if record_id==17336
+replace dxyr=2015 if record_id==17336
+replace ICD10="C900" if record_id==17336
+replace ICCCcode="2b" if record_id==17336
+
+replace top="739" if record_id==17375
+replace topography=739 if record_id==17375
+replace topcat=65 if record_id==17375
+replace primarysite="THYROID GLAND" if record_id==17375
+replace morphology="8000" if record_id==17375
+replace morph=8000 if record_id==17375
+replace morphcat=1 if record_id==17375
+replace hx="CARCINOMA OF THE THYROID GLAND" if record_id==17375
+replace lat=0 if record_id==17375
+replace latcat=0 if record_id==17375
+replace beh=3 if record_id==17375
+replace grade=9 if record_id==17375
+replace basis=0 if record_id==17375
+replace dot=dod if record_id==17375
+replace dotyear=year(dot) if record_id==17375
+replace dxyr=2015 if record_id==17375
+replace ICD10="C73" if record_id==17375
+replace ICCCcode="12b" if record_id==17375
+
+replace top="349" if record_id==17385
+replace topography=349 if record_id==17385
+replace topcat=32 if record_id==17385
+replace primarysite="LUNG" if record_id==17385
+replace morphology="8000" if record_id==17385
+replace morph=8000 if record_id==17385
+replace morphcat=1 if record_id==17385
+replace hx="PULMONARY CANCER" if record_id==17385
+replace lat=3 if record_id==17385
+replace latcat=13 if record_id==17385
+replace beh=3 if record_id==17385
+replace grade=9 if record_id==17385
+replace basis=0 if record_id==17385
+replace dot=dod if record_id==17385
+replace dotyear=year(dot) if record_id==17385
+replace dxyr=2015 if record_id==17385
+replace ICD10="C349" if record_id==17385
+replace ICCCcode="12b" if record_id==17385
+
+replace top="421" if record_id==17461
+replace topography=421 if record_id==17461
+replace topcat=38 if record_id==17461
+replace primarysite="BONE MARROW" if record_id==17461
+replace morphology="9732" if record_id==17461
+replace morph=9732 if record_id==17461
+replace morphcat=46 if record_id==17461
+replace hx="MULTIPLE MYELOMA" if record_id==17461
+replace lat=0 if record_id==17461
+replace latcat=0 if record_id==17461
+replace beh=3 if record_id==17461
+replace grade=9 if record_id==17461
+replace basis=0 if record_id==17461
+replace dot=dod if record_id==17461
+replace dotyear=year(dot) if record_id==17461
+replace dxyr=2015 if record_id==17461
+replace ICD10="C900" if record_id==17461
+replace ICCCcode="2b" if record_id==17461
+** Create duplicate observations for MPs in CODs
+expand=2 if record_id==17461, gen (dupobs1do15)
+replace top="530" if record_id==17461 & dupobs1do15>0
+replace topography=530 if record_id==17461 & dupobs1do15>0
+replace topcat=46 if record_id==17461 & dupobs1do15>0
+replace primarysite="CERVIX" if record_id==17461 & dupobs1do15>0
+replace morphology="8000" if record_id==17461 & dupobs1do15>0
+replace morph=8000 if record_id==17461 & dupobs1do15>0
+replace morphcat=1 if record_id==17461 & dupobs1do15>0
+replace hx="CERVICAL CANCER" if record_id==17461 & dupobs1do15>0
+replace lat=0 if record_id==17461 & dupobs1do15>0
+replace latcat=0 if record_id==17461 & dupobs1do15>0
+replace beh=3 if record_id==17461 & dupobs1do15>0
+replace grade=9 if record_id==17461 & dupobs1do15>0
+replace basis=0 if record_id==17461 & dupobs1do15>0
+replace dot=dod if record_id==17461 & dupobs1do15>0
+replace dotyear=year(dot) if record_id==17461 & dupobs1do15>0
+replace dxyr=2015 if record_id==17461 & dupobs1do15>0
+replace ICD10="C530" if record_id==17461 & dupobs1do15>0
+replace ICCCcode="12b" if record_id==17461 & dupobs1do15>0
+replace cr5id="T2S1" if record_id==17461 & dupobs1do15>0
+
+replace top="619" if record_id==17473
+replace topography=619 if record_id==17473
+replace topcat=53 if record_id==17473
+replace primarysite="PROSTATE" if record_id==17473
+replace morphology="8000" if record_id==17473
+replace morph=8000 if record_id==17473
+replace morphcat=1 if record_id==17473
+replace hx="PROSTATE CANCER" if record_id==17473
+replace lat=0 if record_id==17473
+replace latcat=0 if record_id==17473
+replace beh=3 if record_id==17473
+replace grade=9 if record_id==17473
+replace basis=0 if record_id==17473
+replace dot=dod if record_id==17473
+replace dotyear=year(dot) if record_id==17473
+replace dxyr=2015 if record_id==17473
+replace ICD10="C61" if record_id==17473
+replace ICCCcode="12b" if record_id==17473
+
+replace top="541" if record_id==17477
+replace topography=541 if record_id==17477
+replace topcat=47 if record_id==17477
+replace primarysite="ENDOMETRIUM" if record_id==17477
+replace morphology="8000" if record_id==17477
+replace morph=8000 if record_id==17477
+replace morphcat=1 if record_id==17477
+replace hx="METASTATIC ENDOMETRIAL CARCINOMA" if record_id==17477
+replace lat=0 if record_id==17477
+replace latcat=0 if record_id==17477
+replace beh=3 if record_id==17477
+replace grade=9 if record_id==17477
+replace basis=0 if record_id==17477
+replace dot=dod if record_id==17477
+replace dotyear=year(dot) if record_id==17477
+replace dxyr=2015 if record_id==17477
+replace ICD10="C541" if record_id==17477
+replace ICCCcode="12b" if record_id==17477
+
+replace top="719" if record_id==17489
+replace topography=719 if record_id==17489
+replace topcat=63 if record_id==17489
+replace primarysite="BRAIN" if record_id==17489
+replace morphology="9382" if record_id==17489
+replace morph=9382 if record_id==17489
+replace morphcat=36 if record_id==17489
+replace hx="ANAPLASTIC MIXED GLIOMA-OLIGOASTROCYTOMA" if record_id==17489
+replace lat=0 if record_id==17489
+replace latcat=0 if record_id==17489
+replace beh=3 if record_id==17489
+replace grade=4 if record_id==17489
+replace basis=7 if record_id==17489
+replace dot=d(30jun2008) if record_id==17489
+replace dotyear=year(dot) if record_id==17489
+replace dxyr=2008 if record_id==17489
+replace ICD10="C719" if record_id==17489
+replace ICCCcode="3b" if record_id==17489
+
+replace top="259" if record_id==17503
+replace topography=259 if record_id==17503
+replace topcat=26 if record_id==17503
+replace primarysite="PANCREAS" if record_id==17503
+replace morphology="8000" if record_id==17503
+replace morph=8000 if record_id==17503
+replace morphcat=1 if record_id==17503
+replace hx="PANCREATIC CANCER WITH LIVER METASTASES" if record_id==17503
+replace lat=0 if record_id==17503
+replace latcat=0 if record_id==17503
+replace beh=3 if record_id==17503
+replace grade=9 if record_id==17503
+replace basis=0 if record_id==17503
+replace dot=dod if record_id==17503
+replace dotyear=year(dot) if record_id==17503
+replace dxyr=2015 if record_id==17503
+replace ICD10="C259" if record_id==17503
+replace ICCCcode="12b" if record_id==17503
+
+replace top="259" if record_id==17505
+replace topography=259 if record_id==17505
+replace topcat=26 if record_id==17505
+replace primarysite="PANCREAS" if record_id==17505
+replace morphology="8000" if record_id==17505
+replace morph=8000 if record_id==17505
+replace morphcat=1 if record_id==17505
+replace hx="METASTATIC CARCINOMA OF PANCREAS" if record_id==17505
+replace lat=0 if record_id==17505
+replace latcat=0 if record_id==17505
+replace beh=3 if record_id==17505
+replace grade=9 if record_id==17505
+replace basis=0 if record_id==17505
+replace dot=dod if record_id==17505
+replace dotyear=year(dot) if record_id==17505
+replace dxyr=2015 if record_id==17505
+replace ICD10="C259" if record_id==17505
+replace ICCCcode="12b" if record_id==17505
+
+replace top="169" if record_id==17524
+replace topography=169 if record_id==17524
+replace topcat=17 if record_id==17524
+replace primarysite="STOMACH" if record_id==17524
+replace morphology="8000" if record_id==17524
+replace morph=8000 if record_id==17524
+replace morphcat=1 if record_id==17524
+replace hx="ADENOCARCINOMA OF THE STOMACH" if record_id==17524
+replace lat=0 if record_id==17524
+replace latcat=0 if record_id==17524
+replace beh=3 if record_id==17524
+replace grade=9 if record_id==17524
+replace basis=0 if record_id==17524
+replace dot=dod if record_id==17524
+replace dotyear=year(dot) if record_id==17524
+replace dxyr=2015 if record_id==17524
+replace ICD10="C169" if record_id==17524
+replace ICCCcode="12b" if record_id==17524
+
+replace top="619" if record_id==17564
+replace topography=619 if record_id==17564
+replace topcat=53 if record_id==17564
+replace primarysite="PROSTATE" if record_id==17564
+replace morphology="8000" if record_id==17564
+replace morph=8000 if record_id==17564
+replace morphcat=1 if record_id==17564
+replace hx="PROSTATE CANCER" if record_id==17564
+replace lat=0 if record_id==17564
+replace latcat=0 if record_id==17564
+replace beh=3 if record_id==17564
+replace grade=9 if record_id==17564
+replace basis=0 if record_id==17564
+replace dot=dod if record_id==17564
+replace dotyear=year(dot) if record_id==17564
+replace dxyr=2015 if record_id==17564
+replace ICD10="C61" if record_id==17564
+replace ICCCcode="12b" if record_id==17564
+
+replace top="220" if record_id==17591
+replace topography=220 if record_id==17591
+replace topcat=23 if record_id==17591
+replace primarysite="LIVER" if record_id==17591
+replace morphology="8000" if record_id==17591
+replace morph=8000 if record_id==17591
+replace morphcat=1 if record_id==17591
+replace hx="METASTATIC CARCINOID TUMOR" if record_id==17591
+replace lat=0 if record_id==17591
+replace latcat=0 if record_id==17591
+replace beh=3 if record_id==17591
+replace grade=9 if record_id==17591
+replace basis=1 if record_id==17591
+replace dot=d(05dec2014) if record_id==17591
+replace dotyear=year(dot) if record_id==17591
+replace dxyr=2014 if record_id==17591
+replace ICD10="C229" if record_id==17591
+replace ICCCcode="7c" if record_id==17591
+replace comments="Trace back: Liver cell carcinoma diagnosed December 5 2014.Clinical." if record_id==17591
+
+replace top="169" if record_id==17607
+replace topography=169 if record_id==17607
+replace topcat=17 if record_id==17607
+replace primarysite="STOMACH" if record_id==17607
+replace morphology="8000" if record_id==17607
+replace morph=8000 if record_id==17607
+replace morphcat=1 if record_id==17607
+replace hx="METASTATIC GASTRIC CARCINOMA" if record_id==17607
+replace lat=0 if record_id==17607
+replace latcat=0 if record_id==17607
+replace beh=3 if record_id==17607
+replace grade=9 if record_id==17607
+replace basis=0 if record_id==17607
+replace dot=dod if record_id==17607
+replace dotyear=year(dot) if record_id==17607
+replace dxyr=2015 if record_id==17607
+replace ICD10="C169" if record_id==17607
+replace ICCCcode="12b" if record_id==17607
+
+replace top="169" if record_id==17617
+replace topography=169 if record_id==17617
+replace topcat=17 if record_id==17617
+replace primarysite="STOMACH" if record_id==17617
+replace morphology="8000" if record_id==17617
+replace morph=8000 if record_id==17617
+replace morphcat=1 if record_id==17617
+replace hx="CARCINOMA OF THE STOMACH" if record_id==17617
+replace lat=0 if record_id==17617
+replace latcat=0 if record_id==17617
+replace beh=3 if record_id==17617
+replace grade=9 if record_id==17617
+replace basis=0 if record_id==17617
+replace dot=dod if record_id==17617
+replace dotyear=year(dot) if record_id==17617
+replace dxyr=2015 if record_id==17617
+replace ICD10="C169" if record_id==17617
+replace ICCCcode="12b" if record_id==17617
+
+replace top="421" if record_id==17635
+replace topography=421 if record_id==17635
+replace topcat=38 if record_id==17635
+replace primarysite="BONE MARROW" if record_id==17635
+replace morphology="8000" if record_id==17635
+replace morph=8000 if record_id==17635
+replace morphcat=1 if record_id==17635
+replace hx="HAEMATOLOGIC MALIGNANCY" if record_id==17635
+replace lat=0 if record_id==17635
+replace latcat=0 if record_id==17635
+replace beh=3 if record_id==17635
+replace grade=9 if record_id==17635
+replace basis=5 if record_id==17635
+replace dot=d(15mar2015) if record_id==17635
+replace dotyear=year(dot) if record_id==17635
+replace dxyr=2015 if record_id==17635
+replace ICD10="C969" if record_id==17635
+replace ICCCcode="12b" if record_id==17635
+
+replace top="619" if record_id==17640
+replace topography=619 if record_id==17640
+replace topcat=53 if record_id==17640
+replace primarysite="PROSTATE" if record_id==17640
+replace morphology="8000" if record_id==17640
+replace morph=8000 if record_id==17640
+replace morphcat=1 if record_id==17640
+replace hx="CARCINOMA OF THE PROSTATE GLAND WITH METASTASIS" if record_id==17640
+replace lat=0 if record_id==17640
+replace latcat=0 if record_id==17640
+replace beh=3 if record_id==17640
+replace grade=9 if record_id==17640
+replace basis=0 if record_id==17640
+replace dot=dod if record_id==17640
+replace dotyear=year(dot) if record_id==17640
+replace dxyr=2015 if record_id==17640
+replace ICD10="C61" if record_id==17640
+replace ICCCcode="12b" if record_id==17640
+
+replace top="169" if record_id==17644
+replace topography=169 if record_id==17644
+replace topcat=17 if record_id==17644
+replace primarysite="STOMACH" if record_id==17644
+replace morphology="8000" if record_id==17644
+replace morph=8000 if record_id==17644
+replace morphcat=1 if record_id==17644
+replace hx="GASTROINTESTINAL TUMOR OF STOMACH" if record_id==17644
+replace lat=0 if record_id==17644
+replace latcat=0 if record_id==17644
+replace beh=3 if record_id==17644
+replace grade=9 if record_id==17644
+replace basis=0 if record_id==17644
+replace dot=dod if record_id==17644
+replace dotyear=year(dot) if record_id==17644
+replace dxyr=2015 if record_id==17644
+replace ICD10="C169" if record_id==17644
+replace ICCCcode="12b" if record_id==17644
+
+replace top="809" if record_id==17654
+replace topography=809 if record_id==17654
+replace topcat=70 if record_id==17654
+replace primarysite="99" if record_id==17654
+replace morphology="8000" if record_id==17654
+replace morph=8000 if record_id==17654
+replace morphcat=1 if record_id==17654
+replace hx="CARCINOMATOSIS HIGH GRADE SPINDLE CELL SARCOMA" if record_id==17654
+replace lat=0 if record_id==17654
+replace latcat=0 if record_id==17654
+replace beh=3 if record_id==17654
+replace grade=9 if record_id==17654
+replace basis=0 if record_id==17654
+replace dot=dod if record_id==17654
+replace dotyear=year(dot) if record_id==17654
+replace dxyr=2015 if record_id==17654
+replace ICD10="C80" if record_id==17654
+replace ICCCcode="12b" if record_id==17654
+
+replace top="029" if record_id==17663
+replace topography=29 if record_id==17663
+replace topcat=3 if record_id==17663
+replace primarysite="TONGUE" if record_id==17663
+replace morphology="8000" if record_id==17663
+replace morph=8000 if record_id==17663
+replace morphcat=1 if record_id==17663
+replace hx="METASTATIC TONGUE CANCER" if record_id==17663
+replace lat=0 if record_id==17663
+replace latcat=0 if record_id==17663
+replace beh=3 if record_id==17663
+replace grade=9 if record_id==17663
+replace basis=1 if record_id==17663
+replace dot=d(28apr2013) if record_id==17663
+replace dotyear=year(dot) if record_id==17663
+replace dxyr=2013 if record_id==17663
+replace ICD10="C029" if record_id==17663
+replace ICCCcode="12b" if record_id==17663
+replace comments="Trace back: Definitely diagnosed well before 2015: First presentation was to Dr A Irvine 28th April 2013 with supraclavicular lymphadenopathy and refered to Dr Jillian Clarke due to suspected ENT malignancy. Was treated for metastatic ca tongue by Dr T Lauret locally in conjunction with a specialist center overseas." if record_id==17663
+
+replace top="239" if record_id==17678
+replace topography=239 if record_id==17678
+replace topcat=24 if record_id==17678
+replace primarysite="GALLBLADDER" if record_id==17678
+replace morphology="8000" if record_id==17678
+replace morph=8000 if record_id==17678
+replace morphcat=1 if record_id==17678
+replace hx="METASTATIC CARCINOMA OF THE GALL BLADDER" if record_id==17678
+replace lat=0 if record_id==17678
+replace latcat=0 if record_id==17678
+replace beh=3 if record_id==17678
+replace grade=9 if record_id==17678
+replace basis=1 if record_id==17678
+replace dot=d(30jun2014) if record_id==17678
+replace dotyear=year(dot) if record_id==17678
+replace dxyr=2014 if record_id==17678
+replace ICD10="C23" if record_id==17678
+replace ICCCcode="12b" if record_id==17678
+replace comments="Trace back: Dx in 2014." if record_id==17678
+
+replace top="421" if record_id==17699
+replace topography=421 if record_id==17699
+replace topcat=38 if record_id==17699
+replace primarysite="BONE MARROW" if record_id==17699
+replace morphology="9800" if record_id==17699
+replace morph=9800 if record_id==17699
+replace morphcat=50 if record_id==17699
+replace hx="LEUKAEMIA" if record_id==17699
+replace lat=0 if record_id==17699
+replace latcat=0 if record_id==17699
+replace beh=3 if record_id==17699
+replace grade=9 if record_id==17699
+replace basis=0 if record_id==17699
+replace dot=dod if record_id==17699
+replace dotyear=year(dot) if record_id==17699
+replace dxyr=2015 if record_id==17699
+replace ICD10="C959" if record_id==17699
+replace ICCCcode="1e" if record_id==17699
+
+replace top="619" if record_id==17714
+replace topography=619 if record_id==17714
+replace topcat=53 if record_id==17714
+replace primarysite="PROSTATE" if record_id==17714
+replace morphology="8000" if record_id==17714
+replace morph=8000 if record_id==17714
+replace morphcat=1 if record_id==17714
+replace hx="METASTATIC PROATATE CARCINOMA" if record_id==17714
+replace lat=0 if record_id==17714
+replace latcat=0 if record_id==17714
+replace beh=3 if record_id==17714
+replace grade=9 if record_id==17714
+replace basis=0 if record_id==17714
+replace dot=dod if record_id==17714
+replace dotyear=year(dot) if record_id==17714
+replace dxyr=2015 if record_id==17714
+replace ICD10="C61" if record_id==17714
+replace ICCCcode="12b" if record_id==17714
+
+replace top="619" if record_id==17728
+replace topography=619 if record_id==17728
+replace topcat=53 if record_id==17728
+replace primarysite="PROSTATE" if record_id==17728
+replace morphology="8000" if record_id==17728
+replace morph=8000 if record_id==17728
+replace morphcat=1 if record_id==17728
+replace hx="METASTATIC PROATATE CARCINOMA" if record_id==17728
+replace lat=0 if record_id==17728
+replace latcat=0 if record_id==17728
+replace beh=3 if record_id==17728
+replace grade=9 if record_id==17728
+replace basis=0 if record_id==17728
+replace dot=dod if record_id==17728
+replace dotyear=year(dot) if record_id==17728
+replace dxyr=2015 if record_id==17728
+replace ICD10="C61" if record_id==17728
+replace ICCCcode="12b" if record_id==17728
+
+replace top="809" if record_id==17729
+replace topography=809 if record_id==17729
+replace topcat=70 if record_id==17729
+replace primarysite="99" if record_id==17729
+replace morphology="8000" if record_id==17729
+replace morph=8000 if record_id==17729
+replace morphcat=1 if record_id==17729
+replace hx="METASTATIC CARCINOMA OF UNKNOWN ORIGIN" if record_id==17729
+replace lat=0 if record_id==17729
+replace latcat=0 if record_id==17729
+replace beh=3 if record_id==17729
+replace grade=9 if record_id==17729
+replace basis=1 if record_id==17729
+replace dot=d(30jun2014) if record_id==17729
+replace dotyear=year(dot) if record_id==17729
+replace dxyr=2014 if record_id==17729
+replace ICD10="C80" if record_id==17729
+replace ICCCcode="12b" if record_id==17729
+replace comments="Trace back: Dx in 2014." if record_id==17729
+
+replace top="619" if record_id==17741
+replace topography=619 if record_id==17741
+replace topcat=53 if record_id==17741
+replace primarysite="PROSTATE" if record_id==17741
+replace morphology="8000" if record_id==17741
+replace morph=8000 if record_id==17741
+replace morphcat=1 if record_id==17741
+replace hx="PROSTATE CANCER METASTATIC" if record_id==17741
+replace lat=0 if record_id==17741
+replace latcat=0 if record_id==17741
+replace beh=3 if record_id==17741
+replace grade=9 if record_id==17741
+replace basis=0 if record_id==17741
+replace dot=dod if record_id==17741
+replace dotyear=year(dot) if record_id==17741
+replace dxyr=2015 if record_id==17741
+replace ICD10="C61" if record_id==17741
+replace ICCCcode="12b" if record_id==17741
+
+replace top="220" if record_id==17761
+replace topography=220 if record_id==17761
+replace topcat=23 if record_id==17761
+replace primarysite="LIVER" if record_id==17761
+replace morphology="8000" if record_id==17761
+replace morph=8000 if record_id==17761
+replace morphcat=1 if record_id==17761
+replace hx="METASTATIC LIVER DISEASE" if record_id==17761
+replace lat=0 if record_id==17761
+replace latcat=0 if record_id==17761
+replace beh=3 if record_id==17761
+replace grade=9 if record_id==17761
+replace basis=0 if record_id==17761
+replace dot=dod if record_id==17761
+replace dotyear=year(dot) if record_id==17761
+replace dxyr=2015 if record_id==17761
+replace ICD10="C229" if record_id==17761
+replace ICCCcode="7c" if record_id==17761
+
+replace top="509" if record_id==17789
+replace topography=509 if record_id==17789
+replace topcat=43 if record_id==17789
+replace primarysite="BREAST" if record_id==17789
+replace morphology="8000" if record_id==17789
+replace morph=8000 if record_id==17789
+replace morphcat=1 if record_id==17789
+replace hx="CARCINOMATOSIS BREAST CANCER" if record_id==17789
+replace lat=3 if record_id==17789
+replace latcat=31 if record_id==17789
+replace beh=3 if record_id==17789
+replace grade=9 if record_id==17789
+replace basis=0 if record_id==17789
+replace dot=dod if record_id==17789
+replace dotyear=year(dot) if record_id==17789
+replace dxyr=2015 if record_id==17789
+replace ICD10="C509" if record_id==17789
+replace ICCCcode="12b" if record_id==17789
+
+replace top="189" if record_id==17804
+replace topography=189 if record_id==17804
+replace topcat=19 if record_id==17804
+replace primarysite="COLON" if record_id==17804
+replace morphology="8140" if record_id==17804
+replace morph=8140 if record_id==17804
+replace morphcat=6 if record_id==17804
+replace hx="METASTATIC ADENOCARCINOMA OF THE COLON SPREAD TO THE LIVER" if record_id==17804
+replace lat=0 if record_id==17804
+replace latcat=0 if record_id==17804
+replace beh=3 if record_id==17804
+replace grade=9 if record_id==17804
+replace basis=7 if record_id==17804
+replace dot=d(15jan2015) if record_id==17804
+replace dotyear=year(dot) if record_id==17804
+replace dxyr=2015 if record_id==17804
+replace ICD10="C189" if record_id==17804
+replace ICCCcode="11f" if record_id==17804
+replace comments="Trace back: Dx in 2015 - hx of primary colonoscopy done by Kwame Connell referred to S Ferdinand then from Wayne Clarke went to QEH. Hx would have been done privately at IPS." if record_id==17804
+
+replace top="250" if record_id==17809
+replace topography=250 if record_id==17809
+replace topcat=26 if record_id==17809
+replace primarysite="PANCREAS-HEAD" if record_id==17809
+replace morphology="8000" if record_id==17809
+replace morph=8000 if record_id==17809
+replace morphcat=1 if record_id==17809
+replace hx="CANCER OF THE HEAD OF THE PANCREAS WITH OBSTRUCTIVE JAUNDICE" if record_id==17809
+replace lat=0 if record_id==17809
+replace latcat=0 if record_id==17809
+replace beh=3 if record_id==17809
+replace grade=9 if record_id==17809
+replace basis=0 if record_id==17809
+replace dot=dod if record_id==17809
+replace dotyear=year(dot) if record_id==17809
+replace dxyr=2015 if record_id==17809
+replace ICD10="C250" if record_id==17809
+replace ICCCcode="12b" if record_id==17809
+
+replace top="541" if record_id==17829
+replace topography=541 if record_id==17829
+replace topcat=47 if record_id==17829
+replace primarysite="ENDOMETRIUM" if record_id==17829
+replace morphology="8000" if record_id==17829
+replace morph=8000 if record_id==17829
+replace morphcat=1 if record_id==17829
+replace hx="ADVANCED ENDOMETRIAL CANCER" if record_id==17829
+replace lat=0 if record_id==17829
+replace latcat=0 if record_id==17829
+replace beh=3 if record_id==17829
+replace grade=9 if record_id==17829
+replace basis=1 if record_id==17829
+replace dot=d(06apr2015) if record_id==17829
+replace dotyear=year(dot) if record_id==17829
+replace dxyr=2015 if record_id==17829
+replace ICD10="C541" if record_id==17829
+replace ICCCcode="12b" if record_id==17829
+replace comments="Trace back: Last admitted at QEH April 6, 2015. Seen by Rudolph Delice. Malignant neoplasm: endometrium." if record_id==17829
+
+replace top="199" if record_id==17842
+replace topography=199 if record_id==17842
+replace topcat=20 if record_id==17842
+replace primarysite="COLORECTAL" if record_id==17842
+replace morphology="8000" if record_id==17842
+replace morph=8000 if record_id==17842
+replace morphcat=1 if record_id==17842
+replace hx="METASTATIC CANCER COLORECTAL CANCER" if record_id==17842
+replace lat=0 if record_id==17842
+replace latcat=0 if record_id==17842
+replace beh=3 if record_id==17842
+replace grade=9 if record_id==17842
+replace basis=0 if record_id==17842
+replace dot=dod if record_id==17842
+replace dotyear=year(dot) if record_id==17842
+replace dxyr=2015 if record_id==17842
+replace ICD10="C19" if record_id==17842
+replace ICCCcode="12b" if record_id==17842
+
+replace top="259" if record_id==17846
+replace topography=259 if record_id==17846
+replace topcat=26 if record_id==17846
+replace primarysite="PANCREAS" if record_id==17846
+replace morphology="8000" if record_id==17846
+replace morph=8000 if record_id==17846
+replace morphcat=1 if record_id==17846
+replace hx="ADVANCED PANCREATIC CANCER" if record_id==17846
+replace lat=0 if record_id==17846
+replace latcat=0 if record_id==17846
+replace beh=3 if record_id==17846
+replace grade=9 if record_id==17846
+replace basis=0 if record_id==17846
+replace dot=dod if record_id==17846
+replace dotyear=year(dot) if record_id==17846
+replace dxyr=2015 if record_id==17846
+replace ICD10="C259" if record_id==17846
+replace ICCCcode="12b" if record_id==17846
+
+replace top="619" if record_id==17848
+replace topography=619 if record_id==17848
+replace topcat=53 if record_id==17848
+replace primarysite="PROSTATE" if record_id==17848
+replace morphology="8000" if record_id==17848
+replace morph=8000 if record_id==17848
+replace morphcat=1 if record_id==17848
+replace hx="CARCINOMA PROSTATE WITH BONE METASTASIS" if record_id==17848
+replace lat=0 if record_id==17848
+replace latcat=0 if record_id==17848
+replace beh=3 if record_id==17848
+replace grade=9 if record_id==17848
+replace basis=0 if record_id==17848
+replace dot=dod if record_id==17848
+replace dotyear=year(dot) if record_id==17848
+replace dxyr=2015 if record_id==17848
+replace ICD10="C61" if record_id==17848
+replace ICCCcode="12b" if record_id==17848
+
+replace top="349" if record_id==17865
+replace topography=349 if record_id==17865
+replace topcat=32 if record_id==17865
+replace primarysite="LUNG" if record_id==17865
+replace morphology="8000" if record_id==17865
+replace morph=8000 if record_id==17865
+replace morphcat=1 if record_id==17865
+replace hx="METASTATIC LUNG CANCER" if record_id==17865
+replace lat=3 if record_id==17865
+replace latcat=13 if record_id==17865
+replace beh=3 if record_id==17865
+replace grade=9 if record_id==17865
+replace basis=0 if record_id==17865
+replace dot=dod if record_id==17865
+replace dotyear=year(dot) if record_id==17865
+replace dxyr=2015 if record_id==17865
+replace ICD10="C349" if record_id==17865
+replace ICCCcode="12b" if record_id==17865
+
+replace top="249" if record_id==17868
+replace topography=249 if record_id==17868
+replace topcat=25 if record_id==17868
+replace primarysite="HEPATOBILLARY" if record_id==17868
+replace morphology="8000" if record_id==17868
+replace morph=8000 if record_id==17868
+replace morphcat=1 if record_id==17868
+replace hx="HEPATOBILLARY CANCER" if record_id==17868
+replace lat=0 if record_id==17868
+replace latcat=0 if record_id==17868
+replace beh=3 if record_id==17868
+replace grade=9 if record_id==17868
+replace basis=0 if record_id==17868
+replace dot=dod if record_id==17868
+replace dotyear=year(dot) if record_id==17868
+replace dxyr=2015 if record_id==17868
+replace ICD10="C249" if record_id==17868
+replace ICCCcode="12b" if record_id==17868
+
+replace top="679" if record_id==17886
+replace topography=679 if record_id==17886
+replace topcat=59 if record_id==17886
+replace primarysite="BLADDER" if record_id==17886
+replace morphology="8000" if record_id==17886
+replace morph=8000 if record_id==17886
+replace morphcat=1 if record_id==17886
+replace hx="CANCER BLADDER" if record_id==17886
+replace lat=0 if record_id==17886
+replace latcat=0 if record_id==17886
+replace beh=3 if record_id==17886
+replace grade=9 if record_id==17886
+replace basis=0 if record_id==17886
+replace dot=dod if record_id==17886
+replace dotyear=year(dot) if record_id==17886
+replace dxyr=2015 if record_id==17886
+replace ICD10="C679" if record_id==17886
+replace ICCCcode="12b" if record_id==17886
+
+replace top="619" if record_id==17891
+replace topography=619 if record_id==17891
+replace topcat=53 if record_id==17891
+replace primarysite="PROSTATE" if record_id==17891
+replace morphology="8000" if record_id==17891
+replace morph=8000 if record_id==17891
+replace morphcat=1 if record_id==17891
+replace hx="CARCINOMA OF THE PROSTATE" if record_id==17891
+replace lat=0 if record_id==17891
+replace latcat=0 if record_id==17891
+replace beh=3 if record_id==17891
+replace grade=9 if record_id==17891
+replace basis=0 if record_id==17891
+replace dot=dod if record_id==17891
+replace dotyear=year(dot) if record_id==17891
+replace dxyr=2015 if record_id==17891
+replace ICD10="C61" if record_id==17891
+replace ICCCcode="12b" if record_id==17891
+
+replace top="619" if record_id==17894
+replace topography=619 if record_id==17894
+replace topcat=53 if record_id==17894
+replace primarysite="PROSTATE" if record_id==17894
+replace morphology="8000" if record_id==17894
+replace morph=8000 if record_id==17894
+replace morphcat=1 if record_id==17894
+replace hx="PROSTATE CANCER" if record_id==17894
+replace lat=0 if record_id==17894
+replace latcat=0 if record_id==17894
+replace beh=3 if record_id==17894
+replace grade=9 if record_id==17894
+replace basis=0 if record_id==17894
+replace dot=dod if record_id==17894
+replace dotyear=year(dot) if record_id==17894
+replace dxyr=2015 if record_id==17894
+replace ICD10="C61" if record_id==17894
+replace ICCCcode="12b" if record_id==17894
+
+replace top="619" if record_id==17915
+replace topography=619 if record_id==17915
+replace topcat=53 if record_id==17915
+replace primarysite="PROSTATE" if record_id==17915
+replace morphology="8000" if record_id==17915
+replace morph=8000 if record_id==17915
+replace morphcat=1 if record_id==17915
+replace hx="CARCINOMA OF THE PROSTATE" if record_id==17915
+replace lat=0 if record_id==17915
+replace latcat=0 if record_id==17915
+replace beh=3 if record_id==17915
+replace grade=9 if record_id==17915
+replace basis=0 if record_id==17915
+replace dot=dod if record_id==17915
+replace dotyear=year(dot) if record_id==17915
+replace dxyr=2015 if record_id==17915
+replace ICD10="C61" if record_id==17915
+replace ICCCcode="12b" if record_id==17915
+
+replace top="199" if record_id==17930
+replace topography=199 if record_id==17930
+replace topcat=20 if record_id==17930
+replace primarysite="COLORECTAL" if record_id==17930
+replace morphology="8000" if record_id==17930
+replace morph=8000 if record_id==17930
+replace morphcat=1 if record_id==17930
+replace hx="COLORECTAL CANCER" if record_id==17930
+replace lat=0 if record_id==17930
+replace latcat=0 if record_id==17930
+replace beh=3 if record_id==17930
+replace grade=9 if record_id==17930
+replace basis=0 if record_id==17930
+replace dot=dod if record_id==17930
+replace dotyear=year(dot) if record_id==17930
+replace dxyr=2015 if record_id==17930
+replace ICD10="C19" if record_id==17930
+replace ICCCcode="12b" if record_id==17930
+
+replace top="619" if record_id==17942
+replace topography=619 if record_id==17942
+replace topcat=53 if record_id==17942
+replace primarysite="PROSTATE" if record_id==17942
+replace morphology="8000" if record_id==17942
+replace morph=8000 if record_id==17942
+replace morphcat=1 if record_id==17942
+replace hx="ADVANCED PROSTATE CANCER" if record_id==17942
+replace lat=0 if record_id==17942
+replace latcat=0 if record_id==17942
+replace beh=3 if record_id==17942
+replace grade=9 if record_id==17942
+replace basis=0 if record_id==17942
+replace dot=dod if record_id==17942
+replace dotyear=year(dot) if record_id==17942
+replace dxyr=2015 if record_id==17942
+replace ICD10="C61" if record_id==17942
+replace ICCCcode="12b" if record_id==17942
+
+replace top="189" if record_id==17945
+replace topography=189 if record_id==17945
+replace topcat=19 if record_id==17945
+replace primarysite="COLON" if record_id==17945
+replace morphology="8000" if record_id==17945
+replace morph=8000 if record_id==17945
+replace morphcat=1 if record_id==17945
+replace hx="CANCER OF COLON" if record_id==17945
+replace lat=0 if record_id==17945
+replace latcat=0 if record_id==17945
+replace beh=3 if record_id==17945
+replace grade=9 if record_id==17945
+replace basis=0 if record_id==17945
+replace dot=dod if record_id==17945
+replace dotyear=year(dot) if record_id==17945
+replace dxyr=2015 if record_id==17945
+replace ICD10="C189" if record_id==17945
+replace ICCCcode="12b" if record_id==17945
+
+replace top="559" if record_id==17948
+replace topography=559 if record_id==17948
+replace topcat=48 if record_id==17948
+replace primarysite="UTERUS" if record_id==17948
+replace morphology="8000" if record_id==17948
+replace morph=8000 if record_id==17948
+replace morphcat=1 if record_id==17948
+replace hx="MALIGNANT NEOPLASM ADENO CARCINOMA OF UTERUS" if record_id==17948
+replace lat=0 if record_id==17948
+replace latcat=0 if record_id==17948
+replace beh=3 if record_id==17948
+replace grade=9 if record_id==17948
+replace basis=0 if record_id==17948
+replace dot=dod if record_id==17948
+replace dotyear=year(dot) if record_id==17948
+replace dxyr=2015 if record_id==17948
+replace ICD10="C55" if record_id==17948
+replace ICCCcode="12b" if record_id==17948
+
+replace top="269" if record_id==17966
+replace topography=269 if record_id==17966
+replace topcat=27 if record_id==17966
+replace primarysite="GASTROINTESTINAL TRACT" if record_id==17966
+replace morphology="8000" if record_id==17966
+replace morph=8000 if record_id==17966
+replace morphcat=1 if record_id==17966
+replace hx="MESTASTATIC HEPATIC DISEASE GASTROINTESTINAL MALIGNANCY" if record_id==17966
+replace lat=0 if record_id==17966
+replace latcat=0 if record_id==17966
+replace beh=3 if record_id==17966
+replace grade=9 if record_id==17966
+replace basis=0 if record_id==17966
+replace dot=dod if record_id==17966
+replace dotyear=year(dot) if record_id==17966
+replace dxyr=2015 if record_id==17966
+replace ICD10="C269" if record_id==17966
+replace ICCCcode="12b" if record_id==17966
+
+replace top="529" if record_id==17973
+replace topography=529 if record_id==17973
+replace topcat=45 if record_id==17973
+replace primarysite="VAGINA" if record_id==17973
+replace morphology="8000" if record_id==17973
+replace morph=8000 if record_id==17973
+replace morphcat=1 if record_id==17973
+replace hx="CANCER OF VAGINA, VULVA; WIDESPREAD MEATSTASES" if record_id==17973
+replace lat=0 if record_id==17973
+replace latcat=0 if record_id==17973
+replace beh=3 if record_id==17973
+replace grade=9 if record_id==17973
+replace basis=0 if record_id==17973
+replace dot=dod if record_id==17973
+replace dotyear=year(dot) if record_id==17973
+replace dxyr=2015 if record_id==17973
+replace ICD10="C52" if record_id==17973
+replace ICCCcode="12b" if record_id==17973
+
+replace top="779" if record_id==17998
+replace topography=779 if record_id==17998
+replace topcat=69 if record_id==17998
+replace primarysite="LYMPH NODE-99" if record_id==17998
+replace morphology="9591" if record_id==17998
+replace morph=9591 if record_id==17998
+replace morphcat=41 if record_id==17998
+replace hx="NON HODGKINS LYMPHOMA" if record_id==17998
+replace lat=0 if record_id==17998
+replace latcat=0 if record_id==17998
+replace beh=3 if record_id==17998
+replace grade=9 if record_id==17998
+replace basis=0 if record_id==17998
+replace dot=dod if record_id==17998
+replace dotyear=year(dot) if record_id==17998
+replace dxyr=2015 if record_id==17998
+replace ICD10="C859" if record_id==17998
+replace ICCCcode="2b" if record_id==17998
+
+replace top="719" if record_id==17999
+replace topography=719 if record_id==17999
+replace topcat=63 if record_id==17999
+replace primarysite="BRAIN" if record_id==17999
+replace morphology="8000" if record_id==17999
+replace morph=8000 if record_id==17999
+replace morphcat=1 if record_id==17999
+replace hx="BRAIN CANCER" if record_id==17999
+replace lat=0 if record_id==17999
+replace latcat=0 if record_id==17999
+replace beh=3 if record_id==17999
+replace grade=9 if record_id==17999
+replace basis=0 if record_id==17999
+replace dot=dod if record_id==17999
+replace dotyear=year(dot) if record_id==17999
+replace dxyr=2015 if record_id==17999
+replace ICD10="C719" if record_id==17999
+replace ICCCcode="12b" if record_id==17999
+
+replace top="509" if record_id==18014
+replace topography=509 if record_id==18014
+replace topcat=43 if record_id==18014
+replace primarysite="BREAST" if record_id==18014
+replace morphology="8000" if record_id==18014
+replace morph=8000 if record_id==18014
+replace morphcat=1 if record_id==18014
+replace hx="CARCINOMATOSIS BREAST CANCER" if record_id==18014
+replace lat=3 if record_id==18014
+replace latcat=31 if record_id==18014
+replace beh=3 if record_id==18014
+replace grade=9 if record_id==18014
+replace basis=9 if record_id==18014
+replace dot=d(15may2015) if record_id==18014
+replace dotyear=year(dot) if record_id==18014
+replace dxyr=2015 if record_id==18014
+replace ICD10="C509" if record_id==18014
+replace ICCCcode="12b" if record_id==18014
+replace comments="Trace back: Admitted May 15, 2015 with malignant neoplasm of breast. Not sure when first diagnosed. Check RT. Was seen by both Shenoy and Smith-connell." if record_id==18014
+
+replace top="421" if record_id==18059
+replace topography=421 if record_id==18059
+replace topcat=38 if record_id==18059
+replace primarysite="BONE MARROW" if record_id==18059
+replace morphology="9989" if record_id==18059
+replace morph=9989 if record_id==18059
+replace morphcat=56 if record_id==18059
+replace hx="MYELODYSPLASTIC SYNDROME" if record_id==18059
+replace lat=0 if record_id==18059
+replace latcat=0 if record_id==18059
+replace beh=3 if record_id==18059
+replace grade=9 if record_id==18059
+replace basis=0 if record_id==18059
+replace dot=dod if record_id==18059
+replace dotyear=year(dot) if record_id==18059
+replace dxyr=2015 if record_id==18059
+replace ICD10="D469" if record_id==18059
+replace ICCCcode="1d" if record_id==18059
+
+replace top="619" if record_id==18063
+replace topography=619 if record_id==18063
+replace topcat=53 if record_id==18063
+replace primarysite="PROSTATE" if record_id==18063
+replace morphology="8000" if record_id==18063
+replace morph=8000 if record_id==18063
+replace morphcat=1 if record_id==18063
+replace hx="PROSTATE CANCER" if record_id==18063
+replace lat=0 if record_id==18063
+replace latcat=0 if record_id==18063
+replace beh=3 if record_id==18063
+replace grade=9 if record_id==18063
+replace basis=9 if record_id==18063
+replace dot=d(08aug2014) if record_id==18063
+replace dotyear=year(dot) if record_id==18063
+replace dxyr=2014 if record_id==18063
+replace ICD10="C61" if record_id==18063
+replace ICCCcode="12b" if record_id==18063
+replace comments="Trace back: Last seen August 8, 2014 with diagnosis of prostate cancer. Ineligible for 2015." if record_id==18063
+
+replace top="189" if record_id==18089
+replace topography=189 if record_id==18089
+replace topcat=19 if record_id==18089
+replace primarysite="COLON" if record_id==18089
+replace morphology="8000" if record_id==18089
+replace morph=8000 if record_id==18089
+replace morphcat=1 if record_id==18089
+replace hx="CARCINOMA OF COLON" if record_id==18089
+replace lat=0 if record_id==18089
+replace latcat=0 if record_id==18089
+replace beh=3 if record_id==18089
+replace grade=9 if record_id==18089
+replace basis=0 if record_id==18089
+replace dot=dod if record_id==18089
+replace dotyear=year(dot) if record_id==18089
+replace dxyr=2015 if record_id==18089
+replace ICD10="C189" if record_id==18089
+replace ICCCcode="12b" if record_id==18089
+
+replace top="189" if record_id==18094
+replace topography=189 if record_id==18094
+replace topcat=19 if record_id==18094
+replace primarysite="COLON" if record_id==18094
+replace morphology="8000" if record_id==18094
+replace morph=8000 if record_id==18094
+replace morphcat=1 if record_id==18094
+replace hx="CARCINOMA OF COLON" if record_id==18094
+replace lat=0 if record_id==18094
+replace latcat=0 if record_id==18094
+replace beh=3 if record_id==18094
+replace grade=9 if record_id==18094
+replace basis=0 if record_id==18094
+replace dot=dod if record_id==18094
+replace dotyear=year(dot) if record_id==18094
+replace dxyr=2015 if record_id==18094
+replace ICD10="C189" if record_id==18094
+replace ICCCcode="12b" if record_id==18094
+
+replace top="199" if record_id==18109
+replace topography=199 if record_id==18109
+replace topcat=20 if record_id==18109
+replace primarysite="COLORECTAL" if record_id==18109
+replace morphology="8000" if record_id==18109
+replace morph=8000 if record_id==18109
+replace morphcat=1 if record_id==18109
+replace hx="METASTATIC COLORECTAL CARCINOMA" if record_id==18109
+replace lat=0 if record_id==18109
+replace latcat=0 if record_id==18109
+replace beh=3 if record_id==18109
+replace grade=9 if record_id==18109
+replace basis=0 if record_id==18109
+replace dot=dod if record_id==18109
+replace dotyear=year(dot) if record_id==18109
+replace dxyr=2015 if record_id==18109
+replace ICD10="C19" if record_id==18109
+replace ICCCcode="12b" if record_id==18109
+
+replace top="619" if record_id==18116
+replace topography=619 if record_id==18116
+replace topcat=53 if record_id==18116
+replace primarysite="PROSTATE" if record_id==18116
+replace morphology="8000" if record_id==18116
+replace morph=8000 if record_id==18116
+replace morphcat=1 if record_id==18116
+replace hx="METASTATIC PROSTATE CANCER" if record_id==18116
+replace lat=0 if record_id==18116
+replace latcat=0 if record_id==18116
+replace beh=3 if record_id==18116
+replace grade=9 if record_id==18116
+replace basis=0 if record_id==18116
+replace dot=dod if record_id==18116
+replace dotyear=year(dot) if record_id==18116
+replace dxyr=2015 if record_id==18116
+replace ICD10="C61" if record_id==18116
+replace ICCCcode="12b" if record_id==18116
+
+replace top="189" if record_id==18119
+replace topography=189 if record_id==18119
+replace topcat=19 if record_id==18119
+replace primarysite="COLON" if record_id==18119
+replace morphology="8000" if record_id==18119
+replace morph=8000 if record_id==18119
+replace morphcat=1 if record_id==18119
+replace hx="CARCINOMATOSIS OF COLON" if record_id==18119
+replace lat=0 if record_id==18119
+replace latcat=0 if record_id==18119
+replace beh=3 if record_id==18119
+replace grade=9 if record_id==18119
+replace basis=0 if record_id==18119
+replace dot=dod if record_id==18119
+replace dotyear=year(dot) if record_id==18119
+replace dxyr=2015 if record_id==18119
+replace ICD10="C189" if record_id==18119
+replace ICCCcode="12b" if record_id==18119
+
+replace top="189" if record_id==18129
+replace topography=189 if record_id==18129
+replace topcat=19 if record_id==18129
+replace primarysite="COLON" if record_id==18129
+replace morphology="8000" if record_id==18129
+replace morph=8000 if record_id==18129
+replace morphcat=1 if record_id==18129
+replace hx="LOCALLY ADVANCE COLON CARCINOMA" if record_id==18129
+replace lat=0 if record_id==18129
+replace latcat=0 if record_id==18129
+replace beh=3 if record_id==18129
+replace grade=9 if record_id==18129
+replace basis=0 if record_id==18129
+replace dot=dod if record_id==18129
+replace dotyear=year(dot) if record_id==18129
+replace dxyr=2015 if record_id==18129
+replace ICD10="C189" if record_id==18129
+replace ICCCcode="12b" if record_id==18129
+
+replace top="619" if record_id==18132
+replace topography=619 if record_id==18132
+replace topcat=53 if record_id==18132
+replace primarysite="PROSTATE" if record_id==18132
+replace morphology="8000" if record_id==18132
+replace morph=8000 if record_id==18132
+replace morphcat=1 if record_id==18132
+replace hx="DISSEMINATED PROSTATE CANCER" if record_id==18132
+replace lat=0 if record_id==18132
+replace latcat=0 if record_id==18132
+replace beh=3 if record_id==18132
+replace grade=9 if record_id==18132
+replace basis=0 if record_id==18132
+replace dot=dod if record_id==18132
+replace dotyear=year(dot) if record_id==18132
+replace dxyr=2015 if record_id==18132
+replace ICD10="C61" if record_id==18132
+replace ICCCcode="12b" if record_id==18132
+
+replace top="509" if record_id==18149
+replace topography=509 if record_id==18149
+replace topcat=43 if record_id==18149
+replace primarysite="BREAST" if record_id==18149
+replace morphology="8000" if record_id==18149
+replace morph=8000 if record_id==18149
+replace morphcat=1 if record_id==18149
+replace hx="METASTATIC ADENOCARCINOMA OF BREAST" if record_id==18149
+replace lat=3 if record_id==18149
+replace latcat=31 if record_id==18149
+replace beh=3 if record_id==18149
+replace grade=9 if record_id==18149
+replace basis=0 if record_id==18149
+replace dot=dod if record_id==18149
+replace dotyear=year(dot) if record_id==18149
+replace dxyr=2015 if record_id==18149
+replace ICD10="C509" if record_id==18149
+replace ICCCcode="12b" if record_id==18149
+
+replace top="619" if record_id==18172
+replace topography=619 if record_id==18172
+replace topcat=53 if record_id==18172
+replace primarysite="PROSTATE" if record_id==18172
+replace morphology="8000" if record_id==18172
+replace morph=8000 if record_id==18172
+replace morphcat=1 if record_id==18172
+replace hx="PROSTATE CANCER" if record_id==18172
+replace lat=0 if record_id==18172
+replace latcat=0 if record_id==18172
+replace beh=3 if record_id==18172
+replace grade=9 if record_id==18172
+replace basis=9 if record_id==18172
+replace dot=d(22may2015) if record_id==18172
+replace dotyear=year(dot) if record_id==18172
+replace dxyr=2015 if record_id==18172
+replace ICD10="C61" if record_id==18172
+replace ICCCcode="12b" if record_id==18172
+replace comments="Trace back: Seen on May 22, 2015 at QEH. Jerry Emtage was physician. Diagnosis of Malignant neoplasm of prostate stated as May 22, 2015. Ward A1- Bed 11." if record_id==18172
+
+replace top="449" if record_id==18183
+replace topography=449 if record_id==18183
+replace topcat=39 if record_id==18183
+replace primarysite="SKIN-99" if record_id==18183
+replace morphology="8720" if record_id==18183
+replace morph=8720 if record_id==18183
+replace morphcat=16 if record_id==18183
+replace hx="METASTATIC MALIGNANT MELANOMA" if record_id==18183
+replace lat=0 if record_id==18183
+replace latcat=0 if record_id==18183
+replace beh=3 if record_id==18183
+replace grade=9 if record_id==18183
+replace basis=7 if record_id==18183
+replace dot=d(19aug2014) if record_id==18183
+replace dotyear=year(dot) if record_id==18183
+replace dxyr=2014 if record_id==18183
+replace ICD10="C439" if record_id==18183
+replace ICCCcode="11d" if record_id==18183
+replace comments="Trace back: Dr M Walrond (general surgery) & Dr S Connell (oncology) QEH. Diagnosis of melanoma was on biopsy performed 19/8/2014 while admitted to ward (QEH histopathology report #14155280) during admission for perforated sigmoid diverticula. Skin lesion was discovered incidentally." if record_id==18183
+
+replace top="169" if record_id==18203
+replace topography=169 if record_id==18203
+replace topcat=17 if record_id==18203
+replace primarysite="STOMACH" if record_id==18203
+replace morphology="8000" if record_id==18203
+replace morph=8000 if record_id==18203
+replace morphcat=1 if record_id==18203
+replace hx="CARCINOMA OF STOMACH" if record_id==18203
+replace lat=0 if record_id==18203
+replace latcat=0 if record_id==18203
+replace beh=3 if record_id==18203
+replace grade=9 if record_id==18203
+replace basis=0 if record_id==18203
+replace dot=dod if record_id==18203
+replace dotyear=year(dot) if record_id==18203
+replace dxyr=2015 if record_id==18203
+replace ICD10="C169" if record_id==18203
+replace ICCCcode="12b" if record_id==18203
+
+replace top="259" if record_id==18225
+replace topography=259 if record_id==18225
+replace topcat=26 if record_id==18225
+replace primarysite="PANCREAS" if record_id==18225
+replace morphology="8000" if record_id==18225
+replace morph=8000 if record_id==18225
+replace morphcat=1 if record_id==18225
+replace hx="METASTATIC PANCREATIC CARCINOMA" if record_id==18225
+replace lat=0 if record_id==18225
+replace latcat=0 if record_id==18225
+replace beh=3 if record_id==18225
+replace grade=9 if record_id==18225
+replace basis=0 if record_id==18225
+replace dot=dod if record_id==18225
+replace dotyear=year(dot) if record_id==18225
+replace dxyr=2015 if record_id==18225
+replace ICD10="C259" if record_id==18225
+replace ICCCcode="12b" if record_id==18225
+
+replace top="509" if record_id==18238
+replace topography=509 if record_id==18238
+replace topcat=43 if record_id==18238
+replace primarysite="BREAST" if record_id==18238
+replace morphology="8000" if record_id==18238
+replace morph=8000 if record_id==18238
+replace morphcat=1 if record_id==18238
+replace hx="CARCINOMA OF THE BREAST" if record_id==18238
+replace lat=3 if record_id==18238
+replace latcat=31 if record_id==18238
+replace beh=3 if record_id==18238
+replace grade=9 if record_id==18238
+replace basis=0 if record_id==18238
+replace dot=dod if record_id==18238
+replace dotyear=year(dot) if record_id==18238
+replace dxyr=2015 if record_id==18238
+replace ICD10="C509" if record_id==18238
+replace ICCCcode="12b" if record_id==18238
+
+replace top="259" if record_id==18267
+replace topography=259 if record_id==18267
+replace topcat=26 if record_id==18267
+replace primarysite="PANCREAS" if record_id==18267
+replace morphology="8000" if record_id==18267
+replace morph=8000 if record_id==18267
+replace morphcat=1 if record_id==18267
+replace hx="METASTATIC PANCREATIC CARCINOMA" if record_id==18267
+replace lat=0 if record_id==18267
+replace latcat=0 if record_id==18267
+replace beh=3 if record_id==18267
+replace grade=9 if record_id==18267
+replace basis=0 if record_id==18267
+replace dot=dod if record_id==18267
+replace dotyear=year(dot) if record_id==18267
+replace dxyr=2015 if record_id==18267
+replace ICD10="C259" if record_id==18267
+replace ICCCcode="12b" if record_id==18267
+
+replace top="509" if record_id==18270
+replace topography=509 if record_id==18270
+replace topcat=43 if record_id==18270
+replace primarysite="BREAST" if record_id==18270
+replace morphology="8000" if record_id==18270
+replace morph=8000 if record_id==18270
+replace morphcat=1 if record_id==18270
+replace hx="ADVANCED METASTATIC CANCER OF THE RIGHT BREAST" if record_id==18270
+replace lat=1 if record_id==18270
+replace latcat=31 if record_id==18270
+replace beh=3 if record_id==18270
+replace grade=9 if record_id==18270
+replace basis=0 if record_id==18270
+replace dot=dod if record_id==18270
+replace dotyear=year(dot) if record_id==18270
+replace dxyr=2015 if record_id==18270
+replace ICD10="C509" if record_id==18270
+replace ICCCcode="12b" if record_id==18270
+
+replace top="509" if record_id==18272
+replace topography=509 if record_id==18272
+replace topcat=43 if record_id==18272
+replace primarysite="BREAST" if record_id==18272
+replace morphology="8000" if record_id==18272
+replace morph=8000 if record_id==18272
+replace morphcat=1 if record_id==18272
+replace hx="CANCER RIGHT BREAST WITH METASTASTIC SPREAD" if record_id==18272
+replace lat=1 if record_id==18272
+replace latcat=31 if record_id==18272
+replace beh=3 if record_id==18272
+replace grade=9 if record_id==18272
+replace basis=0 if record_id==18272
+replace dot=dod if record_id==18272
+replace dotyear=year(dot) if record_id==18272
+replace dxyr=2015 if record_id==18272
+replace ICD10="C509" if record_id==18272
+replace ICCCcode="12b" if record_id==18272
+
+replace top="189" if record_id==18299
+replace topography=189 if record_id==18299
+replace topcat=19 if record_id==18299
+replace primarysite="COLON" if record_id==18299
+replace morphology="8000" if record_id==18299
+replace morph=8000 if record_id==18299
+replace morphcat=1 if record_id==18299
+replace hx="METASTATIC CARCINOMA OF THE COLON" if record_id==18299
+replace lat=0 if record_id==18299
+replace latcat=0 if record_id==18299
+replace beh=3 if record_id==18299
+replace grade=9 if record_id==18299
+replace basis=2 if record_id==18299
+replace dot=d(30jun2015) if record_id==18299
+replace dotyear=year(dot) if record_id==18299
+replace dxyr=2015 if record_id==18299
+replace ICD10="C189" if record_id==18299
+replace ICCCcode="12b" if record_id==18299
+replace comments="Trace back: Dr Oneale called. Stated Pt Dx based on U/S of liver. Not in office to give any evidence." if record_id==18299
+
+replace top="619" if record_id==18304
+replace topography=619 if record_id==18304
+replace topcat=53 if record_id==18304
+replace primarysite="PROSTATE" if record_id==18304
+replace morphology="8000" if record_id==18304
+replace morph=8000 if record_id==18304
+replace morphcat=1 if record_id==18304
+replace hx="PROSTATE CANCER" if record_id==18304
+replace lat=0 if record_id==18304
+replace latcat=0 if record_id==18304
+replace beh=3 if record_id==18304
+replace grade=9 if record_id==18304
+replace basis=0 if record_id==18304
+replace dot=dod if record_id==18304
+replace dotyear=year(dot) if record_id==18304
+replace dxyr=2015 if record_id==18304
+replace ICD10="C61" if record_id==18304
+replace ICCCcode="12b" if record_id==18304
+
+replace top="169" if record_id==18341
+replace topography=169 if record_id==18341
+replace topcat=17 if record_id==18341
+replace primarysite="STOMACH" if record_id==18341
+replace morphology="8000" if record_id==18341
+replace morph=8000 if record_id==18341
+replace morphcat=1 if record_id==18341
+replace hx="CARCINOMA OF STOMACH" if record_id==18341
+replace lat=0 if record_id==18341
+replace latcat=0 if record_id==18341
+replace beh=3 if record_id==18341
+replace grade=9 if record_id==18341
+replace basis=0 if record_id==18341
+replace dot=dod if record_id==18341
+replace dotyear=year(dot) if record_id==18341
+replace dxyr=2015 if record_id==18341
+replace ICD10="C169" if record_id==18341
+replace ICCCcode="12b" if record_id==18341
+
+replace top="189" if record_id==18342
+replace topography=189 if record_id==18342
+replace topcat=19 if record_id==18342
+replace primarysite="COLON" if record_id==18342
+replace morphology="8000" if record_id==18342
+replace morph=8000 if record_id==18342
+replace morphcat=1 if record_id==18342
+replace hx="ADVANCED METASTATIC COLON CANCER" if record_id==18342
+replace lat=0 if record_id==18342
+replace latcat=0 if record_id==18342
+replace beh=3 if record_id==18342
+replace grade=9 if record_id==18342
+replace basis=0 if record_id==18342
+replace dot=dod if record_id==18342
+replace dotyear=year(dot) if record_id==18342
+replace dxyr=2015 if record_id==18342
+replace ICD10="C189" if record_id==18342
+replace ICCCcode="12b" if record_id==18342
+
+replace top="619" if record_id==18375
+replace topography=619 if record_id==18375
+replace topcat=53 if record_id==18375
+replace primarysite="PROSTATE" if record_id==18375
+replace morphology="8000" if record_id==18375
+replace morph=8000 if record_id==18375
+replace morphcat=1 if record_id==18375
+replace hx="METASTATIC PROSTATE CANCER" if record_id==18375
+replace lat=0 if record_id==18375
+replace latcat=0 if record_id==18375
+replace beh=3 if record_id==18375
+replace grade=9 if record_id==18375
+replace basis=9 if record_id==18375
+replace dot=d(26jun2015) if record_id==18375
+replace dotyear=year(dot) if record_id==18375
+replace dxyr=2015 if record_id==18375
+replace ICD10="C61" if record_id==18375
+replace ICCCcode="12b" if record_id==18375
+replace comments="Trace back: June 26, 2015 diagnosis but this seems to have been a endoscopy. He was seen by both surgery and urology. Prostate cancer seems to have been chronic and not the cause for the June admission." if record_id==18375
+
+replace top="220" if record_id==18381
+replace topography=220 if record_id==18381
+replace topcat=23 if record_id==18381
+replace primarysite="LIVER" if record_id==18381
+replace morphology="8000" if record_id==18381
+replace morph=8000 if record_id==18381
+replace morphcat=1 if record_id==18381
+replace hx="HEPATOCELLULAR CANCER OF LIVER" if record_id==18381
+replace lat=0 if record_id==18381
+replace latcat=0 if record_id==18381
+replace beh=3 if record_id==18381
+replace grade=9 if record_id==18381
+replace basis=2 if record_id==18381
+replace dot=d(15jul2015) if record_id==18381
+replace dotyear=year(dot) if record_id==18381
+replace dxyr=2015 if record_id==18381
+replace ICD10="C229" if record_id==18381
+replace ICCCcode="7c" if record_id==18381
+replace comments="Trace back: Have letter from Dr. Dottin. Patient was Dx in 2015. Written copy of CT in July show liver mass. No further investigations seen. Will look for other cases, only case not found was Osward Welch. Dr will provide a copy of information found to be collected at earliest convenience." if record_id==18381
+
+replace top="779" if record_id==18399
+replace topography=779 if record_id==18399
+replace topcat=69 if record_id==18399
+replace primarysite="LYMPH NODE-99" if record_id==18399
+replace morphology="9701" if record_id==18399
+replace morph=9701 if record_id==18399
+replace morphcat=44 if record_id==18399
+replace hx="SEZARY SYNDROME" if record_id==18399
+replace lat=0 if record_id==18399
+replace latcat=0 if record_id==18399
+replace beh=3 if record_id==18399
+replace grade=5 if record_id==18399
+replace basis=0 if record_id==18399
+replace dot=dod if record_id==18399
+replace dotyear=year(dot) if record_id==18399
+replace dxyr=2015 if record_id==18399
+replace ICD10="C841" if record_id==18399
+replace ICCCcode="2b" if record_id==18399
+
+replace top="180" if record_id==18451
+replace topography=180 if record_id==18451
+replace topcat=19 if record_id==18451
+replace primarysite="COLON-CAECUM" if record_id==18451
+replace morphology="8000" if record_id==18451
+replace morph=8000 if record_id==18451
+replace morphcat=1 if record_id==18451
+replace hx="CARCINOMA OF CAECUM" if record_id==18451
+replace lat=0 if record_id==18451
+replace latcat=0 if record_id==18451
+replace beh=3 if record_id==18451
+replace grade=9 if record_id==18451
+replace basis=0 if record_id==18451
+replace dot=dod if record_id==18451
+replace dotyear=year(dot) if record_id==18451
+replace dxyr=2015 if record_id==18451
+replace ICD10="C180" if record_id==18451
+replace ICCCcode="12b" if record_id==18451
+replace comments="Trace back: Saw Pt for a short while. No info seen. Pt Dx clinically based on lump/ mass noted in (L) right abdomen. Pt too old to be seen for further investigations." if record_id==18451
+
+replace top="349" if record_id==18468
+replace topography=349 if record_id==18468
+replace topcat=32 if record_id==18468
+replace primarysite="LUNG" if record_id==18468
+replace morphology="8000" if record_id==18468
+replace morph=8000 if record_id==18468
+replace morphcat=1 if record_id==18468
+replace hx="METASTATIC CANCER PULMONARY" if record_id==18468
+replace lat=3 if record_id==18468
+replace latcat=13 if record_id==18468
+replace beh=3 if record_id==18468
+replace grade=9 if record_id==18468
+replace basis=0 if record_id==18468
+replace dot=dod if record_id==18468
+replace dotyear=year(dot) if record_id==18468
+replace dxyr=2015 if record_id==18468
+replace ICD10="C349" if record_id==18468
+replace ICCCcode="12b" if record_id==18468
+
+replace top="259" if record_id==18472
+replace topography=259 if record_id==18472
+replace topcat=26 if record_id==18472
+replace primarysite="PANCREAS" if record_id==18472
+replace morphology="8000" if record_id==18472
+replace morph=8000 if record_id==18472
+replace morphcat=1 if record_id==18472
+replace hx="PANCREATIC CARCINOMA" if record_id==18472
+replace lat=0 if record_id==18472
+replace latcat=0 if record_id==18472
+replace beh=3 if record_id==18472
+replace grade=9 if record_id==18472
+replace basis=0 if record_id==18472
+replace dot=dod if record_id==18472
+replace dotyear=year(dot) if record_id==18472
+replace dxyr=2015 if record_id==18472
+replace ICD10="C259" if record_id==18472
+replace ICCCcode="12b" if record_id==18472
+
+replace top="189" if record_id==18476
+replace topography=189 if record_id==18476
+replace topcat=19 if record_id==18476
+replace primarysite="COLON" if record_id==18476
+replace morphology="8000" if record_id==18476
+replace morph=8000 if record_id==18476
+replace morphcat=1 if record_id==18476
+replace hx="METASTATIC COLON CANCER" if record_id==18476
+replace lat=0 if record_id==18476
+replace latcat=0 if record_id==18476
+replace beh=3 if record_id==18476
+replace grade=9 if record_id==18476
+replace basis=0 if record_id==18476
+replace dot=dod if record_id==18476
+replace dotyear=year(dot) if record_id==18476
+replace dxyr=2015 if record_id==18476
+replace ICD10="C189" if record_id==18476
+replace ICCCcode="12b" if record_id==18476
+
+replace top="619" if record_id==18482
+replace topography=619 if record_id==18482
+replace topcat=53 if record_id==18482
+replace primarysite="PROSTATE" if record_id==18482
+replace morphology="8000" if record_id==18482
+replace morph=8000 if record_id==18482
+replace morphcat=1 if record_id==18482
+replace hx="CARCINOMA OF THE PROSTATE" if record_id==18482
+replace lat=0 if record_id==18482
+replace latcat=0 if record_id==18482
+replace beh=3 if record_id==18482
+replace grade=9 if record_id==18482
+replace basis=0 if record_id==18482
+replace dot=dod if record_id==18482
+replace dotyear=year(dot) if record_id==18482
+replace dxyr=2015 if record_id==18482
+replace ICD10="C61" if record_id==18482
+replace ICCCcode="12b" if record_id==18482
+
+replace top="349" if record_id==18557
+replace topography=349 if record_id==18557
+replace topcat=32 if record_id==18557
+replace primarysite="LUNG" if record_id==18557
+replace morphology="8000" if record_id==18557
+replace morph=8000 if record_id==18557
+replace morphcat=1 if record_id==18557
+replace hx="METASTATIC LUNG CARCINOMA" if record_id==18557
+replace lat=3 if record_id==18557
+replace latcat=13 if record_id==18557
+replace beh=3 if record_id==18557
+replace grade=9 if record_id==18557
+replace basis=0 if record_id==18557
+replace dot=dod if record_id==18557
+replace dotyear=year(dot) if record_id==18557
+replace dxyr=2015 if record_id==18557
+replace ICD10="C349" if record_id==18557
+replace ICCCcode="12b" if record_id==18557
+
+replace top="509" if record_id==18562
+replace topography=509 if record_id==18562
+replace topcat=43 if record_id==18562
+replace primarysite="BREAST" if record_id==18562
+replace morphology="8000" if record_id==18562
+replace morph=8000 if record_id==18562
+replace morphcat=1 if record_id==18562
+replace hx="CANCER OF LEFT BREAST" if record_id==18562
+replace lat=2 if record_id==18562
+replace latcat=31 if record_id==18562
+replace beh=3 if record_id==18562
+replace grade=9 if record_id==18562
+replace basis=0 if record_id==18562
+replace dot=dod if record_id==18562
+replace dotyear=year(dot) if record_id==18562
+replace dxyr=2015 if record_id==18562
+replace ICD10="C509" if record_id==18562
+replace ICCCcode="12b" if record_id==18562
+
+replace top="189" if record_id==18567
+replace topography=189 if record_id==18567
+replace topcat=19 if record_id==18567
+replace primarysite="COLON" if record_id==18567
+replace morphology="8000" if record_id==18567
+replace morph=8000 if record_id==18567
+replace morphcat=1 if record_id==18567
+replace hx="METASTATIC COLON CANCER" if record_id==18567
+replace lat=0 if record_id==18567
+replace latcat=0 if record_id==18567
+replace beh=3 if record_id==18567
+replace grade=9 if record_id==18567
+replace basis=0 if record_id==18567
+replace dot=dod if record_id==18567
+replace dotyear=year(dot) if record_id==18567
+replace dxyr=2015 if record_id==18567
+replace ICD10="C189" if record_id==18567
+replace ICCCcode="12b" if record_id==18567
+
+replace top="699" if record_id==18571
+replace topography=699 if record_id==18571
+replace topcat=61 if record_id==18571
+replace primarysite="RIGHT EYE" if record_id==18571
+replace morphology="8000" if record_id==18571
+replace morph=8000 if record_id==18571
+replace morphcat=1 if record_id==18571
+replace hx="CARCINOMA OF RIGHT EYE" if record_id==18571
+replace lat=1 if record_id==18571
+replace latcat=40 if record_id==18571
+replace beh=3 if record_id==18571
+replace grade=9 if record_id==18571
+replace basis=0 if record_id==18571
+replace dot=dod if record_id==18571
+replace dotyear=year(dot) if record_id==18571
+replace dxyr=2015 if record_id==18571
+replace ICD10="C699" if record_id==18571
+replace ICCCcode="12b" if record_id==18571
+
+replace top="249" if record_id==18585
+replace topography=249 if record_id==18585
+replace topcat=25 if record_id==18585
+replace primarysite="BILIARY TRACT" if record_id==18585
+replace morphology="8000" if record_id==18585
+replace morph=8000 if record_id==18585
+replace morphcat=1 if record_id==18585
+replace hx="CHOLANGIOCARCINOMA" if record_id==18585
+replace lat=0 if record_id==18585
+replace latcat=0 if record_id==18585
+replace beh=3 if record_id==18585
+replace grade=9 if record_id==18585
+replace basis=0 if record_id==18585
+replace dot=dod if record_id==18585
+replace dotyear=year(dot) if record_id==18585
+replace dxyr=2015 if record_id==18585
+replace ICD10="C249" if record_id==18585
+replace ICCCcode="12b" if record_id==18585
+
+replace top="619" if record_id==18596
+replace topography=619 if record_id==18596
+replace topcat=53 if record_id==18596
+replace primarysite="PROSTATE" if record_id==18596
+replace morphology="8000" if record_id==18596
+replace morph=8000 if record_id==18596
+replace morphcat=1 if record_id==18596
+replace hx="METASTATIC PROSTATE CANCER" if record_id==18596
+replace lat=0 if record_id==18596
+replace latcat=0 if record_id==18596
+replace beh=3 if record_id==18596
+replace grade=9 if record_id==18596
+replace basis=9 if record_id==18596
+replace dot=d(30jun2015) if record_id==18596
+replace dotyear=year(dot) if record_id==18596
+replace dxyr=2015 if record_id==18596
+replace ICD10="C61" if record_id==18596
+replace ICCCcode="12b" if record_id==18596
+replace comments="Trace back: Provided palliative care for Pt. Pt was referred from GenSurg. Not primary physician, said check notes for primary physician." if record_id==18596
+
+replace top="421" if record_id==18619
+replace topography=421 if record_id==18619
+replace topcat=38 if record_id==18619
+replace primarysite="BONE MARROW" if record_id==18619
+replace morphology="9732" if record_id==18619
+replace morph=9732 if record_id==18619
+replace morphcat=46 if record_id==18619
+replace hx="MULTIPLE MYELOMA" if record_id==18619
+replace lat=0 if record_id==18619
+replace latcat=0 if record_id==18619
+replace beh=3 if record_id==18619
+replace grade=9 if record_id==18619
+replace basis=9 if record_id==18619
+replace dot=d(30jun2015) if record_id==18619
+replace dotyear=year(dot) if record_id==18619
+replace dxyr=2015 if record_id==18619
+replace ICD10="C900" if record_id==18619
+replace ICCCcode="2b" if record_id==18619
+replace comments="Trace back: Dr said the condition was pre-existing, no confimration information given." if record_id==18619
+
+replace top="619" if record_id==18650
+replace topography=619 if record_id==18650
+replace topcat=53 if record_id==18650
+replace primarysite="PROSTATE" if record_id==18650
+replace morphology="8000" if record_id==18650
+replace morph=8000 if record_id==18650
+replace morphcat=1 if record_id==18650
+replace hx="METASTATIC PROSTATE CARCINOMA" if record_id==18650
+replace lat=0 if record_id==18650
+replace latcat=0 if record_id==18650
+replace beh=3 if record_id==18650
+replace grade=9 if record_id==18650
+replace basis=0 if record_id==18650
+replace dot=dod if record_id==18650
+replace dotyear=year(dot) if record_id==18650
+replace dxyr=2015 if record_id==18650
+replace ICD10="C61" if record_id==18650
+replace ICCCcode="12b" if record_id==18650
+
+replace top="619" if record_id==18693
+replace topography=619 if record_id==18693
+replace topcat=53 if record_id==18693
+replace primarysite="PROSTATE" if record_id==18693
+replace morphology="8000" if record_id==18693
+replace morph=8000 if record_id==18693
+replace morphcat=1 if record_id==18693
+replace hx="METASTATIC PROSTATE CARCINOMA" if record_id==18693
+replace lat=0 if record_id==18693
+replace latcat=0 if record_id==18693
+replace beh=3 if record_id==18693
+replace grade=9 if record_id==18693
+replace basis=0 if record_id==18693
+replace dot=dod if record_id==18693
+replace dotyear=year(dot) if record_id==18693
+replace dxyr=2015 if record_id==18693
+replace ICD10="C61" if record_id==18693
+replace ICCCcode="12b" if record_id==18693
+** Create duplicate observations for MPs in CODs
+expand=2 if record_id==18693, gen (dupobs2do15)
+replace top="189" if record_id==18693 & dupobs2do15>0
+replace topography=189 if record_id==18693 & dupobs2do15>0
+replace topcat=19 if record_id==18693 & dupobs2do15>0
+replace primarysite="COLON" if record_id==18693 & dupobs2do15>0
+replace morphology="8000" if record_id==18693 & dupobs2do15>0
+replace morph=8000 if record_id==18693 & dupobs2do15>0
+replace morphcat=1 if record_id==18693 & dupobs2do15>0
+replace hx="COLON CANCER" if record_id==18693 & dupobs2do15>0
+replace lat=0 if record_id==18693 & dupobs2do15>0
+replace latcat=0 if record_id==18693 & dupobs2do15>0
+replace beh=3 if record_id==18693 & dupobs2do15>0
+replace grade=9 if record_id==18693 & dupobs2do15>0
+replace basis=1 if record_id==18693 & dupobs2do15>0
+replace dot=d(05feb2015) if record_id==18693 & dupobs2do15>0
+replace dotyear=year(dot) if record_id==18693 & dupobs2do15>0
+replace dxyr=2015 if record_id==18693 & dupobs2do15>0
+replace ICD10="C189" if record_id==18693 & dupobs2do15>0
+replace ICCCcode="12b" if record_id==18693 & dupobs2do15>0
+replace cr5id="T2S1" if record_id==18693 & dupobs2do15>0
+replace comments="Trace back: Prostate diagnosis not found. Colon cancer diagnosed seen on Feb 5 2015-clinical." if record_id==18693 & dupobs2do15>0
+
+replace top="169" if record_id==18700
+replace topography=169 if record_id==18700
+replace topcat=17 if record_id==18700
+replace primarysite="STOMACH" if record_id==18700
+replace morphology="8000" if record_id==18700
+replace morph=8000 if record_id==18700
+replace morphcat=1 if record_id==18700
+replace hx="METASTATIC GASTRIC CANCER" if record_id==18700
+replace lat=0 if record_id==18700
+replace latcat=0 if record_id==18700
+replace beh=3 if record_id==18700
+replace grade=9 if record_id==18700
+replace basis=0 if record_id==18700
+replace dot=dod if record_id==18700
+replace dotyear=year(dot) if record_id==18700
+replace dxyr=2015 if record_id==18700
+replace ICD10="C169" if record_id==18700
+replace ICCCcode="12b" if record_id==18700
+
+replace top="679" if record_id==18707
+replace topography=679 if record_id==18707
+replace topcat=59 if record_id==18707
+replace primarysite="BLADDER" if record_id==18707
+replace morphology="8000" if record_id==18707
+replace morph=8000 if record_id==18707
+replace morphcat=1 if record_id==18707
+replace hx="CARCINOMA BLADDER WITH METASTASES TO LIVER" if record_id==18707
+replace lat=0 if record_id==18707
+replace latcat=0 if record_id==18707
+replace beh=3 if record_id==18707
+replace grade=9 if record_id==18707
+replace basis=0 if record_id==18707
+replace dot=dod if record_id==18707
+replace dotyear=year(dot) if record_id==18707
+replace dxyr=2015 if record_id==18707
+replace ICD10="C679" if record_id==18707
+replace ICCCcode="12b" if record_id==18707
+
+replace top="269" if record_id==18710
+replace topography=269 if record_id==18710
+replace topcat=27 if record_id==18710
+replace primarysite="GASTROINTESTINAL TRACT" if record_id==18710
+replace morphology="8000" if record_id==18710
+replace morph=8000 if record_id==18710
+replace morphcat=1 if record_id==18710
+replace hx="GASTRO INTESTINAL STROMAL TUMOUR WITH METASTASES" if record_id==18710
+replace lat=0 if record_id==18710
+replace latcat=0 if record_id==18710
+replace beh=3 if record_id==18710
+replace grade=9 if record_id==18710
+replace basis=0 if record_id==18710
+replace dot=dod if record_id==18710
+replace dotyear=year(dot) if record_id==18710
+replace dxyr=2015 if record_id==18710
+replace ICD10="C269" if record_id==18710
+replace ICCCcode="12b" if record_id==18710
+
+replace top="619" if record_id==18730
+replace topography=619 if record_id==18730
+replace topcat=53 if record_id==18730
+replace primarysite="PROSTATE" if record_id==18730
+replace morphology="8000" if record_id==18730
+replace morph=8000 if record_id==18730
+replace morphcat=1 if record_id==18730
+replace hx="CARCINOMA OF THE PROSTATE" if record_id==18730
+replace lat=0 if record_id==18730
+replace latcat=0 if record_id==18730
+replace beh=3 if record_id==18730
+replace grade=9 if record_id==18730
+replace basis=0 if record_id==18730
+replace dot=dod if record_id==18730
+replace dotyear=year(dot) if record_id==18730
+replace dxyr=2015 if record_id==18730
+replace ICD10="C61" if record_id==18730
+replace ICCCcode="12b" if record_id==18730
+
+replace top="619" if record_id==18744
+replace topography=619 if record_id==18744
+replace topcat=53 if record_id==18744
+replace primarysite="PROSTATE" if record_id==18744
+replace morphology="8000" if record_id==18744
+replace morph=8000 if record_id==18744
+replace morphcat=1 if record_id==18744
+replace hx="PROSTATE CANCER" if record_id==18744
+replace lat=0 if record_id==18744
+replace latcat=0 if record_id==18744
+replace beh=3 if record_id==18744
+replace grade=9 if record_id==18744
+replace basis=9 if record_id==18744
+replace dot=d(30jun2014) if record_id==18744
+replace dotyear=year(dot) if record_id==18744
+replace dxyr=2014 if record_id==18744
+replace ICD10="C61" if record_id==18744
+replace ICCCcode="12b" if record_id==18744
+replace comments="Trace back: Known to have PC in 2014-being treated for same. Not sure when diagnosed." if record_id==18744
+
+replace top="259" if record_id==18746
+replace topography=259 if record_id==18746
+replace topcat=26 if record_id==18746
+replace primarysite="PANCREAS" if record_id==18746
+replace morphology="8000" if record_id==18746
+replace morph=8000 if record_id==18746
+replace morphcat=1 if record_id==18746
+replace hx="PANCREATIC CARCINOMA" if record_id==18746
+replace lat=0 if record_id==18746
+replace latcat=0 if record_id==18746
+replace beh=3 if record_id==18746
+replace grade=9 if record_id==18746
+replace basis=2 if record_id==18746
+replace dot=d(21mar2015) if record_id==18746
+replace dotyear=year(dot) if record_id==18746
+replace dxyr=2015 if record_id==18746
+replace ICD10="C259" if record_id==18746
+replace ICCCcode="12b" if record_id==18746
+replace comments="Trace back: Dr. M O'Shea QEH. Admitted Ward A2 March 2015 and I believe this is date of diagnosis. Likely a clinical diagnosis but high CA19-9 21st/3/2015 very suggestive of pancreatuc ca. Likely had supportive CT imaging." if record_id==18746
+
+replace top="619" if record_id==18801
+replace topography=619 if record_id==18801
+replace topcat=53 if record_id==18801
+replace primarysite="PROSTATE" if record_id==18801
+replace morphology="8000" if record_id==18801
+replace morph=8000 if record_id==18801
+replace morphcat=1 if record_id==18801
+replace hx="METASTATIC CARCINOMA OF THE PROSTATE" if record_id==18801
+replace lat=0 if record_id==18801
+replace latcat=0 if record_id==18801
+replace beh=3 if record_id==18801
+replace grade=9 if record_id==18801
+replace basis=5 if record_id==18801
+replace dot=d(15jul2013) if record_id==18801
+replace dotyear=year(dot) if record_id==18801
+replace dxyr=2013 if record_id==18801
+replace ICD10="C61" if record_id==18801
+replace ICCCcode="12b" if record_id==18801
+replace rx1=5 if record_id==18801
+replace rx1d=d(15jul2013) if record_id==18801
+replace comments="Trace back: Pt Dx July 2013. No bx done because of age. Presented with PSA 68.8. Had abnormal LFT. Referred to Dr. Emtage was given Androcur. PSA wen from 68.8 to 2.6 on medication. Dx based on lab results." if record_id==18801
+
+replace top="509" if record_id==18805
+replace topography=509 if record_id==18805
+replace topcat=43 if record_id==18805
+replace primarysite="BREAST" if record_id==18805
+replace morphology="8000" if record_id==18805
+replace morph=8000 if record_id==18805
+replace morphcat=1 if record_id==18805
+replace hx="CANCER OF BREAST" if record_id==18805
+replace lat=3 if record_id==18805
+replace latcat=31 if record_id==18805
+replace beh=3 if record_id==18805
+replace grade=9 if record_id==18805
+replace basis=0 if record_id==18805
+replace dot=dod if record_id==18805
+replace dotyear=year(dot) if record_id==18805
+replace dxyr=2015 if record_id==18805
+replace ICD10="C509" if record_id==18805
+replace ICCCcode="12b" if record_id==18805
+
+replace top="259" if record_id==18818
+replace topography=259 if record_id==18818
+replace topcat=26 if record_id==18818
+replace primarysite="PANCREAS" if record_id==18818
+replace morphology="8000" if record_id==18818
+replace morph=8000 if record_id==18818
+replace morphcat=1 if record_id==18818
+replace hx="CARCINOMA PANCREAS" if record_id==18818
+replace lat=0 if record_id==18818
+replace latcat=0 if record_id==18818
+replace beh=3 if record_id==18818
+replace grade=9 if record_id==18818
+replace basis=0 if record_id==18818
+replace dot=dod if record_id==18818
+replace dotyear=year(dot) if record_id==18818
+replace dxyr=2015 if record_id==18818
+replace ICD10="C259" if record_id==18818
+replace ICCCcode="12b" if record_id==18818
+
+replace top="619" if record_id==18834
+replace topography=619 if record_id==18834
+replace topcat=53 if record_id==18834
+replace primarysite="PROSTATE" if record_id==18834
+replace morphology="8000" if record_id==18834
+replace morph=8000 if record_id==18834
+replace morphcat=1 if record_id==18834
+replace hx="PROSTATE CANCER" if record_id==18834
+replace lat=0 if record_id==18834
+replace latcat=0 if record_id==18834
+replace beh=3 if record_id==18834
+replace grade=9 if record_id==18834
+replace basis=0 if record_id==18834
+replace dot=dod if record_id==18834
+replace dotyear=year(dot) if record_id==18834
+replace dxyr=2015 if record_id==18834
+replace ICD10="C61" if record_id==18834
+replace ICCCcode="12b" if record_id==18834
+
+replace top="509" if record_id==18835
+replace topography=509 if record_id==18835
+replace topcat=43 if record_id==18835
+replace primarysite="BREAST" if record_id==18835
+replace morphology="8000" if record_id==18835
+replace morph=8000 if record_id==18835
+replace morphcat=1 if record_id==18835
+replace hx="CARCINOMA OF THE RIGHT BREAST" if record_id==18835
+replace lat=1 if record_id==18835
+replace latcat=31 if record_id==18835
+replace beh=3 if record_id==18835
+replace grade=9 if record_id==18835
+replace basis=0 if record_id==18835
+replace dot=dod if record_id==18835
+replace dotyear=year(dot) if record_id==18835
+replace dxyr=2015 if record_id==18835
+replace ICD10="C509" if record_id==18835
+replace ICCCcode="12b" if record_id==18835
+
+replace top="490" if record_id==18849
+replace topography=490 if record_id==18849
+replace topcat=42 if record_id==18849
+replace primarysite="NECK" if record_id==18849
+replace morphology="8850" if record_id==18849
+replace morph=8850 if record_id==18849
+replace morphcat=20 if record_id==18849
+replace hx="LIPOSARCOMA OF NECK" if record_id==18849
+replace lat=0 if record_id==18849
+replace latcat=0 if record_id==18849
+replace beh=3 if record_id==18849
+replace grade=9 if record_id==18849
+replace basis=0 if record_id==18849
+replace dot=dod if record_id==18849
+replace dotyear=year(dot) if record_id==18849
+replace dxyr=2015 if record_id==18849
+replace ICD10="C490" if record_id==18849
+replace ICCCcode="9d" if record_id==18849
+
+replace top="649" if record_id==18854
+replace topography=649 if record_id==18854
+replace topcat=56 if record_id==18854
+replace primarysite="KIDNEY" if record_id==18854
+replace morphology="8312" if record_id==18854
+replace morph=8312 if record_id==18854
+replace morphcat=6 if record_id==18854
+replace hx="METASTATIC RENAL CELL CARCINOMA" if record_id==18854
+replace lat=3 if record_id==18854
+replace latcat=37 if record_id==18854
+replace beh=3 if record_id==18854
+replace grade=9 if record_id==18854
+replace basis=0 if record_id==18854
+replace dot=dod if record_id==18854
+replace dotyear=year(dot) if record_id==18854
+replace dxyr=2015 if record_id==18854
+replace ICD10="C64" if record_id==18854
+replace ICCCcode="6b" if record_id==18854
+
+replace top="619" if record_id==18863
+replace topography=619 if record_id==18863
+replace topcat=53 if record_id==18863
+replace primarysite="PROSTATE" if record_id==18863
+replace morphology="8000" if record_id==18863
+replace morph=8000 if record_id==18863
+replace morphcat=1 if record_id==18863
+replace hx="PROSTATIC CANCER" if record_id==18863
+replace lat=0 if record_id==18863
+replace latcat=0 if record_id==18863
+replace beh=3 if record_id==18863
+replace grade=9 if record_id==18863
+replace basis=0 if record_id==18863
+replace dot=dod if record_id==18863
+replace dotyear=year(dot) if record_id==18863
+replace dxyr=2015 if record_id==18863
+replace ICD10="C61" if record_id==18863
+replace ICCCcode="12b" if record_id==18863
+
+replace top="679" if record_id==18892
+replace topography=679 if record_id==18892
+replace topcat=59 if record_id==18892
+replace primarysite="BLADDER" if record_id==18892
+replace morphology="8000" if record_id==18892
+replace morph=8000 if record_id==18892
+replace morphcat=1 if record_id==18892
+replace hx="BLADDER CANCER" if record_id==18892
+replace lat=0 if record_id==18892
+replace latcat=0 if record_id==18892
+replace beh=3 if record_id==18892
+replace grade=9 if record_id==18892
+replace basis=0 if record_id==18892
+replace dot=dod if record_id==18892
+replace dotyear=year(dot) if record_id==18892
+replace dxyr=2015 if record_id==18892
+replace ICD10="C679" if record_id==18892
+replace ICCCcode="12b" if record_id==18892
+
+replace top="619" if record_id==18943
+replace topography=619 if record_id==18943
+replace topcat=53 if record_id==18943
+replace primarysite="PROSTATE" if record_id==18943
+replace morphology="8000" if record_id==18943
+replace morph=8000 if record_id==18943
+replace morphcat=1 if record_id==18943
+replace hx="PROSTATE CARCINOMA" if record_id==18943
+replace lat=0 if record_id==18943
+replace latcat=0 if record_id==18943
+replace beh=3 if record_id==18943
+replace grade=9 if record_id==18943
+replace basis=0 if record_id==18943
+replace dot=dod if record_id==18943
+replace dotyear=year(dot) if record_id==18943
+replace dxyr=2015 if record_id==18943
+replace ICD10="C61" if record_id==18943
+replace ICCCcode="12b" if record_id==18943
+
+replace top="509" if record_id==18945
+replace topography=509 if record_id==18945
+replace topcat=43 if record_id==18945
+replace primarysite="BREAST" if record_id==18945
+replace morphology="8000" if record_id==18945
+replace morph=8000 if record_id==18945
+replace morphcat=1 if record_id==18945
+replace hx="STAGE 4 BREAST CANCER" if record_id==18945
+replace lat=3 if record_id==18945
+replace latcat=31 if record_id==18945
+replace beh=3 if record_id==18945
+replace grade=9 if record_id==18945
+replace basis=0 if record_id==18945
+replace dot=dod if record_id==18945
+replace dotyear=year(dot) if record_id==18945
+replace dxyr=2015 if record_id==18945
+replace ICD10="C509" if record_id==18945
+replace ICCCcode="12b" if record_id==18945
+
+replace top="189" if record_id==18950
+replace topography=189 if record_id==18950
+replace topcat=19 if record_id==18950
+replace primarysite="COLON" if record_id==18950
+replace morphology="8000" if record_id==18950
+replace morph=8000 if record_id==18950
+replace morphcat=1 if record_id==18950
+replace hx="METASTATIC COLONIC CARCINOMA" if record_id==18950
+replace lat=0 if record_id==18950
+replace latcat=0 if record_id==18950
+replace beh=3 if record_id==18950
+replace grade=9 if record_id==18950
+replace basis=0 if record_id==18950
+replace dot=dod if record_id==18950
+replace dotyear=year(dot) if record_id==18950
+replace dxyr=2015 if record_id==18950
+replace ICD10="C189" if record_id==18950
+replace ICCCcode="12b" if record_id==18950
+
+replace top="539" if record_id==18963
+replace topography=539 if record_id==18963
+replace topcat=46 if record_id==18963
+replace primarysite="CERVIX" if record_id==18963
+replace morphology="8000" if record_id==18963
+replace morph=8000 if record_id==18963
+replace morphcat=1 if record_id==18963
+replace hx="ADVANCED CANCER CERVIX" if record_id==18963
+replace lat=0 if record_id==18963
+replace latcat=0 if record_id==18963
+replace beh=3 if record_id==18963
+replace grade=9 if record_id==18963
+replace basis=9 if record_id==18963
+replace dot=d(06nov2015) if record_id==18963
+replace dotyear=year(dot) if record_id==18963
+replace dxyr=2015 if record_id==18963
+replace ICD10="C539" if record_id==18963
+replace ICCCcode="12b" if record_id==18963
+replace comments="Trace back: last seen QEH Nov 6, 2015. Malignant neoplasm cervix uteri. CHECK RT." if record_id==18963
+
+replace top="189" if record_id==18987
+replace topography=189 if record_id==18987
+replace topcat=19 if record_id==18987
+replace primarysite="COLON" if record_id==18987
+replace morphology="8000" if record_id==18987
+replace morph=8000 if record_id==18987
+replace morphcat=1 if record_id==18987
+replace hx="METASTATIC COLON CANCER" if record_id==18987
+replace lat=0 if record_id==18987
+replace latcat=0 if record_id==18987
+replace beh=3 if record_id==18987
+replace grade=9 if record_id==18987
+replace basis=0 if record_id==18987
+replace dot=dod if record_id==18987
+replace dotyear=year(dot) if record_id==18987
+replace dxyr=2015 if record_id==18987
+replace ICD10="C189" if record_id==18987
+replace ICCCcode="12b" if record_id==18987
+
+replace top="809" if record_id==18989
+replace topography=809 if record_id==18989
+replace topcat=70 if record_id==18989
+replace primarysite="99" if record_id==18989
+replace morphology="8000" if record_id==18989
+replace morph=8000 if record_id==18989
+replace morphcat=1 if record_id==18989
+replace hx="OCCULT MALIGNANCY" if record_id==18989
+replace lat=0 if record_id==18989
+replace latcat=0 if record_id==18989
+replace beh=3 if record_id==18989
+replace grade=9 if record_id==18989
+replace basis=0 if record_id==18989
+replace dot=dod if record_id==18989
+replace dotyear=year(dot) if record_id==18989
+replace dxyr=2015 if record_id==18989
+replace ICD10="C80" if record_id==18989
+replace ICCCcode="12b" if record_id==18989
+
+replace top="809" if record_id==19018
+replace topography=809 if record_id==19018
+replace topcat=70 if record_id==19018
+replace primarysite="99" if record_id==19018
+replace morphology="8000" if record_id==19018
+replace morph=8000 if record_id==19018
+replace morphcat=1 if record_id==19018
+replace hx="METASTATIC CANCER PRIMARY UNKNOWN" if record_id==19018
+replace lat=0 if record_id==19018
+replace latcat=0 if record_id==19018
+replace beh=3 if record_id==19018
+replace grade=9 if record_id==19018
+replace basis=0 if record_id==19018
+replace dot=dod if record_id==19018
+replace dotyear=year(dot) if record_id==19018
+replace dxyr=2015 if record_id==19018
+replace ICD10="C80" if record_id==19018
+replace ICCCcode="12b" if record_id==19018
+
+replace top="569" if record_id==19023
+replace topography=569 if record_id==19023
+replace topcat=49 if record_id==19023
+replace primarysite="OVARY" if record_id==19023
+replace morphology="8000" if record_id==19023
+replace morph=8000 if record_id==19023
+replace morphcat=1 if record_id==19023
+replace hx="METASTATIC OVARIAN CANCER" if record_id==19023
+replace lat=9 if record_id==19023
+replace latcat=32 if record_id==19023
+replace beh=3 if record_id==19023
+replace grade=9 if record_id==19023
+replace basis=0 if record_id==19023
+replace dot=dod if record_id==19023
+replace dotyear=year(dot) if record_id==19023
+replace dxyr=2015 if record_id==19023
+replace ICD10="C56" if record_id==19023
+replace ICCCcode="10e" if record_id==19023
+
+replace top="421" if record_id==19062
+replace topography=421 if record_id==19062
+replace topcat=38 if record_id==19062
+replace primarysite="BONE MARROW" if record_id==19062
+replace morphology="9732" if record_id==19062
+replace morph=9732 if record_id==19062
+replace morphcat=46 if record_id==19062
+replace hx="MULTIPLE MYELOMA" if record_id==19062
+replace lat=0 if record_id==19062
+replace latcat=0 if record_id==19062
+replace beh=3 if record_id==19062
+replace grade=9 if record_id==19062
+replace basis=0 if record_id==19062
+replace dot=dod if record_id==19062
+replace dotyear=year(dot) if record_id==19062
+replace dxyr=2015 if record_id==19062
+replace ICD10="C900" if record_id==19062
+replace ICCCcode="2b" if record_id==19062
+
+replace top="619" if record_id==19077
+replace topography=619 if record_id==19077
+replace topcat=53 if record_id==19077
+replace primarysite="PROSTATE" if record_id==19077
+replace morphology="8000" if record_id==19077
+replace morph=8000 if record_id==19077
+replace morphcat=1 if record_id==19077
+replace hx="PROSTATE CANCER" if record_id==19077
+replace lat=0 if record_id==19077
+replace latcat=0 if record_id==19077
+replace beh=3 if record_id==19077
+replace grade=9 if record_id==19077
+replace basis=0 if record_id==19077
+replace dot=dod if record_id==19077
+replace dotyear=year(dot) if record_id==19077
+replace dxyr=2015 if record_id==19077
+replace ICD10="C61" if record_id==19077
+replace ICCCcode="12b" if record_id==19077
+
+replace top="809" if record_id==19107
+replace topography=809 if record_id==19107
+replace topcat=70 if record_id==19107
+replace primarysite="99" if record_id==19107
+replace morphology="8000" if record_id==19107
+replace morph=8000 if record_id==19107
+replace morphcat=1 if record_id==19107
+replace hx="METASTATIC GASTRO-INTESTINAL, MALIGNANCY-UNKNOWN PRIMARY" if record_id==19107
+replace lat=0 if record_id==19107
+replace latcat=0 if record_id==19107
+replace beh=3 if record_id==19107
+replace grade=9 if record_id==19107
+replace basis=0 if record_id==19107
+replace dot=dod if record_id==19107
+replace dotyear=year(dot) if record_id==19107
+replace dxyr=2015 if record_id==19107
+replace ICD10="C80" if record_id==19107
+replace ICCCcode="12b" if record_id==19107
+
+replace top="421" if record_id==19135
+replace topography=421 if record_id==19135
+replace topcat=38 if record_id==19135
+replace primarysite="BONE MARROW" if record_id==19135
+replace morphology="9732" if record_id==19135
+replace morph=9732 if record_id==19135
+replace morphcat=46 if record_id==19135
+replace hx="MULTIPLE MYELOMA" if record_id==19135
+replace lat=0 if record_id==19135
+replace latcat=0 if record_id==19135
+replace beh=3 if record_id==19135
+replace grade=9 if record_id==19135
+replace basis=0 if record_id==19135
+replace dot=dod if record_id==19135
+replace dotyear=year(dot) if record_id==19135
+replace dxyr=2015 if record_id==19135
+replace ICD10="C900" if record_id==19135
+replace ICCCcode="2b" if record_id==19135
+
+replace top="169" if record_id==19149
+replace topography=169 if record_id==19149
+replace topcat=17 if record_id==19149
+replace primarysite="STOMACH" if record_id==19149
+replace morphology="8000" if record_id==19149
+replace morph=8000 if record_id==19149
+replace morphcat=1 if record_id==19149
+replace hx="CANCER OF STOMACH" if record_id==19149
+replace lat=0 if record_id==19149
+replace latcat=0 if record_id==19149
+replace beh=3 if record_id==19149
+replace grade=9 if record_id==19149
+replace basis=0 if record_id==19149
+replace dot=dod if record_id==19149
+replace dotyear=year(dot) if record_id==19149
+replace dxyr=2015 if record_id==19149
+replace ICD10="C169" if record_id==19149
+replace ICCCcode="12b" if record_id==19149
+
+replace top="509" if record_id==19210
+replace topography=509 if record_id==19210
+replace topcat=43 if record_id==19210
+replace primarysite="BREAST" if record_id==19210
+replace morphology="8000" if record_id==19210
+replace morph=8000 if record_id==19210
+replace morphcat=1 if record_id==19210
+replace hx="BREAST CANCER, RIGHT BREAST" if record_id==19210
+replace lat=1 if record_id==19210
+replace latcat=31 if record_id==19210
+replace beh=3 if record_id==19210
+replace grade=9 if record_id==19210
+replace basis=0 if record_id==19210
+replace dot=dod if record_id==19210
+replace dotyear=year(dot) if record_id==19210
+replace dxyr=2015 if record_id==19210
+replace ICD10="C509" if record_id==19210
+replace ICCCcode="12b" if record_id==19210
+
+replace top="619" if record_id==19230
+replace topography=619 if record_id==19230
+replace topcat=53 if record_id==19230
+replace primarysite="PROSTATE" if record_id==19230
+replace morphology="8000" if record_id==19230
+replace morph=8000 if record_id==19230
+replace morphcat=1 if record_id==19230
+replace hx="PROSTATE CANCER" if record_id==19230
+replace lat=0 if record_id==19230
+replace latcat=0 if record_id==19230
+replace beh=3 if record_id==19230
+replace grade=9 if record_id==19230
+replace basis=0 if record_id==19230
+replace dot=dod if record_id==19230
+replace dotyear=year(dot) if record_id==19230
+replace dxyr=2015 if record_id==19230
+replace ICD10="C61" if record_id==19230
+replace ICCCcode="12b" if record_id==19230
+
+replace top="209" if record_id==19245
+replace topography=209 if record_id==19245
+replace topcat=21 if record_id==19245
+replace primarysite="RECTUM" if record_id==19245
+replace morphology="8000" if record_id==19245
+replace morph=8000 if record_id==19245
+replace morphcat=1 if record_id==19245
+replace hx="RECTAL CANCER" if record_id==19245
+replace lat=0 if record_id==19245
+replace latcat=0 if record_id==19245
+replace beh=3 if record_id==19245
+replace grade=9 if record_id==19245
+replace basis=1 if record_id==19245
+replace dot=d(30oct2015) if record_id==19245
+replace dotyear=year(dot) if record_id==19245
+replace dxyr=2015 if record_id==19245
+replace ICD10="C20" if record_id==19245
+replace ICCCcode="12b" if record_id==19245
+replace comments="Trace back: Clinical diagnosis made by Dr J Herbert 30/10/2015 with discovery of large rectal mass on examination of an elderly lady with constipation, and  rapid & progressive weight loss, cognitive impairment and declining function. She had a normal ultrasound 3 years prior, ordered by Dr R Delice. Her carers suspected vaginal bleeding but its my judgement this was from the low rectal lesion based on her examination findings. No furthe rimaging or biopsy was obtained as her treatmnet was strictly palliative." if record_id==19245
+
+replace top="349" if record_id==19246
+replace topography=349 if record_id==19246
+replace topcat=32 if record_id==19246
+replace primarysite="LUNG" if record_id==19246
+replace morphology="8000" if record_id==19246
+replace morph=8000 if record_id==19246
+replace morphcat=1 if record_id==19246
+replace hx="LUNG CANCER" if record_id==19246
+replace lat=3 if record_id==19246
+replace latcat=13 if record_id==19246
+replace beh=3 if record_id==19246
+replace grade=9 if record_id==19246
+replace basis=0 if record_id==19246
+replace dot=dod if record_id==19246
+replace dotyear=year(dot) if record_id==19246
+replace dxyr=2015 if record_id==19246
+replace ICD10="C349" if record_id==19246
+replace ICCCcode="12b" if record_id==19246
+
+replace top="619" if record_id==19256
+replace topography=619 if record_id==19256
+replace topcat=53 if record_id==19256
+replace primarysite="PROSTATE" if record_id==19256
+replace morphology="8000" if record_id==19256
+replace morph=8000 if record_id==19256
+replace morphcat=1 if record_id==19256
+replace hx="CARCINOMA OF PROSTATE" if record_id==19256
+replace lat=0 if record_id==19256
+replace latcat=0 if record_id==19256
+replace beh=3 if record_id==19256
+replace grade=9 if record_id==19256
+replace basis=0 if record_id==19256
+replace dot=dod if record_id==19256
+replace dotyear=year(dot) if record_id==19256
+replace dxyr=2015 if record_id==19256
+replace ICD10="C61" if record_id==19256
+replace ICCCcode="12b" if record_id==19256
+
+replace top="619" if record_id==19278
+replace topography=619 if record_id==19278
+replace topcat=53 if record_id==19278
+replace primarysite="PROSTATE" if record_id==19278
+replace morphology="8000" if record_id==19278
+replace morph=8000 if record_id==19278
+replace morphcat=1 if record_id==19278
+replace hx="CARCINOMA OF PROSTATE" if record_id==19278
+replace lat=0 if record_id==19278
+replace latcat=0 if record_id==19278
+replace beh=3 if record_id==19278
+replace grade=9 if record_id==19278
+replace basis=0 if record_id==19278
+replace dot=dod if record_id==19278
+replace dotyear=year(dot) if record_id==19278
+replace dxyr=2015 if record_id==19278
+replace ICD10="C61" if record_id==19278
+replace ICCCcode="12b" if record_id==19278
+
 
 sort pid cr5id lname fname
 quietly by pid cr5id :  gen duppidcr5id = cond(_N==1,0,_n)
@@ -4604,7 +7673,7 @@ note: TS This dataset can be used for assessing number of sources per record
 sort pid cr5id lname fname
 quietly by pid :  gen dupst = cond(_N==1,0,_n)
 sort pid cr5id
-count if dupst>0 //1627
+count if dupst>0 //1627; 1646
 sort pid record_id lname fname
 //list pid cr5id dupst ,sepby(pid)
 //list pid cr5id dupst checkstatus recstatus top if dupst>0
@@ -4625,8 +7694,8 @@ label define dupsource_lab  1 "MS-Conf Tumour Rec" 2 "MS-Conf Source Rec" ///
 							5 "MS-Ineligible Tumour 1 Rec" 6 "MS-Ineligible Tumour 2~ & Source Rec" , modify
 label values dupsource dupsource_lab
 
-replace dupsource=1 if recstatus==1 & regexm(cr5id,"S1") //980 confirmed - this is the # eligible non-duplicate tumours
-replace dupsource=2 if recstatus==1 & !strmatch(strupper(cr5id), "*S1") //822 - confirmed
+replace dupsource=1 if recstatus==1 & regexm(cr5id,"S1") //980; 1137 confirmed - this is the # eligible non-duplicate tumours
+replace dupsource=2 if recstatus==1 & !strmatch(strupper(cr5id), "*S1") //822; 824 - confirmed
 replace dupsource=3 if recstatus==4 & regexm(cr5id,"S1") //106 - duplicate
 replace dupsource=4 if recstatus==4 & !strmatch(strupper(cr5id), "*S1") //7 - duplicate
 replace dupsource=5 if recstatus==3 & cr5id=="T1S1" //88 - ineligible
@@ -4656,10 +7725,23 @@ tab duppid_all ,m
           8 |          1        0.05      100.00
 ------------+-----------------------------------
       Total |      2,035      100.00
+
+ duppid_all |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |      1,201       54.74       54.74
+          2 |        653       29.76       84.50
+          3 |        265       12.08       96.58
+          4 |         58        2.64       99.23
+          5 |         13        0.59       99.82
+          6 |          2        0.09       99.91
+          7 |          1        0.05       99.95
+          8 |          1        0.05      100.00
+------------+-----------------------------------
+      Total |      2,194      100.00
 */
 
-count if recstatus==1 & cr5id=="T1S1" //939
-count if recstatus==1 & cr5id=="T2S1" //37
+count if recstatus==1 & cr5id=="T1S1" //939; 1096
+count if recstatus==1 & cr5id=="T2S1" //37; 39
 //list pid cr5id fname lname recstatus persearch duppid duppid_all if recstatus==1 & cr5id=="T2S1"
 
 ** Update persearch based on above data - note for 2015 single dataset MPs from different years count as single tumours
@@ -4728,6 +7810,10 @@ replace persearch=2 if pid=="20155094" & cr5id=="T2S1" //2015 prim; 2015 MP
 replace persearch=1 if pid=="20155094" & cr5id=="T1S1" //2015 prim; 2015 MP
 replace persearch=2 if pid=="20155104" & cr5id=="T2S1" //2015 prim; 2015 MP
 replace persearch=1 if pid=="20155104" & cr5id=="T1S1" //2015 prim; 2015 MP
+replace persearch=2 if pid=="20159029" & cr5id=="T2S1" //2015 prim-DCO; 2015 MP-DCO
+replace persearch=1 if pid=="20159029" & cr5id=="T1S1" //2015 prim-DCO; 2015 MP-DCO
+replace persearch=2 if pid=="20159116" & cr5id=="T2S1" //2015 prim-DCO; 2015 MP-DCO
+replace persearch=1 if pid=="20159116" & cr5id=="T1S1" //2015 prim-DCO; 2015 MP-DCO
 
 sort pid
 gen obsid = _n
@@ -4736,7 +7822,7 @@ by pid: generate pidobstot=_N //give total count for each pid that is duplicated
 
 sort pid obsid
 ** Now check list of only eligible non-duplicate tumours for 'true' and 'false' MPs by first & last names
-count if dupsource==1 //978
+count if dupsource==1 //978; 1137
 //list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 0, 700), sepby(pid)
 //list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 701, 1400), sepby(pid)
 //list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 1401, 2035), sepby(pid)
@@ -4774,8 +7860,8 @@ restore
 
 ** Assign person search variable
 tab persearch ,m
-replace persearch=1 if dupsource==1 & (persearch==0|persearch==.) //927
-replace persearch=3 if (dupsource>1 & dupsource<5) & (persearch==0|persearch==.) //922
+replace persearch=1 if dupsource==1 & (persearch==0|persearch==.) //927; 1081
+replace persearch=3 if (dupsource>1 & dupsource<5) & (persearch==0|persearch==.) //922; 923
 count if recstatus==4 & persearch!=3 //1 - correct it's a non-IARC MP
 count if recstatus==3 //120
 count if recstatus==3 & (persearch==0|persearch==.) //120
@@ -4800,13 +7886,13 @@ label values eidmp eidmp_lab
 tab eidmp ,m
 tab eidmp dxyr
 ** Check if eidmp below match with MPs identified on hardcopy list
-count if dupsource==1 //
+count if dupsource==1 //1137
 sort pid lname fname
 //list pid eidmp dupsource duppid cr5id fname lname if dupsource==1 
 **no corrections needed
 
 
-count //2035
+count //2035; 2194
 
 ************************
 **  Copying COD info  **
@@ -5106,17 +8192,18 @@ count if dodyear==. & _merge==5 //1
 
 ** Create variable to identify patient records
 gen ptrectot=.
-replace ptrectot=1 if eidmp==1 //971 changes
-replace ptrectot=3 if eidmp==2 //13 changes
-label define ptrectot_lab 1 "CR5 pt with single event" 2 "DCO with single event" 3 "CR5 pt with multiple events" ///
-						  4 "DCO with multiple events" 5 "CR5 pt: single event but multiple DC events" , modify
+replace ptrectot=1 if eidmp==1 //971; 1119 changes
+replace ptrectot=3 if eidmp==2 //13; 15 changes
+replace ptrectot=2 if regexm(pid, "20159") //149 changes
+label define ptrectot_lab 1 "CR5 pt with single event" 2 "DC with single event" 3 "CR5 pt with multiple events" ///
+						  4 "DC with multiple events" 5 "CR5 pt: single event but multiple DC events" , modify
 label values ptrectot ptrectot_lab
 /*
 Now check:
 	(1) patient record with T1 are included in category 3 of ptrectot but leave eidmp=single tumour so this var can be used to count MPs
 	(2) patient records with only 1 tumour but maybe labelled as T2 are not included in eidmp and are included in category 1 of ptrectot
 */
-count if eidmp==2 & dupsource==1 //11
+count if eidmp==2 & dupsource==1 //11; 13
 order pid record_id cr5id eidmp dupsource ptrectot primarysite
 //list pid eidmp dupsource duppid cr5id fname lname if eidmp==2 & dupsource==1
 
@@ -5134,25 +8221,29 @@ replace eidmp=. if pid=="20151369" & cr5id=="T1S3" //1 change
 replace ptrectot=3 if pid=="20155043" & cr5id=="T1S1" //1 change
 replace ptrectot=3 if pid=="20155094" & cr5id=="T1S1" //1 change
 replace ptrectot=3 if pid=="20155104" & cr5id=="T1S1" //1 change
+replace ptrectot=4 if pid=="20159029" //2 changes
+replace ptrectot=4 if pid=="20159116" //2 changes
+
+count if ptrectot==.
 
 ** Count # of patients with eligible non-dup tumours
-count if ptrectot==1 //962
+count if ptrectot==1 //962; 963
 
 ** Count # of eligible non-dup tumours
-count if eidmp==1 //972
+count if eidmp==1 //972; 1120
 
 ** Count # of eligible non-dup MPs
-count if eidmp==2 //10
+count if eidmp==2 //10; 12
 
 ** JC 14nov18 - I forgot about missed 2013 cases in dataset so stats for 2014 only:
 ** Count # of patients with eligible non-dup tumours
-count if ptrectot==1 & dxyr==2015 //926
+count if ptrectot==1 & dxyr==2015 //926; 927
 
 ** Count # of eligible non-dup tumours
-count if eidmp==1 & dxyr==2015 //936
+count if eidmp==1 & dxyr==2015 //936; 1074
 
 ** Count # of eligible non-dup MPs
-count if eidmp==2 & dxyr==2015 //10
+count if eidmp==2 & dxyr==2015 //10; 12
 
 /* 
 Count # of multiple source records per tumour:
@@ -5175,6 +8266,18 @@ tab pidobstot ,m //all tumours - need to drop dup sources records to assess DQI 
           8 |          8        0.31      100.00
 ------------+-----------------------------------
       Total |      2,553      100.00
+
+  pidobstot |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        548       24.98       24.98
+          2 |        776       35.37       60.35
+          3 |        621       28.30       88.65
+          4 |        180        8.20       96.86
+          5 |         55        2.51       99.36
+          6 |          6        0.27       99.64
+          8 |          8        0.36      100.00
+------------+-----------------------------------
+      Total |      2,194      100.00
 */
 
 ** Create variable to identify DCI/DCN vs DCO
@@ -5192,23 +8295,24 @@ label var dcostatus "death certificate status"
 
 order pid record_id cr5id eidmp dupsource ptrectot dcostatus primarysite
 ** Assign DCO Status=NA for all events that are not cancer 
-replace dcostatus=2 if nftype==8 //256
-replace dcostatus=2 if basis==0 //14
-replace dcostatus=4 if cancer==2 //7463 changes
-count if slc!=2 //10524
+replace dcostatus=2 if nftype==8 //256; 265
+replace dcostatus=2 if basis==0 //14; 136
+replace dcostatus=4 if cancer==2 //7463; 85 changes
+count if slc!=2 //10524; 978
 //list cr5cod if slc!=2
 replace dcostatus=6 if slc==1 //962 changes
 replace dcostatus=7 if slc==9 //0 changes
-count if dcostatus==. & cr5cod!="" //2898
-replace dcostatus=1 if cr5cod!="" & dcostatus==. & pid!="" //730 changes
-count if dcostatus==. & record_id!=. //2169
-count if dcostatus==. & pid!="" & record_id!=. //1-leave as is; it's a multiple source
+count if dcostatus==. & cr5cod!="" //2898; 755
+replace dcostatus=1 if cr5cod!="" & dcostatus==. & pid!="" //730; 755 changes
+count if dcostatus==. & record_id!=. //2169; 3
+count if dcostatus==. & pid!="" & record_id!=. //2-leave as is; it's a multiple source
 //list pid cr5id record_id basis recstatus eidmp nftype dcostatus if dcostatus==. & pid!="" & record_id!=. ,nolabel
 //replace dcostatus=5 if dcostatus==. & pid!="" & record_id!=.
-count if dcostatus==. //2189
-count if dcostatus==. & pid=="" //2168
-count if dcostatus==. & pid!="" //21
-count if dcostatus==. & pid!="" & slc==2 //5
+replace dcostatus=1 if pid=="20150468" & cr5id=="T2S1" //1 change
+count if dcostatus==. //2189; 22
+count if dcostatus==. & pid=="" //2168; 0
+count if dcostatus==. & pid!="" //21; 22
+count if dcostatus==. & pid!="" & slc==2 //5; 6
 //list pid cr5id record_id basis recstatus eidmp nftype if dcostatus==. & pid!=""
 replace dcostatus=1 if pid=="20150031" //2 changes
 replace dcostatus=1 if pid=="20150506" //2 changes
@@ -5217,15 +8321,15 @@ replace dcostatus=1 if pid=="20155213" //2 changes
 ** Remove unmatched death certificates
 count if pid=="" //9546 - deaths from all years (2008-2018)
 count if _merge==2 & pid=="" //0
-drop if pid=="" //9546 deleted
+drop if pid=="" //9546 deleted; 0 deleted
 
-count //2045
-count if dupsource==.
+count //2045; 2194
+count if dupsource==. //0
 count if eidmp==. //1062
 count if cr5id=="" //0
 
 ** Additional records have been added so need to drop these as they are duplicates created by Stata bysort/missing
-count if eidmp==1
+count if eidmp==1 //1120
 //list pid cr5id eidmp ptrectot if eidmp==1 , sepby(pid)
 drop duppidcr5id
 sort pid cr5id
@@ -5241,9 +8345,9 @@ count if duppidcr5id>0 & _merge_org==5 //10
 duplicates tag pid cr5id, gen(dup_cr5id)
 count if dup_cr5id>0 & _merge_org==5 //10
 //list pid cr5id dup_cr5id duppidcr5id _merge_org if dup_cr5id>0, nolabel sepby(pid)
-drop if dup_cr5id>0 & _merge_org==5 //10 deleted
+drop if dup_cr5id>0 & _merge_org==5 //10; 11 deleted
 
-count //2035
+count //2035; 2183
 
 tab dxyr ,m 
 tab dxyr eidmp ,m
@@ -5251,11 +8355,11 @@ tab dxyr eidmp ,m
 ** Create word doc for NS of duplicates for assessing completeness (sources per record) but want to retain this dataset
 preserve
 ** % tumours - Duplicates
-drop if dxyr!=2015 //65 deleted: removed 2008, 2013, 2014 records
+drop if dxyr!=2015 //65; 75 deleted: removed 2008, 2013, 2014 records
 gen dupdqi=.
 replace dupdqi=1 if eidmp==. & dupsource>1 & dupsource<5 //906 changes
 replace dupdqi=1 if eidmp==. & dupsource==1 //4 changes
-replace dupdqi=2 if eidmp==1 & dupsource==1 //930 changes
+replace dupdqi=2 if eidmp==1 & dupsource==1 //930; 1066 changes
 replace dupdqi=3 if dupsource==5|dupsource==6 //120 changes
 tab dupdqi ,m
 /*
@@ -5267,6 +8371,15 @@ tab dupdqi ,m
           . |         10        0.51      100.00
 ------------+-----------------------------------
       Total |      1,970      100.00
+	  
+     dupdqi |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        910       43.17       43.17
+          2 |      1,066       50.57       93.74
+          3 |        120        5.69       99.43
+          . |         12        0.57      100.00
+------------+-----------------------------------
+      Total |      2,108      100.00
 */
 tab dxyr dupdqi ,m
 replace dupdqi=2 if dupdqi==. //10 changes
@@ -5284,6 +8397,14 @@ non-duplicates |        940       47.72       93.91
    ineligibles |        120        6.09      100.00
 ---------------+-----------------------------------
          Total |      1,970      100.00
+
+        dupdqi |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+    duplicates |        910       43.17       43.17
+non-duplicates |      1,078       51.14       94.31
+   ineligibles |        120        5.69      100.00
+---------------+-----------------------------------
+         Total |      2,108      100.00
 */
 tab dupsource dupdqi ,m
 contract dupdqi, freq(count) percent(percentage)
@@ -5316,7 +8437,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-03-05_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-10-01_DQI.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -5357,7 +8478,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-03-05_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-01_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace
@@ -5378,7 +8499,7 @@ tab eidmp dxyr ,m
 tab recstatus dxyr ,m
 drop if eidmp==. //1062 deleted
 
-count //973
+count //973; 1121
 
 tab dxyr ,m
 /*
@@ -5391,31 +8512,290 @@ DiagnosisYe |
        2015 |        940       96.61      100.00
 ------------+-----------------------------------
       Total |        973      100.00
+
+DiagnosisYe |
+         ar |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2008 |          8        0.71        0.71
+       2013 |         13        1.16        1.87
+       2014 |         22        1.96        3.84
+       2015 |      1,078       96.16      100.00
+------------+-----------------------------------
+      Total |      1,121      100.00
 */
 
+tab dxyr if basis==0
+/*
+DiagnosisYe |
+         ar |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2008 |          1        0.74        0.74
+       2015 |        134       99.26      100.00
+------------+-----------------------------------
+      Total |        135      100.00
+*/
 rename record_id deathid
 
-** Save dataset with duplicates
+** Save dataset without duplicates
 label data "BNR-Cancer data - 2015 Incidence: No duplicates"
 notes _dta :These data prepared from CanReg5 CLEAN (2015BNR-C) database
 save "`datapath'\version02\2-working\2015_cancer_nodups" ,replace
-note: TS This dataset can be used for quality parameter of completeness in assessing number of sources per record
+note: TS This dataset can be used for matching with 2019 deaths
 
+
+*************************
+** 2019 Death Matching **
+*************************
+use "`datapath'\version02\2-working\2015_cancer_nodups", clear
+
+count //1122
+count if slc==2 //597
+gen match2019=1 if slc==2
+label define match2019_lab 1 "Yes" 2 "No" , modify
+label values match2019 match2019_lab
+//gen dod=dlc if slc==2 - no blanks dod if slc==2
+//format dod %tdCCYY-NN-DD
+replace natregno=subinstr(natregno,"-","",.) if regexm(natregno,"-") //0 changes
+count if natregno!="" & natregno!="." & length(natregno)!=10 //0
+
+/* frames won't work unless each obs in current frame cancer links with one obs in deaths frame
+frame rename default cancer
+frame create deaths
+frame change deaths
+use "`datapath'\version02\3-output\2015-2018_deaths_for_matching", clear
+frame change cancer
+frame put pid fname lname natregno slc dlc dod, into(deaths)
+
+frlink m:1 fname lname sex natregno, frame(deaths)
+gen ddmatch=frval(deaths,natregno)=frval(cancer,natregno)
+*/
+
+tab sex ,m
+//no need to convert sex as already F=1, M=2 in dataset
+/*
+labelbook sex_lab
+label drop sex_lab
+
+rename sex sex_old
+gen sex=1 if sex_old==2
+replace sex=2 if sex_old==1
+drop sex_old
+label define sex_lab 1 "Female" 2 "Male" 99 "ND", modify
+label values sex sex_lab
+label var sex "Sex"
+
+tab sex ,m
+*/
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+
+count //1122
+
+drop _merge
+merge m:m lname fname sex using "`datapath'\version02\3-output\2019_deaths_for_matching"
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         3,812
+        from master                     1,073  (_merge==1)
+        from using                      2,739  (_merge==2)
+
+    matched                                49  (_merge==3)
+    -----------------------------------------
+*/
+
+count //3861
+
+sort lname fname record_id pid
+quietly by lname fname :  gen duppt_2019 = cond(_N==1,0,_n)
+sort lname fname
+count if duppt_2019>0 //125
+count if duppt_2019>0 & duppid<2 //28
+count if duppt_2019>0 & duppid<2 & slc!=2 //13
+count if duppt_2019>0 & _merge==3 //2
+count if slc!=2 & _merge==3 //40
+sort lname fname pid
+order pid fname lname natregno sex age primarysite dd2019_coddeath
+//list pid record_id fname lname age dd2019_age natregno dd2019_nrn addr dd2019_address slc if slc!=2 & _merge==3, string(20)
+
+** Remove death data from records where pt doesn't match but still had merged
+replace _merge=4 if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace match2019=2 if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_coddeath="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_regnum=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_nrn=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_pname="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_age=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_dod=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cancer=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cod1a="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_address="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_parish=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_pod="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_mname="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_namematch=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_event=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_dddoa=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_ddda=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_odda="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_certtype=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_district=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_agetxt=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_nrnnd=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_mstatus=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_occu="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_durationnum=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_durationtxt=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsetnumcod1a=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsettxtcod1a=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cod1b="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsetnumcod1b=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsettxtcod1b=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cod1c="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsetnumcod1c=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsettxtcod1c=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cod1d="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsetnumcod1d=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsettxtcod1d=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cod2a="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsetnumcod2a=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsettxtcod2a=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cod2b="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsetnumcod2b=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_onsettxtcod2b=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_deathparish=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_regdate=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_certifier="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_certifieraddr="" if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_cleaned=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_recstatdc=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_duprec=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_dodyear=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+replace dd2019_dod=. if record_id==27220|record_id==29620|record_id==28380|record_id==29540|record_id==29073|record_id==30020|record_id==28269|record_id==27602
+				
+				
+sort pid lname fname
+count if nrn!=dd2019_nrn & _merge==3 //41
+//list pid record_id fname lname age dd2019_age nrn dd2019_nrn addr dd2019_address slc if nrn!=dd2019_nrn & _merge==3, string(20)
+
+replace _merge=5 if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace match2019=2 if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_coddeath="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_regnum=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_nrn=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_pname="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_age=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_dod=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cancer=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cod1a="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_address="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_parish=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_pod="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_mname="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_namematch=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_event=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_dddoa=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_ddda=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_odda="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_certtype=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_district=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_agetxt=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_nrnnd=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_mstatus=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_occu="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_durationnum=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_durationtxt=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsetnumcod1a=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsettxtcod1a=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cod1b="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsetnumcod1b=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsettxtcod1b=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cod1c="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsetnumcod1c=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsettxtcod1c=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cod1d="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsetnumcod1d=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsettxtcod1d=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cod2a="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsetnumcod2a=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsettxtcod2a=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cod2b="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsetnumcod2b=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_onsettxtcod2b=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_deathparish=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_regdate=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_certifier="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_certifieraddr="" if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_cleaned=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_recstatdc=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_duprec=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_dodyear=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+replace dd2019_dod=. if record_id==29590|record_id==29996|record_id==28242|record_id==26993|record_id==28020|record_id==29621|record_id==27520|record_id==27210
+
+** Update death data for records where pt correctly matched
+replace dod=dd2019_dod if slc!=2 & _merge==3 //32 changes
+replace slc=2 if slc!=2 & _merge==3 //32 changes
+
+
+** Check for matches by nrn and pt names
+sort nrn lname fname pid
+quietly by nrn :  gen dupnrn_2019 = cond(_N==1,0,_n)
+sort nrn
+count if dupnrn_2019>0 //3332
+sort lname fname pid record_id
+order pid record_id fname lname sex age nrn dd2019_nrn
+count if dupnrn_2019>0 & nrn!=. & nrn!=dd2019_nrn & _merge!=3 //22 - no matches (used data editor and filtered)
+//list pid record_id fname lname age dd2019_age nrn dd2019_nrn addr dd2019_address slc if dupnrn_2019>0 & nrn!=. & _merge!=3, string(38)
+** duplicate tumour found
+drop if pid=="20150008" //1 deleted
+
+drop duppt_2019
+sort lname fname record_id pid
+quietly by lname fname :  gen duppt_2019 = cond(_N==1,0,_n)
+sort lname fname
+count if duppt_2019>0 //125
+sort lname fname pid record_id
+count if duppt_2019>0 & _merge!=3 //123 - no matches (used data editor and filtered)
+** duplicate tumours found
+drop if pid=="20150051" //1 deleted
+
+
+** Remove & change certain death variables
+//drop tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf nrnyear checkage2
+replace cancer=dd2019_cancer if cancer==. & dd2019_cancer!=. //2772 changes
+drop dd2019_cancer
+//rename dds2* dd_*
+
+** Remove unmerged deaths
+count //3859
+drop if pid=="" //2739 deleted
+count //1120
+
+** Re-assign deathid / record_id
+replace deathid=record_id if deathid==. & record_id!=.
+drop record_id
+
+** Save dataset without duplicates & matched with 2019 deaths
+label data "BNR-Cancer data - 2015 Incidence: No duplicates"
+notes _dta :These data prepared from CanReg5 CLEAN (2015BNR-C) database
+save "`datapath'\version02\2-working\2015_cancer_nodups_matched" ,replace
+note: TS This dataset can be used for final cleaning
 
 *****************************
 **   Final Clean and Prep  **
 *****************************
-use "`datapath'\version02\2-working\2015_cancer_nodups" ,clear
+use "`datapath'\version02\2-working\2015_cancer_nodups_matched" ,clear
 
 
 ** Create variable called "deceased" - same as AR's 2008 dofile called '3_merge_cancer_deaths.do'
 tab slc ,m
 count if slc!=2 & dod!=. //0
-gen deceased=1 if slc==2 //451 changes
+gen deceased=1 if slc==2 //627 changes
 label var deceased "whether patient is deceased"
 label define deceased_lab 1 "dead" 2 "alive at last contact" , modify
 label values deceased deceased_lab
-replace deceased=2 if slc==1 //524 changes
+replace deceased=2 if slc==1 //493 changes
 
 tab slc deceased ,m
 
@@ -5424,22 +8804,22 @@ gen patient=.
 label var patient "cancer patient"
 label define pt_lab 1 "patient" 2 "separate event",modify
 label values patient pt_lab
-replace patient=1 if eidmp==1 //962 changes
-replace patient=2 if eidmp==2 //13 changes
+replace patient=1 if eidmp==1 //1108 changes
+replace patient=2 if eidmp==2 //12 changes
 tab patient ,m
 
 ** Convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname))))
-replace init = lower(rtrim(ltrim(itrim(init))))
-replace lname = lower(rtrim(ltrim(itrim(lname))))
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //870 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 	  
 ** Ensure death date is correct IF PATIENT IS DEAD
-count if dlc!=dod & slc==2 //18
-replace dlc=dod if dlc!=dod & slc==2 //18 changes
+count if dlc!=dod & slc==2 //48
+replace dlc=dod if dlc!=dod & slc==2 //48 changes
 format dod %dD_m_CY
 
-count if dodyear==. & dod!=. //38
-replace dodyear=year(dod) if dodyear==. & dod!=. //38 changes
+count if dodyear==. & dod!=. //70
+replace dodyear=year(dod) if dodyear==. & dod!=. //70 changes
 count if dod==. & slc==2 //0
 //list pid cr5id fname lname nftype dlc if dod==. & slc==2
 /*
@@ -5449,19 +8829,20 @@ label var cr5dodyear "Year of CR5 death"
 count if slc==2 & recstatus==3 //0
 
 ** Check for cases where cancer=2-not cancer but it has been abstracted
-count if cancer==2 & pid!="" //30
+count if cancer==2 & pid!="" //32
 sort pid deathid
-list pid deathid fname lname top cr5cod cod if cancer==2 & pid!="", nolabel string(100)
+//list pid deathid fname lname top cr5cod cod if cancer==2 & pid!="", nolabel string(90)
 //list cr5cod if cancer==2 & pid!=""
 //list cod1a if cancer==2 & pid!=""
 ** Corrections from above list
-replace cod=1 if pid=="20151023"|pid=="20151039"|pid=="20151050"|pid=="20151095"|pid=="20151113"|pid=="20151278 "|pid=="20155201" //6 changes
-replace cancer=1 if pid=="20151113"|pid=="20151278"|pid=="20155201" //3 changes
+replace cod=1 if pid=="20150063"|pid=="20150351"|pid=="20151023"|pid=="20151039"|pid=="20151050"| ///
+				 pid=="20151095"|pid=="20151113"|pid=="20151278 "|pid=="20155201" //8 changes
+replace cancer=1 if pid=="20150063"|pid=="20150351"|pid=="20151039"|pid=="20151095"|pid=="20151113"|pid=="20151278"|pid=="20155201" //7 changes
 //replace dcostatus=1 if pid=="20140047" //1 change
 preserve
 drop if basis!=0
 keep pid fname lname natregno dod cr5cod doctor docaddr certifier
-capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier using "`datapath'\version02\2-working\DCO2015V03.xlsx", sheet("2015 DCOs_cr5data_20200218") firstrow(variables)
+capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier using "`datapath'\version02\2-working\DCO2015V04.xlsx", sheet("2015 DCOs_cr5data_20200902") firstrow(variables)
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 
@@ -5523,6 +8904,10 @@ Results of IARC MP Program:
 	24 MPs (multiple tumours)
 	 0 Duplicate registration
 */
+/*
+Convert ICD-O-3 DCOs (153) to ICD10, ICCCcode:
+
+*/
 ** Below updates from warnings/errors report
 replace grade=9 if pid=="20151100"
 replace grade=9 if pid=="20155222"
@@ -5550,7 +8935,9 @@ replace persearch=1 if pid=="20151369" //1 change
 tab basis ,m
 ** Re-assign dcostatus for cases with updated death trace-back: still pending as of 19feb2020 TBD by NS
 tab dcostatus ,m
-replace dcostatus=1 if pid=="20150468" & dcostatus==. //1 change
+replace dcostatus=1 if pid=="20150468" & dcostatus==. //1 change; 0 changes
+count if dcostatus==2 & basis!=0
+//list pid basis if dcostatus==2 & basis!=0 - autopsy w/ hx
 /*
 replace basis=1 if pid=="20140672" & cr5id=="T2S1"
 replace dcostatus=1 if pid=="20140672" & cr5id=="T2S1"
@@ -5574,7 +8961,7 @@ replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*9999*")) /
 ** Check electoral list and CR5db for those resident=99
 //list pid fname lname nrn natregno dob if resident==99
 //list pid fname lname addr if resident==99
-tab resident ,m //15 missing
+tab resident ,m //15 unknown
 
 ** Check parish
 count if parish!=. & parish!=99 & addr=="" //0
@@ -5622,9 +9009,9 @@ count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //0
 gen age2 = (dot - dob)/365.25
 gen checkage2=int(age2)
 drop age2
-count if dob!=. & dot!=. & age!=checkage2 //3
+count if dob!=. & dot!=. & age!=checkage2 //3; 13
 //list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2
-replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //3 changes
+replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //13 changes
 
 ** Check no missing dxyr so this can be used in analysis
 tab dxyr ,m //0 missing
@@ -5635,11 +9022,12 @@ replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
 //replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
 replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
-count //969
+count //1117
 
 ** Updates to non-2015 dx
-** First check in 2008_2013_2014_cancer_nonsurvival_nonreportable.dta if to keep/remove them
-//list pid cr5id fname lname primarysite morph dxyr if dxyr!=2015
+** First check in 2008_2013_2014_cancer_nonsurvival_bnr_reportable.dta if to keep/remove them
+count if dxyr!=2015 //43
+//list pid cr5id fname lname primarysite morph dxyr slc dlc dot if dxyr!=2015
 drop if pid=="20080292"|pid=="20080563"|pid=="20140817"|pid=="20141288" & cr5id=="T1S1" //4 deleted
 
 ** Create new site variable with CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
@@ -5678,7 +9066,7 @@ label var siteiarc "IARC CI5-XI sites"
 label values siteiarc siteiarc_lab
 
 replace siteiarc=1 if regexm(icd10,"C00") //0 changes
-replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //6 changes
+replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //7 changes
 replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //4 changes
 replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //2 changes
 replace siteiarc=5 if regexm(icd10,"C09") //4 changes
@@ -5687,63 +9075,63 @@ replace siteiarc=7 if regexm(icd10,"C11") //5 changes
 replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //0 changes
 replace siteiarc=9 if regexm(icd10,"C14") //1 change
 replace siteiarc=10 if regexm(icd10,"C15") //12 changes
-replace siteiarc=11 if regexm(icd10,"C16") //29 changes
-replace siteiarc=12 if regexm(icd10,"C17") //7 changes
-replace siteiarc=13 if regexm(icd10,"C18") //101 changes
-replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //45 changes
+replace siteiarc=11 if regexm(icd10,"C16") //37 changes
+replace siteiarc=12 if regexm(icd10,"C17") //8 changes
+replace siteiarc=13 if regexm(icd10,"C18") //117 changes
+replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //49 changes
 replace siteiarc=15 if regexm(icd10,"C21") //6 changes
-replace siteiarc=16 if regexm(icd10,"C22") //3 changes
-replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //8 changes
-replace siteiarc=18 if regexm(icd10,"C25") //16 changes
+replace siteiarc=16 if regexm(icd10,"C22") //7 changes
+replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //12 changes
+replace siteiarc=18 if regexm(icd10,"C25") //27 changes
 replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //2 changes
 replace siteiarc=20 if regexm(icd10,"C32") //7 changes
-replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //26 changes
+replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //32 changes
 replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //1 change
 replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
-replace siteiarc=24 if regexm(icd10,"C43") //9 changes
+replace siteiarc=24 if regexm(icd10,"C43") //10 changes
 replace siteiarc=25 if regexm(icd10,"C44") //0 changes
 replace siteiarc=26 if regexm(icd10,"C45") //0 changes
 replace siteiarc=27 if regexm(icd10,"C46") //0 changes
-replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //4 changes
-replace siteiarc=29 if regexm(icd10,"C50") //194 changes
+replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //5 changes
+replace siteiarc=29 if regexm(icd10,"C50") //209 changes
 replace siteiarc=30 if regexm(icd10,"C51") //2 changes
-replace siteiarc=31 if regexm(icd10,"C52") //3 changes
-replace siteiarc=32 if regexm(icd10,"C53") //16 changes
-replace siteiarc=33 if regexm(icd10,"C54") //44 changes
-replace siteiarc=34 if regexm(icd10,"C55") //5 changes
-replace siteiarc=35 if regexm(icd10,"C56") //18 changes
+replace siteiarc=31 if regexm(icd10,"C52") //4 changes
+replace siteiarc=32 if regexm(icd10,"C53") //19 changes
+replace siteiarc=33 if regexm(icd10,"C54") //46 changes
+replace siteiarc=34 if regexm(icd10,"C55") //7 changes
+replace siteiarc=35 if regexm(icd10,"C56") //19 changes
 replace siteiarc=36 if regexm(icd10,"C57") //2 changes
 replace siteiarc=37 if regexm(icd10,"C58") //0 changes
 replace siteiarc=38 if regexm(icd10,"C60") //1 change
-replace siteiarc=39 if regexm(icd10,"C61") //191 changes
+replace siteiarc=39 if regexm(icd10,"C61") //228 changes
 replace siteiarc=40 if regexm(icd10,"C62") //2 changes
 replace siteiarc=41 if regexm(icd10,"C63") //0 changes
-replace siteiarc=42 if regexm(icd10,"C64") //16 changes
+replace siteiarc=42 if regexm(icd10,"C64") //17 changes
 replace siteiarc=43 if regexm(icd10,"C65") //0 changes
 replace siteiarc=44 if regexm(icd10,"C66") //1 change
-replace siteiarc=45 if regexm(icd10,"C67") //14 changes
+replace siteiarc=45 if regexm(icd10,"C67") //17 changes
 replace siteiarc=46 if regexm(icd10,"C68") //1 change
-replace siteiarc=47 if regexm(icd10,"C69") //1 change
-replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //8 changes
-replace siteiarc=49 if regexm(icd10,"C73") //11 changes
+replace siteiarc=47 if regexm(icd10,"C69") //2 changes
+replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
+replace siteiarc=49 if regexm(icd10,"C73") //12 changes
 replace siteiarc=50 if regexm(icd10,"C74") //0 changes
 replace siteiarc=51 if regexm(icd10,"C75") //0 changes
 replace siteiarc=52 if regexm(icd10,"C81") //6 changes
-replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //27 changes
+replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //30 changes
 replace siteiarc=54 if regexm(icd10,"C88") //0 changes
-replace siteiarc=55 if regexm(icd10,"C90") //26 changes
-replace siteiarc=56 if regexm(icd10,"C91") //6 changes
+replace siteiarc=55 if regexm(icd10,"C90") //32 changes
+replace siteiarc=56 if regexm(icd10,"C91") //5 changes
 replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //6 changes
-replace siteiarc=58 if regexm(icd10,"C95") //2 changes
+replace siteiarc=58 if regexm(icd10,"C95") //4 changes
 replace siteiarc=59 if morphcat==54|morphcat==55 //6 changes
-replace siteiarc=60 if morphcat==56 //4 changes
-replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //31 changes
+replace siteiarc=60 if morphcat==56 //6 changes
+replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //40 changes
 **replace siteiarc=62 if siteiarc<62
 **replace siteiarc=63 if siteiarc<62 & siteiarc!=25
 replace siteiarc=64 if morph==8077 //18 changes
 
 tab siteiarc ,m //1 missing
-//list pid cr5id top morph icd10 if siteiarc==.
+//list pid cr5id primarysite top hx morph icd10 if siteiarc==.
 replace iccc="11f" if pid=="20150298" & cr5id=="T1S1" //1 change
 replace icd10="C059" if pid=="20150298" & cr5id=="T1S1" //1 change
 replace siteiarc=3 if pid=="20150298" & cr5id=="T1S1" //1 change
@@ -5779,25 +9167,30 @@ label var siteiarchaem "IARC CI5-XI lymphoid & haem diseases"
 label values siteiarchaem siteiarchaem_lab
 
 ** Note that morphcat is based on ICD-O-3 edition 3.1. so e.g. morphcat54
-replace siteiarchaem=1 if morphcat==41 //8 changes
-replace siteiarchaem=2 if morphcat==42 //2 changes
-replace siteiarchaem=3 if morphcat==43 //8 changes
-replace siteiarchaem=4 if morphcat==44 //2 changes
+replace siteiarchaem=1 if morphcat==41 //7 changes
+replace siteiarchaem=2 if morphcat==42 //6 changes
+replace siteiarchaem=3 if morphcat==43 //16 changes
+replace siteiarchaem=4 if morphcat==44 //5 changes
 replace siteiarchaem=5 if morphcat==45 //1 change
-replace siteiarchaem=6 if morphcat==46 //33 changes
+replace siteiarchaem=6 if morphcat==46 //32 changes
 replace siteiarchaem=7 if morphcat==47 //0 changes
 replace siteiarchaem=8 if morphcat==48 //0 changes
 replace siteiarchaem=9 if morphcat==49 //0 changes
 replace siteiarchaem=10 if morphcat==50 //4 changes
-replace siteiarchaem=11 if morphcat==51 //6 changes
-replace siteiarchaem=12 if morphcat==52 //5 changes
+replace siteiarchaem=11 if morphcat==51 //5 changes
+replace siteiarchaem=12 if morphcat==52 //6 changes
 replace siteiarchaem=13 if morphcat==53 //0 changes
-replace siteiarchaem=14 if morphcat==54 //0 changes
-replace siteiarchaem=15 if morphcat==55 //3 changes
-replace siteiarchaem=16 if morphcat==56 //1 change
+replace siteiarchaem=14 if morphcat==54 //5 changes
+replace siteiarchaem=15 if morphcat==55 //1 change
+replace siteiarchaem=16 if morphcat==56 //6 changes
 
 tab siteiarchaem ,m //882 missing - correct!
-count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //0
+count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //1
+//list pid cr5id primarysite top hx morph morphcat iccc icd10 if (siteiarc>51 & siteiarc<59) & siteiarchaem==.
+replace iccc="12b" if pid=="20159040" & cr5id=="T1S1" //0 changes
+replace icd10="C80" if pid=="20159040" & cr5id=="T1S1" //1 change
+replace siteiarchaem=15 if pid=="20159040" & cr5id=="T1S1" //1 change
+
 
 ** Create ICD-10 groups according to analysis tables in CR5 db (added after analysis dofiles 4,6)
 gen sitecr5db=.
@@ -5843,42 +9236,43 @@ replace sitecr5db=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C0
 					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
 					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
 					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //34 changes
-replace sitecr5db=2 if regexm(icd10,"C15") //11 changes
-replace sitecr5db=3 if regexm(icd10,"C16") //23 changes
-replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //164 changes
-replace sitecr5db=5 if regexm(icd10,"C22") //13 changes
-replace sitecr5db=6 if regexm(icd10,"C25") //23 changes
-replace sitecr5db=7 if regexm(icd10,"C32") //9 changes
-replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //43 changes
-replace sitecr5db=9 if regexm(icd10,"C43") //7 changes
-replace sitecr5db=10 if regexm(icd10,"C50") //174 changes
-replace sitecr5db=11 if regexm(icd10,"C53") //21 changes
-replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //49 changes
-replace sitecr5db=13 if regexm(icd10,"C56") //9 changes
-replace sitecr5db=14 if regexm(icd10,"C61") //216 changes
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //26 changes
+replace sitecr5db=2 if regexm(icd10,"C15") //12 changes
+replace sitecr5db=3 if regexm(icd10,"C16") //37 changes
+replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //172 changes
+replace sitecr5db=5 if regexm(icd10,"C22") //7 changes
+replace sitecr5db=6 if regexm(icd10,"C25") //27 changes
+replace sitecr5db=7 if regexm(icd10,"C32") //7 changes
+replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //32 changes
+replace sitecr5db=9 if regexm(icd10,"C43") //10 changes
+replace sitecr5db=10 if regexm(icd10,"C50") //209 changes
+replace sitecr5db=11 if regexm(icd10,"C53") //19 changes
+replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //53 changes
+replace sitecr5db=13 if regexm(icd10,"C56") //19 changes
+replace sitecr5db=14 if regexm(icd10,"C61") //228 changes
 replace sitecr5db=15 if regexm(icd10,"C62") //2 changes
-replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //12 changes
-replace sitecr5db=17 if regexm(icd10,"C67") //25 changes
-replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //6 changes
-replace sitecr5db=19 if regexm(icd10,"C73") //11 changes
-replace sitecr5db=20 if siteiarc==61 //51 changes
-replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //54 changes
+replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //19 changes
+replace sitecr5db=17 if regexm(icd10,"C67") //17 changes
+replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
+replace sitecr5db=19 if regexm(icd10,"C73") //12 changes
+replace sitecr5db=20 if siteiarc==61 //40 changes
+replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //67 changes
 replace sitecr5db=22 if (regexm(icd10,"C91")|regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")) //15 changes
-replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //14 changes
-replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //5 changes
-replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //12 changes
+replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //20 changes
+replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //2 changes
+replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //7 changes
 replace sitecr5db=26 if siteiarc==25 //0 changes
-replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //5 changes
-replace sitecr5db=28 if (regexm(icd10,"C60")|regexm(icd10,"C63")) //3 changes
-replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //1 change
-replace sitecr5db=30 if siteiarc==59 //3 changes
-replace sitecr5db=31 if siteiarc==60 //1 change
-replace sitecr5db=32 if siteiarc==64 //24 changes
-replace sitecr5db=33 if (regexm(icd10,"C38")|regexm(icd10,"C69")) //2 changes
+replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //8 changes
+replace sitecr5db=28 if (regexm(icd10,"C60")|regexm(icd10,"C63")) //1 change
+replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //0 changes
+replace sitecr5db=30 if siteiarc==59 //6 changes
+replace sitecr5db=31 if siteiarc==60 //6 changes
+replace sitecr5db=32 if siteiarc==64 //18 changes
+replace sitecr5db=33 if (regexm(icd10,"C38")|regexm(icd10,"C69")) //3 changes
 
 tab sitecr5db ,m
 //list pid cr5id top morph icd10 if sitecr5db==.
+replace sitecr5db=21 if pid=="20159040" & cr5id=="T1S1" //1 change
 
 
 ***********************
@@ -5912,33 +9306,34 @@ replace siteicd10=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C0
 					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
 					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
 					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //34 changes
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //26 changes
 replace siteicd10=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
 					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
 					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
-					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) // changes
-replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //57 changes
-replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //3 changes
-replace siteicd10=5 if siteiarc==24 //7 changes
+					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) //280 changes
+replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //42 changes
+replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
+replace siteicd10=5 if siteiarc==24 //10 changes
 replace siteicd10=6 if siteiarc==25 //0 changes
-replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //12 changes
-replace siteicd10=8 if regexm(icd10,"C50") //174 changes
-replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //14 changes
-replace siteicd10=10 if regexm(icd10,"C61") //216 changes
-replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //5 changes
-replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //37 changes
-replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //6 changes
+replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //6 changes
+replace siteicd10=8 if regexm(icd10,"C50") //209 changes
+replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //99 changes
+replace siteicd10=10 if regexm(icd10,"C61") //228 changes
+replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //3 changes
+replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //36 changes
+replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //13 changes
 replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //12 changes
-replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //3 changess
-replace siteicd10=16 if regexm(icd10,"C80") //43 changes
+replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //0 changess
+replace siteicd10=16 if regexm(icd10,"C80") //35 changes
 replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
 					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
 					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
 					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
-					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")|regexm(icd10,"C96")) //34 changes
+					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")|regexm(icd10,"C96")) //82 changes
 
 
 tab siteicd10 ,m // missing - CIN3, beh /0,/1,/2 and MPDs
+//list pid cr5id top morph icd10 if siteicd10==.
 
 ** Check non-2015 dxyrs are reportable
 count if resident==2 & dxyr!=2015 //0
@@ -5957,7 +9352,7 @@ tab dxyr ,m
 preserve
 drop if dxyr!=2008
 list pid dot
-count //4
+count //4; 6
 
 save "`datapath'\version02\2-working\2008_cancer_nonsurvival_2015extras", replace
 label data "2015 BNR-Cancer analysed data - 2008 Cases"
@@ -5969,7 +9364,7 @@ restore
 preserve
 drop if dxyr!=2013
 list pid dot
-count //10
+count //10; 13
 
 save "`datapath'\version02\2-working\2013_cancer_nonsurvival_2015extras", replace
 label data "2015 BNR-Cancer analysed data - 2013 Cases"
@@ -5980,7 +9375,7 @@ restore
 preserve
 drop if dxyr!=2014
 list pid dot
-count //14
+count //14; 20
 
 save "`datapath'\version02\2-working\2014_cancer_nonsurvival_2015extras", replace
 label data "2015 BNR-Cancer analysed data - 2014 Cases"
@@ -5988,16 +9383,17 @@ note: This dataset was used for 2015 annual report
 restore
 
 ** Remove reportable-non-2015 dx
-drop if dxyr!=2015 //28 deleted
+drop if dxyr!=2015 //28; 39 deleted
 
-count //937
+count //1074
 
+** JC 30-Sep-2020: NS + SF want to switch back non-reportable and reportable datasets so I've described the datasets instead of using non-reportable vs reportable
 ** Save this corrected dataset with non-reportable cases
-save "`datapath'\version02\2-working\2015_cancer_nonsurvival_nonreportable", replace
-label data "2015 BNR-Cancer analysed data - Non-survival Non-reportable Dataset"
+save "`datapath'\version02\2-working\2015_cancer_nonsurvival_bnr_reportable", replace
+label data "2015 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 
-** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
+** Removing cases not included for international reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
 duplicates tag pid, gen(dup_id)
 list pid cr5id if persearch==1 & (resident==2|resident==99|recstatus==3|sex==9|beh!=3|siteiarc==25), nolabel sepby(pid)
 drop if resident==2 //0 deleted - nonresident
@@ -6019,40 +9415,38 @@ tab eidmp ,m
      CR5 tumour |
          events |      Freq.     Percent        Cum.
 ----------------+-----------------------------------
-  single tumour |        894       98.89       98.89
-multiple tumour |         10        1.11      100.00
+  single tumour |      1,029       98.85       98.85
+multiple tumour |         12        1.15      100.00
 ----------------+-----------------------------------
-          Total |        904      100.00
+          Total |      1,041      100.00
 */
 tab persearch ,m
 /*
-
               Person Search |      Freq.     Percent        Cum.
 ----------------------------+-----------------------------------
-                   Done: OK |        894       98.89       98.89
-                   Done: MP |         10        1.11      100.00
+                   Done: OK |      1,029       98.85       98.85
+                   Done: MP |         12        1.15      100.00
 ----------------------------+-----------------------------------
-                      Total |        904      100.00
+                      Total |      1,041      100.00
 */
 
-count //904
+count //1041
 
-** Save this corrected dataset with only reportable cases
-save "`datapath'\version02\2-working\2015_cancer_nonsurvival", replace
-label data "2015 BNR-Cancer analysed data - Non-survival Reportable Dataset"
-note: TS This dataset was used for 2015 annual report
+** Save this corrected dataset with only int'l reportable cases
+save "`datapath'\version02\2-working\2015_cancer_nonsurvival_intl_reportable", replace
+label data "2015 BNR-Cancer analysed data - Non-survival International Reportable Dataset"
+note: TS This dataset was NOT used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
 clear
-
 
 *************************************************
 ** 2008, 2013, 2014, 2015 Non-survival Dataset **
 *************************************************
 ** This done before 2015 data prepared so can be used by NS at CARPHA
 ** Load the dataset (2008-2013-2014)
-use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", replace
-count //2417
+use "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival_bnr_reportable", replace
+count //2417; 2961
 ** 20130414 didn't merge with death 18963 from previous merge when 2014 annual report was done
 preserve
 drop if pid!="20130414"
@@ -6096,29 +9490,30 @@ replace dcostatus=5 if pid=="20130414"
 format dd_dod %tdCCYY-NN-DD
 
 append using "`datapath'\version02\2-working\2008_cancer_nonsurvival_2015extras" ,force
-count //2421
+count //2421; 2423; 2967
 append using "`datapath'\version02\2-working\2013_cancer_nonsurvival_2015extras" ,force
-count //2431
+count //2431; 2436; 2980
 append using "`datapath'\version02\2-working\2014_cancer_nonsurvival_2015extras" ,force
-count //2445
-append using "`datapath'\version02\2-working\2015_cancer_nonsurvival" ,force
-count //3349
+count //2445; 2456; 3000
+append using "`datapath'\version02\2-working\2015_cancer_nonsurvival_bnr_reportable" ,force
+count //3349; 3530; 4074
 
 tab dxyr ,m
-/*DiagnosisYe |
+/*
+DiagnosisYe |
          ar |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-       2008 |        807       24.10       24.10
-       2013 |        796       23.77       47.87
-       2014 |        842       25.14       73.01
-       2015 |        904       26.99      100.00
+       2008 |      1,217       29.87       29.87
+       2013 |        883       21.67       51.55
+       2014 |        900       22.09       73.64
+       2015 |      1,074       26.36      100.00
 ------------+-----------------------------------
-      Total |      3,349      100.00
+      Total |      4,074      100.00
 */
 
-replace dd_coddeath=cod1a_cancer if (dd_coddeath==""|dd_coddeath=="99") & cod1a_cancer!="" & cod1a_cancer!="99" //1477 changes
-replace cr5cod=dd_coddeath if (cr5cod==""|cr5cod=="99") & dd_coddeath!="" & dd_coddeath!="99" //1123 changes
-replace cod1a_cancer=dd_coddeath if (cod1a_cancer==""|cod1a_cancer=="99") & dd_coddeath!="" & dd_coddeath!="99" //466 changes
+replace dd_coddeath=cod1a_cancer if (dd_coddeath==""|dd_coddeath=="99") & cod1a_cancer!="" & cod1a_cancer!="99" //1477; 1575 changes
+replace cr5cod=dd_coddeath if (cr5cod==""|cr5cod=="99") & dd_coddeath!="" & dd_coddeath!="99" //1123; 1217 changes
+replace cod1a_cancer=dd_coddeath if (cod1a_cancer==""|cod1a_cancer=="99") & dd_coddeath!="" & dd_coddeath!="99" //482; 614; 619 changes
 
 ** Updates to 2013 cases found during 2015 reviews
 replace dlc=d(19may2015) if pid=="20130804" //1 change
@@ -6131,11 +9526,11 @@ drop dupnrn
 sort natregno lname fname pid
 quietly by natregno :  gen dupnrn = cond(_N==1,0,_n)
 sort natregno
-count if dupnrn>0 //153 - check pid in Stata results then primarysite & cod1a in Stata data editor
-count if dupnrn>0 & !(strmatch(strupper(natregno), "*9999*")) //133
+count if dupnrn>0 //153; 167; 466 - check pid in Stata results then primarysite & cod1a in Stata data editor
+count if dupnrn>0 & !(strmatch(strupper(natregno), "*9999*")) //133; 135; 251
 sort lname fname pid
 order pid fname lname natregno sex age primarysite cod1a
-//list pid cr5id deathid fname lname natregno sex age persearch namematch dxyr if dupnrn>0 & !(strmatch(strupper(natregno), "*9999*")) ,sepby(pid)
+//list pid cr5id deathid fname lname sex age persearch eidmp namematch dxyr if dupnrn>0 & !(strmatch(strupper(natregno), "*9999*")) ,sepby(pid)
 
 ** Duplicate pt; duplicate tumour found - compare in Stata data editor and update and remove accordingly
 ** 5 missed merges
@@ -6213,6 +9608,39 @@ replace str_grade="3" if pid=="20155104" & cr5id=="T1S1" //1 change
 replace iccc="11f" if pid=="20155104" & cr5id=="T1S1" //1 change
 replace icd10="C161" if pid=="20155104" & cr5id=="T1S1" //1 change
 drop if pid=="20150275" //1 deleted
+
+replace eidmp=2 if pid=="20130885" & cr5id=="T2S1" //1 change
+replace persearch=2 if pid=="20130885" & cr5id=="T2S1" //1 change
+replace ptrectot=3 if pid=="20130885" & cr5id=="T2S1" //1 change
+replace patient=2 if pid=="20130885" & cr5id=="T2S1" //1 change
+replace mpseq=2 if pid=="20130885" & cr5id=="T2S1" //1 change
+replace mptot=2 if pid=="20130885" & cr5id=="T2S1" //1 change
+replace mpseq=1 if pid=="20130885" & cr5id=="T1S1" //0 changes
+replace mptot=2 if pid=="20130885" & cr5id=="T1S1" //1 change
+replace dlc=dod if pid=="20130885" & cr5id=="T1S1" //1 change
+
+replace eidmp=2 if pid=="20080048" & cr5id=="T2S1" //1 change
+replace persearch=2 if pid=="20080048" & cr5id=="T2S1" //1 change
+replace ptrectot=3 if pid=="20080048" & cr5id=="T2S1" //1 change
+replace patient=2 if pid=="20080048" & cr5id=="T2S1" //1 change
+replace mpseq=2 if pid=="20080048" & cr5id=="T2S1" //1 change
+replace mptot=2 if pid=="20080048" & cr5id=="T2S1" //1 change
+replace mpseq=1 if pid=="20080048" & cr5id=="T1S1" //0 changes
+replace mptot=2 if pid=="20080048" & cr5id=="T1S1" //1 change
+replace dlc=d(10dec2018) if pid=="20080048" & cr5id=="T1S1" //1 change
+
+replace dlc=dod if pid=="20130414" & cr5id=="T1S1" //1 change
+drop if pid=="20159137" //1 deleted - duplicate of above pid
+
+replace eidmp=2 if pid=="20080679" & cr5id=="T2S1" //1 change
+replace persearch=2 if pid=="20080679" & cr5id=="T2S1" //1 change
+replace ptrectot=3 if pid=="20080679" & cr5id=="T2S1" //1 change
+replace patient=2 if pid=="20080679" & cr5id=="T2S1" //1 change
+replace mpseq=2 if pid=="20080679" & cr5id=="T2S1" //1 change
+replace mptot=2 if pid=="20080679" & cr5id=="T2S1" //1 change
+replace mpseq=1 if pid=="20080679" & cr5id=="T1S1" //0 changes
+replace mptot=2 if pid=="20080679" & cr5id=="T1S1" //1 change
+replace dlc=d(14aug2015) if pid=="20080679" & cr5id=="T1S1" //1 change
 
 drop if pid=="20150292" //1 deleted
 
@@ -6298,8 +9726,8 @@ drop duppt
 sort lname fname pid
 quietly by lname fname :  gen duppt = cond(_N==1,0,_n)
 sort lname fname pid
-count if duppt>0 //184 - check pid in Stata results then  primarysite & cod1a in Stata data editor for ones not matched in above 
-//list pid cr5id fname lname natregno sex age top eidmp persearch ptrectot patient namematch dxyr if duppt>0 ,sepby(pid) string(20)
+count if duppt>0 //184; 190; 364 - check pid in Stata results then primarysite & cod1a in Stata data editor for ones not matched in above 
+//list pid cr5id fname lname natregno sex age top eidmp persearch ptrectot patient namematch dxyr if duppt>0 ,sepby(pid) string(10)
 order pid fname lname natregno sex age primarysite cod1a
 //list pid deathid fname lname natregno sex age persearch nm if duppt>0
 rename namematch nm
@@ -6311,6 +9739,9 @@ replace nm=1 if pid=="20140907"
 replace nm=1 if pid=="20155203"
 replace nm=1 if pid==""
 drop if pid=="20150287" //1 deleted; duplicate of pid=20150112
+drop if pid=="20150268" //1 deleted; duplicate of 20145044
+replace nm=1 if pid=="20150112"
+replace nm=1 if pid=="20150287"
 replace nm=1 if pid=="20150297"
 replace nm=1 if pid=="20130079"
 replace nm=1 if pid=="20155152"
@@ -6340,7 +9771,7 @@ replace nm=1 if pid=="20150498"
 replace nm=1 if pid=="20080132"
 replace nm=1 if pid=="20151244"
 replace nm=. if pid=="20140077"
-replace nm=1 if pid=="20080827 "
+replace nm=1 if pid=="20080827"
 replace nm=1 if pid=="20150403"
 replace ptrectot=3 if pid=="20080567" & cr5id=="T2S1"
 replace patient=2 if pid=="20080567" & cr5id=="T2S1"
@@ -6350,7 +9781,7 @@ replace eidmp=2 if pid=="20080567" & cr5id=="T2S1"
 count if eidmp==. //0
 count if patient==2 & eidmp!=2 //0
 count if patient==1 & eidmp!=1 //0
-count if eidmp!=2 & ptrectot==3 //22
+count if eidmp!=2 & ptrectot==3 //22; 28
 sort pid lname fname
 order pid cr5id fname lname patient eidmp ptrectot dcostatus
 //list pid cr5id fname lname patient eidmp ptrectot dcostatus if eidmp!=2 & ptrectot==3
@@ -6358,6 +9789,30 @@ replace patient=1 if pid=="20080215" & cr5id=="T1S1"
 replace eidmp=1 if pid=="20080215" & cr5id=="T1S1"
 replace patient=2 if pid=="20080215" & cr5id=="T3S1"
 replace eidmp=2 if pid=="20080215" & cr5id=="T3S1"
+replace patient=1 if pid=="20080381" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080381" & cr5id=="T1S1"
+replace patient=2 if pid=="20080381" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080381" & cr5id=="T2S1"
+replace patient=1 if pid=="20080460" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080460" & cr5id=="T1S1"
+replace patient=2 if pid=="20080460" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080460" & cr5id=="T2S1"
+replace patient=1 if pid=="20080662" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080662" & cr5id=="T1S1"
+replace patient=2 if pid=="20080662" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080662" & cr5id=="T2S1"
+replace patient=1 if pid=="20080733" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080733" & cr5id=="T1S1"
+replace patient=2 if pid=="20080733" & cr5id=="T4S1"
+replace eidmp=2 if pid=="20080733" & cr5id=="T4S1"
+replace patient=1 if pid=="20080738" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080738" & cr5id=="T1S1"
+replace patient=2 if pid=="20080738" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080738" & cr5id=="T2S1"
+replace patient=1 if pid=="20080739" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080739" & cr5id=="T1S1"
+replace patient=2 if pid=="20080739" & cr5id=="T3S1"
+replace eidmp=2 if pid=="20080739" & cr5id=="T3S1"
 replace ptrectot=1 if pid=="20080705"
 replace ptrectot=1 if pid=="20140077" & cr5id=="T1S1"
 replace ptrectot=1 if pid=="20140176" & cr5id=="T1S1"
@@ -6387,21 +9842,27 @@ count if patient==1 & ptrectot==3 //0
 
 ** Check ptrectot
 count if ptrectot==. //0
-count if ptrectot==1 & eidmp==2 //7
-count if patient==2 & ptrectot==1 //7
+count if ptrectot==1 & eidmp==2 //7; 8
+count if patient==2 & ptrectot==1 //7; 8
 //list pid cr5id fname lname patient eidmp ptrectot dcostatus if ptrectot==1 & eidmp==2
 //list pid cr5id fname lname patient eidmp ptrectot dcostatus if patient==2 & ptrectot==1
-replace ptrectot=3 if ptrectot==1 & eidmp==2 //7 changes
+replace ptrectot=3 if ptrectot==1 & eidmp==2 //7; 8 changes
 
 ** Check persearch
 count if persearch==. //0
-count if persearch==1 & eidmp==2 //2
+count if persearch==1 & eidmp==2 //2; 8
 count if persearch==2 & eidmp==1 //1
 //list pid cr5id fname lname patient eidmp ptrectot dcostatus persearch if persearch==1 & eidmp==2
 //list pid cr5id fname lname patient eidmp ptrectot dcostatus persearch if persearch==2 & eidmp==1
 replace persearch=2 if pid=="20080567" & cr5id=="T2S1" //1 change
 replace persearch=2 if pid=="20080215" & cr5id=="T3S1" //1 change
 replace persearch=1 if pid=="20080215" & cr5id=="T1S1" //1 change
+replace persearch=2 if pid=="20080381" & cr5id=="T2S1" //1 change
+replace persearch=2 if pid=="20080460" & cr5id=="T2S1" //1 change
+replace persearch=2 if pid=="20080662" & cr5id=="T2S1" //1 change
+replace persearch=2 if pid=="20080733" & cr5id=="T4S1" //1 change
+replace persearch=2 if pid=="20080738" & cr5id=="T2S1" //1 change
+replace persearch=2 if pid=="20080739" & cr5id=="T3S1" //1 change
 
 ** Check dcostatus
 count if dcostatus==. //0
@@ -6491,6 +9952,7 @@ replace eidmp=2 if pid=="20151020" & cr5id=="T3S1"
 replace persearch=2 if pid=="20151020" & cr5id=="T3S1"
 
 tab persearch ,m
+replace persearch=4 if persearch==5 //18 changes
 
 ** Update mpseq mptot - 20080295 already corrected!
 /*
@@ -6513,7 +9975,7 @@ count if parish==. & addr!="" & addr!="99" //0
 tab sex ,m //none missing
 
 ** Check for missing age & 100+
-tab age ,m //none missing - 4 are 100+; 2 are 0 age
+tab age ,m //3 missing - 4 are 100+; 2 are 0 age
 
 ** Check for missing follow-up
 tab slc ,m //none missing
@@ -6523,7 +9985,7 @@ tab deceased ,m //none missing and parallels slc correctly
 //list pid if slc==99
 
 ** Check DCOs
-tab basis ,m //145
+tab basis ,m //146; 267; 272
 ** Re-assign dcostatus for cases with updated death trace-back
 tab dcostatus ,m
 //list pid basis dcostatus if basis==0 & dcostatus!=2
@@ -6531,7 +9993,7 @@ count if basis!=0 & dcostatus==2 //4-correct as autop w/ hx
 replace dcostatus=2 if basis==0
 //list pid cr5id basis dcostatus if basis!=0 & dcostatus==2
 
-replace dcostatus=1 if slc==2 & basis!=0 //33 changes
+replace dcostatus=1 if slc==2 & basis!=0 //33; 35; 65 changes
 replace dcostatus=6 if slc!=2 //0 changes
 replace dcostatus=2 if basis==0 //0 changes
 
@@ -6539,14 +10001,24 @@ replace dcostatus=2 if basis==0 //0 changes
 tab recstatus ,m //0 ineligible
 
 ** Check for non-malignant
-tab beh ,m //0 in-situ
+tab beh ,m
+/*
+  Behaviour |      Freq.     Percent        Cum.
+------------+-----------------------------------
+     Benign |          8        0.20        0.20
+  Uncertain |         10        0.25        0.44
+    In situ |        134        3.30        3.74
+  Malignant |      3,908       96.26      100.00
+------------+-----------------------------------
+      Total |      4,060      100.00
+*/
 
 ** Check for duplicate tumours
-tab persearch ,m //56 MPs; 0 dups
+tab persearch ,m //56; 60 MPs; 0 dups; 18 excluded (in-situ)
 
 ** Check dob
-count if dob==. //27-all missing natregno
-//list pid cr5id age natregno birthdate if dob==.
+count if dob==. //27; 37; 156 -all missing natregno
+//list pid cr5id age natregno nrn birthdate if dob==.
 //count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //0
 //list pid age natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
 /*
@@ -6579,15 +10051,15 @@ tab dxyr ,m
 DiagnosisYe |
          ar |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-       2008 |        807       24.20       24.20
-       2013 |        796       23.87       48.07
-       2014 |        840       25.19       73.25
-       2015 |        892       26.75      100.00
+       2008 |      1,217       29.98       29.98
+       2013 |        883       21.75       51.72
+       2014 |        898       22.12       73.84
+       2015 |      1,062       26.16      100.00
 ------------+-----------------------------------
-      Total |      3,335      100.00
+      Total |      4,060      100.00
 */
 
-** Format dataset in prep for match with death data
+** Check for missing for cancer field
 /*
 replace natregno=subinstr(natregno,"-","",.)
 rename address address_cancer
@@ -6599,13 +10071,13 @@ rename cod1a cod1a_cancer
 count if cancer==. & slc==2 //47
 //list pid deathid fname lname natregno dod if cancer==. & slc==2
 tab notindd dxyr,m
-count if cancer==. & slc==2 & notindd==. //34
-replace notindd=1 if cancer==. & slc==2 & notindd==. //34 changes
-count if cancer==1 & slc==2 & notindd==. //1781
-replace notindd=2 if cancer==1 & slc==2 & notindd==. //1781 changes
-count if cancer==2 & slc==2 & notindd==. //165
-replace notindd=2 if cancer==2 & slc==2 & notindd==. //165 changes
-count if notindd==. & slc!=2 //1339
+count if cancer==. & slc==2 & notindd==. //34; 33
+replace notindd=1 if cancer==. & slc==2 & notindd==. //34; 33 changes
+count if cancer==1 & slc==2 & notindd==. //1781; 1794; 1964; 2006
+replace notindd=2 if cancer==1 & slc==2 & notindd==. //1781; 1794; 1964; 2006 changes
+count if cancer==2 & slc==2 & notindd==. //165; 164; 220
+replace notindd=2 if cancer==2 & slc==2 & notindd==. //165; 164; 220 changes
+count if notindd==. & slc!=2 //1339; 1784
 /*
 gen notindd=1 if cancer==. & slc==2 //14
 replace notindd=2 if pid=="20130331"|pid=="20080885"
@@ -6615,7 +10087,31 @@ label values notindd notindd_lab
 */
 count if cancer!=. & slc!=2 //0
 //list pid deathid fname lname natregno dod if cancer!=. & slc!=2
-replace cancer=. if cancer!=. & slc!=2 //387 changes
+replace cancer=. if cancer!=. & slc!=2 //387; 0 changes
+
+** Update cancer variable if cod indicates cancer (check against 2008-2020 death data file)
+count if cancer==. & slc==2 //47
+//list pid deathid fname lname dd_coddeath if cancer==. & slc==2, string(100)
+replace cod1a_cancer="REFRACTORY MULTIPLE MYELOMA ACUTE CONGESTIVE CARDIAC FAILURE CARDIAC AMYLOIDOSIS" if pid=="20150005"
+replace cod1a_cancer="ASPIRATION PNEUMONIA DYSPHAGIA MULTIPLE MYELOMA" if pid=="20150007"
+replace cod1a_cancer="REFRACTORY MULTIPLE MYELOMA" if pid=="20150031"
+replace cod1a_cancer=cr5cod if cancer==. & slc==2 & cod1a_cancer=="" & cr5cod!="" //37 changes
+label define cancer 1 "cancer" 2 "not cancer" 3 "unknown" ,modify
+replace cancer=3 if cancer==. & slc==2 & cod1a_cancer=="99" //15 changes
+replace cancer=1 if cancer==. & slc==2 //32 changes
+
+
+** Check missing for cod field
+count if cod==. & slc==2 //2175; 2274
+count if dd_cod==. & slc==2 //2113; 2212
+replace cod=dd_cod if dd_cod!=. & cod==. //63 changes
+count if cod==. & slc==2 //2112; 2211
+replace cod=1 if cancer==1 //1944; 1986 changes
+replace cod=2 if cancer==2 //154; 210 changes
+** one unknown causes of death in 2014 data - record_id 12323
+replace cod=3 if cod1a_cancer=="99"|(regexm(cod1a_cancer,"INDETERMINATE")|regexm(cod1a_cancer,"UNDETERMINED")) //14; 15 changes
+count if cod==. & slc==2 //0
+
 
 count if slc==2 & dod==. //0
 drop dodyear
@@ -6629,12 +10125,12 @@ tab dotyear ,m
 /*
     dotyear |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-       2008 |        807       24.20       24.20
-       2013 |        796       23.87       48.07
-       2014 |        840       25.19       73.25
-       2015 |        892       26.75      100.00
+       2008 |      1,217       29.98       29.98
+       2013 |        883       21.75       51.72
+       2014 |        898       22.12       73.84
+       2015 |      1,062       26.16      100.00
 ------------+-----------------------------------
-      Total |      3,335      100.00
+      Total |      4,060      100.00
 */
 
 ** Check dot
@@ -6648,61 +10144,42 @@ replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
 replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
 replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
-count //3336
-
-** Save this corrected dataset with non-reportable cases
-save "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_nonsurvival_nonreportable", replace
-label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival Non-reportable Dataset"
-note: TS This dataset was used for 2015 annual report
-
-** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
-drop dup_id
-sort pid
-duplicates tag pid, gen(dup_id)
-list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
-drop if resident==2 //0 deleted - nonresident
-drop if resident==99 //0 deleted - resident unknown
-drop if recstatus==3 //0 deleted - ineligible case definition
-drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //0 deleted - nonmalignant
-drop if persearch>2 //0 deleted
-drop if siteiarc==25 //0 deleted - nonreportable skin cancers
 
 ** There are 2 sets of death data variables so sort and remove
-replace dd_dddoa=dddoa if dd_dddoa==. & dddoa!=. //997 changes
-replace dd_ddda=ddda if dd_ddda==. & ddda!=. //997 changes
-replace redcap_event_name="1" if redcap_event_name=="death_data_collect_arm_1" //997 changes
+replace dd_dddoa=dddoa if dd_dddoa==. & dddoa!=. //997;1091 changes
+replace dd_ddda=ddda if dd_ddda==. & ddda!=. //997;1091 changes
+replace redcap_event_name="1" if redcap_event_name=="death_data_collect_arm_1" //997; 999; 1139 changes
 destring redcap_event_name ,replace
-replace dd_event=redcap_event_name if dd_event==. & redcap_event_name==1 //997 changes
-replace dd_odda=odda if dd_odda=="" & odda!="" //997 changes
-replace dd_certtype=certtype if dd_certtype==. & certtype!=. //1473 changes
-replace dd_district=district if dd_district==. & district!=. //1473 changes
-replace dd_address=address_cancer if dd_address=="" & address_cancer!="" //1473 changes
-replace dd_parish=ddparish if dd_parish==. & ddparish!=. //997 changes
-replace dd_age=ddage if dd_age==. & ddage!=. //997 changes
-replace dd_agetxt=ddagetxt if dd_agetxt==. & ddagetxt!=. //997 changes
-replace dd_mstatus=mstatus if dd_mstatus==. & mstatus!=. //1473 changes
-replace dd_occu=occu if dd_occu=="" & occu!="" //1473 changes
-replace dd_pod=pod if dd_pod=="" & pod!="" //1473 changes
-replace dd_deathparish=deathparish if dd_deathparish==. & deathparish!=. //1473 changes
-replace dd_regdate=regdate if dd_regdate==. & regdate!=. //1473 changes
-replace dd_certifier=ddcertifier if dd_certifier=="" & ddcertifier!="" //997 changes
-replace dd_namematch=ddnamematch if dd_namematch==. & ddnamematch!=. //997 changes
+replace dd_event=redcap_event_name if dd_event==. & redcap_event_name==1 //997; 998; 1139 changes
+replace dd_odda=odda if dd_odda=="" & odda!="" //997; 1091 changes
+replace dd_certtype=certtype if dd_certtype==. & certtype!=. //1473; 1571 changes
+replace dd_district=district if dd_district==. & district!=. //1473; 1571 changes
+replace dd_address=address_cancer if dd_address=="" & address_cancer!="" //1473; 1472; 1570 changes
+replace dd_parish=ddparish if dd_parish==. & ddparish!=. //997; 1091 changes
+replace dd_age=ddage if dd_age==. & ddage!=. //997; 1091 changes
+replace dd_agetxt=ddagetxt if dd_agetxt==. & ddagetxt!=. //997; 1089 changes
+replace dd_mstatus=mstatus if dd_mstatus==. & mstatus!=. //1473; 1571 changes
+replace dd_occu=occu if dd_occu=="" & occu!="" //1473; 1571 changes
+replace dd_pod=pod if dd_pod=="" & pod!="" //1473; 1478; 1576 changes
+replace dd_deathparish=deathparish if dd_deathparish==. & deathparish!=. //1473; 1477; 1575 changes
+replace dd_regdate=regdate if dd_regdate==. & regdate!=. //1473; 1571 changes
+replace dd_certifier=ddcertifier if dd_certifier=="" & ddcertifier!="" //997; 1091 changes
+replace dd_namematch=ddnamematch if dd_namematch==. & ddnamematch!=. //997; 1091 changes
 rename recstatdc dd_dcstatus
-replace dd_dcstatus=dcstatus if dd_dcstatus==. & dcstatus!=. //997 changes
+replace dd_dcstatus=dcstatus if dd_dcstatus==. & dcstatus!=. //997; 1091 changes
 replace dd_duprec=duprec if dd_duprec==. & duprec!=. //0 changes
-replace dd_mname=mname if dd_mname=="" & mname!="" //118 changes
+replace dd_mname=mname if dd_mname=="" & mname!="" //118; 119 changes
 rename nm namematch
-replace dd_durationnum=durationnum if dd_durationnum==. & durationnum!=. //476 changes
+replace dd_durationnum=durationnum if dd_durationnum==. & durationnum!=. //476; 480 changes
 replace dd_durationtxt=durationtxt if dd_durationtxt==. & durationtxt!=. //8 changes
-replace dd_onsetnumcod1a=onsetnumcod1a if dd_onsetnumcod1a==. & onsetnumcod1a!=. //476 changes
+replace dd_onsetnumcod1a=onsetnumcod1a if dd_onsetnumcod1a==. & onsetnumcod1a!=. //476; 480 changes
 replace dd_onsettxtcod1a=onsettxtcod1a if dd_onsettxtcod1a==. & onsettxtcod1a!=. //7 changes
-replace dd_certifieraddr=certifieraddr if dd_certifieraddr=="" & certifieraddr!="" //2353 changes
-replace deathid=record_id if deathid==. & record_id!=. //0 changes
-replace dd_dod=dod if dd_dod==. & dod!=. //1528 changes
+replace dd_certifieraddr=certifieraddr if dd_certifieraddr=="" & certifieraddr!="" //2353; 2352; 2896 changes
+replace deathid=record_id if deathid==. & record_id!=. //0; 1 changes
+replace dd_dod=dod if dd_dod==. & dod!=. //1528; 1529; 1658 changes
 replace dod=dd_dod if dd_dod!=. & dod==. //0 changes
 rename nrn dd_nrn
-replace dd_pod=placeofdeath if dd_pod=="" & placeofdeath!="" //198 changes
+replace dd_pod=placeofdeath if dd_pod=="" & placeofdeath!="" //198; 210; 348 changes
 destring notreat1 ,replace
 destring notreat2 ,replace
 destring norx2 ,replace
@@ -6717,18 +10194,40 @@ label var dd_dod "DeathData-date of death"
 label var dotyear "Year of incidence"
 
 ** Remove unnecessary variables
-drop cod1a_cancer tumouridsourcetable sid2 eid2 patientidtumourtable PatientRecordIDTumourTable ObsoleteFlagTumourTable TumourUnduplicationStatus ObsoleteFlagPatientTable pid2 str_sourcerecordid str_pid2 patienttotal patienttot str_patientidtumourtable mpseq2 sourceseq tumseq tumsourceseq str_sourcerecordid2 eidcorrect tumourtot sourcetot dobyear dobmonth dobday rx1year rx1month rx1day rx2year rx2month rx2day rx3year rx3month rx3day rx4year rx4month rx4day stdyear stdmonth stdday rdyear rdmonth rdday rptyear rptmonth rptday admyear admmonth admday dfcyear dfcmonth dfcday rtyear rtmonth rtday sname dotyear2 dupnrn duppt checkage2 redcap_event_name dddoa ddda odda certtype district address_cancer ddparish ddsex ddage ddagetxt mstatus occu pod deathparish regdate ddcertifier ddnamematch dcstatus duprec pnameextra duppid duppid_all case mppid monset age5 age_10 mname pfu age45 age55 age65 site _merge_icd10 notiftype durationnum durationtxt deathyear onsetnumcod1a onsettxtcod1a certifieraddr record_id _merge dotyear2 nrnday dob_yr dob_year year2 dobchk nrnid morphology laterality behaviour str_grade bas diagyr dup_pid dd_dupname dd_dupdod placeofdeath _merge_org dupst obsid pidobsid pidobstot duppidcr5id dup_cr5id dupnrn duppt checkage2 dodyear_cancer dup_id othtreat1 notreat1 notreat2
+drop cod1a_cancer tumouridsourcetable sid2 eid2 patientidtumourtable PatientRecordIDTumourTable ObsoleteFlagTumourTable TumourUnduplicationStatus ObsoleteFlagPatientTable pid2 str_sourcerecordid str_pid2 patienttotal patienttot str_patientidtumourtable mpseq2 sourceseq tumseq tumsourceseq str_sourcerecordid2 eidcorrect tumourtot sourcetot dobyear dobmonth dobday rx1year rx1month rx1day rx2year rx2month rx2day rx3year rx3month rx3day rx4year rx4month rx4day stdyear stdmonth stdday rdyear rdmonth rdday rptyear rptmonth rptday admyear admmonth admday dfcyear dfcmonth dfcday rtyear rtmonth rtday sname dotyear2 dupnrn duppt checkage2 redcap_event_name dddoa ddda odda certtype district address_cancer ddparish ddsex ddage ddagetxt mstatus occu pod deathparish regdate ddcertifier ddnamematch dcstatus duprec pnameextra duppid duppid_all case mppid monset age5 age_10 mname pfu age45 age55 age65 site _merge_icd10 notiftype durationnum durationtxt deathyear onsetnumcod1a onsettxtcod1a certifieraddr record_id _merge dotyear2 nrnday dob_yr dob_year year2 dobchk nrnid morphology laterality behaviour str_grade bas diagyr dup_pid dd_dupname dd_dupdod placeofdeath _merge_org dupst obsid pidobsid pidobstot duppidcr5id dup_cr5id dupnrn duppt checkage2 dodyear_cancer othtreat1 notreat1 notreat2
 
-count //3336
 
 ** Put variables in order they are to appear	  
 order pid cr5id dot fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx grade eid sid
 
-** Save this corrected dataset with only reportable cases
-save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival", replace
-label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+count //3336; 3346; 3516; 4060
+
+** Save this corrected dataset with non-reportable cases
+save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable", replace
+label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
+
+** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
+**drop dup_id
+sort pid
+duplicates tag pid, gen(dup_id)
+list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
+drop if resident==2 //0 deleted - nonresident
+drop if resident==99 //14 deleted - resident unknown
+drop if recstatus==3 //0 deleted - ineligible case definition
+drop if sex==9 //0 deleted - sex unknown
+drop if beh!=3 //18 deleted - nonmalignant
+drop if persearch>2 //0 deleted
+drop if siteiarc==25 //0 deleted - nonreportable skin cancerscount //3336; 3346
+drop dup_id
+
+count //3484
+
+** Save this corrected dataset with only reportable cases
+save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_intl_reportable", replace
+label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival Inernational Reportable Dataset"
+note: TS This dataset was NOT used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
 
@@ -6761,7 +10260,7 @@ Excluded Criteria:
 * Survival analysis to 1 year, 3 years and 5 years
 **************************************************************************
 ** Load the dataset
-use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival", clear
+use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable", clear
 
 ** Update dataset to meet IARC standards for calculating survival
 tab patient ,m 
@@ -6771,26 +10270,26 @@ count if patient==2 & persearch==1 //0
 //list pid fname lname if patient==2 & persearch==1
 
 ** Note: most below figures will be less one(1) as found one(1) ineligible during 2015 reviews (pid=20141523)
-count //3336
+count //3336; 3346; 3516; 4060
 
-drop if basis==0 //145 deleted - DCO 
-drop if age>100 //3 deleted - age 100+
+drop if basis==0 //14; 146; 267 deleted - DCO 
+drop if age>100 //3; 4 deleted - age 100+
 drop if slc==99 //0 deleted - status at last contact unknown
-drop if patient!=1 //52 deleted - MP
+drop if patient!=1 //52; 55 deleted - MP
 drop if resident==2 //0 deleted - nonresident
-drop if resident==99 //0 deleted - resident unknown
+drop if resident==99 //0; 13 deleted - resident unknown
 drop if recstatus==3 //0 deleted - ineligible case definition
 drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //0 deleted - nonmalignant
+drop if beh!=3 //0; 18 deleted - nonmalignant
 drop if persearch>2 //0 to be deleted
 drop if siteiarc==25 //0 deleted - nonreportable skin cancers
 
-count //3136
+count //3136; 3145; 3159
 
 ** now ensure everyone has a unique id
 count if pid=="" //0
 
-recode deceased 2=0 //1321 changes
+recode deceased 2=0 //1321; 1319 changes
 
 gen deceased_1yr=deceased
 gen deceased_3yr=deceased
@@ -6805,13 +10304,13 @@ label var deceased_3yr "Survival identifer at 3yrs"
 label var deceased_5yr "Survival identifer at 5yrs"
 label var deceased_10yr "Survival identifer at 10yrs"
 
-tab deceased ,m //1402 dead; 849 censored
-tab deceased_1yr ,m //1402 dead; 849 censored
-tab deceased_3yr ,m //1402 dead; 849 censored
-tab deceased_5yr ,m //1402 dead; 849 censored
-tab deceased_10yr ,m //1402 dead; 849 censored
+tab deceased ,m //1402 dead; 849 censored; 1870 dead; 1289 censored
+tab deceased_1yr ,m //1402 dead; 849 censored; 1870 dead; 1289 censored
+tab deceased_3yr ,m //1402 dead; 849 censored; 1870 dead; 1289 censored
+tab deceased_5yr ,m //1402 dead; 849 censored; 1870 dead; 1289 censored
+tab deceased_10yr ,m //1402 dead; 849 censored; 1870 dead; 1289 censored
 count if dlc==. //0
-count if dod==. //1321
+count if dod==. //1321; 1289
 
 ** check for all patients who are deceased but missing dod
 count if deceased==1 & dod==. //0
@@ -6825,29 +10324,29 @@ count if dot==. //0
 ** Create end_date variables: 1 year, 3 years, 5 years and 10 years from incidence
 gen enddate_1yr=(dot+(365.25*1)) if dot!=.
 gen enddate_3yr=(dot+(365.25*3)) if dot!=.
-gen enddate_5yr=(dot+(365.25*5)) if dot!=. & dxyr<2014 //2019 death data not available as of 17nov2019
+gen enddate_5yr=(dot+(365.25*5)) if dot!=. & dxyr<2015 //2019 death data not available as of 17nov2019; 2019 deaths now added 30-Sep-2020 so code updated from dxyr<2014
 gen enddate_10yr=(dot+(365.25*10)) if dot!=. & dxyr==2008
 
 format enddate* %dD_m_CY
 
 count if enddate_1yr==. //0
 count if enddate_3yr==. //0
-count if enddate_5yr==. & dxyr<2014 //0
+count if enddate_5yr==. & dxyr<2015 //0
 count if enddate_10yr==. & dxyr==2008 //0
 
 ** Since end_date is 1, 3, 5, 10 years from incidence, reset deceased from dead to censored if pt died after end_date
-count if dod!=. & dod>dot+(365.25*1) //767
+count if dod!=. & dod>dot+(365.25*1) //767; 801
 //list pid deceased_1yr dot dod dlc enddate_1yr if dod!=. & dod>dot+(365.25*1)
-count if dod!=. & dod>dot+(365.25*3) //275
+count if dod!=. & dod>dot+(365.25*3) //275; 305
 //list pid deceased_3yr dot dod dlc enddate_3yr if dod!=. & dod>dot+(365.25*3)
-count if dod!=. & dod>dot+(365.25*5) & dxyr<2014 //113
+count if dod!=. & dod>dot+(365.25*5) & dxyr<2015 //113; 115
 //list pid deceased_5yr dot dod dlc enddate_5yr if dod!=. & dod>dot+(365.25*5)
 count if dod!=. & dod>dot+(365.25*10) & dxyr==2008 //5
 //list pid deceased_10yr dot dod dlc enddate_10yr if dod!=. & dod>dot+(365.25*10)
 
-replace deceased_1yr=0 if dod!=. & dod>dot+(365.25*1) //767 changes
-replace deceased_3yr=0 if dod!=. & dod>dot+(365.25*3) //275 changes
-replace deceased_5yr=0 if dod!=. & dod>dot+(365.25*5) & dxyr<2014 //113 changes
+replace deceased_1yr=0 if dod!=. & dod>dot+(365.25*1) //767; 801 changes
+replace deceased_3yr=0 if dod!=. & dod>dot+(365.25*3) //275; 305 changes
+replace deceased_5yr=0 if dod!=. & dod>dot+(365.25*5) & dxyr<2015 //113; 115 changes
 replace deceased_10yr=0 if dod!=. & dod>dot+(365.25*10) & dxyr==2008 //5 changes
 
 ** set to missing those who have dod>1 year from incidence date - but
@@ -6855,7 +10354,7 @@ replace deceased_10yr=0 if dod!=. & dod>dot+(365.25*10) & dxyr==2008 //5 changes
 ** (1) use dod to define time to death if died within 1, 3, 5, 10 yrs
 gen time_1yr=dod-dot if (dod!=. & deceased_1yr==1 & dod<dot+(365.25*1))
 gen time_3yr=dod-dot if (dod!=. & deceased_3yr==1 & dod<dot+(365.25*3))
-gen time_5yr=dod-dot if (dod!=. & deceased_5yr==1 & dod<dot+(365.25*5) & dxyr<2014)
+gen time_5yr=dod-dot if (dod!=. & deceased_5yr==1 & dod<dot+(365.25*5) & dxyr<2015)
 gen time_10yr=dod-dot if (dod!=. & deceased_10yr==1 & dod<dot+(365.25*10) & dxyr==2008)
 
 ** (2) next use 1, 3, 5 yrs as time, if died >1, >3, >5, >10 yrs from incidence
@@ -6863,39 +10362,39 @@ count if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0
 replace time_1yr=enddate_1yr-dot if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0 changes
 count if (enddate_3yr<dod & dod!=. & deceased_3yr==1) //0
 replace time_3yr=enddate_3yr-dot if (enddate_3yr<dod & dod!=. & deceased_3yr==1) //0 changes
-count if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr<2014) //0
-replace time_5yr=enddate_5yr-dot if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr<2014) //0 changes
+count if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr<2015) //0
+replace time_5yr=enddate_5yr-dot if (enddate_5yr<dod & dod!=. & deceased_5yr==1 & dxyr<2015) //0 changes
 count if (enddate_10yr<dod & dod!=. & deceased_10yr==1 & dxyr==2008) //0
 replace time_10yr=enddate_10yr-dot if (enddate_10yr<dod & dod!=. & deceased_10yr==1 & dxyr==2008) //0 changes
 
 ** (2) next use dlc as end date, if alive and have date last seen (dlc)
-count if (dlc<enddate_1yr & deceased_1yr==0) //1034
-replace time_1yr=dlc-dot if (dlc<enddate_1yr & deceased_1yr==0) //1034 changes
-count if (dlc<enddate_3yr & deceased_3yr==0) //1263
-replace time_3yr=dlc-dot if (dlc<enddate_3yr & deceased_3yr==0) //1263 changes
-count if (dlc<enddate_5yr & deceased_5yr==0 & dxyr<2014) //571
-replace time_5yr=dlc-dot if (dlc<enddate_5yr & deceased_5yr==0 & dxyr<2014) //571 changes
-count if (dlc<enddate_10yr & deceased_10yr==0 & dxyr==2008) //230
-replace time_10yr=dlc-dot if (dlc<enddate_10yr & deceased_10yr==0 & dxyr==2008) //230 changes
+count if (dlc<enddate_1yr & deceased_1yr==0) //1034; 1003
+replace time_1yr=dlc-dot if (dlc<enddate_1yr & deceased_1yr==0) //1034; 1003 changes
+count if (dlc<enddate_3yr & deceased_3yr==0) //1263; 1231
+replace time_3yr=dlc-dot if (dlc<enddate_3yr & deceased_3yr==0) //1263; 1231 changes
+count if (dlc<enddate_5yr & deceased_5yr==0 & dxyr<2015) //571; 907
+replace time_5yr=dlc-dot if (dlc<enddate_5yr & deceased_5yr==0 & dxyr<2015) //571; 907 changes
+count if (dlc<enddate_10yr & deceased_10yr==0 & dxyr==2008) //229
+replace time_10yr=dlc-dot if (dlc<enddate_10yr & deceased_10yr==0 & dxyr==2008) //229 changes
 
-//tab time_1yr ,m //875=missing; 298=0
-//tab time_3yr ,m //292=missing; 298=0
-//tab time_5yr if dxyr<2014 ,m //48=missing; 86=0
-//tab time_10yr if dxyr==2008 ,m //5=missing; 17=0
+//tab time_1yr ,m //875=missing; 298=0; 1060=missing; 546=0
+//tab time_3yr ,m //292=missing; 298=0; 336=missing; 535=0
+//tab time_5yr if dxyr<2015 ,m //48=missing; 86=0; 58=missing; 273=0
+//tab time_10yr if dxyr==2008 ,m //5=missing; 17=0; 6=missing; 16=0
 //list time_1yr dot dlc enddate_1yr dod deceased_1yr if time_1yr==.
-replace time_1yr=enddate_1yr-dot if (enddate_1yr<dlc & deceased_1yr==0) & time_1yr==. & dlc!=. //1054 changes
-replace time_3yr=enddate_3yr-dot if (enddate_3yr<dlc & deceased_3yr==0) & time_3yr==. & dlc!=. //333 changes
-replace time_5yr=enddate_5yr-dot if (enddate_5yr<dlc & deceased_5yr==0) & time_5yr==. & dlc!=. & dxyr<2014 //56 changes
-replace time_10yr=enddate_10yr-dot if (enddate_10yr<dlc & deceased_10yr==0) & time_10yr==. & dlc!=. & dxyr==2008 //6 changes
+replace time_1yr=enddate_1yr-dot if (enddate_1yr<dlc & deceased_1yr==0) & time_1yr==. & dlc!=. //1054; 1087 changes
+replace time_3yr=enddate_3yr-dot if (enddate_3yr<dlc & deceased_3yr==0) & time_3yr==. & dlc!=. //333; 363 changes
+replace time_5yr=enddate_5yr-dot if (enddate_5yr<dlc & deceased_5yr==0) & time_5yr==. & dlc!=. & dxyr<2015 //56; 60 changes
+replace time_10yr=enddate_10yr-dot if (enddate_10yr<dlc & deceased_10yr==0) & time_10yr==. & dlc!=. & dxyr==2008 //7 changes
 
 count if time_1yr==. //0
 count if time_3yr==. //0
-count if time_5yr==. & dxyr<2014 //0
+count if time_5yr==. & dxyr<2015 //0
 count if time_10yr==. & dxyr==2008 //0
 
 replace time_1yr=dlc-dot if deceased_1yr==0 & time_1yr==. //0 changes
 replace time_3yr=dlc-dot if deceased_3yr==0 & time_3yr==. //0 changes
-replace time_5yr=dlc-dot if deceased_5yr==0 & time_5yr==. & dxyr<2014 //0 changes
+replace time_5yr=dlc-dot if deceased_5yr==0 & time_5yr==. & dxyr<2015 //0 changes
 replace time_10yr=dlc-dot if deceased_10yr==0 & time_10yr==. & dxyr==2008 //0 changes
 
 ** these are from above - change dod to missing (deceased already
@@ -6906,15 +10405,15 @@ gen dod_5yr=dod
 gen dod_10yr=dod 
 format dod_* %tdCCYY-NN-DD
 
-replace dod_1yr=. if enddate_1yr<dod_1yr & dod_1yr!=. //767 changes
-replace dod_3yr=. if enddate_3yr<dod_3yr & dod_3yr!=. //275 changes
-replace dod_5yr=. if enddate_5yr<dod_5yr & dod_5yr!=. & dxyr<2014 //113 changes
+replace dod_1yr=. if enddate_1yr<dod_1yr & dod_1yr!=. //767; 801 changes
+replace dod_3yr=. if enddate_3yr<dod_3yr & dod_3yr!=. //275; 305 changes
+replace dod_5yr=. if enddate_5yr<dod_5yr & dod_5yr!=. & dxyr<2015 //113; 115 changes
 replace dod_10yr=. if enddate_10yr<dod_10yr & dod_10yr!=. & dxyr==2008 //5 changes
 
 sort enddate_*
 tab enddate_1yr ,m 
 tab enddate_3yr ,m 
-tab enddate_5yr if dxyr<2014 ,m
+tab enddate_5yr if dxyr<2015 ,m
 tab enddate_10yr if dxyr==2008 ,m
 
 ** Now to set up dataset for survival analysis, we need each patient's date of
@@ -6931,22 +10430,22 @@ sort pid
 //list deceased_3yr dot newenddate_3yr if deceased_3yr!=1
 //list deceased_5yr dot dlc newenddate_5yr if deceased_5yr!=1
 //list deceased_10yr dot newenddate_10yr if deceased_10yr!=1
-count if dlc>d(31dec2018) & deceased_1yr!=1 //4-dlc in 2019
-count if dlc>d(31dec2018) & deceased_3yr!=1 //4
-count if dlc>d(31dec2018) & deceased_5yr!=1 //4
-count if dlc>d(31dec2018) & deceased_10yr!=1 //4
-//list pid dot dlc deceased_1yr if dlc>d(31dec2018) & deceased_1yr!=1
+count if dlc>d(31dec2019) & deceased_1yr!=1 //4-dlc in 2019; 0
+count if dlc>d(31dec2019) & deceased_3yr!=1 //4; 0
+count if dlc>d(31dec2019) & deceased_5yr!=1 //4; 0
+count if dlc>d(31dec2019) & deceased_10yr!=1 //4; 0
+//list pid dot dlc deceased_1yr if dlc>d(31dec2019) & deceased_1yr!=1
 
 ** Create new end_date based on fixed censored date of 31dec2018 (last date of current death data)
 //list pid dot deceased_1yr dod dlc end_date
-count if (enddate_1yr>dod_1yr & dod_1yr!=. & deceased_1yr==1) //1048
-count if (enddate_3yr>dod_3yr & dod_3yr!=. & deceased_3yr==1) //1540
-count if (enddate_5yr>dod_5yr & dod_5yr!=. & deceased_5yr==1 & dxyr<2014) //863
-count if (enddate_10yr>dod_10yr & dod_10yr!=. & deceased_10yr==1 & dxyr==2008) //513
-gen newenddate_1yr=d(31dec2018) if deceased_1yr!=1
-gen newenddate_3yr=d(31dec2018) if deceased_3yr!=1
-gen newenddate_5yr=d(31dec2018) if deceased_5yr!=1
-gen newenddate_10yr=d(31dec2018) if deceased_10yr!=1
+count if (enddate_1yr>dod_1yr & dod_1yr!=. & deceased_1yr==1) //1048; 1069
+count if (enddate_3yr>dod_3yr & dod_3yr!=. & deceased_3yr==1) //1540; 1565
+count if (enddate_5yr>dod_5yr & dod_5yr!=. & deceased_5yr==1 & dxyr<2015) //863; 1318
+count if (enddate_10yr>dod_10yr & dod_10yr!=. & deceased_10yr==1 & dxyr==2008) //513; 514
+gen newenddate_1yr=d(31dec2019) if deceased_1yr!=1
+gen newenddate_3yr=d(31dec2019) if deceased_3yr!=1
+gen newenddate_5yr=d(31dec2019) if deceased_5yr!=1
+gen newenddate_10yr=d(31dec2019) if deceased_10yr!=1
 
 /* old method
 gen newenddate_1yr=dod_1yr if (enddate_1yr>dod_1yr & dod_1yr!=. & deceased_1yr==1)
@@ -6963,32 +10462,32 @@ replace newenddate_3yr=dlc if (dlc<enddate_3yr) & dod_3yr==. & deceased_3yr==0 /
 replace newenddate_5yr=dlc if (dlc<enddate_5yr) & dod_5yr==. & deceased_5yr==0 & dxyr<2014 //572 changes
 replace newenddate_10yr=dlc if (dlc<enddate_10yr) & dod_10yr==. & deceased_10yr==0 & dxyr==2008 //229 changes
 */
-count if newenddate_1yr==. //1048
-count if newenddate_3yr==. //1540
-count if newenddate_5yr==. & dxyr<2014 //863
-count if newenddate_10yr==. & dxyr==2008 //513
+count if newenddate_1yr==. //1048; 1069
+count if newenddate_3yr==. //1540; 1565
+count if newenddate_5yr==. & dxyr<2015 //863; 1318
+count if newenddate_10yr==. & dxyr==2008 //513; 514
 
 //list dot deceased_1yr dod_1yr dlc enddate_1yr if newenddate_1yr==.
-replace newenddate_1yr=enddate_1yr if newenddate_1yr==. //1048 changes
-replace newenddate_3yr=enddate_3yr if newenddate_3yr==. //1540 changes
-replace newenddate_5yr=enddate_5yr if newenddate_5yr==. & dxyr<2014 //863 changes
-replace newenddate_10yr=enddate_10yr if newenddate_10yr==. & dxyr==2008 //513 changes
+replace newenddate_1yr=enddate_1yr if newenddate_1yr==. //1048; 1069 changes
+replace newenddate_3yr=enddate_3yr if newenddate_3yr==. //1540; 1565 changes
+replace newenddate_5yr=enddate_5yr if newenddate_5yr==. & dxyr<2015 //863; 1318 changes
+replace newenddate_10yr=enddate_10yr if newenddate_10yr==. & dxyr==2008 //513; 514 changes
 format newenddate_* %dD_m_CY
 
 sort dot
-tab time_1yr ,m //1056=365.25
-tab time_3yr ,m //335=1095.75
-tab time_5yr if dxyr<2014 ,m //56=1826.25
-tab time_10yr if dxyr==2008 ,m //6=3652.5
+tab time_1yr ,m //1056=365.25; 1087=365.25
+tab time_3yr ,m //335=1095.75; 363=1095.75
+tab time_5yr if dxyr<2015 ,m //56=1826.25; 60=1826.25
+tab time_10yr if dxyr==2008 ,m //7=3652.5
 
-replace time_1yr=365 if time_1yr==365.25 //1056 changes
-replace time_3yr=1095 if time_3yr==1095.75 //335 changes
-replace time_5yr=1826 if time_5yr==1826.25 //56 changes
-replace time_10yr=3652 if time_10yr==3652.5 //6 changes
+replace time_1yr=365 if time_1yr==365.25 //1056; 1087 changes
+replace time_3yr=1095 if time_3yr==1095.75 //335; 363 changes
+replace time_5yr=1826 if time_5yr==1826.25 //56; 60 changes
+replace time_10yr=3652 if time_10yr==3652.5 //7 changes
 
-count if time_1yr==0 //546
-count if time_3yr==0 //535
-count if time_5yr==0 //71
+count if time_1yr==0 //546; 536
+count if time_3yr==0 //535; 536
+count if time_5yr==0 //71; 273
 count if time_10yr==0 //16
 //list basis deceased_1yr dot dod_1yr dlc enddate_1yr newenddate_1yr if time_1yr==0 ,noobs
 //list basis deceased_3yr dot dod_3yr dlc enddate_3yr newenddate_3yr if time_3yr==0 ,noobs
@@ -7001,12 +10500,12 @@ count if time_10yr==0 //16
 replace newend_date=newend_date+1 if (time==0 & deceased==0)
 replace time=1 if (time==0 & deceased==0) //241 changes
 */
-replace newenddate_1yr=newenddate_1yr+1 if time_1yr==0 //546 changes
-replace time_1yr=1 if time_1yr==0 //546 changes
-replace newenddate_3yr=newenddate_3yr+1 if time_3yr==0 //535 changes
-replace time_3yr=1 if time_3yr==0 //535 changes
-replace newenddate_5yr=newenddate_5yr+1 if time_5yr==0 //71 changes
-replace time_5yr=1 if time_5yr==0 //71 changes
+replace newenddate_1yr=newenddate_1yr+1 if time_1yr==0 //546; 536 changes
+replace time_1yr=1 if time_1yr==0 //546; 536 changes
+replace newenddate_3yr=newenddate_3yr+1 if time_3yr==0 //535; 526 changes
+replace time_3yr=1 if time_3yr==0 //535; 526 changes
+replace newenddate_5yr=newenddate_5yr+1 if time_5yr==0 //71; 273 changes
+replace time_5yr=1 if time_5yr==0 //71; 273 changes
 replace newenddate_10yr=newenddate_10yr+1 if time_10yr==0 //16 changes
 replace time_10yr=1 if time_10yr==0 //16 changes
 
@@ -7016,12 +10515,12 @@ tab deceased_3yr ,m
 tab deceased_5yr ,m 
 tab deceased_10yr ,m 
 
-count //3136
+count //3136; 3159
 
 
 tab deceased_1yr dxyr ,m
 tab deceased_3yr dxyr ,m
-tab deceased_5yr dxyr if dxyr<2014 ,m
+tab deceased_5yr dxyr if dxyr<2015 ,m
 tab deceased_10yr dxyr if dxyr==2008 ,m
 
 
@@ -7044,12 +10543,14 @@ gen surv1yr_2014=1 if deceased_1yr==1 & dxyr==2014
 replace surv1yr_2014=0 if deceased_1yr==0 & dxyr==2014
 gen surv3yr_2014=1 if deceased_3yr==1 & dxyr==2014
 replace surv3yr_2014=0 if deceased_3yr==0 & dxyr==2014
+gen surv5yr_2014=1 if deceased_5yr==1 & dxyr==2014
+replace surv5yr_2014=0 if deceased_5yr==0 & dxyr==2014
 gen surv1yr_2015=1 if deceased_1yr==1 & dxyr==2015
 replace surv1yr_2015=0 if deceased_1yr==0 & dxyr==2015
 gen surv3yr_2015=1 if deceased_3yr==1 & dxyr==2015
 replace surv3yr_2015=0 if deceased_3yr==0 & dxyr==2015
 label define surv_lab 0 "censored" 1 "dead", modify
-label values surv1yr_2008 surv3yr_2008 surv5yr_2008 surv10yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv1yr_2015 surv3yr_2015 surv_lab
+label values surv1yr_2008 surv3yr_2008 surv5yr_2008 surv10yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv5yr_2014 surv1yr_2015 surv3yr_2015 surv_lab
 label var surv1yr_2008 "Survival at 1yr - 2008"
 label var surv3yr_2008 "Survival at 3yrs - 2008"
 label var surv5yr_2008 "Survival at 5yrs - 2008"
@@ -7059,6 +10560,7 @@ label var surv3yr_2013 "Survival at 3yrs - 2013"
 label var surv5yr_2013 "Survival at 5yrs - 2013"
 label var surv1yr_2014 "Survival at 1yr - 2014"
 label var surv3yr_2014 "Survival at 3yrs - 2014"
+label var surv5yr_2014 "Survival at 5yrs - 2014"
 label var surv1yr_2015 "Survival at 1yr - 2015"
 label var surv3yr_2015 "Survival at 3yrs - 2015"
 
@@ -7072,6 +10574,7 @@ tab surv3yr_2013 if dxyr==2013 ,m
 tab surv5yr_2013 if dxyr==2013 ,m
 tab surv1yr_2014 if dxyr==2014 ,m
 tab surv3yr_2014 if dxyr==2014 ,m
+tab surv5yr_2014 if dxyr==2014 ,m
 tab surv1yr_2015 if dxyr==2015 ,m
 tab surv3yr_2015 if dxyr==2015 ,m
 
@@ -7181,33 +10684,43 @@ tab surv5yr_2013 if siteiarc==53 //nhl  5-yr survival
 ** PROSTATE
 tab surv1yr_2014 if siteiarc==39 //prostate 1-yr survival
 tab surv3yr_2014 if siteiarc==39 //prostate 3-yr survival
+tab surv5yr_2014 if siteiarc==39 //prostate 5-yr survival
 ** BREAST
 tab surv1yr_2014 if siteiarc==29 //breast 1-yr survival
 tab surv3yr_2014 if siteiarc==29 //breast 3-yr survival
+tab surv5yr_2014 if siteiarc==29 //breast 5-yr survival
 ** COLON
 tab surv1yr_2014 if siteiarc==13 //colon 1-yr survival
 tab surv3yr_2014 if siteiarc==13 //colon 3-yr survival
+tab surv5yr_2014 if siteiarc==13 //colon 5-yr survival
 ** CORPUS UTERI
 tab surv1yr_2014 if siteiarc==33 //corpus uteri 1-yr survival
 tab surv3yr_2014 if siteiarc==33 //corpus uteri 3-yr survival
+tab surv5yr_2014 if siteiarc==33 //corpus uteri 5-yr survival
 ** RECTUM
 tab surv1yr_2014 if siteiarc==14 //rectum 1-yr survival
 tab surv3yr_2014 if siteiarc==14 //rectum 3-yr survival
+tab surv5yr_2014 if siteiarc==14 //rectum 5-yr survival
 ** LUNG
 tab surv1yr_2014 if siteiarc==21 //lung 1-yr survival
 tab surv3yr_2014 if siteiarc==21 //lung 3-yr survival
+tab surv5yr_2014 if siteiarc==21 //lung 5-yr survival
 ** CERVIX
 tab surv1yr_2014 if siteiarc==32 //cervix 1-yr survival
 tab surv3yr_2014 if siteiarc==32 //cervix 3-yr survival
+tab surv5yr_2014 if siteiarc==32 //cervix 5-yr survival
 ** STOMACH
 tab surv1yr_2014 if siteiarc==11 //stomach 1-yr survival
 tab surv3yr_2014 if siteiarc==11 //stomach 3-yr survival
+tab surv5yr_2014 if siteiarc==11 //stomach 5-yr survival
 ** MULTIPLE MYELOMA 
 tab surv1yr_2014 if siteiarc==55 //mm  1-yr survival
 tab surv3yr_2014 if siteiarc==55 //mm  3-yr survival
+tab surv5yr_2014 if siteiarc==55 //mm  5-yr survival
 ** NON-HODGKIN LYMPHOMA
 tab surv1yr_2014 if siteiarc==53 //nhl  1-yr survival
 tab surv3yr_2014 if siteiarc==53 //nhl  3-yr survival
+tab surv5yr_2014 if siteiarc==53 //nhl  5-yr survival
 
 
 **********
@@ -7252,13 +10765,12 @@ egen pttotsurv_2014=count(patient) if patient==1 & dxyr==2014
 egen pttotsurv_2013=count(patient) if patient==1 & dxyr==2013
 egen pttotsurv_2008=count(patient) if patient==1 & dxyr==2008
 
-count //3136
+count //3136; 3159
 
 ** Save this corrected dataset with only reportable cases
 save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_survival", replace
-label data "2008 2013 2014 2015 BNR-Cancer analysed data - Survival Reportable Dataset"
+label data "2008 2013 2014 2015 BNR-Cancer analysed data - Survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
-note: TS Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 note: TS For survival analysis, use variables surv1yr_2008, surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2008, surv5yr_2013, surv10yr_2008
 
 ********************

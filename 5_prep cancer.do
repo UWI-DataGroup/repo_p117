@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      28-OCT-2019
-    // 	date last modified      28-OCT-2019
+    // 	date last modified      01-OCT-2020
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -890,9 +890,9 @@ replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
 count //882
 
-** Save this corrected dataset with non-reportable cases
-save "`datapath'\version02\2-working\2014_cancer_nonsurvival_nonreportable", replace
-label data "2014 BNR-Cancer analysed data - Non-survival Non-reportable Dataset"
+** Save this corrected dataset with BNR reportable cases
+save "`datapath'\version02\2-working\2014_cancer_nonsurvival_bnr_reportable", replace
+label data "2014 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 
 ** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
@@ -908,9 +908,9 @@ drop if siteiarc==25 //0 deleted - nonreportable skin cancers
 
 count //830
 
-** Save this corrected dataset with only reportable cases
-save "`datapath'\version02\2-working\2014_cancer_nonsurvival", replace
-label data "2014 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+** Save this corrected dataset with only internationally reportable cases
+save "`datapath'\version02\2-working\2014_cancer_nonsurvival_intl_reportable", replace
+label data "2014 BNR-Cancer analysed data - Non-survival International Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
@@ -1346,9 +1346,9 @@ replace siteicd10=12 if pid=="20080695" //1 change
 
 count //1211
 
-** Save this corrected dataset with non-reportable cases
-save "`datapath'\version02\2-working\2008_cancer_nonsurvival_nonreportable", replace
-label data "2008 BNR-Cancer analysed data - Non-survival Non-reportable Dataset"
+** Save this corrected dataset with BNR reportable cases
+save "`datapath'\version02\2-working\2008_cancer_nonsurvival_bnr_reportable", replace
+label data "2008 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 
 ** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
@@ -1364,9 +1364,9 @@ drop if siteiarc==25 //228 deleted - nonreportable skin cancers
 
 count //803
 
-** Save this corrected dataset with only reportable cases
-save "`datapath'\version02\2-working\2008_cancer_nonsurvival", replace
-label data "2008 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+** Save this corrected dataset with only internationally reportable cases
+save "`datapath'\version02\2-working\2008_cancer_nonsurvival_intl_reportable", replace
+label data "2008 BNR-Cancer analysed data - Non-survival International Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
@@ -1711,9 +1711,9 @@ replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
 count //871
 
-** Save this corrected dataset with non-reportable cases
-save "`datapath'\version02\2-working\2013_cancer_nonsurvival_nonreportable", replace
-label data "2013 BNR-Cancer analysed data - Non-survival Non-reportable Dataset"
+** Save this corrected dataset with BNR reportable cases
+save "`datapath'\version02\2-working\2013_cancer_nonsurvival_bnr_reportable", replace
+label data "2013 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 
 ** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
@@ -1729,9 +1729,9 @@ drop if siteiarc==25 //0 deleted - nonreportable skin cancers
 
 count //786
 
-** Save this corrected dataset with only reportable cases
-save "`datapath'\version02\2-working\2013_cancer_nonsurvival", replace
-label data "2013 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+** Save this corrected dataset with only internationally reportable cases
+save "`datapath'\version02\2-working\2013_cancer_nonsurvival_intl_reportable", replace
+label data "2013 BNR-Cancer analysed data - Non-survival International Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
@@ -1742,13 +1742,13 @@ clear
 *******************************************
 ** This done before 2015 data prepared so can be used by NS at CARPHA
 ** Load the dataset (2008)
-use "`datapath'\version02\2-working\2008_cancer_nonsurvival", replace
-count //803
+use "`datapath'\version02\2-working\2008_cancer_nonsurvival_bnr_reportable", replace
+count //803; 1211
 
-append using "`datapath'\version02\2-working\2014_cancer_nonsurvival"
-count //1633
-append using "`datapath'\version02\2-working\2013_cancer_nonsurvival"
-count //2419
+append using "`datapath'\version02\2-working\2014_cancer_nonsurvival_bnr_reportable"
+count //1633; 2093
+append using "`datapath'\version02\2-working\2013_cancer_nonsurvival_bnr_reportable"
+count //2419; 2964
 
 tab dxyr ,m 
 
@@ -1972,15 +1972,18 @@ replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
 replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
 replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
-count //2419
+** Remove unnecessary variables
+drop dotyear2 dupnrn duppt checkage2
 
-** Save this corrected dataset with non-reportable cases
-save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_nonreportable", replace
-label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Non-reportable Dataset"
+count //2419; 2964
+
+** Save this corrected dataset with BNR reportable cases
+save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_bnr_reportable_prematch", replace
+label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 
 ** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
-drop dup_id
+//drop dup_id
 sort pid
 duplicates tag pid, gen(dup_id)
 list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
@@ -1992,14 +1995,11 @@ drop if beh!=3 //0 deleted - nonmalignant
 drop if persearch>2 //1 to be deleted
 drop if siteiarc==25 //0 deleted - nonreportable skin cancers
 
-** Remove unnecessary variables
-drop dotyear2 dupnrn duppt checkage2
-
 count //2418
 
-** Save this corrected dataset with only reportable cases
-save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_prematch", replace
-label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+** Save this corrected dataset with only internationally reportable cases
+save "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_intl_reportable", replace
+label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival International Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
@@ -2010,7 +2010,10 @@ note: TS Excludes ineligible case definition, non-residents, unk sex, non-malign
 ** Match with most current death data (2017, 2018) - note some 2017 deaths found after previous 2017 matching
 
 ** LOAD the 2008-2014 cancer_prematch (multi-year) dataset
-use "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_prematch", replace
+use "`datapath'\version02\2-working\2008_2013_2014_cancer_nonsurvival_bnr_reportable_prematch", replace
+
+count //2964
+
 drop _merge
 drop nrn
 rename natregno nrn
@@ -2018,7 +2021,7 @@ destring nrn,replace
 format nrn %12.0g
 tostring certifieraddr,replace
 //list pid deathid fname lname slc redcap_event_name if slc==2
-count if slc==2 & redcap_event_name!="" //997
+count if slc==2 & redcap_event_name!="" //997; 1091
 gen matchdone=1 if slc==2 & redcap_event_name!=""
 gen record_id=.
 
@@ -2034,9 +2037,18 @@ merge m:1 lname fname sex dod using "`datapath'\version02\3-output\2017-2018_dea
 
     matched                                60  (_merge==3)
     -----------------------------------------
+Below ran after change to non-reportable vs reportable datasets:
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         7,893
+        from master                     2,900  (_merge==1)
+        from using                      4,993  (_merge==2)
+
+    matched                                64  (_merge==3)
+    -----------------------------------------
 */
 //list pid deathid record_id fname lname slc matchdone if _merge==3
-count if matchdone==1 & _merge==3 //30
+count if matchdone==1 & _merge==3 //30; 34
 
 preserve
 drop if slc==2 //1494 deleted
@@ -2044,7 +2056,7 @@ drop if slc==2 //1494 deleted
 sort lname fname record_id pid
 quietly by lname fname :  gen duppt = cond(_N==1,0,_n)
 sort lname fname
-count if duppt>0 //334
+count if duppt>0 //334; 483
 sort lname fname pid
 order pid fname lname nrn sex age primarysite dds2coddeath
 //list pid record_id fname lname nrn addr dds2address if duppt>0, string(38)
@@ -2053,7 +2065,7 @@ order pid fname lname nrn sex age primarysite dds2coddeath
 sort nrn lname fname pid
 quietly by nrn :  gen dupnrn = cond(_N==1,0,_n)
 sort nrn
-count if dupnrn>0 //406
+count if dupnrn>0 //406; 649
 sort lname fname pid
 order pid fname lname nrn sex age primarysite dds2coddeath
 //list pid record_id fname lname nrn addr dds2address if dupnrn>0 & nrn!=. & nrn!=9999999999, string(38)
@@ -2132,12 +2144,12 @@ replace record_id=24774 if pid=="20141134"
 
 
 ** Remove merged death dataset
-drop if _merge==2 //4996 deleted
+drop if _merge==2 //4996; 4993 deleted
 rename nrn natregno
 drop _merge
 drop dds2*
 
-count //2418
+count //2418; 2964
 
 ** Merge again - use record_id this time
 merge m:1 record_id using "`datapath'\version02\3-output\2017-2018_deaths_for_matching"
@@ -2146,6 +2158,16 @@ merge m:1 record_id using "`datapath'\version02\3-output\2017-2018_deaths_for_ma
     -----------------------------------------
     not matched                         7,346
         from master                     2,355  (_merge==1)
+        from using                      4,991  (_merge==2)
+
+    matched                                63  (_merge==3)
+    -----------------------------------------
+Ran below after switching non-reportable vs reportable datasets
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         7,892
+        from master                     2,901  (_merge==1)
         from using                      4,991  (_merge==2)
 
     matched                                63  (_merge==3)
@@ -2166,20 +2188,20 @@ tab dcostatus ,m
 **     DEATHS	   **
 *********************
 ** (1) CHECK FOR CANCER DEATHS 2017-2018 THAT HAVE NOT MERGED WTIH A NATIONAL DEATH
-count if slc==2 //1557 (=1494+63 merged)
-count if deathid==. & slc==2 //19
+count if slc==2 //1557 (=1494+63 merged); 1657
+count if deathid==. & slc==2 //19; 20
 count if record_id!=. & slc==2 //63
-count if deathid!=. & slc==2 /1538
+count if deathid!=. & slc==2 //1538; 1637
 replace deathid=. if record_id!=. & slc==2 //63 changes
 replace deathid=record_id if record_id!=. & slc==2 //63 changes
-tab _merge if deathid==. & slc==2 //19 master only
-count if record_id==. & pid!="" & slc==2 //1494
+tab _merge if deathid==. & slc==2 //19; 20 master only
+count if record_id==. & pid!="" & slc==2 //1494; 1594
 replace deathid=12931 if pid=="20130331" //1
 
 ** (2) Visually check unmerged cancer and deaths (not done as of 17nov2019)
 sort lname fname pid record_id
 //cancer list
-count if slc!=2 & _merge==1 //861
+count if slc!=2 & _merge==1 //861; 1307
 //list pid fname lname natregno addr if slc!=2 & _merge==1, noobs
 //death list
 count if _merge==2 //4991
@@ -2197,14 +2219,14 @@ list record_id fname lname nrn if regexm(lname, "^v") & _merge==2 | regexm(lname
 */
 drop if _merge==2 //4991 deleted
 
-count //2418
+count //2418; 2964
 
 ** Check analysis variables are correct
 tab deceased ,m 
-tab deceased if slc==2 //1557
+tab deceased if slc==2 //1557; 1657
 
 count if dod==. & slc==2 //0
-tab slc ,m //1557
+tab slc ,m //1557; 1657
 
 ** Check patient, eidmp, persearch
 tab patient ,m 
@@ -2222,7 +2244,7 @@ list pid deathid natregno nrn if natregno!=. & nrn!=. & natregno!=nrn //3 are tr
 replace natregno=nrn if pid=="20140975" //1 change
 gen nrn2=natregno
 tostring natregno,replace
-count if natregno!="" & length(natregno)!=10 //18
+count if natregno!="" & length(natregno)!=10 //18; 19
 //list pid deathid dot natregno nrn dob age if natregno!="" & length(natregno)!=10
 replace natregno=subinstr(natregno,"9","09",.) if pid=="20140048"
 replace natregno=subinstr(natregno,"9","09",.) if pid=="20080797"
@@ -2242,6 +2264,10 @@ replace natregno=subinstr(natregno,"91","091",.) if pid=="20130369"
 replace natregno=subinstr(natregno,"7","07",.) if pid=="20080315"
 replace natregno=subinstr(natregno,"5","05",.) if pid=="20080867"
 replace natregno=subinstr(natregno,"303","0303",.) if pid=="20080703"
+replace natregno=subinstr(natregno,"99","112",.) if pid=="20080637"
+replace natregno=subinstr(natregno,"041","611",.) if pid=="20080637"
+replace natregno=subinstr(natregno,"26","56",.) if pid=="20080637"
+
 
 ** Check dob
 count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //1
@@ -2276,6 +2302,10 @@ replace dodyear_cancer=year(dod) if dodyear_cancer!=year(dod) //63 changes
 
 tab dotyear ,m
 
+tab recstatus ,m //2 ineligible
+
+drop if recstatus==3 //2 deleted
+
 rename nm namematch
 rename dodyear_cancer dodyear
 
@@ -2296,9 +2326,11 @@ replace dlc=d(08mar2015) if pid=="20080336" //0 changes
 ** Remove variables not needed in final dataset
 drop checkage2 nrn2 dds2recstatdc dds2tfdddoa dds2tfddda dds2tfregnumstart dds2tfdistrictstart dds2tfregnumend dds2tfdistrictend dds2tfddtxt dds2recstattf dds2duprec dds2dupname dds2dupdod dds2dodyear
 
-** Save this corrected dataset with only reportable cases
-save "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival", replace
-label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival Reportable Dataset"
+count //2961
+
+** Save this corrected dataset with only BNR reportable cases
+save "`datapath'\version02\3-output\2008_2013_2014_cancer_nonsurvival_bnr_reportable", replace
+label data "2008 2013 2014 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
