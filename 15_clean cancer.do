@@ -8337,13 +8337,13 @@ quietly by pid cr5id :  gen duppidcr5id = cond(_N==1,0,_n)
 sort pid cr5id
 count if duppidcr5id>0 //17
 //list pid cr5id record_id eidmp ptrectot primarysite duppidcr5id _merge_org if duppidcr5id>0
-count if _merge_org==5 //39 - some are correct so don't drop
+count if _merge_org==5 //39; 38 - some are correct so don't drop
 //list pid cr5id record_id eidmp ptrectot primarysite duppidcr5id _merge_org if _merge_org==5
-count if duppidcr5id>0 & _merge_org==5 //10
+count if duppidcr5id>0 & _merge_org==5 //11
 //list pid cr5id record_id eidmp ptrectot primarysite duppidcr5id _merge_org if duppidcr5id>0 & _merge_org==5
 ** Need to avoid inadvertently deleting a correct source record so need to tag the duplicate cr5id
 duplicates tag pid cr5id, gen(dup_cr5id)
-count if dup_cr5id>0 & _merge_org==5 //10
+count if dup_cr5id>0 & _merge_org==5 //11
 //list pid cr5id dup_cr5id duppidcr5id _merge_org if dup_cr5id>0, nolabel sepby(pid)
 drop if dup_cr5id>0 & _merge_org==5 //10; 11 deleted
 
@@ -8351,6 +8351,8 @@ count //2035; 2183
 
 tab dxyr ,m 
 tab dxyr eidmp ,m
+tab sourcename ,m  //149 missing - missed death certificates from DCO list
+replace sourcename=5 if sourcename==. //149 changes
 
 ** Create word doc for NS of duplicates for assessing completeness (sources per record) but want to retain this dataset
 preserve
@@ -8423,12 +8425,12 @@ putdocx text ("# duplicates: "), bold font(Helvetica,10)
 putdocx text ("910"), shading("yellow") bold font(Helvetica,10)
 putdocx paragraph
 putdocx text ("# non-duplicates: "), bold font(Helvetica,10)
-putdocx text ("940"), shading("yellow") bold font(Helvetica,10)
+putdocx text ("1,078"), shading("yellow") bold font(Helvetica,10)
 putdocx paragraph
 putdocx text ("# ineligibles: "), bold font(Helvetica,10)
 putdocx text ("120"), shading("yellow") bold font(Helvetica,10)
 putdocx paragraph, halign(center)
-putdocx text ("Duplicates (total records/n=1,970)"), bold font(Helvetica,14,"blue")
+putdocx text ("Duplicates (total records/n=2,108)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename dupdqi Total_Duplicates
 rename count Total_Records
@@ -8437,7 +8439,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-01_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-10-03_DQI.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -8449,11 +8451,11 @@ restore
 ** Create word doc for SAF of sources but want to retain this dataset
 ** NB: some sources need updating from 7-BNRdb to 4-IPS and 1-QEH
 preserve
-drop if dxyr!=2015 //65 deleted: removed 2008, 2013, 2014 records
-count if sourcename==7 & length(labnum)<8 //2
-replace sourcename=4 if sourcename==7 & length(labnum)<8 //2 changes
+drop if dxyr!=2015 //74 deleted: removed 2008, 2013, 2014 records
+count if sourcename==7 & length(labnum)<8 //0
+replace sourcename=4 if sourcename==7 & length(labnum)<8 //0 changes
 count if sourcename==7
-replace sourcename=1 if sourcename==7 //1 change
+replace sourcename=1 if sourcename==7 //0 changes
 contract sourcename, freq(count) percent(percentage)
 gsort -count
 
@@ -8464,10 +8466,10 @@ putdocx begin
 putdocx paragraph, style(Heading1)
 putdocx text ("Sources"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Sources (total records/n=1,970)"), bold font(Helvetica,14,"blue")
+putdocx text ("Sources (total records/n=2,108)"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("2015 Completeness: Sources per Record = 2.09"), bold font(Helvetica,12,"red")
-//1,970/940=2.09: nonsurvival ds has 904 tumours so 1,970/904=2.18 sources per record
+putdocx text ("2015 Completeness: Sources per Record = 1.98"), bold font(Helvetica,12,"red")
+//2108/1078=1.96: nonsurvival ds has 1062 tumours so 2108/1062=1.98 sources per record
 putdocx paragraph, halign(center)
 putdocx text ("2014 Completeness: Sources per Record = 2.75"), bold font(Helvetica,12,"lightpink")
 putdocx paragraph
@@ -8478,7 +8480,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-01_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-03_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace
