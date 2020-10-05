@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL/ Kern ROCKE
     //  date first created      17-NOV-2019
-    // 	date last modified      29-FEB-2020
+    // 	date last modified      05-OCT-2020
     //  algorithm task          Preparing 2008-2015 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2008-2015 data for 2015 annual report.
@@ -39,7 +39,7 @@ cls
 *************************
 ** Annual report: Table 1 (executive summary)
 ** Load the NON-SURVIVAL dataset
-use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival", clear // note pop_bb removed in the 
+use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable", clear // note pop_bb removed in the 
 //save "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , replace
 //use "`datapath'\version02\2-working\2008_2013_2014_summstats_prerpt" , clear
 
@@ -133,7 +133,8 @@ drop surv3yr_2008
 gen surv3yr_2008=surv3yr_2008_censor/pttotsurv_2008*100
 ** 5-yr survival
 gen surv5yr_2015=.
-gen surv5yr_2014=.
+egen surv5yr_2014_censor=count(surv5yr_2014) if surv5yr_2014==0
+egen surv5yr_2014_dead=count(surv5yr_2014) if surv5yr_2014==1
 egen surv5yr_2013_censor=count(surv5yr_2013) if surv5yr_2013==0
 egen surv5yr_2013_dead=count(surv5yr_2013) if surv5yr_2013==1
 drop surv5yr_2013
@@ -184,6 +185,7 @@ gen asir_2015=asir if cancer_site==1 & year==1
 gen asir_2014=asir if cancer_site==1 & year==2
 gen asir_2013=asir if cancer_site==1 & year==3
 gen asir_2008=asir if cancer_site==1 & year==4
+format asir_* %04.2f
 
 ** Re-arrange dataset
 gen id=_n
@@ -237,24 +239,23 @@ replace title=11 if surv10yr_2008!=.
 
 *-------------------------------------------------------------------------------
 
-tab title ,m //some title replaced so add in new obs
+tab title ,m //some titles got replaced so add in new obs
 ** % of entire population needs to be added in
-list id tumourtotper_2008 if tumourtotper_2008!=.
-expand=2 in 292, gen (tumtotper_2008)
-replace id=9003 if tumtotper_2008==1
+//list id tumourtotper_2008 if tumourtotper_2008!=.
+expand=2 in 1, gen (tumtotper_2008)
+replace id=9000 if tumtotper_2008==1
 replace title=3 if tumtotper_2008!=0
-list id tumourtotper_2013 if tumourtotper_2013!=.
-expand=2 in 520, gen (tumtotper_2013)
-replace id=9004 if tumtotper_2013==1
+//list id tumourtotper_2013 if tumourtotper_2013!=.
+expand=2 in 333, gen (tumtotper_2013)
+replace id=9001 if tumtotper_2013==1
 replace title=3 if tumtotper_2013!=0
-list id tumourtotper_2014 if tumourtotper_2014!=.
-expand=2 in 177, gen (tumtotper_2014)
-replace id=9005 if tumtotper_2014==1
+//list id tumourtotper_2014 if tumourtotper_2014!=.
+expand=2 in 191, gen (tumtotper_2014)
+replace id=9002 if tumtotper_2014==1
 replace title=3 if tumtotper_2014!=0
-
-list id tumourtotper_2015 if tumourtotper_2015!=.
-expand=2 in 303, gen (tumtotper_2015) // Note to change the in input
-replace id=9006 if tumtotper_2015==1
+//list id tumourtotper_2015 if tumourtotper_2015!=.
+expand=2 in 358, gen (tumtotper_2015) // Note to change the in input
+replace id=9003 if tumtotper_2015==1
 replace title=3 if tumtotper_2015!=0
 
 /*
@@ -275,28 +276,29 @@ replace title=6 if asir_2014!=0
 replace title=6 if asir_2013!=0
 replace title=6 if asir_2008!=0
 */
-** No.registered by death certificate only needs to be added in
-list id dco_2008 if dco_2008!=.
-expand=2 in 2, gen (dcotot_2008)
-replace id=9011 if dcotot_2008==1
-replace title=6 if dcotot_2008!=0
-list id dco_2013 if dco_2013!=.
-expand=2 in 12, gen (dcotot_2013)
-replace id=9012 if dcotot_2013==1
-replace title=6 if dcotot_2013!=0
-list id dco_2014 if dco_2014!=.
-expand=2 in 20, gen (dcotot_2014)
-replace id=9013 if dcotot_2014==1
-replace title=6 if dcotot_2014!=0
 
-list id dco_2015 if dco_2015!=.
-expand=2 in 30, gen (dcotot_2015) // Note check the in input
-replace id=9014 if dcotot_2015==1
+** No.registered by death certificate only needs to be added in
+//list id dco_2008 if dco_2008!=.
+expand=2 in 393, gen (dcotot_2008)
+replace id=9004 if dcotot_2008==1
+replace title=6 if dcotot_2008!=0
+//list id dco_2013 if dco_2013!=.
+expand=2 in 1329, gen (dcotot_2013)
+replace id=9005 if dcotot_2013==1
+replace title=6 if dcotot_2013!=0
+//list id dco_2014 if dco_2014!=.
+expand=2 in 1109, gen (dcotot_2014)
+replace id=9006 if dcotot_2014==1
+replace title=6 if dcotot_2014!=0
+//list id dco_2015 if dco_2015!=.
+expand=2 in 3488, gen (dcotot_2015) // Note check the in input
+replace id=9007 if dcotot_2015==1
 replace title=6 if dcotot_2015!=0
 
 drop tumtotper_* dcotot_*
 
-tab title ,m 
+tab title ,m //40 missing - remove blank titles as no data in any of the corresponding fields for those blank titles
+drop if title==. //40 deleted
 
 ** Rearrange summ stats datast
 egen tumtot_2015=max(tumourtot_2015)
@@ -350,24 +352,25 @@ egen surv10yrtot_2014=max(surv10yr_2014)
 egen surv10yrtot_2013=max(surv10yr_2013)
 egen surv10yrtot_2008=max(surv10yr_2008)
 
-**  Useusing format below displays all correctly but this one as it need rounding up first
-//replace dcototper_2008=round(dcototper_2008, 0.15)
-//replace dcototper_2013=round(dcototper_2013, 0.15)
-//replace dcototper_2014=round(dcototper_2014, 0.15)
-//replace dcototper_2015=round(dcototper_2015, 0.15)
-//replace surv1yrtot_2015=round(surv1yrtot_2015, 0.15)
-//replace surv1yrtot_2014=round(surv1yrtot_2014, 0.15)
-//replace surv1yrtot_2013=round(surv1yrtot_2013, 0.15)
-//replace surv1yrtot_2008=round(surv1yrtot_2008, 0.15)
-//replace surv3yrtot_2015=round(surv3yrtot_2015, 0.15)
-//replace surv3yrtot_2014=round(surv3yrtot_2014, 0.15)
+**  Using format below displays all correctly but this one as it need rounding up first
+replace dcototper_2008=round(dcototper_2008, 0.15)
+replace dcototper_2013=round(dcototper_2013, 0.15)
+replace dcototper_2014=round(dcototper_2014, 0.15)
+replace dcototper_2015=round(dcototper_2015, 0.15)
+replace surv1yrtot_2015=round(surv1yrtot_2015, 0.15)
+replace surv1yrtot_2014=round(surv1yrtot_2014, 0.15)
+replace surv1yrtot_2013=round(surv1yrtot_2013, 0.15)
+replace surv1yrtot_2008=round(surv1yrtot_2008, 0.15)
+replace surv3yrtot_2015=round(surv3yrtot_2015, 0.15)
+replace surv3yrtot_2014=round(surv3yrtot_2014, 0.15)
 replace surv3yrtot_2013=round(surv3yrtot_2013, 0.15)
 replace surv3yrtot_2008=round(surv3yrtot_2008, 0.15)
-//replace surv5yrtot_2013=round(surv5yrtot_2013, 0.15)
-//replace surv5yrtot_2008=round(surv5yrtot_2008, 0.15)
-//replace surv10yrtot_2008=round(surv10yrtot_2008, 0.15)
-format dcototper_2008 dcototper_2013 dcototper_2014 dcototper_2015 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2013 surv5yrtot_2008 surv10yrtot_2008 %2.1f
-//stop
+replace surv5yrtot_2014=round(surv5yrtot_2014, 0.15)
+replace surv5yrtot_2013=round(surv5yrtot_2013, 0.15)
+replace surv5yrtot_2008=round(surv5yrtot_2008, 0.15)
+replace surv10yrtot_2008=round(surv10yrtot_2008, 0.15)
+format dcototper_2008 dcototper_2013 dcototper_2014 dcototper_2015 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv1yrtot_2008 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv3yrtot_2008 surv5yrtot_2014 surv5yrtot_2013 surv5yrtot_2008 surv10yrtot_2008 %2.1f
+
 *-------------------------------------------------------------------------------
 
 drop tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv1yr_* surv3yr_* surv5yr_* surv10yr_*
@@ -385,7 +388,7 @@ replace title=9 if id==9
 replace title=10 if id==10
 replace title=11 if id==11
 
-drop if id>10
+drop if id>11
 rename tumtot_2015 results_2015
 rename tumtot_2014 results_2014
 rename tumtot_2013 results_2013
@@ -403,10 +406,13 @@ replace results_2013=pttot_2013 if id==4
 replace results_2008=pttot_2008 if id==4
 drop pttot_*
 
+format asirtot_* %04.2f
 replace results_2015=asirtot_2015 if id==5
 replace results_2014=asirtot_2014 if id==5
 replace results_2013=asirtot_2013 if id==5
 replace results_2008=asirtot_2008 if id==5
+//if id==5 format results_* %04.2f
+//replace results_2014=204.80 if id==5
 drop asirtot_*
 
 replace results_2015=dcotot_2015 if id==6
@@ -460,7 +466,7 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2015 Annual Report: Stata Results"), bold
 putdocx textblock begin
-Date Prepared: 04-MAR-2020. 
+Date Prepared: 05-OCT-2020. 
 Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
 Generated using Dofile: 30_report cancer.do
 putdocx textblock end
@@ -473,22 +479,22 @@ putdocx image "`datapath'\version02\1-input\standards.png", width(6.64) height(6
 putdocx paragraph
 putdocx text ("Methods"), bold
 putdocx textblock begin
-(1) No.(tumours): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+(1) No.(tumours): Excludes international case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable")
 putdocx textblock end
 putdocx textblock begin
 (2) % of population: 2000 (census) population for 2008 diagnoses; 2010 (census) population for 2013 onwards (see p_117\2015AnnualReport branch\0_population.do)
 putdocx textblock end
 putdocx textblock begin
-(3) No.(patients): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+(3) No.(patients): Excludes international case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable")
 putdocx textblock end
 putdocx textblock begin
-(4) ASIR: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs; stata command distrate used with pop_wpp_2015-10, pop_wpp_2014-10, pop_wpp_2013-10, pop_wpp_2008-10 for 2015,2014,2013,2008 cancer incidence, respectively, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10;pop_wpp_2014-10;pop_wpp_2013-10;pop_wpp_2008-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
+(4) ASIR: Excludes international case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; stata command distrate used with pop_wpp_2015-10, pop_wpp_2014-10, pop_wpp_2013-10, pop_wpp_2008-10 for 2015,2014,2013,2008 cancer incidence, respectively, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10;pop_wpp_2014-10;pop_wpp_2013-10;pop_wpp_2008-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
-(5) Site Order: These tables show where the order of 2015 top 10 sites in 2014,2013,2008, respectively; site order datasets used: "`datapath'\version02\2-working\siteorder_2014; siteorder_2013; siteorder_2008")
+(5) Site Order: These tables show where the order of 2015 top 10 sites in 2015,2014,2013,2008, respectively; site order datasets used: "`datapath'\version02\2-working\siteorder_2015; siteorder_2014; siteorder_2013; siteorder_2008")
 putdocx textblock end
 putdocx textblock begin
-(6) ASIR by sex: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
+(6) ASIR by sex: Excludes international case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
 (7) Population text files (WPP): saved in: "`datapath'\version02\2-working\WPP_population by sex_yyyy"
@@ -497,10 +503,10 @@ putdocx textblock begin
 (8) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
 putdocx textblock end
 putdocx textblock begin
-(9) No.(DCOs): Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs. NB: 2015 DCO trace-back for 176 cases still pending completion so 163 of these, found in death data and not previously abstracted, have been excluded from the dataset until trace-back completed. (variable used: basis. dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+(9) No.(DCOs): Excludes international case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs. (variable used: basis. dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable")
 putdocx textblock end
 putdocx textblock begin
-(10) % of tumours: Excludes ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival")
+(10) % of tumours: Excludes international case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable")
 putdocx textblock end
 putdocx textblock begin
 (11) 1-yr, 3-yr, 5-yr, 10-yr survival (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2008, surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2008, surv5yr_2013, surv10yr_2008; dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_survival")
@@ -532,7 +538,7 @@ putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_2015summstats" ,replace
@@ -544,7 +550,7 @@ clear
 preserve
 use "`datapath'\version02\2-working\ASIRs", clear
 format asir %04.2f
-sort cancer_site year asir
+sort cancer_site year number
 
 				****************************
 				*	   MS WORD REPORT      *
@@ -561,7 +567,7 @@ putdocx text ("ASIRs"), bold
 putdocx paragraph, halign(center)
 putdocx text ("All Sites by Year"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx table tbl1 = data(cancer_site year asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1 = data(cancer_site year number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -573,7 +579,7 @@ putdocx table tbl1(1,8), bold shading(lightgray)
 putdocx table tbl1(1,9), bold shading(lightgray)
 putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -614,8 +620,8 @@ putdocx table tbl1(8,.), bold shading("yellow")
 putdocx table tbl1(9,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
-putdocx table tbl1(12,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+//putdocx table tbl1(12,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -654,10 +660,10 @@ putdocx table tbl1(6,.), bold shading("yellow")
 putdocx table tbl1(7,.), bold shading("yellow")
 putdocx table tbl1(8,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
-putdocx table tbl1(12,.), bold shading("yellow")
-putdocx table tbl1(16,.), bold shading("yellow")
-putdocx table tbl1(17,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+putdocx table tbl1(11,.), bold shading("yellow")
+putdocx table tbl1(13,.), bold shading("yellow")
+//putdocx table tbl1(17,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -694,11 +700,12 @@ putdocx table tbl1(5,.), bold shading("yellow")
 putdocx table tbl1(7,.), bold shading("yellow")
 putdocx table tbl1(8,.), bold shading("yellow")
 putdocx table tbl1(9,.), bold shading("yellow")
-putdocx table tbl1(10,.), bold shading("yellow")
+putdocx table tbl1(11,.), bold shading("yellow")
 putdocx table tbl1(12,.), bold shading("yellow")
-putdocx table tbl1(14,.), bold shading("yellow")
-putdocx table tbl1(15,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+putdocx table tbl1(13,.), bold shading("yellow")
+//putdocx table tbl1(14,.), bold shading("yellow")
+//putdocx table tbl1(15,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -736,10 +743,10 @@ putdocx table tbl1(6,.), bold shading("yellow")
 putdocx table tbl1(7,.), bold shading("yellow")
 putdocx table tbl1(8,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
+putdocx table tbl1(11,.), bold shading("yellow")
 putdocx table tbl1(12,.), bold shading("yellow")
-putdocx table tbl1(13,.), bold shading("yellow")
-putdocx table tbl1(14,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+//putdocx table tbl1(14,.), bold shading("yellow")
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -767,14 +774,14 @@ putdocx text ("ASIRs"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx table tbl1 = data(cancer_site asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -801,14 +808,14 @@ putdocx text ("ASIRs"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx table tbl1 = data(cancer_site asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2020-03-05_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 restore
 

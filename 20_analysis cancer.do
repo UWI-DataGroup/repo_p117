@@ -665,7 +665,7 @@ putdocx table tbl_bod = data("Site Total_DQI Total_Records Pct_DQI"), varnames  
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_bod(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-03_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-05_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_basis.dta" ,replace
@@ -695,7 +695,7 @@ putdocx table tbl_site = data("Total_DQI Total_Records Pct_DQI"), varnames  ///
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-03_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-05_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_siteage.dta" ,replace
