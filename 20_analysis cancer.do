@@ -641,6 +641,7 @@ tab boddqi rectot,m
 tab siteagedqi ,m
 tab siteagedqi rectot,m
 
+/*
 preserve
 ** Append to above .docx for NS of basis,site,age but want to retain this dataset
 ** % tumours - basis by siteicd10
@@ -666,6 +667,143 @@ putdocx table tbl_bod = data("Site Total_DQI Total_Records Pct_DQI"), varnames  
 putdocx table tbl_bod(1,.), bold
 
 putdocx save "`datapath'\version02\3-output\2020-10-05_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_basis.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Basis"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+*/
+
+
+** Create variables for table by basis (DCO% + MV%) in Data Quality section of annual report
+** This was done manually in excel for 2014 annual report so the above code has now been updated to be automated in Stata
+tab sitecr5db boddqi if boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=2 & sitecr5db!=5 & sitecr5db!=7 & sitecr5db!=9 & sitecr5db!=13 & sitecr5db!=15 & sitecr5db!=16 & sitecr5db!=17 & sitecr5db!=18 & sitecr5db!=19 & sitecr5db!=20
+/*
+                      |       basis DQI
+          CR5db sites |        MV        DCO |     Total
+----------------------+----------------------+----------
+Mouth & pharynx (C00- |        25          0 |        25 
+        Stomach (C16) |        23          9 |        32 
+Colon, rectum, anus ( |       144         19 |       163 
+       Pancreas (C25) |         7         10 |        17 
+Lung, trachea, bronch |        13          7 |        20 
+         Breast (C50) |       181         14 |       195 
+         Cervix (C53) |        14          2 |        16 
+Corpus & Uterus NOS ( |        43          4 |        47 
+       Prostate (C61) |       170         33 |       203 
+Lymphoma (C81-85,88,9 |        45          7 |        52 
+   Leukaemia (C91-95) |        11          2 |        13 
+----------------------+----------------------+----------
+                Total |       676        107 |       783
+*/
+labelbook sitecr5db_lab
+
+preserve
+drop if boddqi==. | boddqi>2 | sitecr5db==. | sitecr5db>22 | sitecr5db==20 | sitecr5db==2 | sitecr5db==5 | sitecr5db==7 | sitecr5db==9 | sitecr5db==13 | (sitecr5db>14 & sitecr5db<21) //279 deleted
+contract sitecr5db boddqi, freq(count) percent(percentage)
+input
+34	1	676	0
+34	2	107	0
+end
+
+label define sitecr5db_lab ///
+1 "Mouth & pharynx" ///
+2 "Oesophagus" ///
+3 "Stomach" ///
+4 "Colon, rectum, anus" ///
+5 "Liver" ///
+6 "Pancreas" ///
+7 "Larynx" ///
+8 "Lung, trachea, bronchus" ///
+9 "Melanoma of skin" ///
+10 "Breast" ///
+11 "Cervix" ///
+12 "Corpus & Uterus NOS" ///
+13 "Ovary & adnexa" ///
+14 "Prostate" ///
+15 "Testis" ///
+16 "Kidney & urinary NOS" ///
+17 "Bladder" ///
+18 "Brain, nervous system" ///
+19 "Thyroid" ///
+20 "O&U" ///
+21 "Lymphoma" ///
+22 "Leukaemia" ///
+23 "Other digestive" ///
+24 "Nose, sinuses" ///
+25 "Bone, cartilage, etc" ///
+26 "Other skin" ///
+27 "Other female organs" ///
+28 "Other male organs" ///
+29 "Other endocrine" ///
+30 "Myeloproliferative disorders (MPD)" ///
+31 "Myelodysplastic syndromes (MDS)" ///
+32 "D069: CIN 3" ///
+33 "Eye,Heart,etc" ///
+34 "All sites (in this table)" , modify
+label var sitecr5db "CR5db sites"
+label values sitecr5db sitecr5db_lab
+drop percentage
+gen percentage=(count/25)*100 if sitecr5db==1 & boddqi==1
+replace percentage=(count/25)*100 if sitecr5db==1 & boddqi==2
+replace percentage=(count/32)*100 if sitecr5db==3 & boddqi==1
+replace percentage=(count/32)*100 if sitecr5db==3 & boddqi==2
+replace percentage=(count/163)*100 if sitecr5db==4 & boddqi==1
+replace percentage=(count/163)*100 if sitecr5db==4 & boddqi==2
+replace percentage=(count/17)*100 if sitecr5db==6 & boddqi==1
+replace percentage=(count/17)*100 if sitecr5db==6 & boddqi==2
+replace percentage=(count/20)*100 if sitecr5db==8 & boddqi==1
+replace percentage=(count/20)*100 if sitecr5db==8 & boddqi==2
+replace percentage=(count/195)*100 if sitecr5db==10 & boddqi==1
+replace percentage=(count/195)*100 if sitecr5db==10 & boddqi==2
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==1
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==2
+replace percentage=(count/47)*100 if sitecr5db==12 & boddqi==1
+replace percentage=(count/47)*100 if sitecr5db==12 & boddqi==2
+replace percentage=(count/203)*100 if sitecr5db==14 & boddqi==1
+replace percentage=(count/203)*100 if sitecr5db==14 & boddqi==2
+replace percentage=(count/52)*100 if sitecr5db==21 & boddqi==1
+replace percentage=(count/52)*100 if sitecr5db==21 & boddqi==2
+replace percentage=(count/13)*100 if sitecr5db==22 & boddqi==1
+replace percentage=(count/13)*100 if sitecr5db==22 & boddqi==2
+replace percentage=(count/783)*100 if sitecr5db==34 & boddqi==1
+replace percentage=(count/783)*100 if sitecr5db==34 & boddqi==2
+format percentage %04.1f
+
+gen icd10dqi="C00-14" if sitecr5db==1
+replace icd10dqi="C16" if sitecr5db==3
+replace icd10dqi="C18-21" if sitecr5db==4
+replace icd10dqi="C25" if sitecr5db==6
+replace icd10dqi="C33-34" if sitecr5db==8
+replace icd10dqi="C50" if sitecr5db==10
+replace icd10dqi="C53" if sitecr5db==11
+replace icd10dqi="C54-55" if sitecr5db==12
+replace icd10dqi="C61" if sitecr5db==14
+replace icd10dqi="C81-85,88,90,96" if sitecr5db==21
+replace icd10dqi="C91-95" if sitecr5db==22
+replace icd10dqi="All" if sitecr5db==34
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Basis"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=1,062)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename sitecr5db Cancer_Site
+rename boddqi Total_DQI
+rename count Cases
+rename percentage Pct_DQI
+rename icd10dqi ICD10
+putdocx table tbl_bod = data("Cancer_Site Total_DQI Cases Pct_DQI ICD10"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_bod(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2020-10-12_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_basis.dta" ,replace
