@@ -494,7 +494,7 @@ putdocx textblock begin
 (5) Site Order: These tables show where the order of 2015 top 10 sites in 2015,2014,2013,2008, respectively; site order datasets used: "`datapath'\version02\2-working\siteorder_2015; siteorder_2014; siteorder_2013; siteorder_2008")
 putdocx textblock end
 putdocx textblock begin
-(6) ASIR by sex: Excludes international case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
+(6) ASIR by sex: Excludes international case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; unk/missing ages were included in the median age group; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version02\2-working\2008_2013_2014_2015_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
 (7) Population text files (WPP): saved in: "`datapath'\version02\2-working\WPP_population by sex_yyyy"

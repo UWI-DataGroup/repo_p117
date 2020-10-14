@@ -37,12 +37,17 @@ cls
 
 
 
-************************************************************************* 
+***************************************************************************
 * SECTION 1: NUMBERS 
 *        (1.1) total number & number of multiple events
 *        (1.2) DCOs
-*    	 (1.3) tumours by age-group
-**************************************************************************
+*    	 (1.3) tumours by age-group: 
+*				NOTE: missing/unknown age (code 999) are 
+*				to be included in the age group that has a median total if 
+*			  	total number of unk age is small, i.e. 5 cases with unk age; 
+*			  	if larger then they would be distributed amongst more than
+*			  	one age groups with median totals (NS update on 14-Oct-2020)
+****************************************************************************
  
 ** LOAD cancer incidence dataset INCLUDING DCOs
 use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable" ,clear

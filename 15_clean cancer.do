@@ -10218,7 +10218,7 @@ order pid cr5id dot fname lname init age sex dob natregno resident slc dlc dod /
 
 count //3336; 3346; 3516; 4060
 
-** Save this corrected dataset with non-reportable cases
+** Save this corrected dataset with BNR reportable cases
 save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_nonsurvival_bnr_reportable", replace
 label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival BNR Reportable Dataset"
 note: TS This dataset was NOT used for 2015 annual report
