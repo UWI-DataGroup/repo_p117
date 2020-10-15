@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      04-DEC-2019
-    // 	date last modified      04-DEC-2019
+    // 	date last modified      15-OCT-2020
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASIRs (3) Survival
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2015 death data for inclusion in 2015 cancer report.
@@ -198,6 +198,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=1 if cancer_site==.
@@ -205,7 +207,7 @@ replace year=1 if year==.
 gen asmr_id="all" if rpt_id==.
 replace rpt_id=1 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==1 & asmr_id==""
 drop asmr_id
@@ -286,6 +288,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=2 if cancer_site==.
@@ -293,7 +297,7 @@ replace year=1 if year==.
 gen asmr_id="prost" if rpt_id==.
 replace rpt_id=2 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==2 & asmr_id==""
 drop asmr_id
@@ -399,6 +403,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=3 if cancer_site==.
@@ -406,7 +412,7 @@ replace year=1 if year==.
 gen asmr_id="colon" if rpt_id==.
 replace rpt_id=3 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==3 & asmr_id==""
 drop asmr_id
@@ -540,6 +546,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=4 if cancer_site==.
@@ -547,7 +555,7 @@ replace year=1 if year==.
 gen asmr_id="breast" if rpt_id==.
 replace rpt_id=4 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==4 & asmr_id==""
 drop asmr_id
@@ -661,6 +669,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=5 if cancer_site==.
@@ -668,7 +678,7 @@ replace year=1 if year==.
 gen asmr_id="stom" if rpt_id==.
 replace rpt_id=5 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==5 & asmr_id==""
 drop asmr_id
@@ -788,6 +798,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=6 if cancer_site==.
@@ -795,7 +807,7 @@ replace year=1 if year==.
 gen asmr_id="panc" if rpt_id==.
 replace rpt_id=6 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==6 & asmr_id==""
 drop asmr_id
@@ -915,6 +927,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=7 if cancer_site==.
@@ -922,7 +936,7 @@ replace year=1 if year==.
 gen asmr_id="lung" if rpt_id==.
 replace rpt_id=7 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==7 & asmr_id==""
 drop asmr_id
@@ -1049,6 +1063,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=8 if cancer_site==.
@@ -1056,7 +1072,7 @@ replace year=1 if year==.
 gen asmr_id="MM" if rpt_id==.
 replace rpt_id=8 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==8 & asmr_id==""
 drop asmr_id
@@ -1139,6 +1155,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=9 if cancer_site==.
@@ -1146,7 +1164,7 @@ replace year=1 if year==.
 gen asmr_id="corpus" if rpt_id==.
 replace rpt_id=9 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==9 & asmr_id==""
 drop asmr_id
@@ -1254,6 +1272,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=10 if cancer_site==.
@@ -1261,7 +1281,7 @@ replace year=1 if year==.
 gen asmr_id="rect" if rpt_id==.
 replace rpt_id=10 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==10 & asmr_id==""
 drop asmr_id
@@ -1390,6 +1410,8 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
+gen percent=number/631*100
+replace percent=round(percent,0.01)
 
 append using "`datapath'\version02\2-working\ASMRs"
 replace cancer_site=11 if cancer_site==.
@@ -1397,7 +1419,7 @@ replace year=1 if year==.
 gen asmr_id="NHL" if rpt_id==.
 replace rpt_id=11 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percentage asmr ci_lower ci_upper year
+order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==11 & asmr_id==""
 drop asmr_id rpt_id

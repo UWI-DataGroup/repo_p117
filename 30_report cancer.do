@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL/ Kern ROCKE
     //  date first created      17-NOV-2019
-    // 	date last modified      05-OCT-2020
+    // 	date last modified      15-OCT-2020
     //  algorithm task          Preparing 2008-2015 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2008-2015 data for 2015 annual report.
@@ -819,7 +819,8 @@ putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx"
 putdocx clear
 restore
 
-/* JC 03mar20: neither of the below reports will be used in the 2015 annual report so code has been disabled
+** JC 03mar20: neither of the below reports will be used in the 2015 annual report so code has been disabled
+** JC 15oct20: NS decided to include ASMRs on 14-OCT-2020.
 				****************************
 				*	   MS WORD REPORT      *
 				* ANNUAL REPORT STATISTICS *
@@ -835,13 +836,14 @@ sort cancer_site year asmr
 preserve
 putdocx clear
 putdocx begin, footer(foot1)
+putdocx pagebreak
 putdocx paragraph, tofooter(foot1)
 putdocx text ("Page ")
 putdocx pagenumber
 putdocx paragraph, halign(center)
 putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=276,633)"), bold font(Helvetica,10,"blue")
 putdocx textblock begin
-Date Prepared: 04-Dec-2019. 
+Date Prepared: 15-Oct-2020.
 Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
 Generated using Dofile: 25_analysis mort.do
 putdocx textblock end
@@ -854,7 +856,7 @@ putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using barbados population: pop_bss_2015-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version02\3-output\2015 prep mort")
 putdocx textblock end
 //putdocx pagebreak
-putdocx table tbl1 = data(cancer_site year number percentage asmr ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -862,13 +864,13 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2019-12-04_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-05_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\3-output\2008_2013_2014_2015_summstats" ,replace
 restore
 
-
+/*
 ** Output for above ASIRs comparison using BSS vs WPP populations
 use "`datapath'\version02\2-working\ASIRs_BSS_WPP", clear
 format asir %04.2f
