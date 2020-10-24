@@ -10300,6 +10300,8 @@ drop dup_id
 
 count //3484; 3488; 2744
 
+capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV01.xlsx", sheet("2015 DCOs_deathdata_20200218") firstrow(variables) replace
+
 ** Save this corrected dataset with internationally reportable cases
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival", replace
 label data "2013 2014 2015 BNR-Cancer analysed data - Non-survival Dataset"
