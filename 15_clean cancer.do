@@ -8447,7 +8447,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-23_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2020-10-26_DQI.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -8488,7 +8488,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-23_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2020-10-26_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace
@@ -10280,6 +10280,16 @@ order pid cr5id dot fname lname init age sex dob natregno resident slc dlc dod /
 
 count //3336; 3346; 3516; 4060
 
+
+** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
+** See p131 version06 for more info on this data request
+save "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival", replace
+label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival Dataset for IARC Hub's Data Request"
+note: TS This dataset was used for data prep for IARC Hub's quality assessment (see p131 v06)
+note: TS Excludes ineligible case definition
+note: TS Includes unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
+
+
 ** For 2015 annaul report remove 2008 cases as decided by NS on 06-Oct-2020, email subject: BNR-C: 2015 cancer stats tables completed
 drop if dxyr==2008
 
@@ -10300,7 +10310,7 @@ drop dup_id
 
 count //3484; 3488; 2744
 
-capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV02.xlsx", sheet("2013_2014_2015_20201024") firstrow(varlabels) replace
+capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV03.xlsx", sheet("2013_2014_2015_20201026") firstrow(varlabels) replace
 
 ** Save this corrected dataset with internationally reportable cases
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival", replace
