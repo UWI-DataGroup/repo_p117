@@ -909,7 +909,7 @@ clear
 				****************************
 				*	   MS WORD REPORT      *
 				* ANNUAL REPORT STATISTICS *
-                *           ASMRs          *
+                *      ASMRs - BSS         *
 				****************************
 
 ** Output for above ASIRs comparison using BSS vs WPP populations
@@ -955,6 +955,133 @@ putdocx save "`datapath'\version02\3-output\2020-10-23_annual_report_stats.docx"
 putdocx clear
 
 save "`datapath'\version02\3-output\2013_2014_2015_summstats" ,replace
+restore
+
+stop
+
+** JC 07jan21: realized I used BSS pop instead of WPP pop for ASMRs; Also added in age-and-sex-specific rates as requested by SF.
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASMRs - WPP        *
+				****************************
+
+** Output for above ASIRs comparison using BSS vs WPP populations
+use "`datapath'\version02\2-working\ASMRs_wpp", clear
+//format asmr %04.2f
+//format percentage %04.1f
+sort cancer_site year asmr
+
+preserve
+putdocx clear
+putdocx begin, footer(foot1)
+putdocx pagebreak
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2015 Annual Report: ASMRs - WPP"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=285,327)"), bold font(Helvetica,10,"blue")
+putdocx textblock begin
+Date Prepared: 07-Jan-2021.
+Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
+Generated using Dofile: 25_analysis mort.do
+putdocx textblock end
+putdocx paragraph
+putdocx text ("Methods"), bold
+putdocx textblock begin
+(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version02\3-output\2015_prep mort")
+putdocx textblock end
+putdocx textblock begin
+(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2015-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version02\3-output\2015 prep mort")
+putdocx textblock end
+//putdocx pagebreak
+putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx table tbl1(1,7), bold shading(lightgray)
+putdocx save "`datapath'\version02\3-output\2020-10-23_annual_report_stats.docx", append
+putdocx clear
+
+save "`datapath'\version02\3-output\2013_2014_2015_summstats" ,replace
+restore
+
+** Output for top10 age-specific rates
+preserve
+use "`datapath'\version02\2-working\2015_top10mort_age_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*      MORTALITY: 2015     *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific mortality rates for 2015 Top 10 cancers: 2015"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Mortality Top 10 - 2015"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version02\2-working\2015_top10mort_age_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx save "`datapath'\version02\3-output\2020-10-23_annual_report_stats.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version02\2-working\2015_top10mort_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				* by sex - MORTALITY: 2015 *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific mortality rates for 2015 Top 10 cancers by Sex: 2015"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Mortality Top 10 - 2015"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version02\2-working\2015_top10mort_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx save "`datapath'\version02\3-output\2020-10-23_annual_report_stats.docx", append
+putdocx clear
 restore
 
 /*
