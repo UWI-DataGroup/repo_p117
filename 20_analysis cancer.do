@@ -3524,6 +3524,2251 @@ restore
 clear
 
 
+*************************************************************** 2015 BSS pop *******************************************************
+
+/* 
+	08jan21 NS requested an excel workbook to compare BSS vs WPP ASIRs and ASMRs for 2015.
+	Background: when SF requested age-specific mortality rates, JC noticed she generated the ASMRs using BSS pop instead of WPP pop,
+				as agreed upon. JC unsure if this was a mistake or intentional so that our ASMRs would be similar to MoHW's,
+				who use BSS pop for their mortality rates.
+	Methods: JC manually compiled stats into excel workbook using below Stata datasets from version02\2-working
+				- ASIRs
+				- ASIRs_bss
+				- ASMRs
+				- ASMRs_wpp
+			 Excel workbook stored in path: 
+			 X:\The University of the West Indies\FORDE, Shelly-Ann - BNR\REPORTS\Annual Reports\2015 Cancer Report\BSS vs WPP comparison 2015 ASIRs ASMRs.xlsx
+*/
+
+* *********************************************
+* ANALYSIS: SECTION 3 - cancer sites
+* Covering:
+*  3.1  Classification of cancer by site
+*  3.2 	ASIRs by site; overall, men and women
+* *********************************************
+** NOTE: bb popn and WHO popn data prepared by IH are ALL coded M=2 and F=1
+** Above note by AR from 2008 dofile
+
+** Load the dataset
+use "`datapath'\version02\2-working\2013_2014_2015_cancer_numbers", clear
+
+****************************************************************************** 2015 BSS pop ****************************************************************************************
+drop if dxyr!=2015 //1709 deleted
+
+count //1035
+
+
+
+**********************************************************************************
+** ASIR and 95% CI for Table 1 using AR's site groupings - using WHO World popn **
+**					WORLD POPULATION PROSPECTS (WPP): 2015						**
+*drop pfu
+gen pfu=1 // for % year if not whole year collected; not done for cancer        **
+**********************************************************************************
+** NSobers confirmed use of WPP populations
+labelbook sex_lab
+
+********************************************************************
+* (2.4c) IR age-standardised to WHO world popn - ALL TUMOURS: 2015
+********************************************************************
+** Using WHO World Standard Population
+//tab siteiarc ,m
+
+*drop _merge
+merge m:m sex age_10 using "`datapath'\version02\2-working\pop_bss_2015-10"
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                             1,035  (_merge==3)
+    -----------------------------------------
+*/
+** No unmatched records
+
+** Check for missing age as these would need to be added to the median group for that site when assessing ASIRs to prevent creating an outlier
+count if age==.|age==999 //0
+
+** Below saved in pathway: 
+//X:\The University of the West Indies\DataGroup - repo_data\data_p117\version02\2-working\WPP_population by sex_2013.txt
+tab pop_bss age_10  if sex==1 //female
+tab pop_bss age_10  if sex==2 //male
+
+** Next, IRs for invasive tumours only
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** No missing age groups
+		
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR ALL SITES (INVASIVE TUMOURS ONLY) - STD TO WHO WORLD POPN
+
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  | 1035   276633   374.14    260.10   243.97   277.07     8.37 |
+  +-------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+gen cancer_site=1
+gen year=1
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse cancer_site year number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+label define cancer_site_lab 1 "all" 2 "prostate" 3 "breast" 4 "colon" 5 "rectum" 6 "corpus uteri" 7 "stomach" ///
+							 8 "lung" 9 "multiple myeloma" 10 "non-hodgkin lymphoma" 11 "pancreas" ,modify
+label values cancer_site cancer_site_lab
+label define year_lab 1 "2015" 2 "2014" 3 "2013" ,modify
+label values year year_lab
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+
+** Next, IRs for invasive tumours FEMALE only
+preserve
+	drop if age_10==.
+	drop if beh!=3 //18 deleted
+	drop if sex==2 //490 deleted
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** No missing age groups
+		
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR ALL SITES (INVASIVE TUMOURS ONLY-FEMALE) - STD TO WHO WORLD POPN
+
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  545   143485   379.83    249.80   228.15   273.05    11.31 |
+  +-------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+gen cancer_site=1
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse cancer_site number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+label define cancer_site_lab 1 "all" 2 "breast" 3 "colon" 4 "corpus uteri" 5 "rectum" 6 "multiple myeloma" ,modify
+label values cancer_site cancer_site_lab
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_female" ,replace
+restore
+
+** Next, IRs for invasive tumours MALE only
+preserve
+	drop if age_10==.
+	drop if beh!=3 //18 deleted
+	drop if sex==1 //545 deleted
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** No missing age groups
+		
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR ALL SITES (INVASIVE TUMOURS ONLY-FEMALE) - STD TO WHO WORLD POPN
+
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  490   133148   368.01    277.61   253.25   303.79    12.73 |
+  +-------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+gen cancer_site=1
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse cancer_site number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+label define cancer_site_lab 1 "all" 2 "prostate" 3 "colon" 4 "rectum" 5 "lung" 6 "stomach" ,modify
+label values cancer_site cancer_site_lab
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_male" ,replace
+restore
+
+
+********************************
+** Next, IRs by site and year **
+********************************
+** PROSTATE
+tab pop_bss age_10 if siteiarc==39 //male
+
+preserve
+	drop if age_10==. //0 deleted
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==39 // prostate only
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M 0-14,15-24,25-34
+	expand 2 in 1
+	replace sex=2 in 7
+	replace age_10=1 in 7
+	replace case=0 in 7
+	replace pop_bss=(26626) in 7
+	sort age_10	
+	
+	expand 2 in 1
+	replace sex=2 in 8
+	replace age_10=2 in 8
+	replace case=0 in 8
+	replace pop_bss=(19111)  in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 9
+	replace age_10=3 in 9
+	replace case=0 in 9
+	replace pop_bss=(18440) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR PC - STD TO WHO WORLD POPN 
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  217   132285   164.04    121.24   105.51   138.78     8.34 |
+  +-------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=2 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** PROSTATE - for male top5 table
+tab pop_bss age_10 if siteiarc==39 //male
+
+preserve
+	drop if age_10==. //0 deleted
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==39 // prostate only
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M 0-14,15-24,25-34
+	expand 2 in 1
+	replace sex=2 in 7
+	replace age_10=1 in 7
+	replace case=0 in 7
+	replace pop_bss=(26626) in 7
+	sort age_10	
+	
+	expand 2 in 1
+	replace sex=2 in 8
+	replace age_10=2 in 8
+	replace case=0 in 8
+	replace pop_bss=(19111)  in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 9
+	replace age_10=3 in 9
+	replace case=0 in 9
+	replace pop_bss=(18440) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR PC - STD TO WHO WORLD POPN 
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  217   132285   164.04    121.24   105.51   138.78     8.34 |
+  +-------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/490*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_male" 
+replace cancer_site=2 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_male" ,replace
+restore
+
+** BREAST - excluded male breast cancer
+tab pop_bss age_10  if siteiarc==29 & sex==1 //female
+tab pop_bss age_10  if siteiarc==29 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==29 //200 breast only 
+	drop if sex==2 //1 deleted
+	//excluded the 1 male as it would be potential confidential breach if reported separately
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M&F 0-14,15-24
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=1 in 8
+	replace case=0 in 8
+	replace pop_bss=(25537) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=2 in 9
+	replace case=0 in 9
+	replace pop_bss=(18761) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+sort age_10
+total pop_bss
+
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR BC (FEMALE) - STD TO WHO WORLD POPN 
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  197   142913   137.85     96.28    82.77   111.47     7.19 |
+  +-------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=3 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** BREAST - for female top5 table
+tab pop_bss age_10  if siteiarc==29 & sex==1 //female
+tab pop_bss age_10  if siteiarc==29 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==29 //200 breast only 
+	drop if sex==2 //1 deleted
+	//excluded the 1 male as it would be potential confidential breach if reported separately
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M&F 0-14,15-24
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=1 in 8
+	replace case=0 in 8
+	replace pop_bss=(25537) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=2 in 9
+	replace case=0 in 9
+	replace pop_bss=(18761) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+sort age_10
+total pop_bss
+
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR BC (FEMALE) - STD TO WHO WORLD POPN 
+/*
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  197   142913   137.85     96.28    82.77   111.47     7.19 |
+  +-------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/545*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_female" 
+replace cancer_site=2 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_female" ,replace
+restore
+
+** COLON 
+tab pop_bss age_10  if siteiarc==13 & sex==1 //female
+tab pop_bss age_10  if siteiarc==13 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==13
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M&F 0-14,15-24
+	** M   25-34
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=1 in 14
+	replace case=0 in 14
+	replace pop_bss=(25537) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=1 in 15
+	replace case=0 in 15
+	replace pop_bss=(26626) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=2 in 16
+	replace case=0 in 16
+	replace pop_bss=(18761) in 16
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=2 in 17
+	replace case=0 in 17
+	replace pop_bss=(19111) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=3 in 18
+	replace case=0 in 18
+	replace pop_bss=(18440) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR COLON CANCER (M&F)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  114   275198   41.42     27.45    22.51    33.22     2.66 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=4 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** COLON - female only for top5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==13
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M&F 0-14,15-24
+	** M   25-34
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=1 in 14
+	replace case=0 in 14
+	replace pop_bss=(25537) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=1 in 15
+	replace case=0 in 15
+	replace pop_bss=(26626) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=2 in 16
+	replace case=0 in 16
+	replace pop_bss=(18761) in 16
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=2 in 17
+	replace case=0 in 17
+	replace pop_bss=(19111) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=3 in 18
+	replace case=0 in 18
+	replace pop_bss=(18440) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+drop if sex==2 //9 deleted: for breast cancer - female ONLY
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR COLON CANCER (FEMALE)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   54   142913   37.79     24.75    18.39    32.76     3.55 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/545*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_female" 
+replace cancer_site=3 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_female" ,replace
+restore
+
+** COLON - male only for top5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==13
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M&F 0-14,15-24
+	** M   25-34
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=1 in 14
+	replace case=0 in 14
+	replace pop_bss=(25537) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=1 in 15
+	replace case=0 in 15
+	replace pop_bss=(26626) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=2 in 16
+	replace case=0 in 16
+	replace pop_bss=(18761) in 16
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=2 in 17
+	replace case=0 in 17
+	replace pop_bss=(19111) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=3 in 18
+	replace case=0 in 18
+	replace pop_bss=(18440) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+drop if sex==1 //9 deleted: for breast cancer - male ONLY
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR COLON CANCER (MALE)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   60   132285   45.36     31.89    24.26    41.35     4.22 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/490*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_male" 
+replace cancer_site=3 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_male" ,replace
+restore
+
+
+** RECTUM 
+tab pop_bss age_10  if siteiarc==14 & sex==1 //female
+tab pop_bss age_10  if siteiarc==14 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==14
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24
+	** M 85+
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=1 in 14
+	replace case=0 in 14
+	replace pop_bss=(25537) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=1 in 15
+	replace case=0 in 15
+	replace pop_bss=(26626) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=2 in 16
+	replace case=0 in 16
+	replace pop_bss=(18761) in 16
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=2 in 17
+	replace case=0 in 17
+	replace pop_bss=(19111) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=9 in 18
+	replace case=0 in 18
+	replace pop_bss=(2487) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR RECTAL CANCER (M&F)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   47   276064   17.03     11.97     8.68    16.15     1.84 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=5 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** RECTUM - female only for top5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==14
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24
+	** M 85+
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=1 in 14
+	replace case=0 in 14
+	replace pop_bss=(25537) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=1 in 15
+	replace case=0 in 15
+	replace pop_bss=(26626) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=2 in 16
+	replace case=0 in 16
+	replace pop_bss=(18761) in 16
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=2 in 17
+	replace case=0 in 17
+	replace pop_bss=(19111) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=9 in 18
+	replace case=0 in 18
+	replace pop_bss=(2487) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+drop if sex==2 // for rectal cancer - female ONLY
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR RECTAL CANCER (FEMALE)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   26   142913   18.19     11.07     6.98    16.88     2.42 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/545*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_female" 
+replace cancer_site=5 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_female" ,replace
+restore
+
+** RECTUM - male only for top5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==14
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24
+	** M 85+
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=1 in 14
+	replace case=0 in 14
+	replace pop_bss=(25537) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=1 in 15
+	replace case=0 in 15
+	replace pop_bss=(26626) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=2 in 16
+	replace case=0 in 16
+	replace pop_bss=(18761) in 16
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=2 in 17
+	replace case=0 in 17
+	replace pop_bss=(19111) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=9 in 18
+	replace case=0 in 18
+	replace pop_bss=(2487) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+drop if sex==1 // for rectal cancer - male ONLY
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR RECTAL CANCER (MALE)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   21   133151   15.77     12.75     7.87    19.63     2.89 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/490*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_male" 
+replace cancer_site=4 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_male" ,replace
+restore
+
+
+** CORPUS UTERI
+tab pop_bss age_10 if siteiarc==33
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==33 // corpus uteri only
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** F 0-14,15-24,25-34
+	expand 2 in 1
+	replace sex=1 in 7
+	replace age_10=1 in 7
+	replace case=0 in 7
+	replace pop_bss=(25537) in 7
+	sort age_10	
+	
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=2 in 8
+	replace case=0 in 8
+	replace pop_bss=(18761) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=3 in 9
+	replace case=0 in 9
+	replace pop_bss=(18963) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR CORPUS UTERI - STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   44   142643   30.85     20.74    14.96    28.20     3.26 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=6 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** CORPUS UTERI - for female top 5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==33 // corpus uteri only
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** F 0-14,15-24,25-34
+	expand 2 in 1
+	replace sex=1 in 7
+	replace age_10=1 in 7
+	replace case=0 in 7
+	replace pop_bss=(25537) in 7
+	sort age_10	
+	
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age_10=2 in 8
+	replace case=0 in 8
+	replace pop_bss=(18761) in 8
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=3 in 9
+	replace case=0 in 9
+	replace pop_bss=(18963) in 9
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR CORPUS UTERI - STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   44   142643   30.85     20.74    14.96    28.20     3.26 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/545*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_female" 
+replace cancer_site=4 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_female" ,replace
+restore
+
+
+** STOMACH 
+tab pop_bss age_10  if siteiarc==11 & sex==1 //female
+tab pop_bss age_10  if siteiarc==11 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==11
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24,25-34,35-44
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=1 in 11
+	replace case=0 in 11
+	replace pop_bss=(25537) in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age_10=1 in 12
+	replace case=0 in 12
+	replace pop_bss=(26626) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=2 in 13
+	replace case=0 in 13
+	replace pop_bss=(18761) in 13
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age_10=2 in 14
+	replace case=0 in 14
+	replace pop_bss=(19111) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age_10=3 in 15
+	replace case=0 in 15
+	replace pop_bss=(18963) in 15
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age_10=3 in 16
+	replace case=0 in 16
+	replace pop_bss=(18440) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=4 in 17
+	replace case=0 in 17
+	replace pop_bss=(20315) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=4 in 18
+	replace case=0 in 18
+	replace pop_bss=(19218) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR STOMACH CANCER (M&F)- STD TO WHO WORLD POPN
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   36   274005   13.14      7.62     5.25    10.83     1.36 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=7 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** STOMACH - male only for top5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==11
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24,25-34,35-44
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=1 in 11
+	replace case=0 in 11
+	replace pop_bss=(25537) in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age_10=1 in 12
+	replace case=0 in 12
+	replace pop_bss=(26626) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=2 in 13
+	replace case=0 in 13
+	replace pop_bss=(18761) in 13
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age_10=2 in 14
+	replace case=0 in 14
+	replace pop_bss=(19111) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age_10=3 in 15
+	replace case=0 in 15
+	replace pop_bss=(18963) in 15
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age_10=3 in 16
+	replace case=0 in 16
+	replace pop_bss=(18440) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=4 in 17
+	replace case=0 in 17
+	replace pop_bss=(20315) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=4 in 18
+	replace case=0 in 18
+	replace pop_bss=(19218) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+drop if sex==1 // for stomach cancer - male ONLY
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR STOMACH CANCER (MALE)- STD TO WHO WORLD POPN
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   17   131937   12.88      9.24     5.34    15.09     2.38 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/490*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_male" 
+replace cancer_site=6 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_male" ,replace
+restore
+
+
+** LUNG
+tab pop_bss age_10 if siteiarc==21 & sex==1 //female
+tab pop_bss age_10 if siteiarc==21 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==21
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M&F 0-14,15-24,25-34
+	** F   35-44,45-54
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=1 in 11
+	replace case=0 in 11
+	replace pop_bss=(25537) in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age_10=1 in 12
+	replace case=0 in 12
+	replace pop_bss=(26626) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=2 in 13
+	replace case=0 in 13
+	replace pop_bss=(18761) in 13
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age_10=2 in 14
+	replace case=0 in 14
+	replace pop_bss=(19111) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age_10=3 in 15
+	replace case=0 in 15
+	replace pop_bss=(18963) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age_10=3 in 16
+	replace case=0 in 16
+	replace pop_bss=(18440) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=4 in 17
+	replace case=0 in 17
+	replace pop_bss=(20315) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age_10=5 in 18
+	replace case=0 in 18
+	replace pop_bss=(21585) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR LUNG CANCER (M&F)- STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   30   274196   10.94      7.46     4.98    10.82     1.43 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=8 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** LUNG - male only for top5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==21
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings: 
+	** M&F 0-14,15-24,25-34
+	** F   35-44,45-54
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=1 in 11
+	replace case=0 in 11
+	replace pop_bss=(25537) in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age_10=1 in 12
+	replace case=0 in 12
+	replace pop_bss=(26626) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=2 in 13
+	replace case=0 in 13
+	replace pop_bss=(18761) in 13
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age_10=2 in 14
+	replace case=0 in 14
+	replace pop_bss=(19111) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age_10=3 in 15
+	replace case=0 in 15
+	replace pop_bss=(18963) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age_10=3 in 16
+	replace case=0 in 16
+	replace pop_bss=(18440) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=4 in 17
+	replace case=0 in 17
+	replace pop_bss=(20315) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age_10=5 in 18
+	replace case=0 in 18
+	replace pop_bss=(21585) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+drop if sex==1 // for lung cancer - male ONLY
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR LUNG CANCER (M&F)- STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   21   132285   15.87     12.06     7.44    18.64     2.74 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/490*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_male" 
+replace cancer_site=5 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_male" ,replace
+restore
+
+
+** MULTIPLE MYELOMA
+tab pop_bss age_10 if siteiarc==55 & sex==1 //female
+tab pop_bss age_10 if siteiarc==55 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==55
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24,25-34,35-44
+	** F 45-54
+	** M 75-84
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=1 in 9
+	replace case=0 in 9
+	replace pop_bss=(25537) in 9
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 10
+	replace age_10=1 in 10
+	replace case=0 in 10
+	replace pop_bss=(26626) in 10
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=2 in 11
+	replace case=0 in 11
+	replace pop_bss=(18761) in 11
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age_10=2 in 12
+	replace case=0 in 12
+	replace pop_bss=(19111) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=3 in 13
+	replace case=0 in 13
+	replace pop_bss=(18963) in 13
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age_10=3 in 14
+	replace case=0 in 14
+	replace pop_bss=(18440) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age_10=4 in 15
+	replace case=0 in 15
+	replace pop_bss=(20315) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age_10=4 in 16
+	replace case=0 in 16
+	replace pop_bss=(19218) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=5 in 17
+	replace case=0 in 17
+	replace pop_bss=(21585) in 17
+	sort age_10
+		
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=8 in 18
+	replace case=0 in 18
+	replace pop_bss=(5564) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR MULTIPLE MYELOMA CANCER (M&F)- STD TO WHO WORLD POPN 
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   28   274558   10.20      6.70     4.40     9.89     1.34 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=9 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+** MULTIPLE MYELOMA - female only for top5 table
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==55
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24,25-34,35-44
+	** F 45-54
+	** M 75-84
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age_10=1 in 9
+	replace case=0 in 9
+	replace pop_bss=(25537) in 9
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 10
+	replace age_10=1 in 10
+	replace case=0 in 10
+	replace pop_bss=(26626) in 10
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=2 in 11
+	replace case=0 in 11
+	replace pop_bss=(18761) in 11
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age_10=2 in 12
+	replace case=0 in 12
+	replace pop_bss=(19111) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=3 in 13
+	replace case=0 in 13
+	replace pop_bss=(18963) in 13
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age_10=3 in 14
+	replace case=0 in 14
+	replace pop_bss=(18440) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age_10=4 in 15
+	replace case=0 in 15
+	replace pop_bss=(20315) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age_10=4 in 16
+	replace case=0 in 16
+	replace pop_bss=(19218) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=5 in 17
+	replace case=0 in 17
+	replace pop_bss=(21585) in 17
+	sort age_10
+		
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age_10=8 in 18
+	replace case=0 in 18
+	replace pop_bss=(5564) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+drop if sex==2 // for MM - female ONLY
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR MM CANCER (FEMALE)- STD TO WHO WORLD POPN
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   21   141911   14.80      8.82     5.35    13.97     2.10 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/545*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss_female" 
+replace cancer_site=6 if cancer_site==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss_female" ,replace
+restore
+
+
+** NON-HODGKIN LYMPHOMA 
+tab pop_bss age_10  if siteiarc==53 & sex==1 //female
+tab pop_bss age_10  if siteiarc==53 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==53
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24
+	** F   85+
+	** M   55-64
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age_10=1 in 13
+	replace case=0 in 13
+	replace pop_bss=(25537) in 13
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age_10=1 in 14
+	replace case=0 in 14
+	replace pop_bss=(26626) in 14
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age_10=2 in 15
+	replace case=0 in 15
+	replace pop_bss=(18761) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age_10=2 in 16
+	replace case=0 in 16
+	replace pop_bss=(19111) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=6 in 17
+	replace case=0 in 17
+	replace pop_bss=(16493) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age_10=9 in 18
+	replace case=0 in 18
+	replace pop_bss=(3975) in 18
+	sort age_10
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR NHL (M&F)- STD TO WHO WORLD POPN
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   26   278139    9.35      7.06     4.53    10.53     1.48 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=10 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+
+** PANCREAS 
+tab pop_bss age_10  if siteiarc==18 & sex==1 //female
+tab pop_bss age_10  if siteiarc==18 & sex==2 //male
+
+preserve
+	drop if age_10==.
+	drop if beh!=3 //0 deleted
+	keep if siteiarc==18
+	
+	collapse (sum) case (mean) pop_bss, by(pfu age_10 sex)
+	sort age sex
+	** now we have to add in the cases and popns for the missings:
+	** M&F 0-14,15-24,25-34,35-44
+	** F   45-54
+	expand 2 in 1
+	replace sex=1 in 10
+	replace age_10=1 in 10
+	replace case=0 in 10
+	replace pop_bss=(25537) in 10
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 11
+	replace age_10=1 in 11
+	replace case=0 in 11
+	replace pop_bss=(26626) in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 12
+	replace age_10=2 in 12
+	replace case=0 in 12
+	replace pop_bss=(18761) in 12
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 13
+	replace age_10=2 in 13
+	replace case=0 in 13
+	replace pop_bss=(19111) in 13
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age_10=3 in 14
+	replace case=0 in 14
+	replace pop_bss=(18963) in 14
+	sort age_10
+
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age_10=3 in 15
+	replace case=0 in 15
+	replace pop_bss=(18440) in 15
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age_10=4 in 16
+	replace case=0 in 16
+	replace pop_bss=(20315) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age_10=4 in 17
+	replace case=0 in 17
+	replace pop_bss=(19218) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age_10=5 in 18
+	replace case=0 in 18
+	replace pop_bss=(21585) in 18
+	sort age_10
+	
+	
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age_10
+total pop_bss
+
+distrate case pop_bss using "`datapath'\version02\2-working\who2000_10-2", 	///	
+		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR PANCREATIC CANCER (M&F)- STD TO WHO WORLD POPN
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   26   273848    9.49      5.61     3.61     8.47     1.19 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(adj)
+matrix number = r(NDeath)
+matrix asir = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asir
+svmat ci_lower
+svmat ci_upper
+
+collapse number asir ci_lower ci_upper
+rename number1 number
+rename asir1 asir 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asir=round(asir,0.01)
+format asir %04.2f
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/1035*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version02\2-working\ASIRs_bss" 
+replace cancer_site=11 if cancer_site==.
+replace year=1 if year==.
+order cancer_site number percent asir ci_lower ci_upper
+sort cancer_site number
+save "`datapath'\version02\2-working\ASIRs_bss" ,replace
+restore
+
+clear
+
 * *********************************************
 * ANALYSIS: SECTION 3 - cancer sites
 * Covering:
