@@ -10280,7 +10280,46 @@ order pid cr5id dot fname lname init age sex dob natregno resident slc dlc dod /
 
 count //3336; 3346; 3516; 4060
 
+** JC 12jan21: While reviewing IARC check warnings from Sarah for IARC Hub DQ assessment, incorrect morph noted for below case
+** Note below code not included in dataset sent to Sarah or 2015 annual report analysis as of 12jan2021.
+replace morph=9591 if pid=="20080839" & cr5id=="T1S1"
+replace morphcat=41 if pid=="20080839" & cr5id=="T1S1"
+replace hx="NEUROENDOCRINE CARCINOMA, SMALL CELL TYPE/NON HODGKIN LYMPHOMA" if pid=="20080839"
 
+replace morph=8000 if pid=="20140046" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140046" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140200" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140200" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140230" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140230" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140245" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140245" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140320" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140320" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140343" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140343" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140467" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140467" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140536" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140536" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140668" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140668" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20155150" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20155150" & cr5id=="T1S1"
+
+replace basis=7 if pid=="20140214" & cr5id=="T1S1"
+
+replace basis=5 if pid=="20140745" & cr5id=="T1S1"
+stop
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
 save "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival", replace
