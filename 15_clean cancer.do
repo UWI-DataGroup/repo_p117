@@ -10289,8 +10289,18 @@ replace hx="NEUROENDOCRINE CARCINOMA, SMALL CELL TYPE/NON HODGKIN LYMPHOMA" if p
 replace morph=8000 if pid=="20140046" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140046" & cr5id=="T1S1"
 
+replace basis=7 if pid=="20140062" & cr5id=="T1S1"
+
 replace morph=8000 if pid=="20140200" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140200" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140205" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140205" & cr5id=="T1S1"
+
+replace basis=7 if pid=="20140214" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140229" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140229" & cr5id=="T1S1"
 
 replace morph=8000 if pid=="20140230" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140230" & cr5id=="T1S1"
@@ -10298,27 +10308,125 @@ replace morphcat=1 if pid=="20140230" & cr5id=="T1S1"
 replace morph=8000 if pid=="20140245" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140245" & cr5id=="T1S1"
 
+replace topography=421 if pid=="20140259" & cr5id=="T1S1"
+replace top="421" if pid=="20140259" & cr5id=="T1S1"
+replace topcat=38 if pid=="20140259" & cr5id=="T1S1"
+
+replace basis=7 if pid=="20140281" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140318" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140318" & cr5id=="T1S1"
+replace basis=0 if pid=="20140318" & cr5id=="T1S1"
+replace dot=d(28jun2014) if pid=="20140318" & cr5id=="T1S1"
+
 replace morph=8000 if pid=="20140320" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140320" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140332" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140332" & cr5id=="T1S1"
 
 replace morph=8000 if pid=="20140343" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140343" & cr5id=="T1S1"
 
+replace morph=8000 if pid=="20140365" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140365" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140367" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140367" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140381" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140381" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140385" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140385" & cr5id=="T1S1"
+
+replace topography=421 if pid=="20140390" & cr5id=="T1S1"
+replace top="421" if pid=="20140390" & cr5id=="T1S1"
+replace topcat=38 if pid=="20140390" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140391" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140391" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140393" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140393" & cr5id=="T1S1"
+replace basis=4 if pid=="20140393" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140411" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140411" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140418" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140418" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140430" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140430" & cr5id=="T1S1"
+
 replace morph=8000 if pid=="20140467" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140467" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140505" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140505" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140514" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140514" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140517" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140517" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140522" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140522" & cr5id=="T1S1"
 
 replace morph=8000 if pid=="20140536" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140536" & cr5id=="T1S1"
 
+replace morph=8000 if pid=="20140576" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140576" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140578" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140578" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140586" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140586" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140595" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140595" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140619" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140619" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140627" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140627" & cr5id=="T1S1"
+replace basis=4 if pid=="20140627" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20140656" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20140656" & cr5id=="T1S1"
+
 replace morph=8000 if pid=="20140668" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20140668" & cr5id=="T1S1"
 
+replace basis=5 if pid=="20140745" & cr5id=="T1S1"
+
+replace topography=421 if pid=="20140825" & cr5id=="T1S1"
+replace top="421" if pid=="20140825" & cr5id=="T1S1"
+replace topcat=38 if pid=="20140825" & cr5id=="T1S1"
+
+replace basis=7 if pid=="20141553" & cr5id=="T1S1"
+
+replace morph=8000 if pid=="20145153" & cr5id=="T1S1"
+replace morphcat=1 if pid=="20145153" & cr5id=="T1S1"
+
+replace topography=445 if pid=="20150210" & cr5id=="T1S1"
+replace top="445" if pid=="20150210" & cr5id=="T1S1"
+replace topcat=39 if pid=="20150210" & cr5id=="T1S1"
+
+replace morph=8500 if pid=="20150294" & cr5id=="T1S1"
+replace morphcat=10 if pid=="20150294" & cr5id=="T1S1"
+
+replace topography=421 if pid=="20150314" & cr5id=="T1S1"
+replace top="421" if pid=="20150314" & cr5id=="T1S1"
+replace topcat=38 if pid=="20150314" & cr5id=="T1S1"
+
 replace morph=8000 if pid=="20155150" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20155150" & cr5id=="T1S1"
-
-replace basis=7 if pid=="20140214" & cr5id=="T1S1"
-
-replace basis=5 if pid=="20140745" & cr5id=="T1S1"
 stop
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
