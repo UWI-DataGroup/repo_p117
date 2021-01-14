@@ -10427,6 +10427,137 @@ replace topcat=38 if pid=="20150314" & cr5id=="T1S1"
 
 replace morph=8000 if pid=="20155150" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20155150" & cr5id=="T1S1"
+
+// 14jan21 JC: incidentally found an error in abs date field when performing below mean & median calculations
+//list pid cr5id ttdoa if ttdoa<d(01jan2010)
+replace ttdoa=d(01jan2000) if pid=="20140268" & cr5id=="T1S1" //1 change
+
+** 14jan21 JC: Sarah from the IARC Hub needs the below to assess Timeliness
+//	Mean and median duration in months from date of incident diagnosis to date of abstraction
+** First calculate the difference in months between these 2 dates 
+// (need to add in qualifier to ignore missing abstraction dates which are recorded as 01jan2000)
+gen ttdoadotdiff = (ttdoa - dot) / (365/12) if ttdoa!=d(01jan2000) & ttdoa!=.
+** Now calculate the overall mean & median
+preserve
+drop if ttdoadotdiff==. //209 deleted
+summ ttdoadotdiff //displays mean
+/*
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+ttdoadotdiff |      3,850    46.61537    10.82285  -4.865754   139.3315
+*/
+summ ttdoadotdiff, detail //displays mean + median (median is the percentile next to 50%)
+/*
+                        ttdoadotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     22.48767      -4.865754
+ 5%     31.29863              0
+10%     36.19726       1.775342       Obs               3,850
+25%     40.93151       2.334247       Sum of Wgt.       3,850
+
+50%         45.6                      Mean           46.61537
+                        Largest       Std. Dev.      10.82285
+75%     51.05753       126.2137
+90%     60.31233       134.5973       Variance       117.1341
+95%     65.49041       137.4904       Skewness       1.408363
+99%     71.17809       139.3315       Kurtosis       13.09364
+*/
+restore
+
+** Now calculate mean & median per diagnosis year
+// 2008
+preserve
+drop if dxyr!=2008 //2,842 deleted
+drop if ttdoadotdiff==. //3 deleted
+summ ttdoadotdiff, detail
+/*
+                        ttdoadotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     30.18082       24.13151
+ 5%     34.81644       24.82192
+10%     39.35342       24.88767       Obs               1,214
+25%     47.67123       26.69589       Sum of Wgt.       1,214
+
+50%      54.4274                      Mean           54.79226
+                        Largest       Std. Dev.      12.74966
+75%     62.20274       126.2137
+90%      67.7589       134.5973       Variance       162.5539
+95%     69.83014       137.4904       Skewness       1.641544
+99%     114.8712       139.3315       Kurtosis       11.97042
+*/
+restore
+
+// 2013
+preserve
+drop if dxyr!=2013 //3,177 deleted
+drop if ttdoadotdiff==. //38 deleted
+summ ttdoadotdiff, detail
+/*
+                        ttdoadotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     5.391781      -4.865754
+ 5%     22.94794              0
+10%     25.74247       1.775342       Obs                 844
+25%      34.2411       2.334247       Sum of Wgt.         844
+
+50%     40.43835                      Mean           39.30524
+                        Largest       Std. Dev.      10.14108
+75%     46.10959       71.83562
+90%     49.84109       77.68767       Variance       102.8416
+95%     51.74794       81.89589       Skewness      -.3556102
+99%     66.54247       82.35616       Kurtosis       5.095819
+*/
+restore
+
+// 2014
+preserve
+drop if dxyr!=2014 //3,161 deleted
+drop if ttdoadotdiff==. //30 deleted
+summ ttdoadotdiff, detail
+/*
+                        ttdoadotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     39.41918       15.41918
+ 5%     40.60274       20.87671
+10%     41.49041        38.9589       Obs                 868
+25%     43.33151       38.99178       Sum of Wgt.         868
+
+50%     46.06027                      Mean           46.23606
+                        Largest       Std. Dev.      4.029991
+75%     48.80548       58.22466
+90%     51.22192       58.29041       Variance       16.24083
+95%     52.66849       65.68767       Skewness      -.2651334
+99%     54.93699       67.52877       Kurtosis       9.024799
+*/
+restore
+
+// 2015
+preserve
+drop if dxyr!=2015 //2,997 deleted
+drop if ttdoadotdiff==. //138 deleted
+summ ttdoadotdiff, detail
+/*
+                        ttdoadotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     36.13151       34.38904
+ 5%     37.11781       35.50685
+10%     37.84109       35.83562       Obs                 924
+25%     39.78082       35.83562       Sum of Wgt.         924
+
+50%     42.70685                      Mean           42.90568
+                        Largest       Std. Dev.       3.86423
+75%     46.04383       57.73151
+90%     47.50685       58.22466       Variance       14.93227
+95%     48.62466       58.81644       Skewness        .386649
+99%     52.27397       59.37534       Kurtosis       3.187158
+*/
+restore
+
 stop
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
