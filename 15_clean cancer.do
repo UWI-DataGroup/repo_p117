@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      02-DEC-2019
-    // 	date last modified      23-OCT-2020
+    // 	date last modified      20-JAN-2021
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -8422,7 +8422,7 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2015 Annual Report: DQI"), bold
 putdocx textblock begin
-Date Prepared: 23-OCT-2020. 
+Date Prepared: 20-JAN-2021. 
 Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
 Generated using Dofiles: 15_clean cancer.do and 20_analysis cancer.do
 putdocx textblock end
@@ -8447,7 +8447,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-26_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-01-20_DQI.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -8488,7 +8488,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-26_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2021-01-20_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace
@@ -10421,9 +10421,9 @@ replace topcat=39 if pid=="20150210" & cr5id=="T1S1"
 replace morph=8500 if pid=="20150294" & cr5id=="T1S1"
 replace morphcat=10 if pid=="20150294" & cr5id=="T1S1"
 
-replace topography=421 if pid=="20150314" & cr5id=="T1S1"
-replace top="421" if pid=="20150314" & cr5id=="T1S1"
-replace topcat=38 if pid=="20150314" & cr5id=="T1S1"
+replace topography=421 if pid=="20150314" & cr5id=="T2S1"
+replace top="421" if pid=="20150314" & cr5id=="T2S1"
+replace topcat=38 if pid=="20150314" & cr5id=="T2S1"
 
 replace morph=8000 if pid=="20155150" & cr5id=="T1S1"
 replace morphcat=1 if pid=="20155150" & cr5id=="T1S1"
@@ -10444,7 +10444,7 @@ summ ttdoadotdiff //displays mean
 /*
     Variable |        Obs        Mean    Std. Dev.       Min        Max
 -------------+---------------------------------------------------------
-ttdoadotdiff |      3,850    46.61537    10.82285  -4.865754   139.3315
+ttdoadotdiff |      3,850    46.61499     10.8229  -4.865754   139.3315
 */
 summ ttdoadotdiff, detail //displays mean + median (median is the percentile next to 50%)
 /*
@@ -10456,12 +10456,12 @@ summ ttdoadotdiff, detail //displays mean + median (median is the percentile nex
 10%     36.19726       1.775342       Obs               3,850
 25%     40.93151       2.334247       Sum of Wgt.       3,850
 
-50%         45.6                      Mean           46.61537
-                        Largest       Std. Dev.      10.82285
+50%         45.6                      Mean           46.61499
+                        Largest       Std. Dev.       10.8229
 75%     51.05753       126.2137
-90%     60.31233       134.5973       Variance       117.1341
-95%     65.49041       137.4904       Skewness       1.408363
-99%     71.17809       139.3315       Kurtosis       13.09364
+90%     60.31233       134.5973       Variance       117.1351
+95%     65.49041       137.4904       Skewness       1.408448
+99%     71.17809       139.3315       Kurtosis       13.09361
 */
 restore
 
@@ -10518,6 +10518,7 @@ drop if dxyr!=2014 //3,161 deleted
 drop if ttdoadotdiff==. //30 deleted
 summ ttdoadotdiff, detail
 /*
+
                         ttdoadotdiff
 -------------------------------------------------------------
       Percentiles      Smallest
@@ -10526,12 +10527,12 @@ summ ttdoadotdiff, detail
 10%     41.49041        38.9589       Obs                 868
 25%     43.33151       38.99178       Sum of Wgt.         868
 
-50%     46.06027                      Mean           46.23606
-                        Largest       Std. Dev.      4.029991
+50%     46.06027                      Mean           46.23439
+                        Largest       Std. Dev.      4.030377
 75%     48.80548       58.22466
-90%     51.22192       58.29041       Variance       16.24083
-95%     52.66849       65.68767       Skewness      -.2651334
-99%     54.93699       67.52877       Kurtosis       9.024799
+90%     51.22192       58.29041       Variance       16.24394
+95%     52.66849       65.68767       Skewness      -.2638959
+99%     54.93699       67.52877       Kurtosis       9.020942
 */
 restore
 
@@ -10558,7 +10559,7 @@ summ ttdoadotdiff, detail
 */
 restore
 
-stop
+
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
 save "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival", replace

@@ -6,7 +6,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL / Kern ROCKE
     //  date first created      02-DEC-2019
-    // 	date last modified      23-OCT-2020
+    // 	date last modified      20-JAN-2021
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASIRs (3) Survival
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2013, 2014 data for inclusion in 2015 cancer report.
@@ -857,7 +857,7 @@ putdocx table tbl_bod = data("Cancer_Site Total_DQI Cases Pct_DQI ICD10"), varna
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_bod(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-23_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2021-01-20_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_basis.dta" ,replace
@@ -887,7 +887,7 @@ putdocx table tbl_site = data("Total_DQI Total_Records Pct_DQI"), varnames  ///
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2020-10-23_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2021-01-20_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_siteage.dta" ,replace
