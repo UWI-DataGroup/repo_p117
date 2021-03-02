@@ -3,7 +3,7 @@
     //  algorithm name          5_prep cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      29-OCT-2019
+    //  date first created      28-OCT-2019
     // 	date last modified      01-OCT-2020
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
