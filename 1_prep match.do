@@ -33,3 +33,9 @@
     capture log close
     log using "`logpath'\1_prep match.smcl", replace
 ** HEADER -----------------------------------------------------
+
+** Load 2018 CR5 dataset
+** Prep CR5 dataset
+** Merge 2018 death dataset from 10_prep mort.do
+** Remove 2017 deaths from that dataset
+** Look for matches 
