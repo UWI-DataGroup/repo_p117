@@ -3,8 +3,8 @@
     //  algorithm name          10_prep_mort.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      14-NOV-2019
-    // 	date last modified      12-OCT-2020
+    //  date first created      03-MAR-2021
+    // 	date last modified      03-MAR-2021
     //  algorithm task          Prep and format death data
     //  status                  Completed
     //  objective               To have multiple datasets with cleaned death data for matching and reporting.
