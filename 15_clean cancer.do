@@ -10559,6 +10559,13 @@ summ ttdoadotdiff, detail
 */
 restore
 
+** JC 17-mar-2021 while reviewing IARC Hub's feedback that 20081039 should be coded to vagina not cervix
+** This update will not affect 2015 annual rpt as 2008 cases not included in that report.
+replace primarysite="VAGINA" if pid=="20081039"
+replace top="529" if pid=="20081039"
+replace topography=529 if pid=="20081039"
+replace topcat=45 if pid=="20081039"
+
 
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
