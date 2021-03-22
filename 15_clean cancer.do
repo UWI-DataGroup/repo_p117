@@ -10566,6 +10566,9 @@ replace top="529" if pid=="20081039"
 replace topography=529 if pid=="20081039"
 replace topcat=45 if pid=="20081039"
 
+** JC 22-mar-2021 while reviewing 2017 data, noted this update
+replace dlc=d(19jun2017) if pid=="20080158"
+
 
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
