@@ -10569,6 +10569,28 @@ replace topcat=45 if pid=="20081039"
 ** JC 22-mar-2021 while reviewing 2017 data, noted this update
 replace dlc=d(19jun2017) if pid=="20080158"
 
+** JC 24-mar-2021 while reviewing duplicates list, noted this update
+AWAIT feedback from KWG then decide if to drop if pid=="20151197" //NPX ca - need to confirm with KWG first
+** JC 24-mar-2021 while reviewing duplicates list, noted this update in CR5db as new source added post-review but DA didn't update tumour fields or alert reviewers to the change
+replace primarysite="ENDOMETRIUM" if pid=="20151355"
+replace top="541" if pid=="20151355"
+replace topography=541 if pid=="20151355"
+replace topcat=47 if pid=="20151355"
+replace hx="CARCINOMA" if pid=="20151355"
+replace morph=8010 if pid=="20151355"
+replace lat=0 if pid=="20151355"
+replace grade=1 if pid=="20151355"
+replace basis=7 if pid=="20151355"
+replace consultant="W WELCH" if pid=="20151355"
+replace iccc="11f" if pid=="20151355"
+replace icd10="C541" if pid=="20151355"
+replace siteiarc=33 if pid=="20151355"
+replace sitecr5db=12 if pid=="20151355"
+replace rx2=1 if pid=="20151355"
+replace rx2d=d(13sep2016) if pid=="20151355"
+
+NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
+stop
 
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
