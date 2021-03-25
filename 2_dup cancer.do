@@ -132,6 +132,25 @@ replace birthdate=subinstr(birthdate,"-0","",.) if registrynumber==20201091 & bi
 gen str_dob=birthdate
 destring birthdate ,replace
 
+NEXT TIME YOU RUN DUP LIST FOR DOB, TRY USING BELOW CODE FROM DEATH DATA
+** Create string dod field so can using in duplicate matching
+gen dod2=dod
+format dod2 %tdCCYY-NN-DD
+tostring dod2 ,replace
+
+/* 
+Check below list for cases where namematch=no match but 
+there is a pt with same name then:
+ (1) check if same pt and remove duplicate pt;
+ (2) check if same name but different pt and
+	 update namematch variable to reflect this, i.e.
+	 namematch=1
+*/
+sort lname fname dod2 record_id
+quietly by lname fname dod2 : gen dupnmdod2 = cond(_N==1,0,_n)
+sort lname fname dod2 record_id
+count if dupnmdod2>0 //22
+
 preserve
 //tostring birthdate, gen (str_dob)
 gen dobyear = substr(str_dob,1,4)
