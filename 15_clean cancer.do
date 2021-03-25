@@ -10571,6 +10571,7 @@ replace dlc=d(19jun2017) if pid=="20080158"
 ** JC 24-mar-2021 while reviewing duplicates list, noted this update
 AWAIT feedback from KWG then decide if to drop if pid=="20151197" //NPX ca - need to confirm with KWG first
 ** JC 24-mar-2021 while reviewing duplicates list, noted this update in CR5db as new source added post-review but DA didn't update tumour fields or alert reviewers to the change
+/*
 replace primarysite="ENDOMETRIUM" if pid=="20151355"
 replace top="541" if pid=="20151355"
 replace topography=541 if pid=="20151355"
@@ -10587,6 +10588,8 @@ replace siteiarc=33 if pid=="20151355"
 replace sitecr5db=12 if pid=="20151355"
 replace rx2=1 if pid=="20151355"
 replace rx2d=d(13sep2016) if pid=="20151355"
+*/
+//after seeing another pid 20160342, the above is a different pt - the DA entered the new source into 20151355 but it belongs to different pt - PIDs 20160342, 20161068
 
 ** JC 25-mar-2021 while reviewing duplicates list, noted this merge wasn't done with pid 20155164 but on review 20155164 wasn't merged because incorrect NRN, DOB were assigned to this pt in CR5 and it turns out this pt is non-resident according to CR5 comments
 drop if pid=="20151151" //rectal ca; death record_id 17676
