@@ -10588,6 +10588,9 @@ replace sitecr5db=12 if pid=="20151355"
 replace rx2=1 if pid=="20151355"
 replace rx2d=d(13sep2016) if pid=="20151355"
 
+** JC 25-mar-2021 while reviewing duplicates list, noted this merge wasn't done with pid 20155164 but on review 20155164 wasn't merged because incorrect NRN, DOB were assigned to this pt in CR5 and it turns out this pt is non-resident according to CR5 comments
+drop if pid=="20151151" //rectal ca
+
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 stop
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
