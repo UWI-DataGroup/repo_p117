@@ -10589,7 +10589,7 @@ replace rx2=1 if pid=="20151355"
 replace rx2d=d(13sep2016) if pid=="20151355"
 
 ** JC 25-mar-2021 while reviewing duplicates list, noted this merge wasn't done with pid 20155164 but on review 20155164 wasn't merged because incorrect NRN, DOB were assigned to this pt in CR5 and it turns out this pt is non-resident according to CR5 comments
-drop if pid=="20151151" //rectal ca
+drop if pid=="20151151" //rectal ca; death record_id 17676
 
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 stop
