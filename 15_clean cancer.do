@@ -10593,6 +10593,12 @@ replace rx2d=d(13sep2016) if pid=="20151355"
 
 ** JC 25-mar-2021 while reviewing duplicates list, noted this merge wasn't done with pid 20155164 but on review 20155164 wasn't merged because incorrect NRN, DOB were assigned to this pt in CR5 and it turns out this pt is non-resident according to CR5 comments
 drop if pid=="20151151" //rectal ca; death record_id 17676
+** JC 29-mar-2021 while reviewing KWG's feedback on the duplicates list, noted this update post-merging of 20160018 and 20160201
+replace primarysite="STOMACH-LESSER CURVATURE" if pid=="20180018" & cr5id=="T1S1"
+replace top="165" if pid=="20180018" & cr5id=="T1S1"
+replace topography=165 if pid=="20180018" & cr5id=="T1S1"
+replace topcat=17 if pid=="20180018" & cr5id=="T1S1"
+
 
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 stop
