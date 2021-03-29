@@ -89,17 +89,6 @@ replace lastname=firstname if registrynumber==20190316
 replace firstname=middleinitials if registrynumber==20190316
 replace middleinitials="" if registrynumber==20190316
 
-** Patient Names duplicate check
-preserve
-drop if lastname==""
-sort lastname firstname
-quietly by lastname firstname:  gen dup = cond(_N==1,0,_n)
-sort lastname firstname registrynumber
-count if dup>0 //702
-capture export_excel str_no registrynumber lastname firstname sex birthdate hospitalnumber diagnosisyear str_da str_dadate str_action if dup>0 using "`datapath'\version04\3-output\20210311CancerDuplicates.xlsx", sheet("Names") firstrow(varlabels)
-drop dup 
-restore
-
 ** Check for matches using natregno
 preserve
 drop if nrn==""|nrn=="999999-9999"|regexm(nrn,"9999")
@@ -179,6 +168,21 @@ sort hospitalnumber
 count if dup>0 //153
 capture export_excel str_no registrynumber lastname firstname birthdate sex hospitalnumber diagnosisyear str_da str_dadate str_action if dup>0 using "`datapath'\version04\3-output\20210311CancerDuplicates.xlsx", sheet("Hosp#") firstrow(varlabels)
 drop dup
+restore
+
+** Patient Names duplicate check
+/*
+Names tab should be the last to be reviewed as often there are misspellings and name swaps in the data;
+The other tabs are more definitive and reliable so the Names tab is used for "sweeping up" those duplicates that do not have DOB, NRN, Hosp#.
+*/
+preserve
+drop if lastname==""
+sort lastname firstname
+quietly by lastname firstname:  gen dup = cond(_N==1,0,_n)
+sort lastname firstname registrynumber
+count if dup>0 //702
+capture export_excel str_no registrynumber lastname firstname sex birthdate hospitalnumber diagnosisyear str_da str_dadate str_action if dup>0 using "`datapath'\version04\3-output\20210311CancerDuplicates.xlsx", sheet("Names") firstrow(varlabels)
+drop dup 
 restore
 
 save "`datapath'\version04\3-output\2008-2020_duplicates_cancer.dta" ,replace
