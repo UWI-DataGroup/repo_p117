@@ -10596,10 +10596,13 @@ replace rx2d=d(13sep2016) if pid=="20151355"
 drop if pid=="20151151" //rectal ca; death record_id 17676
 
 ** JC 29-mar-2021 while reviewing KWG's feedback on the duplicates list, noted this update post-merging of 20160018 and 20160201
-replace primarysite="STOMACH-LESSER CURVATURE" if pid=="20180018" & cr5id=="T1S1"
-replace top="165" if pid=="20180018" & cr5id=="T1S1"
-replace topography=165 if pid=="20180018" & cr5id=="T1S1"
-replace topcat=17 if pid=="20180018" & cr5id=="T1S1"
+replace primarysite="STOMACH-LESSER CURVATURE" if pid=="20160018" & cr5id=="T1S1"
+replace top="165" if pid=="20160018" & cr5id=="T1S1"
+replace topography=165 if pid=="20160018" & cr5id=="T1S1"
+replace topcat=17 if pid=="20160018" & cr5id=="T1S1"
+replace iccc="2b" if pid=="20160018" & cr5id=="T1S1"
+replace icd10="C844" if pid=="20160018" & cr5id=="T1S1"
+//no changes for sites as already set to correct sites for M9702
 
 
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
