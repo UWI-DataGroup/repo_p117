@@ -55,8 +55,9 @@
 insheet using "`datapath'\version04\1-input\2021-05-04_MAIN Source+Tumour+Patient_JC.txt"
 
 ** Use below example code to automate file names using current date
-local suffix: display %tdCCYY-NN-DD =daily("`c(current_date)'", "DMY")
-use "my_file.`suffix'.dta", clear
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+capture export_excel str_no registrynumber flag1 flag5 flag2 flag6 flag3 flag7 flag4 flag8 str_da str_dadate str_action if flag1!=.|flag2!=.|flag3!=.|flag4!=. using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+
 
 ** STEP #9
 ** Email KWG re any errors found so he can update main CR5db

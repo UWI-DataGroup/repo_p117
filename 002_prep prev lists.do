@@ -1,10 +1,10 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          2b_dup cancer.do
+    //  algorithm name          002_prep prev lists.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      03-MAY-2021
-    // 	date last modified      05-MAY-2021
+    // 	date last modified      10-MAY-2021
     //  algorithm task          Flagging previously-checked duplicates from CanReg5 dataset in prep for comparison with newly-generated lists (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have a dataset with previously-checked duplicates to flag these and append the DA's comments to new duplicates list where applicable.
@@ -33,7 +33,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\2b_dup cancer.smcl", replace
+    log using "`logpath'\002_prep prev lists.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /* 
@@ -56,7 +56,9 @@ rename dxyear diagnosisyear
 rename datotakeaction str_da
 rename datedatookaction str_dadate
 rename actiontaken str_action
+destring birthdate ,replace
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action nrnlist checked
+count //229
 save "`datapath'\version04\2-working\prevNRN_dups" ,replace
 clear
 ** DOB list
@@ -72,6 +74,7 @@ rename datotakeaction str_da
 rename datedatookaction str_dadate
 rename actiontaken str_action
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action doblist checked
+count //271
 save "`datapath'\version04\2-working\prevDOB_dups" ,replace
 clear
 ** Hosp# list
@@ -87,6 +90,7 @@ rename datotakeaction str_da
 rename datedatookaction str_dadate
 rename actiontaken str_action
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action hosplist checked
+count //153
 save "`datapath'\version04\2-working\prevHOSP_dups" ,replace
 clear
 ** Names list
@@ -101,7 +105,9 @@ rename dxyear diagnosisyear
 rename datotakeaction str_da
 rename datedatookaction str_dadate
 rename actiontaken str_action
+destring birthdate ,replace
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action nameslist checked
+count //702
 save "`datapath'\version04\2-working\prevNAMES_dups" ,replace
 clear
 

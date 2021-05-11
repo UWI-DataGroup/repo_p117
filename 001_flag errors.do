@@ -1,10 +1,10 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          2a_dup cancer.do
+    //  algorithm name          001_flag errors.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      04-MAY-2021
-    // 	date last modified      06-MAY-2021
+    // 	date last modified      10-MAY-2021
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -34,7 +34,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\2a_dup cancer.smcl", replace
+    log using "`logpath'\001_flag errors.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /* 
@@ -90,9 +90,9 @@ drop tumouridsourcetable recordnumber cfdiagnosis labnumber specimen sampletaken
 
 ** STEP #6
 ** Create variables for the excel duplicate lists that the SDA will update and label already exisiting variables that will appear in list
-gen str_no=""
-gen str_da=""
-gen str_dadate=""
+gen str_no=.
+gen str_da=.
+gen str_dadate=.
 gen str_action=""
 label var registrynumber "Reg #"
 label var lastname "Last Name"
@@ -120,33 +120,35 @@ drop dup
 ** NOTE: correct all records whether eligible or not since records maybe matched to other records that are eligible
 ** Create flags for errors within found in First Name, Last Name, NRN, DOB variables
 ** Create error list to be included in duplicates excel workbook for DA to correct in CR5db
-forvalues j=1/4 {
-	gen flag`j'=.
+forvalues j=1/5 {
+	gen flag`j'=""
 }
 
 label var flag1 "Error: Missing FirstName"
 label var flag2 "Error: Missing LastName"
 label var flag3 "Error: Invalid Length NRN"
 label var flag4 "Error: Invalid Length DOB"
+label var flag5 "Error: Invalid Length Hosp#"
 
-forvalues j=5/8 {
+forvalues j=6/10 {
 	gen flag`j'=""
 }
-label var flag5 "Correction: Missing FirstName"
-label var flag6 "Correction: Missing LastName"
-label var flag7 "Correction: Invalid Length NRN"
-label var flag8 "Correction: Invalid Length DOB"
+label var flag6 "Correction: Missing FirstName"
+label var flag7 "Correction: Missing LastName"
+label var flag8 "Correction: Invalid Length NRN"
+label var flag9 "Correction: Invalid Length DOB"
+label var flag10 "Correction: Invalid Length Hosp#"
 
 
 ** STEP #9
 ** Check for if first or last name is missing 
 ** Flag errors for DA to correct in CR5db
 count if firstname=="" //1
-replace flag1=1 if firstname=="" //1 change
-replace flag5="delete blank record" if firstname==""
+replace flag1="missing" if firstname=="" //1 change
+replace flag6="delete blank record" if firstname==""
 count if lastname=="" //1
-replace flag2=1 if lastname=="" //1 change
-replace flag6="delete blank record" if lastname==""
+replace flag2="missing" if lastname=="" //1 change
+replace flag7="delete blank record" if lastname==""
 
 ** STEP #10
 ** Correct Names errors flagged above
@@ -157,16 +159,10 @@ replace flag6="delete blank record" if lastname==""
 ** Check for invalid length NRN
 count if length(nrn)<11 & nrn!="" //169
 list registrynumber firstname lastname nrn birthdate if length(nrn)<11 & nrn!=""
-replace flag3=1 if length(nrn)<11 & nrn!="" //169 changes
+replace flag3=nrn if length(nrn)<11 & nrn!="" //169 changes
 
 
 ** STEP #12
-** Identify erroneous NRNs in prep for export to excel ERRORS list
-gen errornrn=nrn if flag3==1 //this field 
-label var errornrn "Incorrect NRNs"
-
-
-** STEP #13
 ** Correct NRN errors flagged above for non-specific incorrect NRNs
 replace nrn="999999-9999" if nrn=="99" //1 change
 replace nrn="999999-9999" if nrn=="9999-9999" //1 change
@@ -180,7 +176,7 @@ drop nrn2
 replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //1 change
 
 
-** STEP #14
+** STEP #13
 ** Correct NRN errors flagged above for specific incorrect NRNs, i.e. checked against electoral list
 replace nrn=subinstr(nrn,"BO","9999",.) //1 change
 replace nrn=subinstr(nrn,"LP","9999",.) //1 change
@@ -190,7 +186,7 @@ replace nrn=substr(birthdate, -6,6) + "-9999" if registrynumber==20160062 //1 ch
 replace nrn="999999-9999" if registrynumber==20190385 //1 change
 
 
-** STEP #15
+** STEP #14
 /* 
 	Correct NRN errors flagged for specific incorrect NRNs using this method: 
 	electoral list - filter in NRN using 'Begins with' and enter dob part of NRN. 
@@ -217,22 +213,29 @@ replace nrn=subinstr(nrn,"36","39",.) if registrynumber==20201204
 //99 changes
 
 
-** STEP #16
+** STEP #15
 ** Identify corrected NRNs in prep for export to excel ERRORS list
-replace flag7=nrn if flag3==1 //169 changes
+replace flag8=nrn if flag3!="" //169 changes
 
 
-** STEP #17
+** STEP #16
 ** Check for invalid length DOB
 count if length(birthdate)<8|length(birthdate)>8 //19 - check against electoral list using 'Contains' filter in the Names fields on electoral list
 list registrynumber firstname lastname nrn birthdate if length(birthdate)<8|length(birthdate)>8
-replace flag4=1 if length(birthdate)<8|length(birthdate)>8 //19 changes
+replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //9 changes
+replace flag4="missing" if birthdate=="" //10 changes
+
+
+** STEP #17
+** Check for invalid characters in DOB
+count if regexm(birthdate,"-") //1
+replace flag4=birthdate if regexm(birthdate,"-") //1 change
 
 
 ** STEP #18
-** Identify erroneous DOBs in prep for export to excel ERRORS list
-gen errordob=birthdate if flag4==1
-label var errordob "Incorrect DOBs"
+** Correct DOB errors using below method as these won't lead to de-identifying the dofile
+replace birthdate=subinstr(birthdate,"-0","",.) if registrynumber==20201091 & birthdate!=""
+replace birthdate=subinstr(birthdate,"3","193",.) if registrynumber==20201091 & birthdate!=""
 
 
 ** STEP #19
@@ -262,40 +265,68 @@ replace lastname=elec_lname if _merge==3 //0 changes
 drop elec_* _merge
 
 
-** STEP #21
+** STEP #20
 ** Correct DOB errors using below method as these won't lead to de-identifying the dofile
 replace birthdate=subinstr(birthdate,"8","18",.) if registrynumber==20160465 //1 change
 replace birthdate="99999999" if birthdate==""|birthdate=="99" //7 changes
 
 
-** STEP #22
-** Identify corrected NRNs in prep for export to excel ERRORS list 
-replace flag8=birthdate if flag4==1 //19 changes - this will store the corrected DOBs in this variable in prep for export to the error excel list
-replace flag8="delete blank record" if registrynumber==20159999 //1 change
+** STEP #21
+** Identify corrected DOBs in prep for export to excel ERRORS list 
+replace flag9=birthdate if flag4!="" //20 changes - this will store the corrected DOBs in this variable in prep for export to the error excel list
+replace flag9="delete blank record" if registrynumber==20159999 //1 change
 
 
 ** STEP #23
-** Create excel errors list before deleting incorrect records
-** Use below code to automate file names using current date
-//local fileprefix = string( d(`c(current_date)'), "%dCYND" )
-//local suffix: display %tdCCYYYYNNDD =daily("`c(current_date)'", "YMD")
-//use "my_file.`suffix'.dta", clear
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no registrynumber flag1 flag5 flag2 flag6 flag3 flag7 flag4 flag8 str_da str_dadate str_action if flag1!=.|flag2!=.|flag3!=.|flag4!=. using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+** Check for invalid length Hosp#
+count if length(hospitalnumber)==1 //4
+list registrynumber firstname lastname hospitalnumber if length(hospitalnumber)==1
+replace flag5=hospitalnumber if length(hospitalnumber)==1 //4 changes
 
-Emailed CH to help me with prepend the current date to excel export - currently it appends the current date.
 
 ** STEP #24
+** Correct Hosp# errors using below method as these won't lead to de-identifying the dofile
+replace hospitalnumber="99" if length(hospitalnumber)==1 //4 changes
+
+
+** STEP #25
+** Identify corrected Hosp#s in prep for export to excel ERRORS list
+replace flag10=hospitalnumber if flag5!="" //4 changes
+
+
+** STEP #26
+** Prepare this dataset for export to excel
+preserve
+sort registrynumber
+
+drop if  flag1=="" & flag2=="" & flag3=="" & flag4=="" & flag5=="" //8,930 deleted
+
+drop str_no
+gen str_no= _n
+label var str_no "No."
+
+
+** STEP #27
+** Create excel errors list before deleting incorrect records
+** Use below code to automate file names using current date
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+capture export_excel str_no registrynumber flag1 flag6 flag2 flag7 flag3 flag8 flag4 flag9 flag5 flag10 str_da str_dadate str_action if flag1!=""|flag2!=""|flag3!=""|flag4!=""|flag5!="" using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+restore
+
+
+** STEP #28
 ** Correct errors flagged from Names check (STEP #9 above)
 drop if registrynumber==20159999 //1 deleted
 
 
-** STEP #25
+** STEP #29
 ** Remove variables not needed for exel lists
 drop stdataabstractor stsourcedate nftype sourcename doctor doctoraddress recordstatus
 
+count //9,116
 
-** STEP #26
+
+** STEP #30
 ** Save this dataset
 save "`datapath'\version04\2-working\corrected_cancer_dups.dta" ,replace
 label data "BNR-Cancer Duplicates"
