@@ -205,6 +205,7 @@ replace nrn=nrn + "6" if registrynumber==20172010|registrynumber==20181101|regis
 replace nrn=nrn + "7" if registrynumber==20190534|registrynumber==20190535|registrynumber==20190544|registrynumber==20190546|registrynumber==20190591|registrynumber==20200184|registrynumber==20201062|registrynumber==20201093|registrynumber==20201107|registrynumber==20201204
 replace nrn=nrn + "8" if registrynumber==20190507|registrynumber==20190536|registrynumber==20190541|registrynumber==20190545|registrynumber==20190597|registrynumber==20190605|registrynumber==20191248|registrynumber==20200202|registrynumber==20200203|registrynumber==20200216|registrynumber==20201026|registrynumber==20201040|registrynumber==20201050|registrynumber==20201102|registrynumber==20201106
 replace nrn=nrn + "9" if registrynumber==20190398|registrynumber==20190503|registrynumber==20190533|registrynumber==20190557|registrynumber==20201048|registrynumber==20201105|registrynumber==20201203
+replace nrn=subinstr(nrn,"-000","",.) if registrynumber==20200183
 replace nrn=nrn + "-9999" if registrynumber==20200183
 replace nrn=subinstr(nrn,"7","1",.) if registrynumber==20200219
 replace nrn=subinstr(nrn,"80","90",.) if registrynumber==20201108
