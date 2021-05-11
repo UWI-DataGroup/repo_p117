@@ -11,7 +11,7 @@
 	//								flagging repeated records on these newly-generated lists to differentiate previously-checked from newly-generated and
 	//								appending the DA's comments to new duplicates list where applicable.
 	//							(2) To have the SOP for this process written into the dofile.
-    //  methods                 Importing current CR5db dataset, identifying duplicates and using frames to compare with previously-checked duplicates list
+    //  methods                 Importing current CR5db dataset, identifying duplicates and using quietly sort to compare with previously-checked duplicates list
 	//							This dofile is also saved in the path: L:\Sync\Cancer\CanReg5\DA Duplicates
 
     ** General algorithm set-up

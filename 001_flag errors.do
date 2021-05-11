@@ -332,3 +332,12 @@ save "`datapath'\version04\2-working\corrected_cancer_dups.dta" ,replace
 label data "BNR-Cancer Duplicates"
 notes _dta :These data prepared for SDA to use in prep for 2018 annual report
 
+/*
+** STEP #31
+** Run all of the dofiles from this dofile
+do "`logpath'\002_prep_prev_lists"
+do 003a_compare lists_NRN
+do 003b_compare lists_DOB
+do 003c_compare lists_HOSP
+do 003d_compare lists_NAMES
+do 004_export new lists
