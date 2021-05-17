@@ -100,7 +100,7 @@ count if duppid>0 //890
 order registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked
 list registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked if duppid>0 , string(50)
 
-
+QUIETLY SORT BY LNAME FNAME REGISTRYNUMBER AND DROP IF DUPNMPID>0
 ** STEP #8
 /* 
 	(1) Manually review list above for duppid>0
