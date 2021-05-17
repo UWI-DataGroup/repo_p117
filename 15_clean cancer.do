@@ -10602,6 +10602,26 @@ replace iccc="2b" if pid=="20160018" & cr5id=="T1S1"
 replace icd10="C844" if pid=="20160018" & cr5id=="T1S1"
 //no changes for sites as already set to correct sites for M9702
 
+** JC 11-may-2021: while reviewing duplicates list, noted this merge wasn't done with pid 20141171.
+** Correct DOB errors flagged by merging with list of corrections manually created using electoral list (this ensures dofile remains de-identified)
+preserve
+clear
+import excel using "`datapath'\version02\2-working\PostCleaningUpdates20210511.xlsx" , firstrow case(lower)
+save "`datapath'\version02\2-working\postcleanupdates" ,replace
+restore
+merge 1:1 pid using "`datapath'\version02\2-working\postcleanupdates" ,force
+/*
+
+*/
+replace nrn=elec_nrn if _merge==3 //11 changes
+replace birthdate=elec_dob if _merge==3 //11 changes
+replace firstname=elec_fname if _merge==3 //2 changes
+replace middleinitials=elec_mname if _merge==3 //1 changes
+replace lastname=elec_lname if _merge==3 //0 changes
+drop elec_* _merge
+
+** Remove unused variables
+drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ttdoadotdiff
 
 
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
