@@ -3,7 +3,7 @@
     //  algorithm name          1_prep match.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      02-MAR-2021
+    //  date first created      25-MAY-2021
     // 	date last modified      04-MAR-2021
     //  algorithm task          Matching uncleaned 2018 cancer dataset with REDCap's 2018 deaths
     //  status                  Completed
