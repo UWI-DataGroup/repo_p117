@@ -970,7 +970,49 @@ label drop cod_lab
 label drop sex_lab
 */
 
+
+** Create 2016 death dataset for pre-cleaning matching with CR5 dataset for DAs to use in final further retrieval and DCO trace-back for 2016 cases
+preserve
+drop if dodyear!=2016 // deleted
+
+** Prep NRN field for merging with cancer dataset
+//nsplit nrn, digits(6 4) gen(nrndob nrnnum)
+gen double nrn2=nrn
+format nrn2 %15.0g
+tostring nrn2 ,replace
+gen nrndob=substr(nrn2,1,6) if length(nrn2)==10
+gen nrnnum=substr(nrn2,7,4) if length(nrn2)==10
+gen natregno=nrndob+"-"+nrnnum if length(nrn2)==10
+drop nrn2 nrndob nrnnum
+
+label data "BNR MORTALITY data 2016"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version05\3-output\2016_deaths_for_matching" ,replace
+note: TS This dataset can be used for matching 2016 deaths with pre-cleaning incidence data
+restore
+
+** Create 2017 death dataset for pre-cleaning matching with CR5 dataset for DAs to use in final further retrieval and DCO trace-back for 2017 cases
+preserve
+drop if dodyear!=2017 // deleted
+
+** Prep NRN field for merging with cancer dataset
+//nsplit nrn, digits(6 4) gen(nrndob nrnnum)
+gen double nrn2=nrn
+format nrn2 %15.0g
+tostring nrn2 ,replace
+gen nrndob=substr(nrn2,1,6) if length(nrn2)==10
+gen nrnnum=substr(nrn2,7,4) if length(nrn2)==10
+gen natregno=nrndob+"-"+nrnnum if length(nrn2)==10
+drop nrn2 nrndob nrnnum
+
+label data "BNR MORTALITY data 2017"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version06\3-output\2017_deaths_for_matching" ,replace
+note: TS This dataset can be used for matching 2017 deaths with pre-cleaning incidence data
+restore
+
 ** Create 2018 death dataset for pre-cleaning matching with CR5 dataset for DAs to use in final further retrieval and DCO trace-back for 2018 cases
+preserve
 drop if dodyear!=2018 // deleted
 
 ** Prep NRN field for merging with cancer dataset
@@ -987,4 +1029,4 @@ label data "BNR MORTALITY data 2018"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
 save "`datapath'\version04\3-output\2018_deaths_for_matching" ,replace
 note: TS This dataset can be used for matching 2018 deaths with pre-cleaning incidence data
-
+restore
