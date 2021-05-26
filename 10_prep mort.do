@@ -970,7 +970,7 @@ label drop cod_lab
 label drop sex_lab
 */
 
-
+** Since the below datasets (2016 + 2017) were already created in 2015AnnualReportV02 branch, I'll use those datasets instead of these for the pre-clean death matching for those years
 ** Create 2016 death dataset for pre-cleaning matching with CR5 dataset for DAs to use in final further retrieval and DCO trace-back for 2016 cases
 preserve
 drop if dodyear!=2016 // deleted
