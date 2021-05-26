@@ -4,14 +4,14 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      25-MAY-2021
-    // 	date last modified      04-MAR-2021
-    //  algorithm task          Matching uncleaned 2018 cancer dataset with REDCap's 2018 deaths
+    // 	date last modified      25-MAY-2021
+    //  algorithm task          Matching uncleaned 2016 cancer dataset with REDCap's 2016 deaths
     //  status                  Completed
-    //  objective               To have a complete list of DCOs for the cancer team to use in trace-back in prep for 2018 cancer report.
-    //  methods                 Merging CR5 2018 dataset with the prepared 2018 death dataset from 10_prep mort.do
+    //  objective               To have a complete list of DCOs for the cancer team to use in trace-back in prep for 2016 cancer report.
+    //  methods                 Merging CR5 2016 dataset with the prepared 2016 death dataset from 10_prep mort.do
 
     ** General algorithm set-up
-    version 16.0
+    version 16.1
     clear all
     macro drop _all
     set more off
@@ -31,8 +31,30 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\1_prep match.smcl", replace
+    log using "`logpath'\1_prep match_2016.smcl", replace
 ** HEADER -----------------------------------------------------
+
+/* 
+	Since 2016 deaths were already prepared for death matching in
+	10_prep mort.do from 2015AnnualReportV02 branch,
+	we will use that dataset but need to prep NRN before preparing the CR5db dataset
+*/
+** LOAD the 2016 death dataset from 2015 branch
+use "`datapath'\version02\3-output\2016_deaths_for_matching" ,clear
+
+** Prep NRN field for merging with cancer dataset
+//nsplit nrn, digits(6 4) gen(nrndob nrnnum)
+gen double nrn2=nrn
+format nrn2 %15.0g
+tostring nrn2 ,replace
+gen nrndob=substr(nrn2,1,6) if length(nrn2)==10
+gen nrnnum=substr(nrn2,7,4) if length(nrn2)==10
+gen natregno=nrndob+"-"+nrnnum if length(nrn2)==10
+drop nrn2 nrndob nrnnum
+
+save "`datapath'\version05\3-output\2016_deaths_for_matching" ,replace
+
+clear
 
 * ************************************************************************
 * PREP AND FORMAT
@@ -60,10 +82,10 @@
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-import excel using "`datapath'\version04\1-input\2021-03-03_MAIN Source+Tumour+Patient_JC_excel.xlsx", firstrow
-save "`datapath'\version04\2-working\2008-2020_cancer_import_dp" ,replace
+import excel using "`datapath'\version05\1-input\2021-05-21_MAIN Source+Tumour+Patient_JC_excel.xlsx", firstrow
+save "`datapath'\version05\2-working\2008-2020_cancer_import_dp" ,replace
 
-count //15,544
+count //16,022
 
 ** Format incidence date to create tumour year
 nsplit IncidenceDate, digits(4 2 2) gen(dotyear dotmonth dotday)
@@ -74,7 +96,7 @@ label var dot "IncidenceDate"
 label var dotyear "Incidence year"
 drop IncidenceDate
 
-count //15,544
+count //16,022
 
 ** Renaming CanReg5 variables
 rename Personsearch persearch
@@ -463,8 +485,9 @@ label values staging staging_lab
 ** Diagnosis Year
 label var dxyr "DiagnosisYear"
 ** Check for blanks as may accidentally drop 2014 cases in 2nd dofile
-count if dxyr==. //0
+count if dxyr==. //3
 list pid dot ttda stda cr5id if dxyr==.
+replace dxyr=2015 if dxyr==. //3 changes
 
 ** Consultant
 label var consultant "Consultant"
@@ -685,37 +708,38 @@ label values streviewer streviewer_lab
 ** CanReg5 ID
 label var cr5id "CanReg5 ID"
 
-count //15,544
+count //16,022
 
-save "`datapath'\version04\2-working\2008-2020_cancer_dp" ,replace
+save "`datapath'\version05\2-working\2008-2020_cancer_dp" ,replace
 label data "BNR-Cancer prepared 2008-2020 data"
-notes _dta :These data prepared for 2018 pre-cleaning death matching for further retrieval and DCO trace-back (2018 annual report)
+notes _dta :These data prepared for 2016 pre-cleaning death matching for further retrieval and DCO trace-back (2016 annual report)
 
 ** Change name format to match death data
-replace fname=lower(fname)
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
-replace lname=lower(lname)
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+replace fname=lower(fname) //16,022 changes
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //424 changes
+replace lname=lower(lname) //16,022 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //598 changes
 
 ** Look for matches
 sort lname fname pid
 quietly by lname fname : gen dupname = cond(_N==1,0,_n)
 sort lname fname pid
-count if dupname>0 //10,907
+count if dupname>0 //11,218
 
 order pid fname lname natregno
-drop if dupname>1
+drop if dupname>1 //7,052 deleted
 
-** Merge 2018 death dataset from 10_prep mort.do
-merge m:1 lname fname natregno using "`datapath'\version04\3-output\2018_deaths_for_matching"
+** Merge 2016 death dataset from 10_prep mort.do from 2015AnnualReportV02 branch
+merge m:1 lname fname natregno using "`datapath'\version05\3-output\2016_deaths_for_matching"
+
 /*
     Result                           # of obs.
     -----------------------------------------
-    not matched                        10,041
-        from master                     8,108  (_merge==1)
-        from using                      1,933  (_merge==2)
+    not matched                        10,785
+        from master                     8,633  (_merge==1)
+        from using                      2,152  (_merge==2)
 
-    matched                               594  (_merge==3)
+    matched                               337  (_merge==3)
     -----------------------------------------
 */
 ** Check the merges
@@ -725,19 +749,30 @@ drop dupname
 sort lname fname record_id
 quietly by lname fname : gen dupname = cond(_N==1,0,_n)
 sort lname fname record_id
-count if dupname>0 //339
+count if dupname>0 //550
 
 order pid record_id fname lname natregno namematch primarysite hx coddeath cr5cod
 
 ** Remove non-cancer CODs from death data
-drop if cancer!=1 & pid=="" //1,816 deleted
+drop if cancer!=1 & pid=="" //1,819 deleted
 
 ** Check for cancer deaths that didn't merge
-count if _merge==2 //117
-count if _merge==2 & dupname==0 //56
+count if _merge==2 //331
+count if _merge==2 & dupname==0 //170
 
-** Flag cases that didn't merge but should have
-list pid record_id fname lname natregno if dupname>0 //221
+** Flag cases that didn't merge but should have but first
+** repeat name matching code above; if not the non-cancer deaths that were dropped will still be flagged in this list
+drop dupname 
+sort lname fname record_id
+quietly by lname fname : gen dupname = cond(_N==1,0,_n)
+sort lname fname record_id
+count if dupname>0 //319
+
+list pid record_id fname lname natregno if dupname>0 //319
+
+** Visually check the list above in Stata Browse/Editor to see if name matches don't have a corresponding pid and record_id
+** These will be classified as possible missed DCO matches
+/*
 gen notdco=1 if record_id==26147|record_id==25207|record_id==25932|record_id==24781|record_id==25410| ///
 				record_id==24547|record_id==26907|record_id==24191|record_id==24446|record_id==26013| ///
 				record_id==24820|record_id==26772|record_id==25045|record_id==26156|record_id==26517| ///
@@ -751,9 +786,17 @@ replace notdco=1 if pid=="20180391"|pid=="20180697"|pid=="20151150"|pid=="201800
 				pid=="20141176"|pid=="20180596"|pid=="20180159"|pid=="20180227"|pid=="20150020"| ///
 				pid=="20180570"|pid=="20181178"|pid=="20155016" 
 				//27 changes
+*/
+gen missedmatch=1 if dupname>0 //319 changes
 ** check those that merged that they're correct - added pid=20155016 (record_id=25083; record_id=26156) which seems to have merged to wrong pt based on CODs so I think NRN in CR5db for that pid is incorrect
 
-gen dco=1 if record_id!=. & notdco!=1 & pid=="" //90 changes
+** Check for ones that merged but are noted as not deceased in CR5db
+** These will be classified as matched but alive
+count if _merge==3 & slc!=2
+gen alivematch=1 if _merge==3 & slc!=2 //38 changes
+
+** Check for ones that did not merge but have cancer COD
+gen dco=1 if record_id!=. & missedmatch!=1 & pid=="" // changes
 
 ** Check for matches using natregno
 preserve
@@ -761,40 +804,49 @@ drop if natregno==""|natregno=="999999-9999"|regexm(natregno,"9999")
 sort natregno 
 quietly by natregno : gen dupnrn = cond(_N==1,0,_n)
 sort natregno record_id lname fname
-count if dupnrn>0 //159
-list pid record_id fname lname natregno notdco dco if dupnrn>0
+count if dupnrn>0 //61
+list pid record_id fname lname natregno missedmatch dco if dupnrn>0
 restore
 
-replace notdco=1 if record_id==25676|record_id==25685|record_id==26294|record_id==26188|record_id==25209| ///
-					record_id==25535|record_id==25603|record_id==26311|record_id==25195|record_id==25402| ///
-					record_id==25892|record_id==26046|record_id==25060|record_id==25695|record_id==25925| ///
-					record_id==24961|record_id==25131|record_id==24774|record_id==26192|record_id==25628| ///
-					record_id==25356|record_id==26241|record_id==26780|record_id==24748|record_id==25567| ///
-					record_id==25325|record_id==26615|record_id==24554|record_id==25319|record_id==25696| ///
-					record_id==25006|record_id==25721|record_id==25875|record_id==25558|record_id==24720| ///
-					record_id==26473|record_id==24901|record_id==25448|record_id==26712
-					//39 changes
-replace notdco=1 if pid=="20180774"|pid=="20180802"|pid=="20180725"|pid=="20180839"|pid=="20180168"| ///
-					pid=="20160728"|pid=="20180747"|pid=="20180591"|pid=="20180608"|pid=="20170052"| ///
-					pid=="20180910"|pid=="20180833"|pid=="20180864"|pid=="20180113"|pid=="20181153"| ///
-					pid=="20180664"|pid=="20151139"|pid=="20155061"|pid=="20141134"|pid=="20180895"| ///
-					pid=="20170266"|pid=="20130137"|pid=="20140789"|pid=="20180905"|pid=="20130272"| ///
-					pid=="20145106"|pid=="20180893"|pid=="20162026"|pid=="20172034"|pid=="20180886"| ///
-					pid=="20141451"|pid=="20130045"|pid=="20181065"|pid=="20180780"|pid=="20170254"| ///
-					pid=="20180769"|pid=="20180598"|pid=="20141503"|pid=="20145095"|pid=="20180605"| ///
-					pid=="20180597"|pid=="20180160"|pid=="20181074"|pid=="20180703"|pid=="20141361"| ///
-					pid=="20151197"|pid=="20160096"|pid=="20180483"
-					//40 changes
-replace dco=. if notdco==1 //31 changes
+** After reviewing above list, classify the NRN matches as possible missed DCO matches
+replace missedmatch=1 if record_id==19831|record_id==19517|record_id==21074|record_id==21763|record_id==19515| ///
+					record_id==20843|record_id==19966|record_id==20749|record_id==20845|record_id==20497| ///
+					record_id==19783|record_id==20051|record_id==20093|record_id==20211|record_id==19596| ///
+					record_id==20531|record_id==20575|record_id==19866|record_id==21628|record_id==20006| ///
+					record_id==21560|record_id==20107|record_id==21004|record_id==20760|record_id==19729| ///
+					record_id==20758|record_id==20249
+					//25 changes
+replace missedmatch=1 if pid=="20151323"|pid=="20161083"|pid=="20080295"|pid=="20162038"|pid=="20190249"| ///
+					pid=="20190331"|pid=="20141398"|pid=="20151134"|pid=="20160525"|pid=="20155214"| ///
+					pid=="20160197"|pid=="20141477"|pid=="20161090"|pid=="20130395"|pid=="20150031"| ///
+					pid=="20161101"|pid=="20160118"|pid=="20160092"|pid=="20151365"|pid=="20160731"| ///
+					pid=="20151274"|pid=="20141283"|pid=="20160880"|pid=="20160917"|pid=="20160091"| ///
+					pid=="20160977"|pid=="20160662"|pid=="20155213"|pid=="20160127"|pid=="20200267"| ///
+					pid=="20200248"|pid=="20151321"
+					//32 changes
+**replace missedmatch=1 if dupnrn>0
 
-gen dcotxt="2018 possible DCOs: Check CR5db (all years) if this case definitely has not been previously captured." if dco==1
-gen notdcotxt="2018 not DCOs: (1) Check CR5db (all years) and REDCapdb 2008-2020 db if this is definitely the same patient. (2) Update any CR5db fields based on the death data, e.g. SLC, DLC, NRN, Address, etc. (3) Check for any possible missed merges in CR5db and merge these cases and update the records accordingly." if notdco==1
+**drop if pid=="20080667" //2 deleted - these are patient records that were merged in CR5db so there are 2 CR5db patient records for this same person
 
-** Create 2 lists for KWG - one for those that are not DCOs but didn't merge so he can check the death fields are correct in CR5db (export natregno slc dlc fields); one for DCOs not found in CR5db
+replace dco=. if missedmatch==1 //25 changes
+
+gen dcotxt="possible DCOs: Check CR5db (all years) if this case definitely has not been previously captured." if dco==1
+gen missedmatchtxt="possible missed DCO match: (1) Check CR5db (all years) and REDCapdb 2008-2020 db if this is definitely the same patient - Note that the list is sorted by LastName, FirstName, NRN so if the name appears to be alone, check by NRN to find the corresponding possible match. (2) Update any CR5db fields based on the death data, e.g. SLC, DLC, NRN, Address, etc. (3) Check for any possible missed merges in CR5db (first and last names maybe switched) and merge these cases and update the records accordingly." if missedmatch==1
+gen alivematchtxt="alive match: Cases merged with death data but SLC in CR5db not = deceased: (1) Check CR5db (all years) and REDCapdb 2008-2020 db if this is definitely the same patient. (2) Update any CR5db fields based on the death data, e.g. SLC, DLC, NRN, Address, etc." if alivematch==1
+
+/* 
+	Create 3 lists for KWG:
+	 (1) those that are possible missed DCO matches but didn't merge so he can check the death fields are correct in CR5db (export natregno slc dlc fields); 
+	 (2) those for DCOs (i.e. cancer CODs) not found in CR5db
+	 (3) those that merged but are not listed as deceased in CR5db
+*/
 sort lname fname natregno 
 ** Change version for below lists before re-running this dofile!
+** Use below code to automate file names using current date
+local listdate = string( d(`c(current_date)'), "%dCYND" )
 /*
-capture export_excel dcotxt notdcotxt if dco==1 & record_id==25514|notdco==1 & record_id==25209 using "`datapath'\version04\2-working\DCO2018V01.xlsx", sheet("Instructions") firstrow(variables)
-capture export_excel pid record_id fname lname natregno slc dlc dod if dco==1 using "`datapath'\version04\2-working\DCO2018V01.xlsx", sheet("2018 possible DCOs_20210304") firstrow(variables)
-capture export_excel pid record_id fname lname natregno slc dlc dod if notdco==1 using "`datapath'\version04\2-working\DCO2018V01.xlsx", sheet("2018 not DCOs_20210304") firstrow(variables)
+capture export_excel dcotxt missedmatchtxt alivematchtxt if dco==1|missedmatch==1|alivematch==1 using "`datapath'\version05\3-output\precleanDCO2016V01_`listdate'.xlsx", sheet("Instructions") firstrow(variables)
+capture export_excel pid record_id fname lname natregno slc dlc dod if dco==1 using "`datapath'\version05\3-output\precleanDCO2016V01_`listdate'.xlsx", sheet("2016 possible DCOs") firstrow(variables)
+capture export_excel pid record_id fname lname natregno slc dlc dod if missedmatch==1 using "`datapath'\version05\3-output\precleanDCO2016V01_`listdate'.xlsx", sheet("2016 missed DCO match") firstrow(variables)
+capture export_excel pid record_id fname lname natregno slc dlc dod if alivematch==1 using "`datapath'\version05\3-output\precleanDCO2016V01_`listdate'.xlsx", sheet("2016 alive match") firstrow(variables)
 */
