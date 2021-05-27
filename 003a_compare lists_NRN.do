@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      10-MAY-2021
-    // 	date last modified      10-MAY-2021
+    // 	date last modified      27-MAY-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -55,7 +55,7 @@
 
 ** STEP #2
 ** LOAD corrected dataset from dofile 001_flag errors for each list
-use "`datapath'\version04\2-working\corrected_cancer_dups.dta" , clear
+use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
 count //9,116
 
@@ -67,7 +67,7 @@ drop if nrn==""|nrn=="999999-9999"|regexm(nrn,"9999") //remove blank/missing NRN
 sort nrn 
 quietly by nrn : gen dup = cond(_N==1,0,_n)
 sort nrn registrynumber lastname firstname
-count if dup>0 //6
+count if dup>0 //10
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the NRN non-duplicates - 7,182 deleted
-
+count //10
 
 ** STEP #6
 /* 
@@ -89,9 +89,9 @@ drop if dup==0 //remove all the NRN non-duplicates - 7,182 deleted
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
 destring birthdate ,replace
-append using "`datapath'\version04\2-working\prevNRN_dups"
+capture append using "`datapath'\version07\2-working\prevNRN_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-
+count //16
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
@@ -102,7 +102,7 @@ count if duppid>0 //0
 
 ** STEP #8
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //229 deleted
+drop if checked==1 & duppid==0 //6 deleted
 
 
 ** STEP #9
@@ -128,5 +128,5 @@ order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber 
 
 ** STEP #10
 ** Save this dataset for export to excel (see dofile 004_export new lists)
-save "`datapath'\version04\3-output\NRN_dups" ,replace
+save "`datapath'\version07\3-output\NRN_dups" ,replace
 

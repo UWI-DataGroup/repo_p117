@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      10-MAY-2021
-    // 	date last modified      10-MAY-2021
+    // 	date last modified      27-MAY-2021
     //  algorithm task          Exporting newly-generated duplicates lists (see dofiles '003a, 003b, 003c, 003d...')
     //  status                  Completed
     //  objective               (1) To have one excel workbook with 5 tabs - ERRORS, NRN, DOB, HOSP#, NAMES.
@@ -50,13 +50,13 @@
 ** STEP #2
 ** LOAD newly-generated dataset from dofile 003a_compare lists_NRN
 preserve
-use "`datapath'\version04\3-output\NRN_dups.dta" , clear
+use "`datapath'\version07\3-output\NRN_dups.dta" , clear
 
-count //6
+count //10
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nrnlist using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("NRN") firstrow(varlabels)
+capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nrnlist using "`datapath'\version07\3-output\CancerDuplicates`listdate'.xlsx", sheet("NRN") firstrow(varlabels)
 restore
 
 
@@ -69,13 +69,13 @@ restore
 ** STEP #3
 ** LOAD newly-generated dataset from dofile 003b_compare lists_DOB
 preserve
-use "`datapath'\version04\3-output\DOB_dups.dta" , clear
+use "`datapath'\version07\3-output\DOB_dups.dta" , clear
 
-count //6
+count //0
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action doblist using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("DOB") firstrow(varlabels)
+capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action doblist using "`datapath'\version07\3-output\CancerDuplicates`listdate'.xlsx", sheet("DOB") firstrow(varlabels)
 restore
 
 
@@ -88,13 +88,13 @@ restore
 ** STEP #4
 ** LOAD newly-generated dataset from dofile 003c_compare lists_HOSP
 preserve
-use "`datapath'\version04\3-output\HOSP_dups.dta" , clear
+use "`datapath'\version07\3-output\HOSP_dups.dta" , clear
 
-count //4
+count //8
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action hosplist using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("Hosp#") firstrow(varlabels)
+capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action hosplist using "`datapath'\version07\3-output\CancerDuplicates`listdate'.xlsx", sheet("Hosp#") firstrow(varlabels)
 restore
 
 
@@ -107,12 +107,12 @@ restore
 ** STEP #5
 ** LOAD newly-generated dataset from dofile 003d_compare lists_NAMES
 preserve
-use "`datapath'\version04\3-output\NAMES_dups.dta" , clear
+use "`datapath'\version07\3-output\NAMES_dups.dta" , clear
 
-count //0
+count //446
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nameslist using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("Names") firstrow(varlabels)
+capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nameslist using "`datapath'\version07\3-output\CancerDuplicates`listdate'.xlsx", sheet("Names") firstrow(varlabels)
 restore
 

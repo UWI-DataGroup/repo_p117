@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      10-MAY-2021
-    // 	date last modified      10-MAY-2021
+    // 	date last modified      27-MAY-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -55,7 +55,7 @@
 
 ** STEP #2
 ** LOAD corrected dataset from dofile 001_flag errors for each list
-use "`datapath'\version04\2-working\corrected_cancer_dups.dta" , clear
+use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
 count //9,116
 
@@ -67,7 +67,7 @@ drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
-count if dup>0 //22
+count if dup>0 //8
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 5,288 deleted
-
+count //8
 
 ** STEP #6
 /* 
@@ -89,12 +89,13 @@ drop if dup==0 //remove all the Hosp# non-duplicates - 5,288 deleted
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
 destring birthdate ,replace
-append using "`datapath'\version04\2-working\prevHOSP_dups"
+capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-
+count //4
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
+drop if registrynumber==20141171 //2 deleted - this was already merged with 20130865but it's still coming into exported file and can't open record in CR5db to delete it
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
 count if duppid>0 //40
@@ -107,8 +108,10 @@ list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate s
 	(1) Manually review list above for duppid>0
 	(2) Remove previously-checked records according to review
 */
-//drop if checked==1 & duppid==0 //229 deleted
-drop if registrynumber!=20130865 & registrynumber!=20141171
+//drop if registrynumber!=20130865 & registrynumber!=20141171
+** Remove previously-checked records
+drop if checked==1 & duppid==0 //2 deleted
+drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
 
 
 ** STEP #9
@@ -134,5 +137,5 @@ order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber 
 
 ** STEP #10
 ** Save this dataset for export to excel (see dofile 004_export new lists)
-save "`datapath'\version04\3-output\HOSP_dups" ,replace
+save "`datapath'\version07\3-output\HOSP_dups" ,replace
 

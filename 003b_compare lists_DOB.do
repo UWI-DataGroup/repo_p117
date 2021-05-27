@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      10-MAY-2021
-    // 	date last modified      10-MAY-2021
+    // 	date last modified      27-MAY-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -55,7 +55,7 @@
 
 ** STEP #2
 ** LOAD corrected dataset from dofile 001_flag errors for each list
-use "`datapath'\version04\2-working\corrected_cancer_dups.dta" , clear
+use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
 count //9,116
 
@@ -109,7 +109,7 @@ drop if birthdate==. | birthdate==99999999
 sort lastname firstname birthdate
 quietly by lastname firstname birthdate : gen dup = cond(_N==1,0,_n)
 sort lastname firstname birthdate registrynumber
-count if dup>0 //4 - true DOB duplicates
+count if dup>0 //0 - true DOB duplicates
 
 /*
 ** Look for duplicates - METHOD #2
@@ -143,9 +143,9 @@ gen checked=2
 
 
 ** STEP #6
-count if dup==0 //7881
+count if dup==0 //8104
 drop if dup==0 //remove all the DOB non-duplicates - 7881 deleted
-
+count //0
 
 ** STEP #7
 /* 
@@ -153,21 +153,22 @@ drop if dup==0 //remove all the DOB non-duplicates - 7881 deleted
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
 destring birthdate ,replace
-append using "`datapath'\version04\2-working\prevDOB_dups"
+capture append using "`datapath'\version07\2-working\prevDOB_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-
+count //6
 
 ** STEP #8
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
+drop if registrynumber==20201053 //2 deleted - this was already merged with 20151033 but it's still coming into exported file and can't open record in CR5db to delete it
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //4
+count if duppid>0 //2
 
 
 ** STEP #9
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //269 deleted
-
+drop if checked==1 & duppid==0 //2 deleted
+drop if registrynumber==20151033 //2 deleted - these were matched to each other and came from the previously-checked list
 
 ** STEP #10
 ** Prepare this dataset for export to excel
@@ -192,5 +193,5 @@ order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber 
 
 ** STEP #11
 ** Save this dataset for export to excel (see dofile 004_export new lists)
-save "`datapath'\version04\3-output\DOB_dups" ,replace
+save "`datapath'\version07\3-output\DOB_dups" ,replace
 

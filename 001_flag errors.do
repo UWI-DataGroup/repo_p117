@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      04-MAY-2021
-    // 	date last modified      10-MAY-2021
+    // 	date last modified      27-MAY-2021
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -68,7 +68,7 @@
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version04\1-input\2021-05-04_MAIN Source+Tumour+Patient_JC.txt"
+insheet using "`datapath'\version07\1-input\2021-05-26_MAIN Source+Tumour+Patient_JC.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -143,11 +143,11 @@ label var flag10 "Correction: Invalid Length Hosp#"
 ** STEP #9
 ** Check for if first or last name is missing 
 ** Flag errors for DA to correct in CR5db
-count if firstname=="" //1
-replace flag1="missing" if firstname=="" //1 change
+count if firstname=="" //0
+replace flag1="missing" if firstname=="" //0 change
 replace flag6="delete blank record" if firstname==""
-count if lastname=="" //1
-replace flag2="missing" if lastname=="" //1 change
+count if lastname=="" //0
+replace flag2="missing" if lastname=="" //0 change
 replace flag7="delete blank record" if lastname==""
 
 ** STEP #10
@@ -157,33 +157,33 @@ replace flag7="delete blank record" if lastname==""
 
 ** STEP #11
 ** Check for invalid length NRN
-count if length(nrn)<11 & nrn!="" //169
+count if length(nrn)<11 & nrn!="" //1
 list registrynumber firstname lastname nrn birthdate if length(nrn)<11 & nrn!=""
-replace flag3=nrn if length(nrn)<11 & nrn!="" //169 changes
+replace flag3=nrn if length(nrn)<11 & nrn!="" //1 changes
 
 
 ** STEP #12
 ** Correct NRN errors flagged above for non-specific incorrect NRNs
-replace nrn="999999-9999" if nrn=="99" //1 change
-replace nrn="999999-9999" if nrn=="9999-9999" //1 change
+replace nrn="999999-9999" if nrn=="99" //0 changes
+replace nrn="999999-9999" if nrn=="9999-9999" //0 changes
 //replace nrn="999999-9999" if nrn=="999999"
 gen nrn2 = substr(nrn, 1,6) + "-" + substr(nrn, -4,4) if length(nrn)==10 & !(strmatch(strupper(nrn), "*-*"))
-replace nrn=nrn2 if nrn2!="" //56 changes
+replace nrn=nrn2 if nrn2!="" //1 change
 drop nrn2
 gen nrn2 = nrn + "-9999" if length(nrn)==6
-replace nrn=nrn2 if nrn2!="" //9 changes
+replace nrn=nrn2 if nrn2!="" //0 changes
 drop nrn2
-replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //1 change
+replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //0 changes
 
 
 ** STEP #13
 ** Correct NRN errors flagged above for specific incorrect NRNs, i.e. checked against electoral list
-replace nrn=subinstr(nrn,"BO","9999",.) //1 change
-replace nrn=subinstr(nrn,"LP","9999",.) //1 change
-replace nrn=subinstr(nrn,"12","012",.) if registrynumber==20150215 //1 change
-replace nrn=subinstr(nrn,"-","",.) + "-9999" if registrynumber==20155048 //1 change
-replace nrn=substr(birthdate, -6,6) + "-9999" if registrynumber==20160062 //1 change
-replace nrn="999999-9999" if registrynumber==20190385 //1 change
+//replace nrn=subinstr(nrn,"BO","9999",.) //1 change
+//replace nrn=subinstr(nrn,"LP","9999",.) //1 change
+//replace nrn=subinstr(nrn,"12","012",.) if registrynumber==20150215 //1 change
+//replace nrn=subinstr(nrn,"-","",.) + "-9999" if registrynumber==20155048 //1 change
+//replace nrn=substr(birthdate, -6,6) + "-9999" if registrynumber==20160062 //1 change
+//replace nrn="999999-9999" if registrynumber==20190385 //1 change
 
 
 ** STEP #14
@@ -192,9 +192,9 @@ replace nrn="999999-9999" if registrynumber==20190385 //1 change
 	electoral list - filter in NRN using 'Begins with' and enter dob part of NRN. 
 	Check if for 2 entries for same person and using NRN in below list determine which is the one to update.
 */
-count if length(nrn)<11 & nrn!="" //95
+count if length(nrn)<11 & nrn!="" //0
 list registrynumber firstname lastname nrn birthdate nftype sourcename doctor if length(nrn)<11 & nrn!=""
-
+/*
 replace nrn=nrn + "0" if registrynumber==20190556|registrynumber==20190592|registrynumber==20200181|registrynumber==20201038|registrynumber==20201039|registrynumber==20201090|registrynumber==20201101
 replace nrn=nrn + "1" if registrynumber==20190530|registrynumber==20190542|registrynumber==20190573|registrynumber==20190602|registrynumber==20200208|registrynumber==20200218|registrynumber==20200220|registrynumber==20200232|registrynumber==20201049|registrynumber==20201068|registrynumber==20201096
 replace nrn=nrn + "2" if registrynumber==20190537|registrynumber==20190572|registrynumber==20190603|registrynumber==20200222|registrynumber==20201041|registrynumber==20201043|registrynumber==20201099
@@ -212,42 +212,46 @@ replace nrn=subinstr(nrn,"80","90",.) if registrynumber==20201108
 replace nrn=subinstr(nrn,"-","-0",.) if registrynumber==20201108
 replace nrn=subinstr(nrn,"36","39",.) if registrynumber==20201204
 //99 changes
-
+*/
 
 ** STEP #15
 ** Identify corrected NRNs in prep for export to excel ERRORS list
-replace flag8=nrn if flag3!="" //169 changes
+replace flag8=nrn if flag3!="" //1 change
 
 
 ** STEP #16
 ** Check for invalid length DOB
-count if length(birthdate)<8|length(birthdate)>8 //19 - check against electoral list using 'Contains' filter in the Names fields on electoral list
+gen str8 dob = string(birthdate,"%08.0f")
+rename birthdate birthdate2
+rename dob birthdate
+count if length(birthdate)<8|length(birthdate)>8 //0 - check against electoral list using 'Contains' filter in the Names fields on electoral list
 list registrynumber firstname lastname nrn birthdate if length(birthdate)<8|length(birthdate)>8
-replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //9 changes
-replace flag4="missing" if birthdate=="" //10 changes
+replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //0 changes
+replace flag4="missing" if birthdate=="" //0 changes
 
 
 ** STEP #17
 ** Check for invalid characters in DOB
-count if regexm(birthdate,"-") //1
-replace flag4=birthdate if regexm(birthdate,"-") //1 change
+count if regexm(birthdate,"-") //0
+replace flag4=birthdate if regexm(birthdate,"-") //0 changes
 
 
 ** STEP #18
 ** Correct DOB errors using below method as these won't lead to de-identifying the dofile
-replace birthdate=subinstr(birthdate,"-0","",.) if registrynumber==20201091 & birthdate!=""
-replace birthdate=subinstr(birthdate,"3","193",.) if registrynumber==20201091 & birthdate!=""
+//replace birthdate=subinstr(birthdate,"-0","",.) if registrynumber==20201091 & birthdate!=""
+//replace birthdate=subinstr(birthdate,"3","193",.) if registrynumber==20201091 & birthdate!=""
 
 
 ** STEP #19
 ** Correct DOB errors flagged by merging with list of corrections manually created using electoral list (this ensures dofile remains de-identified)
+/*
 preserve
 clear
-import excel using "`datapath'\version04\2-working\DOBNRNelectoral_dups.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version07\2-working\DOBNRNelectoral_dups.xlsx" , firstrow case(lower)
 tostring elec_dob ,replace
-save "`datapath'\version04\2-working\electoral_dobnrn_dups" ,replace
+save "`datapath'\version07\2-working\electoral_dobnrn_dups" ,replace
 restore
-merge 1:1 registrynumber using "`datapath'\version04\2-working\electoral_dobnrn_dups" ,force
+merge 1:1 registrynumber using "`datapath'\version07\2-working\electoral_dobnrn_dups" ,force
 /*
     Result                           # of obs.
     -----------------------------------------
@@ -264,35 +268,35 @@ replace firstname=elec_fname if _merge==3 //2 changes
 replace middleinitials=elec_mname if _merge==3 //1 changes
 replace lastname=elec_lname if _merge==3 //0 changes
 drop elec_* _merge
-
+*/
 
 ** STEP #20
 ** Correct DOB errors using below method as these won't lead to de-identifying the dofile
-replace birthdate=subinstr(birthdate,"8","18",.) if registrynumber==20160465 //1 change
-replace birthdate="99999999" if birthdate==""|birthdate=="99" //7 changes
+//replace birthdate=subinstr(birthdate,"8","18",.) if registrynumber==20160465 //1 change
+//replace birthdate="99999999" if birthdate==""|birthdate=="99" //7 changes
 
 
 ** STEP #21
 ** Identify corrected DOBs in prep for export to excel ERRORS list 
-replace flag9=birthdate if flag4!="" //20 changes - this will store the corrected DOBs in this variable in prep for export to the error excel list
-replace flag9="delete blank record" if registrynumber==20159999 //1 change
+replace flag9=birthdate if flag4!="" //0 changes - this will store the corrected DOBs in this variable in prep for export to the error excel list
+replace flag9="delete blank record" if registrynumber==20159999 //0 changes
 
 
 ** STEP #23
 ** Check for invalid length Hosp#
-count if length(hospitalnumber)==1 //4
+count if length(hospitalnumber)==1 //0
 list registrynumber firstname lastname hospitalnumber if length(hospitalnumber)==1
-replace flag5=hospitalnumber if length(hospitalnumber)==1 //4 changes
+replace flag5=hospitalnumber if length(hospitalnumber)==1 //0 changes
 
 
 ** STEP #24
 ** Correct Hosp# errors using below method as these won't lead to de-identifying the dofile
-replace hospitalnumber="99" if length(hospitalnumber)==1 //4 changes
+replace hospitalnumber="99" if length(hospitalnumber)==1 //0 changes
 
 
 ** STEP #25
 ** Identify corrected Hosp#s in prep for export to excel ERRORS list
-replace flag10=hospitalnumber if flag5!="" //4 changes
+replace flag10=hospitalnumber if flag5!="" //0 changes
 
 
 ** STEP #26
@@ -311,7 +315,7 @@ label var str_no "No."
 ** Create excel errors list before deleting incorrect records
 ** Use below code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no registrynumber flag1 flag6 flag2 flag7 flag3 flag8 flag4 flag9 flag5 flag10 str_da str_dadate str_action if flag1!=""|flag2!=""|flag3!=""|flag4!=""|flag5!="" using "`datapath'\version04\3-output\CancerDuplicates`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+capture export_excel str_no registrynumber flag1 flag6 flag2 flag7 flag3 flag8 flag4 flag9 flag5 flag10 str_da str_dadate str_action if flag1!=""|flag2!=""|flag3!=""|flag4!=""|flag5!="" using "`datapath'\version07\3-output\CancerDuplicates`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
 restore
 
 
@@ -329,9 +333,9 @@ count //9,116
 
 ** STEP #30
 ** Save this dataset
-save "`datapath'\version04\2-working\corrected_cancer_dups.dta" ,replace
+save "`datapath'\version07\2-working\corrected_cancer_dups.dta" ,replace
 label data "BNR-Cancer Duplicates"
-notes _dta :These data prepared for SDA to use in prep for 2018 annual report
+notes _dta :These data prepared for SDA to use for identifying duplicates and possible missed merges
 
 /*
 ** STEP #31
