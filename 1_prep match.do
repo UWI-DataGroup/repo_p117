@@ -538,7 +538,7 @@ label var rx4d "Treatment4Date"
 ** Treatment 5 has no observations so had to slightly adjust code
 replace Treatment5Date=20000101 if Treatment5Date==99999999
 if Treatment5Date !=. nsplit Treatment5Date, digits(4 2 2) gen(rx5year rx5month rx5day)
-if Treatment5Date !=. gen rx5d=mdy(rx5month, rx5day, rx4year)
+if Treatment5Date !=. gen rx5d=mdy(rx5month, rx5day, rx5year)
 if Treatment5Date !=. format rx5d %dD_m_CY
 if Treatment5Date==. rename Treatment5Date rx5d
 label var rx5d "Treatment5Date"
