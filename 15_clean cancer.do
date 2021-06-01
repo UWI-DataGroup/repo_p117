@@ -10623,6 +10623,8 @@ drop elec_* _merge
 ** Remove unused variables
 drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ttdoadotdiff
 
+** Remove non-reportable skin cancers
+drop if siteiarc==25 //0 - nonreportable skin cancers
 
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 stop
@@ -10650,7 +10652,7 @@ drop if recstatus==3 //0 deleted - ineligible case definition
 drop if sex==9 //0 deleted - sex unknown
 drop if beh!=3 //51 deleted - nonmalignant
 drop if persearch>2 //3 deleted
-drop if siteiarc==25 //0 - nonreportable skin cancerscount
+drop if siteiarc==25 //0 - nonreportable skin cancers
 drop dup_id
 
 count //3484; 3488; 2744
