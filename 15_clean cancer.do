@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      02-DEC-2019
-    // 	date last modified      20-JAN-2021
+    // 	date last modified      02-JUN-2021
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -10625,6 +10625,24 @@ drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend
 
 ** Remove non-reportable skin cancers
 drop if siteiarc==25 //0 - nonreportable skin cancers
+
+/*
+	02jun2021 JC: Updates from post-clean cross-check review process.
+	See dofile 45_prep cross-check.do
+*/
+replace dlc=d(09sep2020) if pid=="20080020" //path rpt added for recurrent disease
+//pid 20080154 reviewed but no update needed as only death certificate added in CR5db and this was already matched in Stata.
+replace dlc=d(19jun2017) if pid=="20080158" //path rpt added for 2017 MP
+replace dlc=d(09nov2018) if pid=="20080171" //path rpt added for 2018 MP
+replace dlc=d(26sep2017) if pid=="20080173" //path rpt added for 2017 MP
+replace dlc=d(31dec2014) if pid=="20080196" & cr5id=="T1S1" //merged in CR5db on 17mar2021 after dup list review
+replace patient=2 if pid=="20080196" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080196" & cr5id=="T2S1"
+replace ptrectot=3 if pid=="20080196" & cr5id=="T2S1"
+
+
+
+
 
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 stop
