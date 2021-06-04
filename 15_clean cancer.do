@@ -10631,7 +10631,7 @@ drop if siteiarc==25 //0 - nonreportable skin cancers
 	See dofile 45_prep cross-check.do
 */
 replace dlc=d(09sep2020) if pid=="20080020" //path rpt added for recurrent disease
-//pid 20080154 reviewed but no update needed as only death certificate added in CR5db and this was already matched in Stata.
+replace dlc=dod if pid=="20080154" //death certificate added in CR5db and this was already matched in Stata.
 replace dlc=d(19jun2017) if pid=="20080158" //path rpt added for 2017 MP
 replace dlc=d(09nov2018) if pid=="20080171" //path rpt added for 2018 MP
 replace dlc=d(26sep2017) if pid=="20080173" //path rpt added for 2017 MP
@@ -10639,21 +10639,47 @@ replace dlc=d(31dec2014) if pid=="20080196" & cr5id=="T1S1" //merged in CR5db on
 replace patient=2 if pid=="20080196" & cr5id=="T2S1"
 replace eidmp=2 if pid=="20080196" & cr5id=="T2S1"
 replace ptrectot=3 if pid=="20080196" & cr5id=="T2S1"
+//pid 20080208 reviewed but no update needed as was merged with 20145127 (death info) in CR5db after dup list review - death data was already matched in Stata.
+replace dlc=d(05apr2018) if pid=="20080217" //path rpt added for 2018 MP
+replace dlc=d(02may2017) if pid=="20080232" //merge done for 2016 MP
+//pid 20080241 reviewed but no update needed as only death certificate added in CR5db and this was already matched in Stata.
+replace dlc=dod if pid=="20080252" //merge done for 2016 MP
+replace dlc=dod if pid=="20080261" //merge done for 2016 MP
+replace dlc=d(30mar2017) if pid=="20080274" //merge done for recurrent disease
+replace dlc=dod if pid=="20080295" //merge done for 2016 MP
+replace dlc=dod if pid=="20080316" //death rec bk added - missed 2017 MP on death certificate; further investigation revealed death certificate added to wrong pid
 
 
 
-
-
+RE-RUN NAMES AND NRN DUPLICATES CHECKS
+Check if pt deceased but dlc and dod do not match
+Check for resident=2 or 99 then look them up in MedData
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 stop
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
-save "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival", replace
+save "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_nonreportable", replace
 label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival Dataset for IARC Hub's Data Request"
 note: TS This dataset was used for data prep for IARC Hub's quality assessment (see p131 v06)
 note: TS Excludes ineligible case definition
 note: TS Includes unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
+** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
+drop if resident==2 //4 deleted - nonresident
+drop if resident==99 //40 deleted - resident unknown
+drop if recstatus==3 //0 deleted - ineligible case definition
+drop if sex==9 //0 deleted - sex unknown
+drop if beh!=3 //51 deleted - non malignant
+drop if persearch>2 //3 deleted
+drop if siteiarc==25 //0 - non reportable skin cancers
+
+** JC 03-Jun-2021: For quality assessment by IARC Hub, save this corrected dataset with all malignant (non-reportable skin + non-malignant tumours removed) for 2008, 2013-2015
+** See p131 version06 for more info on this data request
+save "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_reportable", replace
+label data "2008 2013 2014 2015 BNR-Cancer analysed data - Non-survival Dataset for IARC Hub's Data Request"
+note: TS This dataset was used for data prep for IARC Hub's quality assessment (see p131 v06)
+note: TS Excludes ineligible case definition
+note: TS Excludes ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
 ** For 2015 annaul report remove 2008 cases as decided by NS on 06-Oct-2020, email subject: BNR-C: 2015 cancer stats tables completed
 drop if dxyr==2008
@@ -10668,9 +10694,9 @@ drop if resident==2 //4 deleted - nonresident
 drop if resident==99 //40 deleted - resident unknown
 drop if recstatus==3 //0 deleted - ineligible case definition
 drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //51 deleted - nonmalignant
+drop if beh!=3 //51 deleted - non malignant
 drop if persearch>2 //3 deleted
-drop if siteiarc==25 //0 - nonreportable skin cancers
+drop if siteiarc==25 //0 - non reportable skin cancers
 drop dup_id
 
 count //3484; 3488; 2744
@@ -10681,7 +10707,7 @@ capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurviva
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival", replace
 label data "2013 2014 2015 BNR-Cancer analysed data - Non-survival Dataset"
 note: TS This dataset was used for 2015 annual report
-note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
+note: TS Excludes ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
 
 ***********************
