@@ -10648,13 +10648,42 @@ replace dlc=dod if pid=="20080261" //merge done for 2016 MP
 replace dlc=d(30mar2017) if pid=="20080274" //merge done for recurrent disease
 replace dlc=dod if pid=="20080295" //merge done for 2016 MP
 replace dlc=dod if pid=="20080316" //death rec bk added - missed 2017 MP on death certificate; further investigation revealed death certificate added to wrong pid
+replace dlc=d(04mar2019) if pid=="20080326" //path rpt added for progressive disease
+replace dlc=dod if pid=="20080327" //death certificate added; already matched in Stata
+replace dlc=dod if pid=="20080348" //death rec bk added; already matched in Stata
+replace dlc=d(24jan2019) if pid=="20080390" //path rpt added for recurrent disease
+replace dlc=d(02oct2019) if pid=="20080428" //path rpt added for 2019 MP
+replace natregno=subinstr(natregno,"0030","9999",.) if pid=="20080428"
+replace dlc=d(11jul2016) if pid=="20080560" //path rpt added for 2016 MP
+//pid 20080624 reviewed but no update needed as cannot determine any reason for why record was saved 13feb2020, according to TT update date.
+replace dlc=d(04jul2013) if pid=="20130686" //merged in CR5db on 17mar2021 after dup list review
+replace patient=2 if pid=="20130686"
+replace eidmp=2 if pid=="20130686"
+replace ptrectot=3 if pid=="20130686"
+replace persearch=2 if pid=="20130686"
+replace cr5id="T7S1" if pid=="20130686"
+//ssc install fillmissing
+gen nrn=natregno if pid=="20130686"
+fillmissing nrn
+replace natregno=nrn if pid=="20080626" //6 changes
+gen dlc2=dlc if pid=="20130686"
+format dlc2 %dD_m_CY
+fillmissing dlc2
+replace dlc=dlc2 if pid=="20080626" //6 changes
+drop nrn dlc2
+replace pid="20080626" if pid=="20130686"
+//pid 20080626 was missing NRN and had old DLC so used above fillmissing command to copy the NRN + DLC values from pid 20130686 to 20080626
+replace dlc=d(26nov2014) if pid=="20080659" //merge done for ineligible 2014 MP; DLC obtained from MasterDb frmCF_2009 #3598
 
 
 
 RE-RUN NAMES AND NRN DUPLICATES CHECKS
 Check if pt deceased but dlc and dod do not match
 Check for resident=2 or 99 then look them up in MedData
+2020 death prep and matching so can have 5yr survival for 2015 data
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
+
+
 stop
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
