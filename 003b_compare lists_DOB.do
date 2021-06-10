@@ -3,8 +3,8 @@
     //  algorithm name          003b_compare lists_DOB.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      10-MAY-2021
-    // 	date last modified      27-MAY-2021
+    //  date first created      10-JUN-2021
+    // 	date last modified      10-JUN-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //9,116
+count //9,411
 
 
 ** STEP #3
@@ -65,15 +65,15 @@ count //9,116
 	Create variables to identify DOBs with unknown day, month, year and then to drop any that = 99/9999, respectively, 
 	as need to remove blank/missing DOBs as these will be flagged as duplicates of each other
 */
-count if birthdate=="99999999" //592
-replace birthdate="" if birthdate=="99999999" //592 changes
+count if birthdate=="99999999" //576
+replace birthdate="" if birthdate=="99999999" //576 changes
 replace birthdate = lower(rtrim(ltrim(itrim(birthdate)))) //0 changes
 gen dobyear = substr(birthdate,1,4)
 gen dobmonth = substr(birthdate,5,2)
 gen dobday = substr(birthdate,7,2)
-drop if dobyear=="9999" | dobmonth=="99" | dobday=="99"
+drop if dobyear=="9999" | dobmonth=="99" | dobday=="99" //564 deleted
 drop dobday dobmonth dobyear
-drop if birthdate=="" | birthdate=="99999999" //592 deleted
+drop if birthdate=="" | birthdate=="99999999" //576 deleted
 
 
 ** STEP #4
@@ -109,7 +109,7 @@ drop if birthdate==. | birthdate==99999999
 sort lastname firstname birthdate
 quietly by lastname firstname birthdate : gen dup = cond(_N==1,0,_n)
 sort lastname firstname birthdate registrynumber
-count if dup>0 //0 - true DOB duplicates
+count if dup>0 //4 - true DOB duplicates
 
 /*
 ** Look for duplicates - METHOD #2
@@ -143,9 +143,9 @@ gen checked=2
 
 
 ** STEP #6
-count if dup==0 //8104
-drop if dup==0 //remove all the DOB non-duplicates - 7881 deleted
-count //0
+count if dup==0 //8267
+drop if dup==0 //remove all the DOB non-duplicates - 8267 deleted
+count //4
 
 ** STEP #7
 /* 
@@ -162,7 +162,7 @@ count //6
 drop if registrynumber==20201053 //2 deleted - this was already merged with 20151033 but it's still coming into exported file and can't open record in CR5db to delete it
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //2
+count if duppid>0 //0
 
 
 ** STEP #9
@@ -187,6 +187,7 @@ sort birthdate
 drop str_no
 gen str_no= _n
 label var str_no "No."
+label var birthdate DOB
 
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action doblist
 

@@ -3,8 +3,8 @@
     //  algorithm name          004_export new lists.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      10-MAY-2021
-    // 	date last modified      27-MAY-2021
+    //  date first created      10-JUN-2021
+    // 	date last modified      10-JUN-2021
     //  algorithm task          Exporting newly-generated duplicates lists (see dofiles '003a, 003b, 003c, 003d...')
     //  status                  Completed
     //  objective               (1) To have one excel workbook with 5 tabs - ERRORS, NRN, DOB, HOSP#, NAMES.
@@ -52,7 +52,7 @@
 preserve
 use "`datapath'\version07\3-output\NRN_dups.dta" , clear
 
-count //10
+count //4
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
@@ -71,7 +71,7 @@ restore
 preserve
 use "`datapath'\version07\3-output\DOB_dups.dta" , clear
 
-count //0
+count //4
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
@@ -90,7 +90,7 @@ restore
 preserve
 use "`datapath'\version07\3-output\HOSP_dups.dta" , clear
 
-count //8
+count //6
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
@@ -109,10 +109,9 @@ restore
 preserve
 use "`datapath'\version07\3-output\NAMES_dups.dta" , clear
 
-count //446
+count //19
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
 capture export_excel str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nameslist using "`datapath'\version07\3-output\CancerDuplicates`listdate'.xlsx", sheet("Names") firstrow(varlabels)
 restore
-

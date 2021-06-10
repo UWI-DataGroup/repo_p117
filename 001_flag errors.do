@@ -3,8 +3,8 @@
     //  algorithm name          001_flag errors.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      04-MAY-2021
-    // 	date last modified      27-MAY-2021
+    //  date first created      10-JUN-2021
+    // 	date last modified      10-JUN-2021
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -68,7 +68,7 @@
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version07\1-input\2021-05-26_MAIN Source+Tumour+Patient_JC.txt"
+insheet using "`datapath'\version07\1-input\2021-06-09_MAIN Source+Tumour+Patient_JC.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -157,9 +157,9 @@ replace flag7="delete blank record" if lastname==""
 
 ** STEP #11
 ** Check for invalid length NRN
-count if length(nrn)<11 & nrn!="" //1
+count if length(nrn)<11 & nrn!="" //0
 list registrynumber firstname lastname nrn birthdate if length(nrn)<11 & nrn!=""
-replace flag3=nrn if length(nrn)<11 & nrn!="" //1 changes
+replace flag3=nrn if length(nrn)<11 & nrn!="" //0 changes
 
 
 ** STEP #12
@@ -168,7 +168,7 @@ replace nrn="999999-9999" if nrn=="99" //0 changes
 replace nrn="999999-9999" if nrn=="9999-9999" //0 changes
 //replace nrn="999999-9999" if nrn=="999999"
 gen nrn2 = substr(nrn, 1,6) + "-" + substr(nrn, -4,4) if length(nrn)==10 & !(strmatch(strupper(nrn), "*-*"))
-replace nrn=nrn2 if nrn2!="" //1 change
+replace nrn=nrn2 if nrn2!="" //0 changes
 drop nrn2
 gen nrn2 = nrn + "-9999" if length(nrn)==6
 replace nrn=nrn2 if nrn2!="" //0 changes
@@ -216,7 +216,7 @@ replace nrn=subinstr(nrn,"36","39",.) if registrynumber==20201204
 
 ** STEP #15
 ** Identify corrected NRNs in prep for export to excel ERRORS list
-replace flag8=nrn if flag3!="" //1 change
+replace flag8=nrn if flag3!="" //0 changes
 
 
 ** STEP #16
@@ -284,19 +284,19 @@ replace flag9="delete blank record" if registrynumber==20159999 //0 changes
 
 ** STEP #23
 ** Check for invalid length Hosp#
-count if length(hospitalnumber)==1 //0
+count if length(hospitalnumber)==1 //1
 list registrynumber firstname lastname hospitalnumber if length(hospitalnumber)==1
-replace flag5=hospitalnumber if length(hospitalnumber)==1 //0 changes
+replace flag5=hospitalnumber if length(hospitalnumber)==1 //1 change
 
 
 ** STEP #24
 ** Correct Hosp# errors using below method as these won't lead to de-identifying the dofile
-replace hospitalnumber="99" if length(hospitalnumber)==1 //0 changes
+replace hospitalnumber="99" if length(hospitalnumber)==1 //1 change
 
 
 ** STEP #25
 ** Identify corrected Hosp#s in prep for export to excel ERRORS list
-replace flag10=hospitalnumber if flag5!="" //0 changes
+replace flag10=hospitalnumber if flag5!="" //1 change
 
 
 ** STEP #26
