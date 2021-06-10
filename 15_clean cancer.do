@@ -10623,8 +10623,6 @@ drop elec_* _merge
 ** Remove unused variables
 drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ttdoadotdiff
 
-** Remove non-reportable skin cancers
-drop if siteiarc==25 //0 - nonreportable skin cancers
 
 /*
 	02jun2021 JC: Updates from post-clean cross-check review process.
@@ -10639,6 +10637,8 @@ replace dlc=d(31dec2014) if pid=="20080196" & cr5id=="T1S1" //merged in CR5db on
 replace patient=2 if pid=="20080196" & cr5id=="T2S1"
 replace eidmp=2 if pid=="20080196" & cr5id=="T2S1"
 replace ptrectot=3 if pid=="20080196" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20080196" & cr5id=="T2S1"
+replace mptot=2 if pid=="20080196" & cr5id=="T2S1"
 //pid 20080208 reviewed but no update needed as was merged with 20145127 (death info) in CR5db after dup list review - death data was already matched in Stata.
 replace dlc=d(05apr2018) if pid=="20080217" //path rpt added for 2018 MP
 replace dlc=d(02may2017) if pid=="20080232" //merge done for 2016 MP
@@ -10661,6 +10661,9 @@ replace patient=2 if pid=="20130686"
 replace eidmp=2 if pid=="20130686"
 replace ptrectot=3 if pid=="20130686"
 replace persearch=2 if pid=="20130686"
+replace mpseq=7 if pid=="20130686"
+replace mptot=7 if pid=="20130686"
+replace mptot=7 if pid=="20080626"
 replace cr5id="T7S1" if pid=="20130686"
 //ssc install fillmissing
 gen nrn=natregno if pid=="20130686"
@@ -10674,9 +10677,81 @@ drop nrn dlc2
 replace pid="20080626" if pid=="20130686"
 //pid 20080626 was missing NRN and had old DLC so used above fillmissing command to copy the NRN + DLC values from pid 20130686 to 20080626
 replace dlc=d(26nov2014) if pid=="20080659" //merge done for ineligible 2014 MP; DLC obtained from MasterDb frmCF_2009 #3598
+replace dlc=d(15mar2019) if pid=="20080674" //path rpt added for 2019 MP
+//pid 20080688 reviewed but no update needed as cannot determine any reason for why record was saved 19feb2020, according to TT update date.
+replace patient=2 if pid=="20150409"
+replace eidmp=2 if pid=="20150409"
+replace ptrectot=3 if pid=="20150409"
+replace persearch=2 if pid=="20150409"
+replace mpseq=2 if pid=="20150409"
+replace mptot=2 if pid=="20150409"
+replace cr5id="T2S1" if pid=="20150409"
+//ssc install fillmissing
+gen nrn=natregno if pid=="20150409"
+fillmissing nrn
+replace natregno=nrn if pid=="20080696" //1 change
+gen dlc2=dlc if pid=="20150409"
+format dlc2 %dD_m_CY
+fillmissing dlc2
+replace dlc=dlc2 if pid=="20080696" //1 change
+drop nrn dlc2
+replace pid="20080696" if pid=="20150409"
+//pid 20080696 was missing NRN and had old DLC so used above fillmissing command to copy the NRN + DLC values from pid 20150409 to 20080696
+replace patient=2 if pid=="20150255"
+replace eidmp=2 if pid=="20150255"
+replace ptrectot=3 if pid=="20150255"
+replace persearch=2 if pid=="20150255"
+replace mpseq=5 if pid=="20150255"
+replace mptot=5 if pid=="20150255"
+replace mptot=5 if pid=="20080728"
+replace cr5id="T5S1" if pid=="20150255"
+replace slc=2 if pid=="20080728"
+//ssc install fillmissing
+gen nrn=natregno if pid=="20150255"
+fillmissing nrn
+replace natregno=nrn if pid=="20080728" //4 changes
+gen dlc2=dlc if pid=="20150255"
+format dlc2 %dD_m_CY
+fillmissing dlc2
+replace dlc=dlc2 if pid=="20080728" //4 changes
+gen dod2=dod if pid=="20150255"
+format dod2 %dD_m_CY
+fillmissing dod2
+replace dod=dod2 if pid=="20080728" //4 changes
+drop nrn dlc2 dod2
+replace pid="20080728" if pid=="20150255"
+//pid 20080728 was missing NRN and had old DLC so used above fillmissing command to copy the NRN + DLC values from pid 20150255 to 20080728
+replace dlc=d(25nov2014) if pid=="20080753" //merge done for ineligible 2014 MP; DLC obtained from MasterDb frmCF_2009 #3594
+//pid 20080941 reviewed but no update needed as cannot determine any reason for why record was saved 19feb2020, according to TT update date (maybe updating death date).
+//pid 20081031 reviewed but no update needed as cannot determine any reason for why record was saved 21may2021, according to TT update date.
+replace slc=2 if pid=="20081058"
+replace dlc=d(17Nov2019) if pid=="20081058"
+replace dod=d(17Nov2019) if pid=="20081058"
+replace deathid=28983 if pid=="20081058"
+replace cancer=2 if pid=="20081058"
+replace deceased=2 if pid=="20081058"
+replace cod=2 if pid=="20081058"
+replace mpseq=1 if pid=="20081058"
+replace mptot=2 if pid=="20081058"
+replace patient=2 if pid=="20130365"
+replace eidmp=2 if pid=="20130365"
+replace ptrectot=3 if pid=="20130365"
+replace dcostatus=1 if pid=="20081058"|pid=="20130365"
+replace persearch=2 if pid=="20130365"
+replace mpseq=2 if pid=="20130365"
+replace mptot=2 if pid=="20130365"
+replace mpseq=1 if pid=="20081058"
+replace mptot=2 if pid=="20081058"
+replace cr5id="T2S1" if pid=="20130365"
+replace pid="20081058" if pid=="20130365"
+replace mpseq=0 if pid=="20081097"
+replace dlc=d(10dec2020) if pid=="20130016" //path rpt added for recurrent disease
+//pid 20130022 reviewed but no update needed as DA added death rec bk but already matched to death data in Stata.
 
 
 
+
+Check for persearch=Dup to remove
 RE-RUN NAMES AND NRN DUPLICATES CHECKS
 Check if pt deceased but dlc and dod do not match
 Check for resident=2 or 99 then look them up in MedData
@@ -10701,6 +10776,11 @@ drop if sex==9 //0 deleted - sex unknown
 drop if beh!=3 //51 deleted - non malignant
 drop if persearch>2 //3 deleted
 drop if siteiarc==25 //0 - non reportable skin cancers
+
+** Check for cases wherein the non-reportable cancer had the below MP categories as the primary options
+tag duplicate pid
+using tag check if patient=separate event for a single pid
+same for eidmp ptrectot
 
 ** JC 03-Jun-2021: For quality assessment by IARC Hub, save this corrected dataset with all malignant (non-reportable skin + non-malignant tumours removed) for 2008, 2013-2015
 ** See p131 version06 for more info on this data request
