@@ -10751,6 +10751,11 @@ replace dlc=d(10dec2020) if pid=="20130016" //path rpt added for recurrent disea
 
 
 
+** SF noted on 29jun2021 during cancer mtg some 2016 prostate cases have morph=8550 for acinar adenoca but should=8140
+** JC double checked 29jun2021 and found some 2008 etc prostate cases with morph=8550 instead of 8140
+count if morph==8550 and topography==619 //173
+replace morph=8140 if morph==8550 and topography==619 //173 changes
+
 Check for persearch=Dup to remove
 RE-RUN NAMES AND NRN DUPLICATES CHECKS
 Check if pt deceased but dlc and dod do not match
