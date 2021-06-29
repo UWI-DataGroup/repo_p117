@@ -10747,6 +10747,26 @@ replace pid="20081058" if pid=="20130365"
 replace mpseq=0 if pid=="20081097"
 replace dlc=d(10dec2020) if pid=="20130016" //path rpt added for recurrent disease
 //pid 20130022 reviewed but no update needed as DA added death rec bk but already matched to death data in Stata.
+replace dlc=dod if pid=="20130032" //merge done with priv phys NF added
+replace dlc=d(11oct2016) if pid=="20130033"
+replace top="503" if pid=="20130033"
+replace topography=503 if pid=="20130033"
+replace primarysite="BREAST-LOWER INNER"
+replace dlc=dod if pid=="20130038" //merge done with death rec bk added
+replace dlc=dod if pid=="20130055" //merge done with death rec bk added
+replace dlc=dod if pid=="20130063" //merge done with death rec bk added
+replace dlc=dod if pid=="20130073" //merge done with death rec bk added
+replace dlc=(14dec2020) if pid=="20130081" //merge done with path rpt added for recurrent disease
+replace primarysite="SOFT PALATE" if pid=="20130081" //in re-reviewing the original tumour has incorrect info
+replace top="051" if pid=="20130081"
+replace topography=51 if pid=="20130081"
+replace topcat=6 if pid=="20130081"
+replace dlc=d(21apr2016) if pid=="20130087" //path rpt added for 2016 MP
+replace dlc=dod if pid=="20130096" //merge done with death certificate added
+replace dlc=dod if pid=="20130103" //merge done with death rec bk added
+replace dlc=d(01nov2019) if pid=="20130110" //path rpt added for 2019 MP
+replace dlc=dod if pid=="20130119" //merge done with death rec bk added
+
 
 
 
