@@ -3,8 +3,8 @@
     //  algorithm name          003d_compare lists_NAMES.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      10-JUN-2021
-    // 	date last modified      10-JUN-2021
+    //  date first created      29-JUN-2021
+    // 	date last modified      29-JUN-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //9,411
+count //9,680
 
 
 ** STEP #3
@@ -66,7 +66,7 @@ drop if lastname==""
 sort lastname firstname
 quietly by lastname firstname:  gen dup = cond(_N==1,0,_n)
 sort lastname firstname registrynumber
-count if dup>0 //463
+count if dup>0 //493
 
 
 ** STEP #4 
@@ -79,34 +79,34 @@ gen checked=2
 
 
 ** STEP #5
-drop if dup==0 //remove all the Names non-duplicates - 8,948 deleted
-count //463
+drop if dup==0 //remove all the Names non-duplicates - 9,187 deleted
+count //493
 
 ** STEP #6
 /* 
 	(1) Format DOB and 'Date DA Took Action' to match the previously-checked DOB dataset
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
-destring birthdate ,replace
+//destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevNAMES_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //446
+count //512
 
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //888
+count if duppid>0 //26
 order registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked
 //list registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked if duppid>0 , string(50)
 
 sort lastname firstname registrynumber
 quietly by lastname firstname registrynumber:  gen dupnmpid = cond(_N==1,0,_n)
-count if dupnmpid>0 //888
+count if dupnmpid>0 //26
 order registrynumber lastname firstname checked dupnmpid str_no str_da str_dadate str_action
-count if checked==2 & dupnmpid>0 //444 - so all 888 have a corresponding pid that's from previously-checked list so can no new dups found in this list
-count if checked==1 & duppid==0 //2 - check these in Stata Browse/Edit window: previously-checked and merged cases
+count if checked==2 & dupnmpid>0 //13 - so all 13 have a corresponding pid that's from previously-checked list so can no new dups found in this list
+count if checked==1 & duppid==0 //6 - check these in Stata Browse/Edit window: previously-checked and merged cases
 
 
 ** STEP #8
@@ -114,11 +114,11 @@ count if checked==1 & duppid==0 //2 - check these in Stata Browse/Edit window: p
 	(1) Manually review list above for duppid>0
 	(2) Remove previously-checked records according to review
 */
-drop if checked==1 & duppid==0 //2 deleted
-drop if duppid>0 //888 deleted
+drop if checked==1 & duppid==0 //6 deleted
+drop if duppid>0 //26 deleted
 //drop if duppid==0 //446 deleted
 //all observations deleted as no new duplicates for this list
-count //19
+count //480
 
 ** STEP #9
 ** Prepare this dataset for export to excel

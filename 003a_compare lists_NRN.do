@@ -3,8 +3,8 @@
     //  algorithm name          003a_compare lists_NRN.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      10-JUN-2021
-    // 	date last modified      10-JUN-2021
+    //  date first created      29-JUN-2021
+    // 	date last modified      29-JUN-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,17 +57,17 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //9,411
+count //9,680
 
 
 ** STEP #3
 ** Identify possible duplicates using NRN 
 drop if nrn==""|nrn=="999999-9999"|regexm(nrn,"9999") //remove blank/missing NRNs as these will be flagged as duplicates of each other
-//1,878 deleted
+//1,756 deleted
 sort nrn 
 quietly by nrn : gen dup = cond(_N==1,0,_n)
 sort nrn registrynumber lastname firstname
-count if dup>0 //4
+count if dup>0 //16
 
 
 ** STEP #4 
@@ -80,18 +80,18 @@ gen checked=2
 
 
 ** STEP #5
-drop if dup==0 //remove all the NRN non-duplicates - 7,529 deleted
-count //4
+drop if dup==0 //remove all the NRN non-duplicates - 7,908 deleted
+count //16
 
 ** STEP #6
 /* 
 	(1) Format DOB and 'Date DA Took Action' to match the previously-checked DOB dataset
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
-destring birthdate ,replace
+//destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevNRN_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //14
+count //20
 
 
 ** STEP #7
@@ -103,7 +103,7 @@ count if duppid>0 //0
 
 ** STEP #8
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //10 deleted
+drop if checked==1 & duppid==0 //4 deleted
 
 
 ** STEP #9

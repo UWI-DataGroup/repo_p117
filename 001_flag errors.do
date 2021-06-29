@@ -3,8 +3,8 @@
     //  algorithm name          001_flag errors.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      10-JUN-2021
-    // 	date last modified      10-JUN-2021
+    //  date first created      29-JUN-2021
+    // 	date last modified      29-JUN-2021
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -68,7 +68,7 @@
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version07\1-input\2021-06-09_MAIN Source+Tumour+Patient_JC.txt"
+insheet using "`datapath'\version07\1-input\2021-06-29_MAIN Source+Tumour+Patient_JC.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -321,14 +321,14 @@ restore
 
 ** STEP #28
 ** Correct errors flagged from Names check (STEP #9 above)
-drop if registrynumber==20159999 //1 deleted
+//drop if registrynumber==20159999 //1 deleted
 
 
 ** STEP #29
 ** Remove variables not needed for exel lists
 drop stdataabstractor stsourcedate nftype sourcename doctor doctoraddress recordstatus
 
-count //9,116
+count //9,680
 
 
 ** STEP #30

@@ -3,8 +3,8 @@
     //  algorithm name          003c_compare lists_Hosp#.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      10-JUN-2021
-    // 	date last modified      10-JUN-2021
+    //  date first created      29-JUN-2021
+    // 	date last modified      29-JUN-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,13 +57,13 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //9,411
+count //9,680
 
 
 ** STEP #3
 ** Identify possible duplicates using Hosp#
 drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s as these will be flagged as duplicates of each other
-//3984 deleted
+//4168 deleted
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
@@ -81,21 +81,23 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 5,288 deleted
-count //8
+count //6
+
 
 ** STEP #6
 /* 
 	(1) Format DOB and 'Date DA Took Action' to match the previously-checked DOB dataset
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
-destring birthdate ,replace
+//destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //14
+count //12
+
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
-drop if registrynumber==20141171 //2 deleted - this was already merged with 20130865but it's still coming into exported file and can't open record in CR5db to delete it
+//drop if registrynumber==20141171 //2 deleted - this was already merged with 20130865but it's still coming into exported file and can't open record in CR5db to delete it
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
 count if duppid>0 //0
@@ -110,8 +112,8 @@ list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate s
 */
 //drop if registrynumber!=20130865 & registrynumber!=20141171
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //8 deleted
-drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
+drop if checked==1 & duppid==0 //6 deleted
+//drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
 
 
 ** STEP #9
