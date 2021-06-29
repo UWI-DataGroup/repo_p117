@@ -115,6 +115,8 @@ count //6
 save "`datapath'\version07\2-working\prevHOSP_dups" ,replace
 clear
 
+ADD IN EXTRA STEP TO CREATE A STATIC NAMES TAB DATASET FROM THIS 20210629 LIST FOR FUTURE MATCHING IN ADDITION TO THE USUAL PREVIOUS LIST DATASET
+
 ** Names list
 import excel using "`datapath'\version07\1-input\CancerDuplicates20210610.xlsx" , sheet(Names) firstrow case(lower)
 replace nameslist="1"
@@ -133,6 +135,8 @@ rename actiontaken str_action
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action nameslist checked
 count //19
 save "`datapath'\version07\2-working\prevNAMES_dups" ,replace
+gen checked29jun21=1
+save "`datapath'\version07\2-working\29jun21NAMES_dups" ,replace
 clear
 
 /* 

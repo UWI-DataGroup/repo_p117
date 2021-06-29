@@ -59,6 +59,7 @@ use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
 count //9,680
 
+ADD IN EXTRA STEP TO USE 20210629 NAMES TAB LIST AS A REFERENCE POINT IN ADDITION TO THE USUAL PREVIOUS LIST
 
 ** STEP #3
 ** Identify possible duplicates using NAMES 
