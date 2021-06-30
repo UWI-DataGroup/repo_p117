@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-MAY-2021
-    // 	date last modified      27-MAY-2021
+    // 	date last modified      30-JUN-2021
     //  algorithm task          Matching uncleaned, current cancer dataset with cleaned cancer dataset
     //  status                  Completed
     //  objective               To have a uncleaned but prepared dataset with no duplicate sources to merge with cleaned dataset
@@ -713,14 +713,76 @@ replace lname_2=lower(rtrim(ltrim(itrim(lname_2)))) //598 changes
 
 ** Look for matches
 sort lname_2 fname_2 pid
-quietly by lname_2 fname_2 : gen dupname_2 = cond(_N==1,0,_n)
+quietly by lname_2 fname_2 pid : gen dupname_2 = cond(_N==1,0,_n)
 sort lname_2 fname_2 pid
-count if dupname_2>0 //11,218
+count if dupname_2>0 //10,955
 
 order pid fname_2 lname_2 natregno_2
-drop if dupname_2>1 //7,052 deleted
 
-count //8,970
+duplicates tag pid, gen(dup_pid_2)
+count if dup_pid_2>0 //10,958
+count if dup_pid_2==0 //5,064
+//list pid dxyr_2 cr5id_2 dup_pid_2 if dup_pid_2>0, nolabel sepby(pid)
+//list pid dxyr_2 cr5id_2 dup_pid_2 if dup_pid_2==0, nolabel sepby(pid)
+count if ttupdate_2>=d(13feb2020) //8,054
+gen crosschk=1 if ttupdate_2>=d(13feb2020) //13feb2020 date chosen based on date of CR5db .txt file used in 15_clean cancer.do
+count if crosschk==1 & (dxyr_2==2008|dxyr_2==2013|dxyr_2==2014|dxyr_2==2015) //930 - to review in CR5db alongside iarc-hub ds opened in a 2nd Stata Browse/Edit window then added updates in 15_cancer.do in section before creating iarc-hub ds (drop non-reportable skin cancers from iarc-hub ds)
+sort pid lname_2 fname_2
+
+gen reviewed=1 if pid=="20080020"|pid=="20080154"|pid=="20080158"|pid=="20080171"|pid=="20080173"|pid=="20080196"|pid=="20080208" ///
+				  |pid=="20080217"|pid=="20080232"|pid=="20080241"|pid=="20080252"|pid=="20080261"|pid=="20080274"|pid=="20080295" ///
+				  |pid=="20080316"|pid=="20080326"|pid=="20080327"|pid=="20080348"|pid=="20080390"|pid=="20080428"|pid=="20080560" ///
+				  |pid=="20080624"|pid=="20080626"|pid=="20080659"|pid=="20080674"|pid=="20080688"|pid=="20080696"|pid=="20080728" ///
+				  |pid=="20080737"|pid=="20080753"|pid=="20080941"|pid=="20081031"|pid=="20081058"|pid=="20081097"|pid=="20130016" ///
+				  |pid=="20130022"|pid=="20130032"|pid=="20130033"|pid=="20130038"|pid=="20130055"|pid=="20130063"|pid=="20130073" ///
+				  |pid=="20130081"|pid=="20130087"|pid=="20130096"|pid=="20130103"|pid=="20130110"|pid=="20130119"|pid=="20130130" ///
+				  |pid=="20130137"|pid=="20130152"|pid=="20130154"|pid=="20130162"|pid=="20130173"|pid=="20130234"|pid=="20130244" ///
+				  |pid=="20130246"|pid=="20130272"|pid=="20130278"|pid=="20130325"|pid=="20130341"|pid=="20130345"|pid=="20130361" ///
+				  |pid=="20130374"|pid=="20130552"|pid=="20130589"|pid=="20130618"|pid=="20130648"|pid=="20130670"|pid=="20130674" ///
+				  |pid=="20130696"|pid=="20130768"|pid=="20130772"|pid=="20130816"|pid=="20130830"|pid=="20130865"|pid=="20130886" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid==""
+				  
+stop
+drop if dupname_2>1 //6,791 deleted
+
+count //9,231
+
+RE-RUN NAMES AND NRN DUPLICATES CHECKS
+Check if pt deceased but dlc and dod do not match
+Check for resident=2 or 99 then look them up in MedData
 
 save "`datapath'\version02\2-working\2008-2020_cancer_crosschk_dp" ,replace
 label data "BNR-Cancer prepared 2008-2020 cross-check data"

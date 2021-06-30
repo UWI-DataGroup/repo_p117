@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      02-DEC-2019
-    // 	date last modified      02-JUN-2021
+    // 	date last modified      30-JUN-2021
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -10602,6 +10602,10 @@ replace iccc="2b" if pid=="20160018" & cr5id=="T1S1"
 replace icd10="C844" if pid=="20160018" & cr5id=="T1S1"
 //no changes for sites as already set to correct sites for M9702
 
+
+** Remove unused variables
+drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ttdoadotdiff
+
 ** JC 11-may-2021: while reviewing duplicates list, noted this merge wasn't done with pid 20141171.
 ** Correct DOB errors flagged by merging with list of corrections manually created using electoral list (this ensures dofile remains de-identified)
 preserve
@@ -10619,10 +10623,6 @@ replace firstname=elec_fname if _merge==3 //2 changes
 replace middleinitials=elec_mname if _merge==3 //1 changes
 replace lastname=elec_lname if _merge==3 //0 changes
 drop elec_* _merge
-
-** Remove unused variables
-drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ttdoadotdiff
-
 
 /*
 	02jun2021 JC: Updates from post-clean cross-check review process.
@@ -10751,7 +10751,7 @@ replace dlc=dod if pid=="20130032" //merge done with priv phys NF added
 replace dlc=d(11oct2016) if pid=="20130033"
 replace top="503" if pid=="20130033"
 replace topography=503 if pid=="20130033"
-replace primarysite="BREAST-LOWER INNER"
+replace primarysite="BREAST-LOWER INNER" if pid=="20130033"
 replace dlc=dod if pid=="20130038" //merge done with death rec bk added
 replace dlc=dod if pid=="20130055" //merge done with death rec bk added
 replace dlc=dod if pid=="20130063" //merge done with death rec bk added
@@ -10766,6 +10766,40 @@ replace dlc=dod if pid=="20130096" //merge done with death certificate added
 replace dlc=dod if pid=="20130103" //merge done with death rec bk added
 replace dlc=d(01nov2019) if pid=="20130110" //path rpt added for 2019 MP
 replace dlc=dod if pid=="20130119" //merge done with death rec bk added
+replace dlc=dod if pid=="20130130" //death certificate added
+//pid 20130137 reviewed but no update needed as merge done with pid 20140789 + 20140792 ineligible path rpts added
+//pid 20130152 reviewed but no update needed as merge done with pid 20170326 metastatic path rpts added
+replace dlc=dod if pid=="20130154" //death rec bk added
+replace dot=d(13may2014) if pid=="20130162" & cr5id=="T2S1" //merge done with 2014 + 2017 MPs
+replace dlc=d(06jun2017) if pid=="20130162" //merge done with 2017 MP
+replace dlc=dod if pid=="20130173" //death rec bk added
+replace dlc=dod if pid=="20130234" //path rpt for mets + death certificate added
+replace dlc=d(03mar2017) if pid=="20130244" //merge done with 2017 MP
+replace dlc=d(05jan2017) if pid=="20130246" //merge done with 2016 MP + with 2017 path rpt for mets
+//pid 20130272 reviewed but no update needed as merge done with pid 20180905 death certificate
+//pid 20130278 reviewed but no update needed as death rec bk added
+replace dlc=d(10jun2016) if pid=="20130325" //merge done with 2016 path rpt for mets
+//pid 20130341 reviewed but no update needed as merge done with pid 20140554 + 20140840 + 20140914 + 20140915 metastatic path rpts added
+replace dlc=dod if pid=="20130345" //death rec bk added
+replace dlc=dod if pid=="20130361" //death rec bk added + merge with pid 20145098 path rpt
+replace dlc=dod if pid=="20130374" //death rec bk added
+//pid 20130552 reviewed but no update needed as death rec bk added
+//pid 20130589 reviewed but no update needed as merge done with pid 20140494 death certificate added
+//pid 20130618 reviewed but no update needed as merge done with pid 20160589 path rpt for MP added
+replace dlc=dod if pid=="20130648" //death certificate added + merge with pid 20150270 path rpt
+replace dlc=d(13feb2019) if pid=="20130670" //merge done with 2018 path rpt for mets
+replace dlc=dod if pid=="20130674" //death rec bk added
+replace dlc=dod if pid=="20130696" //death rec bk added
+replace dlc=dod if pid=="20130768" //merge with pid 20140677 haem NF
+replace dlc=dod if pid=="20130772" //death rec bk added
+//pid 20130816 reviewed but no update needed as merge done with pid 20160984 death rec bk added
+replace dlc=dod if pid=="20130830" //death certificate added
+//pid 20130865 reviewed but updates from merge with pid 20140361 + 20141171 and these contain identifiable data so manually created an update excel sheet and merged with this dataset above
+//pid 20130886 reviewed but no update needed as death rec bk added
+
+
+
+
 
 
 
