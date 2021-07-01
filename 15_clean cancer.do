@@ -10796,9 +10796,16 @@ replace dlc=dod if pid=="20130772" //death rec bk added
 replace dlc=dod if pid=="20130830" //death certificate added
 //pid 20130865 reviewed but updates from merge with pid 20140361 + 20141171 and these contain identifiable data so manually created an update excel sheet and merged with this dataset above
 //pid 20130886 reviewed but no update needed as death rec bk added
-
-
-
+//pid 20140529 reviewed but no update needed as this is ineligible dx and was already removed from ds
+//pid 20140545 reviewed but updates contain identifiable data so manually created an update excel sheet and merged with this dataset above - also SF to review as discrepancies found between death data vs electoral list for NRNs
+//pid 20140628 reviewed but no update needed as merge done with pid 20141184
+replace dlc=dod if pid=="20140681" //death rec bk added
+//pid 20140697 reviewed but no update needed as merge done with pid 20141123 + 20141474
+//pid 20141557 reviewed but no update needed as merge done with pid 20140724
+//pid 20140729 reviewed but no update needed - unsure what was updated by DAs.
+//pid 20140733 reviewed but no update needed as merge done with pid 20140734 + 20141062 & death rec bk added
+//pid 20140738 reviewed but not present in stata ds as was ineligible & merge done with pid 20141003 + 20141004 + 20150459
+//pid 20140739 reviewed but no update needed as merge done with pid 20140740 + 20140741 + 20140935
 
 
 

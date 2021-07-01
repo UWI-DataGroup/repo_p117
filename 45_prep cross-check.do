@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-MAY-2021
-    // 	date last modified      30-JUN-2021
+    // 	date last modified      27-MAY-2021
     //  algorithm task          Matching uncleaned, current cancer dataset with cleaned cancer dataset
     //  status                  Completed
     //  objective               To have a uncleaned but prepared dataset with no duplicate sources to merge with cleaned dataset
@@ -740,8 +740,8 @@ gen reviewed=1 if pid=="20080020"|pid=="20080154"|pid=="20080158"|pid=="20080171
 				  |pid=="20130246"|pid=="20130272"|pid=="20130278"|pid=="20130325"|pid=="20130341"|pid=="20130345"|pid=="20130361" ///
 				  |pid=="20130374"|pid=="20130552"|pid=="20130589"|pid=="20130618"|pid=="20130648"|pid=="20130670"|pid=="20130674" ///
 				  |pid=="20130696"|pid=="20130768"|pid=="20130772"|pid=="20130816"|pid=="20130830"|pid=="20130865"|pid=="20130886" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
+				  |pid=="20140529"|pid=="20140545"|pid=="20140628"|pid=="20140659"|pid=="20140681"|pid=="20140697"|pid=="20140724" ///
+				  |pid=="20140729"|pid=="20140733"|pid=="20140738"|pid=="20140739"|pid==""|pid==""|pid=="" ///
 				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
 				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
 				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
