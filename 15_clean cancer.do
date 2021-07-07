@@ -10806,6 +10806,43 @@ replace dlc=dod if pid=="20140681" //death rec bk added
 //pid 20140733 reviewed but no update needed as merge done with pid 20140734 + 20141062 & death rec bk added
 //pid 20140738 reviewed but not present in stata ds as was ineligible & merge done with pid 20141003 + 20141004 + 20150459
 //pid 20140739 reviewed but no update needed as merge done with pid 20140740 + 20140741 + 20140935
+//pid 20140836 reviewed (ineligible so not in iarc ds) but no update needed as merge done with pid 20140918
+//pid 20140836 reviewed (ineligible so not in iarc ds) but no update needed as source added for 2020 MP
+replace dot=d(23jan2014) if pid=="20140838" & cr5id=="T1S1" //merge with pid 20141186 showed new incidence date
+//pid 20140841 reviewed but no update needed as merge done with pid 20141036
+//pid 20140843 reviewed but no update needed as merge done with pid 20150167
+replace slc=2 if pid=="20140849"
+replace dlc=d(19may2019) if pid=="20140849"
+replace dod=d(19may2019) if pid=="20140849" 
+replace deathid=27856 if pid=="20140849"
+//pid 20140855 reviewed (ineligible so not in iarc ds) but no update needed as merge done with pid 20140884
+replace dlc=d(31jul2019) if pid=="20140871" //path rpt + RT sources added for mets
+replace dlc=d(28oct2019) if pid=="20140890" //path rpt source added for same primary
+replace dlc=dod if pid=="20140892" //merge done with 20150222
+//pid 20140893 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20140907 reviewed but no update needed as merge done with pid 20140905
+//pid 20140911 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(10jan2020) if pid=="20140923" //path rpt source added for same primary
+//pid 20140959 reviewed but no update needed as merge done with pid 20150258
+//pid 20140975 reviewed but no update needed as merge done with pid 20140976 + 20180765
+Sent pid 20140981 for KWG to review as I'm unsure what to do with it as it's very incomplete.
+//pid 20141031 reviewed but no update needed as merge done with pid 2015483 + 20150484
+replace dlc=d(01oct2019) if pid=="20141063" //RT source added
+replace dlc=dod if pid=="20141064" //Death Rec bk added
+//pid 20141067 reviewed but no update needed as merge done with pid 20150529
+replace dlc=d(28nov2019) if pid=="20141084" //merge done with 20141247; path rpts added for mets
+//pid 20141095 reviewed but no update needed as merge done with pid 20140835
+//pid 20141103 reviewed but no update needed - cannot determine what update was done by DA.
+replace hx="MAMMARY CARCINOMA" if pid=="20141113" & cr5id=="T1S1"
+replace morph=8500 if pid=="20141113" & cr5id=="T1S1"
+replace morphcat=10 if pid=="20141113" & cr5id=="T1S1" //Death Rec bk added
+replace dlc=dod if pid=="20141115" //merge done with pid 20150391 + Death Rec bk added
+
+
+
+
+
+
 
 
 
