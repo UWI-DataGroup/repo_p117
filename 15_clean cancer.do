@@ -10837,7 +10837,42 @@ replace hx="MAMMARY CARCINOMA" if pid=="20141113" & cr5id=="T1S1"
 replace morph=8500 if pid=="20141113" & cr5id=="T1S1"
 replace morphcat=10 if pid=="20141113" & cr5id=="T1S1" //Death Rec bk added
 replace dlc=dod if pid=="20141115" //merge done with pid 20150391 + Death Rec bk added
-
+//pid 20141129 reviewed but no update needed as merge done with pid 20150399
+//pid 20141130 reviewed but no update needed as merge done with pid 20145075 + 20155202
+//pid 20141134 reviewed but no update needed as death certificate added.
+//pid 20141145 reviewed but no update needed as death rec bk added.
+replace dlc=d(04oct2019) if pid=="20141174" //path rpt added for recurrent disease
+replace dlc=d(25mar2020) if pid=="20141205" //path rpt added for 2020 MP - missed by DA
+replace dlc=dod if pid=="20141240" //death rec bk added
+replace dlc=d(04dec2017) if pid=="20141253" //RT added for 2017 MP
+//pid 20141258 reviewed but no update needed as death rec bk added.
+//pid 20141262 reviewed but no update needed as merge done with pid 20150551
+//pid 20141283 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20141306 reviewed but no update needed as merge done with pid 20150506
+replace dlc=dod if pid=="20141308" //death rec bk added
+replace dlc=dod if pid=="20141320" //death rec bk added
+//pid 20141324 reviewed but no update needed as merge done with pid 20160554
+replace dlc=d(05feb2019) if pid=="20141348" //RT added for mets
+//pid 20141361 reviewed but no update needed as merge done with pid 20180703
+//pid 20141365 reviewed but no update needed as merge done with pid 20150508
+replace dlc=d(12may2019) if pid=="20141376" //merge with 20190410 for 2019 MP
+//pid 20141393 reviewed but no update needed as merge done with pid 20150398
+//pid 20141412 reviewed but no update needed as merge done with pid 20140951
+replace dlc=d(12mar2019) if pid=="20141414" //merge with 20191017 for 2019 MP
+//pid 20141425 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20141434 reviewed but no update needed as merge done with pid 20150559
+//pid 20141448 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20141463 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20141486 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(01nov2017) if pid=="20141493" //RT added for same primary
+//pid 20141503 reviewed but no update needed as merge done with pid 20145095
+//pid 20141575 reviewed but no update needed as merge done with pid 20159009
+//pid 20145033 reviewed but no update needed as merge done with pid 20141214
+replace dlc=d(30jul2018) if pid=="20145038" //path rpt added for recurrent 2005 cancer
+//pid 20145047 reviewed but updates contain identifiable data so manually created an update excel sheet and merged with this dataset above.
+//pid 20145053 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(04aug2016) if pid=="20145054" //path rpt added for recurrent disease
+//pid 20145055 reviewed but no update needed - cannot determine what update was done by DA.
 
 
 
