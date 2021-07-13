@@ -10657,11 +10657,11 @@ replace natregno=subinstr(natregno,"0030","9999",.) if pid=="20080428"
 replace dlc=d(11jul2016) if pid=="20080560" //path rpt added for 2016 MP
 //pid 20080624 reviewed but no update needed as cannot determine any reason for why record was saved 13feb2020, according to TT update date.
 replace dlc=d(04jul2013) if pid=="20130686" //merged in CR5db on 17mar2021 after dup list review
-replace patient=2 if pid=="20130686"
-replace eidmp=2 if pid=="20130686"
-replace ptrectot=3 if pid=="20130686"
-replace persearch=2 if pid=="20130686"
-replace mpseq=7 if pid=="20130686"
+replace patient=2 if pid=="20130686" & cr5id=="T1S1"
+replace eidmp=2 if pid=="20130686" & cr5id=="T1S1"
+replace ptrectot=3 if pid=="20130686" & cr5id=="T1S1"
+replace persearch=2 if pid=="20130686" & cr5id=="T1S1"
+replace mpseq=7 if pid=="20130686" & cr5id=="T1S1"
 replace mptot=7 if pid=="20130686"
 replace mptot=7 if pid=="20080626"
 replace cr5id="T7S1" if pid=="20130686"
@@ -10679,11 +10679,11 @@ replace pid="20080626" if pid=="20130686"
 replace dlc=d(26nov2014) if pid=="20080659" //merge done for ineligible 2014 MP; DLC obtained from MasterDb frmCF_2009 #3598
 replace dlc=d(15mar2019) if pid=="20080674" //path rpt added for 2019 MP
 //pid 20080688 reviewed but no update needed as cannot determine any reason for why record was saved 19feb2020, according to TT update date.
-replace patient=2 if pid=="20150409"
-replace eidmp=2 if pid=="20150409"
-replace ptrectot=3 if pid=="20150409"
-replace persearch=2 if pid=="20150409"
-replace mpseq=2 if pid=="20150409"
+replace patient=2 if pid=="20150409" & cr5id=="T1S1"
+replace eidmp=2 if pid=="20150409" & cr5id=="T1S1"
+replace ptrectot=3 if pid=="20150409" & cr5id=="T1S1"
+replace persearch=2 if pid=="20150409" & cr5id=="T1S1"
+replace mpseq=2 if pid=="20150409" & cr5id=="T1S1"
 replace mptot=2 if pid=="20150409"
 replace cr5id="T2S1" if pid=="20150409"
 //ssc install fillmissing
@@ -10697,14 +10697,14 @@ replace dlc=dlc2 if pid=="20080696" //1 change
 drop nrn dlc2
 replace pid="20080696" if pid=="20150409"
 //pid 20080696 was missing NRN and had old DLC so used above fillmissing command to copy the NRN + DLC values from pid 20150409 to 20080696
-replace patient=2 if pid=="20150255"
-replace eidmp=2 if pid=="20150255"
-replace ptrectot=3 if pid=="20150255"
-replace persearch=2 if pid=="20150255"
-replace mpseq=5 if pid=="20150255"
+replace patient=2 if pid=="20150255" & cr5id=="T1S1"
+replace eidmp=2 if pid=="20150255" & cr5id=="T1S1"
+replace ptrectot=3 if pid=="20150255" & cr5id=="T1S1"
+replace persearch=2 if pid=="20150255" & cr5id=="T1S1"
+replace mpseq=5 if pid=="20150255" & cr5id=="T1S1"
 replace mptot=5 if pid=="20150255"
 replace mptot=5 if pid=="20080728"
-replace cr5id="T5S1" if pid=="20150255"
+replace cr5id="T5S1" if pid=="20150255" & cr5id=="T1S1"
 replace slc=2 if pid=="20080728"
 //ssc install fillmissing
 gen nrn=natregno if pid=="20150255"
@@ -10731,36 +10731,36 @@ replace deathid=28983 if pid=="20081058"
 replace cancer=2 if pid=="20081058"
 replace deceased=2 if pid=="20081058"
 replace cod=2 if pid=="20081058"
-replace mpseq=1 if pid=="20081058"
-replace mptot=2 if pid=="20081058"
-replace patient=2 if pid=="20130365"
-replace eidmp=2 if pid=="20130365"
-replace ptrectot=3 if pid=="20130365"
-replace dcostatus=1 if pid=="20081058"|pid=="20130365"
-replace persearch=2 if pid=="20130365"
-replace mpseq=2 if pid=="20130365"
-replace mptot=2 if pid=="20130365"
-replace mpseq=1 if pid=="20081058"
-replace mptot=2 if pid=="20081058"
+replace mpseq=1 if pid=="20081058" & cr5id=="T1S1"
+replace mptot=2 if pid=="20081058" & cr5id=="T1S1"
+replace patient=2 if pid=="20130365" & cr5id=="T1S1"
+replace eidmp=2 if pid=="20130365" & cr5id=="T1S1"
+replace ptrectot=3 if pid=="20130365" & cr5id=="T1S1"
+replace dcostatus=1 if pid=="20081058" & cr5id=="T1S1"|pid=="20130365" & cr5id=="T1S1"
+replace persearch=2 if pid=="20130365" & cr5id=="T1S1"
+replace mpseq=2 if pid=="20130365" & cr5id=="T1S1"
+replace mptot=2 if pid=="20130365" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20081058" & cr5id=="T1S1"
+replace mptot=2 if pid=="20081058" & cr5id=="T1S1"
 replace cr5id="T2S1" if pid=="20130365"
-replace pid="20081058" if pid=="20130365"
-replace mpseq=0 if pid=="20081097"
+replace pid="20081058" if pid=="20130365" & cr5id=="T2S1"
+replace mpseq=0 if pid=="20081097" & cr5id=="T1S1"
 replace dlc=d(10dec2020) if pid=="20130016" //path rpt added for recurrent disease
 //pid 20130022 reviewed but no update needed as DA added death rec bk but already matched to death data in Stata.
 replace dlc=dod if pid=="20130032" //merge done with priv phys NF added
 replace dlc=d(11oct2016) if pid=="20130033"
-replace top="503" if pid=="20130033"
-replace topography=503 if pid=="20130033"
-replace primarysite="BREAST-LOWER INNER" if pid=="20130033"
+replace top="503" if pid=="20130033" & cr5id=="T1S1"
+replace topography=503 if pid=="20130033" & cr5id=="T1S1"
+replace primarysite="BREAST-LOWER INNER" if pid=="20130033" & cr5id=="T1S1"
 replace dlc=dod if pid=="20130038" //merge done with death rec bk added
 replace dlc=dod if pid=="20130055" //merge done with death rec bk added
 replace dlc=dod if pid=="20130063" //merge done with death rec bk added
 replace dlc=dod if pid=="20130073" //merge done with death rec bk added
 replace dlc=(14dec2020) if pid=="20130081" //merge done with path rpt added for recurrent disease
-replace primarysite="SOFT PALATE" if pid=="20130081" //in re-reviewing the original tumour has incorrect info
-replace top="051" if pid=="20130081"
-replace topography=51 if pid=="20130081"
-replace topcat=6 if pid=="20130081"
+replace primarysite="SOFT PALATE" if pid=="20130081" & cr5id=="T1S1" //in re-reviewing the original tumour has incorrect info
+replace top="051" if pid=="20130081" & cr5id=="T1S1"
+replace topography=51 if pid=="20130081" & cr5id=="T1S1"
+replace topcat=6 if pid=="20130081" & cr5id=="T1S1"
 replace dlc=d(21apr2016) if pid=="20130087" //path rpt added for 2016 MP
 replace dlc=dod if pid=="20130096" //merge done with death certificate added
 replace dlc=dod if pid=="20130103" //merge done with death rec bk added
@@ -10825,7 +10825,7 @@ replace dlc=dod if pid=="20140892" //merge done with 20150222
 replace dlc=d(10jan2020) if pid=="20140923" //path rpt source added for same primary
 //pid 20140959 reviewed but no update needed as merge done with pid 20150258
 //pid 20140975 reviewed but no update needed as merge done with pid 20140976 + 20180765
-Sent pid 20140981 for KWG to review as I'm unsure what to do with it as it's very incomplete.
+Sent pid 20140981 for KWG to review as I'm unsure what to do with it as it's very incomplete - KWG to f/u at Dr Hawkins-Voss (13jul2021).
 //pid 20141031 reviewed but no update needed as merge done with pid 2015483 + 20150484
 replace dlc=d(01oct2019) if pid=="20141063" //RT source added
 replace dlc=dod if pid=="20141064" //Death Rec bk added
@@ -10873,10 +10873,81 @@ replace dlc=d(30jul2018) if pid=="20145038" //path rpt added for recurrent 2005 
 //pid 20145053 reviewed but no update needed - cannot determine what update was done by DA.
 replace dlc=d(04aug2016) if pid=="20145054" //path rpt added for recurrent disease
 //pid 20145055 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20145106 reviewed but no update needed as death certificate added
+//pid 20150005 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20150013 reviewed but no update needed as death rec bk added
+//pid 20150022 reviewed but no update needed as RT reg added.
+//pid 20150025 reviewed but no update needed as RT reg added.
+//pid 20150045 reviewed (ineligible so not in iarc ds) but no update needed as merge done with pid 20190307 for 2019 MP
+replace dlc=d(14jan2016) if pid=="20150050" //merge done with pid 20150274 + RT reg added
+replace dlc=d(22feb2016) if pid=="20150062" //merge done with pid 20150564 + RT reg added
+replace dlc=d(30jan2017) if pid=="20150085" //merge done with pid 20150171 + RT reg added
+//pid 20150099 reviewed but no update needed as merge done with pid 20150218 + 20170538
+//pid 20150105 reviewed but no update needed as merge done with pid 20150191
+//pid 20150112 reviewed but no update needed as merge done with pid 20150287
+replace dlc=d(16mar2016) if pid=="20150114" //merge done with pid 20150510, 20160597 + RT reg added
+//pid 20150115 reviewed but no update needed as merge done with pid 20150163 + RT reg added
+//pid 20150140 reviewed but no update needed as death rec bk added
+replace dlc=d(16feb2016) if pid=="20150160" //merge done with pid 20160158
+//pid 20150165 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20150170 reviewed but updates contain identifiable data so manually created an update excel sheet and merged with this dataset above; 2019 MP added.
+replace dlc=d(21jun2017) if pid=="20150173" //merge done with pid 20170379 for path rpt of mets
+//pid 20150174 reviewed but no update needed as merge done with pid 20150227
+replace dlc=d(28jul2017) if pid=="20150180" //merge done with pid 20170506 for 2017 MP
+//pid 20150188 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(23aug2016) if pid=="20150192" //Sx path rpt added
+//pid 20150194 reviewed but no update needed as merge done with pid 20190229
+replace dlc=d(04feb2016) if pid=="20150199" //merge done with pid 20160604 for 2016 MP
+//pid 20150204 reviewed but no update needed as merge done with pid 20150456
+//pid 20150208 reviewed (ineligible so not in iarc ds) but no update needed as merge done with pid 20150262
+//pid 20150209 reviewed but no update needed as merge done with pid 20150248
+//pid 20150215 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20150228 reviewed but no update needed as RT reg added
+replace dlc=d(25apr2016) if pid=="20150229" //RT reg added
+replace dlc=d(04jan2016) if pid=="20150236" //RT reg added
+replace hx="INVASIVE METAPLASTIC CARCINOMA" if pid=="20150240" & cr5id=="T1S1" //merge with pid 20160279 for Sx path rpt added
+replace morph=8575 if pid=="20150240" & cr5id=="T1S1"
+replace morphcat=12 if pid=="20150240" & cr5id=="T1S1"
+//pid 20150242 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(23aug2016) if pid=="20150246" //Sx path rpt added
+//pid 20150247 reviewed but no update needed as merge done with pid 20150055 + 20190030
+//pid 20150251 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(29jan2016) if pid=="20150288" //RT reg added
+//pid 20150296 reviewed but no update needed as RT reg added
+replace primarysite="ANORECTAL JUNCTION" if pid=="20150297" & cr5id=="T1S1" //Sx path rpt added 
+replace top="218" if pid=="20150297" & cr5id=="T1S1"
+replace topography=218 if pid=="20150297" & cr5id=="T1S1"
+replace dlc=d(11jan2016) if pid=="20150297"
+//pid 20150302 reviewed but no update needed as merge done with pid 20150563 + 20155238
+replace dlc=d(10feb2016) if pid=="20150303" //RT reg added
+//pid 20150314 reviewed but no update needed as merge done with pid 20150008 + 20150090
+replace dlc=d(18may2019) if pid=="20150329" //path rpt for mets added
+pid 20150333 reviewed (previously merged with 20150146) but T3S1 only has age and dxyr fields filled in so maybe didn't import correctly so emailed TH (13jul2021) to restore her XML backup from 13-Feb-2020 (last saved by her on that date) - awaiting her feedback.
+replace dlc=d(05jan2016) if pid=="20150335" //RT reg added
+replace dlc=d(29feb2016) if pid=="20150336" //RT reg added
+replace dlc=d(15jun2016) if pid=="20150337" //merge with pid 20160038 + 20160359
+replace dlc=d(03feb2016) if pid=="20150344" //merge with pid 20150126 + 20160354
+//pid 20150359 reviewed but no update needed as merge done with pid 20160578
+replace dlc=d(22mar2016) if pid=="20150368" //Sx path rpt added
+//pid 20150375 reviewed but no update needed as merge done with pid 20150376
+//pid 20150378 reviewed but no update needed as merge done with pid 20150051 + 20150377
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+WHEN RUNNING ABOVE UPDATES, ENSURE ALL HAVE CHANGES.
+IF SOME DON'T THEN CHECK IF THE MERGED PID WAS USED IN IARC DATASET INSTEAD AND UPDATE THE ABOVE CODE.
 
 
 
