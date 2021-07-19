@@ -10568,8 +10568,6 @@ replace topcat=45 if pid=="20081039"
 
 ** JC 22-mar-2021 while reviewing 2017 data, noted this update
 replace dlc=d(19jun2017) if pid=="20080158"
-** JC 24-mar-2021 while reviewing duplicates list, noted this update
-AWAIT feedback from KWG then decide if to drop if pid=="20151197" //NPX ca - need to confirm with KWG first
 ** JC 24-mar-2021 while reviewing duplicates list, noted this update in CR5db as new source added post-review but DA didn't update tumour fields or alert reviewers to the change
 /*
 replace primarysite="ENDOMETRIUM" if pid=="20151355"
@@ -10931,6 +10929,145 @@ replace dlc=d(03feb2016) if pid=="20150344" //merge with pid 20150126 + 20160354
 replace dlc=d(22mar2016) if pid=="20150368" //Sx path rpt added
 //pid 20150375 reviewed but no update needed as merge done with pid 20150376
 //pid 20150378 reviewed but no update needed as merge done with pid 20150051 + 20150377
+//pid 20150404 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(29feb2016) if pid=="20150408" //merge with pid 20150143
+//pid 20150415 reviewed but no update needed as merge done with pid 20150427 + 20160381
+//pid 20150417 reviewed but no update needed as merge done with pid 20150150
+replace dlc=d(19jan2016) if pid=="20150425" //merge with pid 20155065
+replace dlc=d(01mar2016) if pid=="20150434" //Sx path rpt + RT reg added
+//pid 20150440 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(08mar2016) if pid=="20150464" //merge with pid 20150111
+//pid 20150482 reviewed but no update needed as 2017 MP sources added
+replace dlc=d(07mar2017) if pid=="20150519" //merge with pid 20160462
+replace dlc=d(15jan2016) if pid=="20150520" //RT reg added
+//pid 20150521 reviewed but no update needed as Death Rec + RT reg added
+//pid 20150522 reviewed but no update needed as 2016 MP sources added
+//pid 20150527 reviewed (ineligible so not in iarc ds) but no update needed as merge done with pid 20150109 + 20190275
+//pid 20150539 reviewed but no update needed as death certificate added
+replace dlc=d(24may2017) if pid=="20151000" //merge with pid 20172152
+replace dlc=d(20sep2016) if pid=="20151009" //2016 MP tumour added
+//pid 20151010 reviewed (ineligible so not in iarc ds) but no update needed - cannot determine what update was done by DA.
+replace dlc=d(06may2016) if pid=="20151020" //merge with pid 20150108 + 20150352 + 20160362
+//pid 20151029 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(25aug2020) if pid=="20151033" //merge with pid 20190004 + 20201053 for 2019 MP
+//pid 20151042 reviewed but no update needed as merge done with pid 20151368
+replace dlc=d(19nov2018) if pid=="20151103" //merge with pid 20150042 + 20150518 for 2018 MP
+//pid 20151109 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20151113 reviewed but no update needed as Death Rec added
+replace dlc=d(04dec2017) if pid=="20151120" //Death Rec added - this death certificate not found in death data or REDCap Deathdb
+replace slc=2 if pid=="20151120" //Death Rec added - this death certificate not found in death data or REDCap Deathdb
+replace comments="JC 19JUL2021: This death certificate not found in death data from Reg Dept or REDCap 2008-2020 Deathdb. No F/U needed. Abstracted from database." if pid=="20151120"
+//pid 20151150 reviewed but no update needed as death certificate added
+replace dlc=d(04mar2019) if pid=="20151168" //RT Reg added
+//pid 20151171 reviewed but no update needed as RT reg + death certificate added for 2018 MP
+//pid 20151189 reviewed but no update needed as RT reg + Sx path rpt added
+//pid 20151193 reviewed but no update needed - cannot determine what update was done by DA.
+** JC 24-mar-2021 while reviewing duplicates list, noted this update
+//See email from 29mar2021 subject line "possibly incorrect merge - 2015" for KWG's feedback - AWAIT feedback from KWG then decide if to drop if pid=="20151197" //NPX ca is pid 20151313 - need to confirm with KWG first
+drop if pid=="20151197" //this is a separate 2016 primary for a different pt with similar name see pid 20181093 + 20160340; Note KWG kept 20151197 and merged 20151313 into this pid but I removed 20151197 from IARC ds as this contains erroneous data and 20151313 has correct data.
+//pid 20151226 reviewed but no update needed as merge done with pid 20170074 for 2017 MP
+replace dlc=d(20apr2016) if pid=="20151248" //RT Reg added
+replace dlc=d(05jan2016) if pid=="20151262" //RT Reg added
+replace dlc=d(26jan2016) if pid=="20151301" //RT Reg added
+replace dlc=d(09feb2016) if pid=="20151302" //RT Reg added
+replace dlc=d(20mar2017) if pid=="20151307" //RT Reg added
+//pid 20151309 reviewed but no update needed as MedData entry added
+//pid 20151369 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20155002 reviewed but no update needed as RT reg added
+//pid 20155003 reviewed but no update needed as RT reg added
+replace dlc=d(01feb2016) if pid=="20155005" //RT Reg added
+//pid 20155006 reviewed but no update needed as RT reg added
+replace dlc=d(07jan2016) if pid=="20155007" //RT Reg added
+//pid 20155008 reviewed but no update needed as RT reg added
+//pid 20155010 reviewed but no update needed as RT reg added
+//pid 20155012 reviewed but no update needed as RT reg added
+//pid 20155014 reviewed but no update needed as RT reg added
+//pid 20155015 reviewed but no update needed as RT reg added
+//pid 20155016 reviewed but no update needed as death certificate added
+replace dlc=d(08feb2016) if pid=="20155017" //RT Reg added
+replace dlc=d(08jun2017) if pid=="20155018" //Sx path rpt + RT Reg added
+//pid 20155021 reviewed but no update needed as RT reg added
+replace dlc=d(19apr2016) if pid=="20155027" //RT Reg added
+//pid 20155028 reviewed but no update needed as RT reg + Death Rec added
+replace dlc=d(28dec2016) if pid=="20155029" //Death Rec added - this death certificate not found in death data or REDCap Deathdb
+replace slc=2 if pid=="20155029" //Death Rec added - this death certificate not found in death data or REDCap Deathdb
+replace comments="JC 19JUL2021: This death certificate not found in death data from Reg Dept or REDCap 2008-2020 Deathdb. No F/U needed. Abstracted from database." if pid=="20155029"
+//pid 20155030 reviewed but no update needed as RT reg added
+replace dlc=d(29jan2016) if pid=="20155032" //RT Reg added
+replace dlc=d(22feb2016) if pid=="20155033" //RT Reg added
+replace dlc=d(29feb016) if pid=="20155037" //RT Reg added
+//pid 20155039 reviewed but no update needed as RT reg added
+//pid 20155043 reviewed but no update needed as RT reg added
+//pid 20155046 reviewed but no update needed as RT reg added
+replace dlc=d(16feb2016) if pid=="20155049" //RT Reg added
+replace dlc=d(05apr2016) if pid=="20155052" //Sx path rpt + RT Reg added
+replace primarysite="FUNDUS UTERI" if pid=="20155052" //Sx path rpt
+replace top="543" if pid=="20155052" //Sx path rpt
+replace topography=543 if pid=="20155052" //Sx path rpt
+replace hx="ENDOMETRIOID ADENOCARCINOMA, SECRETORY TYPE" if pid=="20155052" //Sx path rpt
+replace morph=8382 if pid=="20155052" //Sx path rpt
+//pid 20155061 reviewed but no update needed - cannot determine what update was done by DA.
+replace dlc=d(29jan2016) if pid=="20155064" //RT Reg added
+//pid 20155070 reviewed but no update needed as merge done with pid 20161024
+replace dlc=d(25feb2016) if pid=="20155071" //RT Reg added
+replace dlc=d(03feb2016) if pid=="20155077" //RT Reg added
+//pid 20155079 reviewed but no update needed as RT reg added
+drop if pid=="20155094" & cr5id=="T2S1" //MedData entry added for 2015 MP but upon further investigation in MedData the prostate ca was dx on 18feb2010.
+//pid 20155095 reviewed but no update needed as RT reg added
+//pid 20155100 reviewed but no update needed as path rpt added
+replace dot=d(04mar2015) if pid=="20155150" //MedData entry added - further review done in MedData by JC 19jul2021
+replace dcostatus=1 if pid=="20155150"
+replace basis=1 if pid=="20155150"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData, Dx C786 Secondary malignant neoplasm of retroperitoneum and preitoneum. Dx Date: 29MAR15. Doctor M Oshea. Admitted 4MAR15. To Abstract. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions, case closed. 18JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155150"
+replace dot=d(27feb2015) if pid=="20155161" //MedData entry added - further review done in MedData by JC 19jul2021
+replace admdate=d(27feb2015) if pid=="20155161"
+replace dcostatus=1 if pid=="20155161"
+replace basis=1 if pid=="20155161"
+replace lname=subinstr(lname,"e","a",.) if pid=="20155161"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData. Lastname spelt:... Dx Malignant neoplasm Liver unspecified IDC10 22.9. Dx Date 7MAR15. To Update. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 17JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155161"
+drop if pid=="20151151" & cr5id=="T1S1" //merged with pid 20155164 and noted to be a visitor for rx and not a resident of Bdos.
+replace dcostatus=1 if pid=="20155175" //MedData entry added
+replace basis=1 if pid=="20155175"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData under LName... Dx Malignant Neoplasm: Colon Unspecified. Dx Date: 20MAY15. Doctor R Delice. To Update. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 17JAN19_TH F/U Path Rpt for BOD and InciDate. LastName changed from..." if pid=="20155175"
+//pid 20155196 reviewed but no update needed - cannot determine what update was done by DA.
+//pid 20155208 reviewed but no update needed as merge done with pid 20151174
+//pid 20155211 reviewed but no update needed as merge done with pid 20160114
+replace dot=d(22may2015) if pid=="20155216" //MedData entry added - further review done in MedData by JC 19jul2021
+replace admdate=d(22may2015) if pid=="20155216"
+replace dcostatus=1 if pid=="20155216"
+replace basis=7 if pid=="20155216"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found on MedData. Dx: Malignanat neoplasm of gallbladder ICD10 23. Dx Date: 30JUN15. Doctor C Flower. To Update. No F/U needed. Check made with QEH Lab and no pathology done on this Pt. Case closed due to deadline to complete 2015 abstractions. 21MAR19_KWG No pathology seen in notes but mention made of Endoscopy and Biopsy. To F/U lab. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155216"
+replace dot=d(29may2015) if pid=="20155221" //MedData entry added
+replace admdate=d(29may2015) if pid=="20155221"
+replace dcostatus=1 if pid=="20155221"
+replace basis=2 if pid=="20155221"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found on MedData. Dx: Malginant neoplasm of Breast Dx Date: 29MAY15. Dr Shenoy. To Update. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155221"
+//pid 20155227 reviewed but no update needed - cannot determine what update was done by DA.
+replace dot=d(14sep2015) if pid=="20155228" //MedData entry added
+replace dcostatus=1 if pid=="20155228"
+replace basis=1 if pid=="20155228"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData. Dx: Malignant neoplasm of prostate Dx Date: 14SEp15. Dr Wayne Clarke. To Updated.No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155228"
+replace dot=d(07oct2015) if pid=="20155251" //MedData entry added - further review done in MedData by JC 19jul2021
+replace admdate=d(07oct2015) if pid=="20155251"
+replace dcostatus=1 if pid=="20155251"
+replace basis=1 if pid=="20155251"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 18MAY21_KWG Conflicting info found on MEDDATA, QEH Death Book records COD as Ovarian Cancer, case abstracted based on Death Book Info. 7APR21_SF Found in MedData. Dx: Malignant neoplasm: Intestinal tract ICD10 26.0. Dr Wayne Clarke. To update. No F/U needed. Mr Barrow unable to locate note. Due to deadline to complete 2015 abstractions, case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155251"
+replace dot=d(02oct2015) if pid=="20155255" //MedData entry added
+replace dcostatus=1 if pid=="20155255"
+replace basis=1 if pid=="20155255"
+replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData. Dx: Malignant neoplasm of uterus, NOS. Dx Date: 2OCT2015. Dr R Shenoy. To Update. No F/U needed. Mr Barrow unable to find note. Due to deadline to complete 2015 abstractions, case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155255"
+//pid 20155265 reviewed but no update needed - cannot determine what update was done by DA.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -10960,9 +11097,12 @@ IF SOME DON'T THEN CHECK IF THE MERGED PID WAS USED IN IARC DATASET INSTEAD AND 
 count if morph==8550 and topography==619 //173
 replace morph=8140 if morph==8550 and topography==619 //173 changes
 
+
+
 Check for persearch=Dup to remove
 RE-RUN NAMES AND NRN DUPLICATES CHECKS
 Check if pt deceased but dlc and dod do not match
+Review DCOs in MedData (basis==0)
 Check for resident=2 or 99 then look them up in MedData
 2020 death prep and matching so can have 5yr survival for 2015 data
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
