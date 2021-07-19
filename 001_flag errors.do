@@ -3,8 +3,8 @@
     //  algorithm name          001_flag errors.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      29-JUN-2021
-    // 	date last modified      29-JUN-2021
+    //  date first created      19-JUL-2021
+    // 	date last modified      19-JUL-2021
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
