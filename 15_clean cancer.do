@@ -8447,7 +8447,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-01-20_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-07-21_DQI.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -8488,7 +8488,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-01-20_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2021-07-21_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace
@@ -10608,10 +10608,10 @@ drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend
 ** Correct DOB errors flagged by merging with list of corrections manually created using electoral list (this ensures dofile remains de-identified)
 preserve
 clear
-import excel using "`datapath'\version02\2-working\PostCleaningUpdates20210511.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version02\2-working\PostCleaningPartialUpdates20210721.xlsx" , firstrow case(lower)
 save "`datapath'\version02\2-working\postcleanupdates" ,replace
 restore
-merge 1:1 pid using "`datapath'\version02\2-working\postcleanupdates" ,force
+merge 1:1 pid using "`datapath'\version02\2-working\postcleanpartupdates" ,force
 /*
 
 */
@@ -10622,6 +10622,21 @@ replace middleinitials=elec_mname if _merge==3 //1 changes
 replace lastname=elec_lname if _merge==3 //0 changes
 drop elec_* _merge
 
+preserve
+clear
+import excel using "`datapath'\version02\2-working\PostCleaningFullUpdates20210721.xlsx" , firstrow case(lower)
+save "`datapath'\version02\2-working\postcleanupdates" ,replace
+restore
+merge 1:1 pid using "`datapath'\version02\2-working\postcleanfullupdates" ,force
+/*
+
+*/
+replace nrn=elec_nrn if _merge==3 //11 changes
+replace birthdate=elec_dob if _merge==3 //11 changes
+replace firstname=elec_fname if _merge==3 //2 changes
+replace middleinitials=elec_mname if _merge==3 //1 changes
+replace lastname=elec_lname if _merge==3 //0 changes
+drop elec_* _merge
 /*
 	02jun2021 JC: Updates from post-clean cross-check review process.
 	See dofile 45_prep cross-check.do
@@ -11016,17 +11031,21 @@ drop if pid=="20155094" & cr5id=="T2S1" //MedData entry added for 2015 MP but up
 //pid 20155095 reviewed but no update needed as RT reg added
 //pid 20155100 reviewed but no update needed as path rpt added
 replace dot=d(04mar2015) if pid=="20155150" //MedData entry added - further review done in MedData by JC 19jul2021
+replace admdate=d(04mar2015) if pid=="20155150"
+replace ptrectot=1 if pid=="20155150"
 replace dcostatus=1 if pid=="20155150"
 replace basis=1 if pid=="20155150"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData, Dx C786 Secondary malignant neoplasm of retroperitoneum and preitoneum. Dx Date: 29MAR15. Doctor M Oshea. Admitted 4MAR15. To Abstract. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions, case closed. 18JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155150"
 replace dot=d(27feb2015) if pid=="20155161" //MedData entry added - further review done in MedData by JC 19jul2021
 replace admdate=d(27feb2015) if pid=="20155161"
+replace ptrectot=1 if pid=="20155161"
 replace dcostatus=1 if pid=="20155161"
 replace basis=1 if pid=="20155161"
 replace lname=subinstr(lname,"e","a",.) if pid=="20155161"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData. Lastname spelt:... Dx Malignant neoplasm Liver unspecified IDC10 22.9. Dx Date 7MAR15. To Update. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 17JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155161"
 drop if pid=="20151151" & cr5id=="T1S1" //merged with pid 20155164 and noted to be a visitor for rx and not a resident of Bdos.
-replace dcostatus=1 if pid=="20155175" //MedData entry added
+replace ptrectot=1 if pid=="20155175" //MedData entry added
+replace dcostatus=1 if pid=="20155175"
 replace basis=1 if pid=="20155175"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData under LName... Dx Malignant Neoplasm: Colon Unspecified. Dx Date: 20MAY15. Doctor R Delice. To Update. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 17JAN19_TH F/U Path Rpt for BOD and InciDate. LastName changed from..." if pid=="20155175"
 //pid 20155196 reviewed but no update needed - cannot determine what update was done by DA.
@@ -11034,49 +11053,343 @@ replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/
 //pid 20155211 reviewed but no update needed as merge done with pid 20160114
 replace dot=d(22may2015) if pid=="20155216" //MedData entry added - further review done in MedData by JC 19jul2021
 replace admdate=d(22may2015) if pid=="20155216"
+replace ptrectot=1 if pid=="20155216"
 replace dcostatus=1 if pid=="20155216"
 replace basis=7 if pid=="20155216"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found on MedData. Dx: Malignanat neoplasm of gallbladder ICD10 23. Dx Date: 30JUN15. Doctor C Flower. To Update. No F/U needed. Check made with QEH Lab and no pathology done on this Pt. Case closed due to deadline to complete 2015 abstractions. 21MAR19_KWG No pathology seen in notes but mention made of Endoscopy and Biopsy. To F/U lab. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155216"
 replace dot=d(29may2015) if pid=="20155221" //MedData entry added
 replace admdate=d(29may2015) if pid=="20155221"
+replace ptrectot=1 if pid=="20155221"
 replace dcostatus=1 if pid=="20155221"
 replace basis=2 if pid=="20155221"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found on MedData. Dx: Malginant neoplasm of Breast Dx Date: 29MAY15. Dr Shenoy. To Update. No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155221"
 //pid 20155227 reviewed but no update needed - cannot determine what update was done by DA.
 replace dot=d(14sep2015) if pid=="20155228" //MedData entry added
+replace admdate=d(14sep2015) if pid=="20155228"
+replace ptrectot=1 if pid=="20155228"
 replace dcostatus=1 if pid=="20155228"
 replace basis=1 if pid=="20155228"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData. Dx: Malignant neoplasm of prostate Dx Date: 14SEp15. Dr Wayne Clarke. To Updated.No F/U needed. Mr Barrow unable to locate notes. Due to deadline to complete 2015 abstractions case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155228"
 replace dot=d(07oct2015) if pid=="20155251" //MedData entry added - further review done in MedData by JC 19jul2021
 replace admdate=d(07oct2015) if pid=="20155251"
+replace ptrectot=1 if pid=="20155251"
 replace dcostatus=1 if pid=="20155251"
 replace basis=1 if pid=="20155251"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 18MAY21_KWG Conflicting info found on MEDDATA, QEH Death Book records COD as Ovarian Cancer, case abstracted based on Death Book Info. 7APR21_SF Found in MedData. Dx: Malignant neoplasm: Intestinal tract ICD10 26.0. Dr Wayne Clarke. To update. No F/U needed. Mr Barrow unable to locate note. Due to deadline to complete 2015 abstractions, case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155251"
 replace dot=d(02oct2015) if pid=="20155255" //MedData entry added
+replace ptrectot=1 if pid=="20155255"
 replace dcostatus=1 if pid=="20155255"
 replace basis=1 if pid=="20155255"
 replace comments="JC 19JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 7APR21_SF Found in MedData. Dx: Malignant neoplasm of uterus, NOS. Dx Date: 2OCT2015. Dr R Shenoy. To Update. No F/U needed. Mr Barrow unable to find note. Due to deadline to complete 2015 abstractions, case closed. 14JAN19_TH F/U Path Rpt for BOD and InciDate." if pid=="20155255"
 //pid 20155265 reviewed but no update needed - cannot determine what update was done by DA.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//pid 20159000 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159001 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159002 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace init="m" if pid=="20159003"
+replace comments="9APR21_KWG Notes seen, sparse and very old. No malignancy seen. Abstracted as a DCO pending MedData check." if pid=="20159003"
+replace init="o" if pid=="20159004"
+//pid 20159005 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159006 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159007 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159008 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159015 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159016 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159019 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159020 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace comments="23APR21_KWG Notes seen, old notes, no mention of cancer. Abstracted as a DCO pending MedData F/U." if pid=="20159021"
+//pid 20159025 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159026 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159027 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159028 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159029 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159030 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159031 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159033 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159034 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159036 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159038 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159041 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159042 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159046 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(25apr2015) if pid=="20159047" //MedData entry added - further review done in MedData by JC 21jul2021
+replace admdate=d(25apr2015) if pid=="20159047"
+replace ptrectot=1 if pid=="20159047"
+replace dcostatus=1 if pid=="20159047"
+replace basis=1 if pid=="20159047"
+//pid 20159047 some updates contain identifiable data so manually created an update excel sheet and merged with this dataset above
+replace dot=d(21mar2015) if pid=="20159048" //MedData entry added - further review done in MedData by JC 21jul2021
+replace admdate=d(21mar2015) if pid=="20159048"
+replace ptrectot=1 if pid=="20159048"
+replace dcostatus=1 if pid=="20159048"
+replace basis=1 if pid=="20159048"
+replace init="a" if pid=="20159048"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Dx: Prostate Cancer. Dx Date: 21MAR2015." if pid=="20159048"
+//pid 20159051 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159053 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159055 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(01may2015) if pid=="20159058" //MedData entry added
+replace admdate=d(01may2015) if pid=="20159058"
+replace ptrectot=1 if pid=="20159058"
+replace dcostatus=1 if pid=="20159058"
+replace basis=1 if pid=="20159058"
+replace init="m" if pid=="20159058"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Middle initial updated. Dx: Cancer of the Pancreas. Dx Date: 1MAY2015." if pid=="20159058"
+replace dot=d(25may2015) if pid=="20159059" //MedData entry added
+replace admdate=d(25may2015) if pid=="20159059"
+replace ptrectot=1 if pid=="20159059"
+replace dcostatus=1 if pid=="20159059"
+replace basis=1 if pid=="20159059"
+replace init="d" if pid=="20159059"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abstract. Found in MEDDATA. Middle Initial updated. Ca Prostate, Dx Date: 25MAY2015." if pid=="20159059"
+//pid 20159060 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(27may2015) if pid=="20159061" //Imaging added - death traceback done
+replace admdate=d(27may2015) if pid=="20159061"
+replace ptrectot=1 if pid=="20159061"
+replace dcostatus=1 if pid=="20159061"
+replace basis=2 if pid=="20159061"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 21APR21_KWG 23MAY2015 Pt presents to AED c/o anorexia and weight los, decreased appetite, extremely lethargic and generally weak. U/S Abdomen ordered. 27MAY2015: U/S ABDOMEN FINDINGS: Liver: Enlarged in size and shows multiple mixed echogenic lesions - suggestive of metastasis. Largest lesion measures about 4 x 3cm. Pancreas, Spleen, Right kidney, Left kidney, Urinary bladder and Prostate are all normal. Bowel wall thickening measuring about 1.8cm is noted in the left upper quadrant - possibly the spenic flexure. IMP: 1. Multiple liver metastasis. 2. Possible bowel wall thickening in the splenic flexure - ?Carcinoma colon." if pid=="20159061"
+replace dot=d(09apr2015) if pid=="20159062" //Death traceback done
+replace admdate=d(09apr2015) if pid=="20159062"
+replace ptrectot=1 if pid=="20159062"
+replace dcostatus=1 if pid=="20159062"
+replace basis=1 if pid=="20159062"
+replace init="h" if pid=="20159062"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 9APR21_KWG Notes seen and Pt suspected of bladder Ca due to perisitent haematuria. However Pt dceased before investigations could be completed. No reports seen in notes." if pid=="20159062"
+//pid 20159063 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159064 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159065 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159068 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(25mar2015) if pid=="20159070" //Imaging added - death traceback done
+replace admdate=d(12jun2015) if pid=="20159070"
+replace ptrectot=1 if pid=="20159070"
+replace dcostatus=1 if pid=="20159070"
+replace basis=2 if pid=="20159070"
+replace init="i" if pid=="20159070"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 23APR21_KWG Pt presented to AED 12JUN2015 c/o general malaise, anorexic, severe weight loss. Pt noted to have had pelvic ultrasound and no other intervention prior to presentation. Pt admitted. Family updated on possible prognosis of malignancy however declined any tests and wished discharge which was done 15Jun2015. 25MAR2015: ULTRASOUND PELVIS FINDINGS: Liver is normal in size and echo pattern and homogeneous in echotexture. Normal gallbladder. No calculi or other intraluminal abnormality is seen. No wall thickening, pericholecystic collection or intra or extrahepatic biliary duct dilatation. The pancreas was not well visualized. The spleen was not well visualized. Multiple enlarged periaortic lymph nodes are evident. In addition a 8.5cm soft tissue is seen in the right lower quadrant. This mass is causing right-sided urinary tract obstruction. Both kidneys are normal in size.....No free fluid or collection is seen. IMP: Diffuse intra-abdominal lymphadenopathy. Right lower quadrant soft tissue mass which is causing right sided urinary tract obstruction. Bladder diverticulum." if pid=="20159070"
+//pid 20159071 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159072 reviewed but no update needed as notes in death trace-back consisted of 2 blank sheets + no dx/encounter info in MedData.
+//pid 20159074 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+drop if pid=="20159075" //reviewed as COD=brain cancer but DA seen notes and meningioma not stated as malignant by NS, SF via email on 21jul2021
+replace dot=d(24may2015) if pid=="20159077" //MedData entry added - further review done in MedData by JC 21jul2021
+replace admdate=d(24may2015) if pid=="20159077"
+replace ptrectot=1 if pid=="20159077"
+replace dcostatus=1 if pid=="20159077"
+replace basis=1 if pid=="20159077"
+replace comments="JC 21JUL2021: TH lists dot as 15may2015 but no evidence of this date in MedData or CR5db comments. Added in TH's CR5db comments - No F/U needed." if pid=="20159077"
+replace dot=d(20feb2015) if pid=="20159080" //Imaging added - death traceback done
+replace admdate=d(20feb2015) if pid=="20159080"
+replace ptrectot=1 if pid=="20159080"
+replace dcostatus=1 if pid=="20159080"
+replace basis=2 if pid=="20159080"
+replace init="o" if pid=="20159080"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 23APR21_KWG 20FEB2015 Pt presents to AED c/o rectal bleed, vomiting, pain to abdomen, weight loss and decreased appetite. Pt suspected of malignancy to colon and CT ordered for 21FEB2015. CT reported verbally but not seen in notes: 'Mass noted in the proximal transverse colon which has evidence of..perforation'. Surgery was only treatment option, however Pt was found to be too weak for further intervention and discharged." if pid=="20159080"
+//pid 20159081 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159082 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(15apr2014) if pid=="20159084" //MedData entry added - further review done in MedData by JC 21jul2021
+replace dotyear=year(dot) if pid=="20159118"
+replace dxyr=2014 if pid=="20159118"
+replace admdate=d(15apr2014) if pid=="20159084"
+replace ptrectot=1 if pid=="20159084"
+replace dcostatus=1 if pid=="20159084"
+replace basis=1 if pid=="20159084"
+replace init="o" if pid=="20159084"
+replace comments="JC 21JUL2021: JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Discuss. Found in MEDDATA. Dx: Abdominal Mass. Dx Date: 15UL14." if pid=="20159084"
+//pid 20159085 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(01jun2015) if pid=="20159086" //MedData entry added
+replace admdate=d(01jun2015) if pid=="20159086"
+replace ptrectot=1 if pid=="20159086"
+replace dcostatus=1 if pid=="20159086"
+replace basis=1 if pid=="20159086"
+replace init="a" if pid=="20159086"
+replace comments="JC 21JUL2021: JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Breast Cancer. Dx Date: 1JUN2015." if pid=="20159086"
+replace dot=d(18jul2015) if pid=="20159089" //MedData entry added
+replace admdate=d(18jul2015) if pid=="20159089"
+replace ptrectot=1 if pid=="20159089"
+replace dcostatus=1 if pid=="20159089"
+replace basis=1 if pid=="20159089"
+replace init="g" if pid=="20159089"
+replace comments="JC 21JUL2021: JC 21JUL2021: Added in TH's CR5db comments - No F/U needed." if pid=="20159089"
+//pid 20159090 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159091 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(15jul2015) if pid=="20159092" //MedData entry added
+replace admdate=d(15jul2015) if pid=="20159092"
+replace ptrectot=1 if pid=="20159092"
+replace dcostatus=1 if pid=="20159092"
+replace basis=1 if pid=="20159092"
+replace init="a" if pid=="20159092"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Dx:Cancer of the Pancreas. Dx Date: 15JUL2015." if pid=="20159092"
+replace dot=d(22may2015) if pid=="20159093" //MedData entry added - further review done in MedData by JC 21jul2021
+replace admdate=d(22may2015) if pid=="20159093"
+replace ptrectot=1 if pid=="20159093"
+replace dcostatus=1 if pid=="20159093"
+replace basis=1 if pid=="20159093"
+//pid 20159093 some updates contain identifiable data so manually created an update excel sheet and merged with this dataset above
+replace ptrectot=1 if pid=="20159096" //Death traceback done - DA didn't state last adm date before death and MedData missing the date of last admission.
+replace dcostatus=1 if pid=="20159096"
+replace basis=1 if pid=="20159096"
+replace init="h" if pid=="20159096"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 23APR21_KWG Notes seen, unclear when Pt diagnosed, no confirmation of prostate Ca seen. Abstracted as a DCO pending MedData F/U." if pid=="20159096"
+replace ptrectot=1 if pid=="20159097" //Death traceback done - DA didn't state last adm date before death and MedData missing the date of last admission.
+replace dcostatus=1 if pid=="20159097"
+replace basis=1 if pid=="20159097"
+replace init="e" if pid=="20159097"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 23APR21_KWG Notes seen, unclear when Pt diagnosed, no confirmation of prostate Ca seen. Abstracted as a DCO pending MedData F/U." if pid=="20159097"
+replace dot=d(07apr2015) if pid=="20159098" //MedData entry added
+replace admdate=d(07apr2015) if pid=="20159098"
+replace ptrectot=1 if pid=="20159098"
+replace dcostatus=1 if pid=="20159098"
+replace basis=1 if pid=="20159098"
+replace init="d" if pid=="20159098"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Dx: Colon Cancer. Dx Date: 7APR2015." if pid=="20159098"
+//pid 20159102 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159103 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(28jul2015) if pid=="20159104" //MedData entry added
+replace admdate=d(28jul2015) if pid=="20159104"
+replace ptrectot=1 if pid=="20159104"
+replace dcostatus=1 if pid=="20159104"
+replace basis=1 if pid=="20159104"
+replace init="c" if pid=="20159104"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF. To Abs. FName different from on list, should be: SONGOAN.  Middle Initials udpated. Dx: Ca Unspecified 80.9. Dx Date: 28JUL15." if pid=="20159104"
+//pid 20159105 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159106 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159108 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159109 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159110 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159111 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159112 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159115 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+drop if pid=="20159116" //DA missed earlier encounters in MedData for prostate ca dx 11jan2012 and colon ca dx 01sep2011.
+//pid 20159117 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(30aug2013) if pid=="20159118" //MedData entry added - eligible prostate MP seen on MedData
+replace dotyear=year(dot) if pid=="20159118"
+replace dxyr=2013 if pid=="20159118"
+replace admdate=d(30aug2013) if pid=="20159118"
+replace ptrectot=3 if pid=="20159118"
+replace dcostatus=1 if pid=="20159118"
+replace basis=1 if pid=="20159118"
+replace init="e" if pid=="20159118"
+replace mpseq=1 if pid=="20159118" & cr5id=="T1S1"
+replace mptot=2 if pid=="20159118" & cr5id=="T1S1"
+replace patient=1 if pid=="20159118" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20159118" & cr5id=="T1S1"
+replace ptrectot=3 if pid=="20159118" & cr5id=="T1S1"
+replace persearch=1 if pid=="20159118" & cr5id=="T1S1"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Middle Initial updated. Prostate and Bladder Cancer Diagnosed in 2013. Diagnosis dates: 13NOV13 and 30AUG13. Diagnosis year changed to 2013." if pid=="20159118"
+expand=2 if pid=="20159118", gen (dupobs1do16)
+replace dot=d(13nov2013) if pid=="20159118" & dupobs1do16>0
+replace dotyear=year(dot) if pid=="20159118" & dupobs1do16>0
+replace dxyr=2013 if pid=="20159118" & dupobs1do16>0
+replace admdate=d(13nov2013) if pid=="20159118" & dupobs1do16>0
+replace top="619" if pid=="20159118" & dupobs1do16>0
+replace topography=619 if pid=="20159118" & dupobs1do16>0
+replace topcat=53 if pid=="20159118" & dupobs1do16>0
+replace primarysite="PROSTATE" if pid=="20159118" & dupobs1do16>0
+replace morphology="8000" if pid=="20159118" & dupobs1do16>0
+replace morph=8000 if pid=="20159118" & dupobs1do16>0
+replace morphcat=1 if pid=="20159118" & dupobs1do16>0
+replace hx="PROSTATE CANCER" if pid=="20159118" & dupobs1do16>0
+replace lat=0 if pid=="20159118" & dupobs1do16>0
+replace latcat=0 if pid=="20159118" & dupobs1do16>0
+replace beh=3 if pid=="20159118" & dupobs1do16>0
+replace grade=9 if pid=="20159118" & dupobs1do16>0
+replace basis=1 if pid=="20159118" & dupobs1do16>0
+replace dotyear=year(dot) if pid=="20159118" & dupobs1do16>0
+replace dxyr=2013 if pid=="20159118" & dupobs1do16>0
+replace ICD10="C61" if pid=="20159118" & dupobs1do16>0
+replace ICCCcode="12b" if pid=="20159118" & dupobs1do16>0
+replace cr5id="T2S1" if pid=="20159118" & dupobs1do16>0
+replace mpseq=2 if pid=="20159118" & cr5id=="T2S1"
+replace mptot=2 if pid=="20159118" & cr5id=="T2S1"
+replace patient=2 if pid=="20159118" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20159118" & cr5id=="T2S1"
+replace ptrectot=3 if pid=="20159118" & cr5id=="T2S1"
+replace persearch=2 if pid=="20159118" & cr5id=="T2S1"
+//pid 20159120 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159124 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(01oct2015) if pid=="20159125" //Imaging added - death traceback done
+replace admdate=d(02oct2015) if pid=="20159125"
+replace dfc=d(01oct2015) if pid=="20159125"
+replace ptrectot=1 if pid=="20159125"
+replace dcostatus=1 if pid=="20159125"
+replace basis=2 if pid=="20159125"
+replace init="o" if pid=="20159125"
+replace top="250" if pid=="20159125"
+replace topography=250 if pid=="20159125"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 21APR21_KWG REF Letter01OCT15 from Dr S King to AED: Dear Dr, Please continue management of Pt O Eversley. He presented yesterday and on examination revealed he was icteric with mild hepatomegaly along with obstructive jaundice. Ass: ?Pancreatic Ca. 01OCT15 Pt presents to AED c/o pale stools, dark urine, weight loss and decreased appetite. O/E: Abdomen soft, non-tender, mass on epigastrum, hard. ?Pancreatic mass ?Liver mass. U/S Abdomen ordered. 02OCT2015: U/S ABDOMEN. FINDINGS: The liver appears enlarged with multiple hypoechoic lesions noted. These may represent metastases. There is a 4.3cm x 4.6cm x 4.4cm heterogenous mass noted in the head of the pancreas. This may represent a pancreatic carcinoma. There is intra and extrahepatic biliary duct dilatation noted. The gallbladder is distended....IMP: 1. Hepatomegaly with hepatic metastases. 2. Likely pancreatic carcinoma of the head of the pancreas. Suggest contrast enhanced CT. 3. Intra and extrahepatic ductal dilatation with distended gallbladder." if pid=="20159125"
+//pid 20159126 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159127 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159128 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(27sep2015) if pid=="20159131" //MedData entry added - further review done by JC 21jul2021.
+replace admdate=d(27sep2015) if pid=="20159131"
+replace ptrectot=1 if pid=="20159131"
+replace dcostatus=1 if pid=="20159131"
+replace basis=1 if pid=="20159131"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 9APR21_KWG Notes seen and no mention of Ca seen. Abstracted as a DCO pending check in MedData." if pid=="20159131"
+replace dot=d(19oct2015) if pid=="20159132" //Imaging added - death traceback done
+replace admdate=d(19oct2015) if pid=="20159132"
+replace ptrectot=1 if pid=="20159132"
+replace dcostatus=1 if pid=="20159132"
+replace basis=2 if pid=="20159132"
+replace init="e" if pid=="20159132"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 21APR21_KWG 18OCT2015 Pt presents to AED c/o hematuria and burning on urination. ?Bladder Ca. U/S ordered. 19OCT2021: U/S ABDOMEN/PELVIS FINDINGS: Abdominal aorta was visualized along its entire length. It is normal in caliber with atheromatous wall clacification....Urinary bladder: Partially distended with Foley's bulb in situ. Patient was unable to tolerate a full bladder. Aheterogeneous lesion measuring 3.6 x 2.4 x 2.3cm is noted within the bladder - ?Blood clot/mass. No free fluid in the peritoneal cavity. Please correlate with clinical findings." if pid=="20159132"
+//pid 20159134 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159135 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(26oct2015) if pid=="20159136" //MedData entry added
+replace admdate=d(26oct2015) if pid=="20159136"
+replace ptrectot=1 if pid=="20159136"
+replace dcostatus=1 if pid=="20159136"
+replace basis=1 if pid=="20159136"
+replace init="c" if pid=="20159136"
+replace comments="JC 21JUL2021: JC 21JUL2021: Added in TH's CR5db comments - No F/U needed." if pid=="20159136"
+replace dot=d(08nov2015) if pid=="20159138" //Imaging added - death traceback done
+replace admdate=d(08nov2015) if pid=="20159138"
+replace ptrectot=1 if pid=="20159138"
+replace dcostatus=1 if pid=="20159138"
+replace basis=2 if pid=="20159138"
+replace init="a" if pid=="20159138"
+replace top="187" if pid=="20159138"
+replace topography=187 if pid=="20159138"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 23APR21_KWG 07NOV2015 Pt presented to AED c/o constipation, decreased oral intake, dehydration and distended abdomen. Pt appeared emaciated. 08NOV2015: CT ABDOMEN FINDINGS: Liver: There are multiple hypodensities noted in the liver likely hepatic metastases....Bowel: The large bowel appears prominent. There is apparent thickening of the walls of the caecum, ascending colon and rectum. There is an impression of a 2.5cm x 3.0cm soft tissue density noted in the sigmoid colon. Peritoneum: There is acites seen....Bones: There are lytic lesions in the imaged bones ?metastases. IMP: 1. ?Sigmoid tumour. 2. Bowel wall thickening of the rectum, caecum and ascending colon. 3. Hepatic metastases. 4. Ascites 5. Left renal cysts. 6. Bilateral pleural effusions and lower lobe consolidations. 7. ?Bony metastases." if pid=="20159138"
+//pid 20159139 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace init="a" if pid=="20159140" //MedData entry added - further review done by JC 21jul2021.
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 9APR21_KWG Notes seen and Pt last seen in QEH on 03MAY2015 for unrelated reason. No malignancy seen in notes, abstracted as a DCO pending check in MedData." if pid=="20159140"
+replace dot=d(09nov2015) if pid=="20159141" //MedData entry added - further review done by JC 21jul2021.
+replace admdate=d(09nov2015) if pid=="20159141"
+replace ptrectot=1 if pid=="20159141"
+replace dcostatus=1 if pid=="20159141"
+replace basis=1 if pid=="20159141"
+replace init="e" if pid=="20159141"
+replace comments="JC 21JUL2021: Added in SF's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Dx: Malignant Neoplasm of Ovary. Dx Date: 20NOV2015. Middle Initial updated." if pid=="20159141"
+//pid 20159142 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159143 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+replace dot=d(10nov2015) if pid=="20159144" //Imaging added - death traceback done
+replace admdate=d(10nov2015) if pid=="20159144"
+replace ptrectot=1 if pid=="20159144"
+replace dcostatus=1 if pid=="20159144"
+replace basis=2 if pid=="20159144"
+replace init="l" if pid=="20159144"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 9APR21_KWG Notes seen, Pt diagnosed from CT scan done on 13NOV15. Report not seen in notes, but summarized. See S1. Pt presented to QEH on 10NOV2015 c/o vomiting for 1/7 'black stuff' and weight loss for 2/12, decreased appetite, abdominal pain and back pain. 13NOV2015: CT ABDOMEN FINDINGS: Cystic mass ?Origin along with metastases to liver and omentum." if pid=="20159144"
+replace dot=d(08dec2015) if pid=="20159145" //MedData entry added
+replace admdate=d(08dec2015) if pid=="20159145"
+replace ptrectot=1 if pid=="20159145"
+replace dcostatus=1 if pid=="20159145"
+replace basis=1 if pid=="20159145"
+replace init="i" if pid=="20159145"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 12MAY21_KWG No F/U needed. 10MAY21_SF To Abs. Found in MEDDATA. Middle Initial updated. Dx: Multiple Myeloma. Dx Date: 8DEC2015." if pid=="20159145"
+replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 21APR21_KWG Notes seen, very old, no information on Ca. Abstracted as a DCO pending check in MedData." if pid=="20159146" //MedData entry added - further review done by JC 21jul2021.
+//pid 20159148 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20159150 reviewed but no update needed as accidentally abstracted by DA during death trace-back.
+//pid 20160017 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
+//pid 20160032 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
+//pid 20160537 reviewed but no update needed as T2 merged incorrectly with this pid instead of 20151204 as noted in CR5db comments.
+//pid 20160556 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
+//pid 20172150 reviewed but no update needed as merge done with pid 20140942 (ineligible so not in iarc ds) for 2017 MP
+pid 20180030 reviewed and emailed to KWG cc SF for review as it's blank but has F/U to be done.
+//pid 20180587 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED ABS
+//pid 20180701 reviewed but no update needed as case ineligible.
+//pid 20180707 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED UPDATE AT MERGE
+//pid 20180731 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
+//pid 20180750 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED ABS
 
 
 
@@ -11100,7 +11413,8 @@ replace morph=8140 if morph==8550 and topography==619 //173 changes
 
 
 Check for persearch=Dup to remove
-RE-RUN NAMES AND NRN DUPLICATES CHECKS
+RE-RUN FINAL CHECKS
+RE-RUN AGE CHECK + NAMES AND NRN DUPLICATES CHECKS
 Check if pt deceased but dlc and dod do not match
 Review DCOs in MedData (basis==0)
 Check for resident=2 or 99 then look them up in MedData
