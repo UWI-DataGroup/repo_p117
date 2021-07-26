@@ -11390,6 +11390,7 @@ pid 20180030 reviewed and emailed to KWG cc SF for review as it's blank but has 
 //pid 20180707 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED UPDATE AT MERGE
 //pid 20180731 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
 //pid 20180750 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED ABS
+//pid 20180867 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
 
 
 
@@ -11398,6 +11399,7 @@ pid 20180030 reviewed and emailed to KWG cc SF for review as it's blank but has 
 
 WHEN RUNNING ABOVE UPDATES, ENSURE ALL HAVE CHANGES.
 IF SOME DON'T THEN CHECK IF THE MERGED PID WAS USED IN IARC DATASET INSTEAD AND UPDATE THE ABOVE CODE.
+
 
 
 
@@ -11419,6 +11421,8 @@ Check if pt deceased but dlc and dod do not match
 Review DCOs in MedData (basis==0)
 Check for resident=2 or 99 then look them up in MedData
 2020 death prep and matching so can have 5yr survival for 2015 data
+Run data through IARCcrgTools - Check + MP programs
+Re-run 2008-2015 survival code to generate surv ds
 NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 
 
