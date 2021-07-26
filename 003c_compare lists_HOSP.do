@@ -57,13 +57,13 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //9,680
+count //9,774
 
 
 ** STEP #3
 ** Identify possible duplicates using Hosp#
 drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s as these will be flagged as duplicates of each other
-//4168 deleted
+//4214 deleted
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber

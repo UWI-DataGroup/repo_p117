@@ -3,8 +3,8 @@
     //  algorithm name          004_export new lists.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      29-JUN-2021
-    // 	date last modified      29-JUN-2021
+    //  date first created      26-JUL-2021
+    // 	date last modified      26-JUL-2021
     //  algorithm task          Exporting newly-generated duplicates lists (see dofiles '003a, 003b, 003c, 003d...')
     //  status                  Completed
     //  objective               (1) To have one excel workbook with 5 tabs - ERRORS, NRN, DOB, HOSP#, NAMES.

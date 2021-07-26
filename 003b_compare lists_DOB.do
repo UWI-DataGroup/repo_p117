@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //9,680
+count //9,774
 
 
 ** STEP #3
@@ -65,15 +65,15 @@ count //9,680
 	Create variables to identify DOBs with unknown day, month, year and then to drop any that = 99/9999, respectively, 
 	as need to remove blank/missing DOBs as these will be flagged as duplicates of each other
 */
-count if birthdate=="99999999" //535
-replace birthdate="" if birthdate=="99999999" //535 changes
+count if birthdate=="99999999" //494
+replace birthdate="" if birthdate=="99999999" //494 changes
 replace birthdate = lower(rtrim(ltrim(itrim(birthdate)))) //0 changes
 gen dobyear = substr(birthdate,1,4)
 gen dobmonth = substr(birthdate,5,2)
 gen dobday = substr(birthdate,7,2)
-drop if dobyear=="9999" | dobmonth=="99" | dobday=="99" //439 deleted
+drop if dobyear=="9999" | dobmonth=="99" | dobday=="99" //286 deleted
 drop dobday dobmonth dobyear
-drop if birthdate=="" | birthdate=="99999999" //535 deleted
+drop if birthdate=="" | birthdate=="99999999" //494 deleted
 
 
 ** STEP #4
@@ -109,7 +109,7 @@ drop if birthdate==. | birthdate==99999999
 sort lastname firstname birthdate
 quietly by lastname firstname birthdate : gen dup = cond(_N==1,0,_n)
 sort lastname firstname birthdate registrynumber
-count if dup>0 //6 - true DOB duplicates
+count if dup>0 //4 - true DOB duplicates
 
 /*
 ** Look for duplicates - METHOD #2
@@ -167,7 +167,7 @@ count if duppid>0 //0
 
 ** STEP #9
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //4 deleted
+drop if checked==1 & duppid==0 //6 deleted
 //drop if registrynumber==20151033 //2 deleted - these were matched to each other and came from the previously-checked list
 
 ** STEP #10
