@@ -10601,9 +10601,6 @@ replace icd10="C844" if pid=="20160018" & cr5id=="T1S1"
 //no changes for sites as already set to correct sites for M9702
 
 
-** Remove unused variables
-drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ttdoadotdiff
-
 ** JC 11-may-2021: while reviewing duplicates list, noted this merge wasn't done with pid 20141171.
 ** Correct DOB errors flagged by merging with list of corrections manually created using electoral list (this ensures dofile remains de-identified)
 preserve
@@ -10615,28 +10612,18 @@ merge 1:1 pid using "`datapath'\version02\2-working\postcleanpartupdates" ,force
 /*
 
 */
-replace nrn=elec_nrn if _merge==3 //11 changes
-replace birthdate=elec_dob if _merge==3 //11 changes
-replace firstname=elec_fname if _merge==3 //2 changes
-replace middleinitials=elec_mname if _merge==3 //1 changes
-replace lastname=elec_lname if _merge==3 //0 changes
-drop elec_* _merge
+drop _merge
 
 preserve
 clear
 import excel using "`datapath'\version02\2-working\PostCleaningFullUpdates20210721.xlsx" , firstrow case(lower)
 save "`datapath'\version02\2-working\postcleanupdates" ,replace
 restore
-merge 1:1 pid using "`datapath'\version02\2-working\postcleanfullupdates" ,force
+append using "`datapath'\version02\2-working\postcleanfullupdates" ,force
 /*
 
 */
-replace nrn=elec_nrn if _merge==3 //11 changes
-replace birthdate=elec_dob if _merge==3 //11 changes
-replace firstname=elec_fname if _merge==3 //2 changes
-replace middleinitials=elec_mname if _merge==3 //1 changes
-replace lastname=elec_lname if _merge==3 //0 changes
-drop elec_* _merge
+
 /*
 	02jun2021 JC: Updates from post-clean cross-check review process.
 	See dofile 45_prep cross-check.do
@@ -11384,13 +11371,27 @@ replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 21APR21_KWG Note
 //pid 20160537 reviewed but no update needed as T2 merged incorrectly with this pid instead of 20151204 as noted in CR5db comments.
 //pid 20160556 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
 //pid 20172150 reviewed but no update needed as merge done with pid 20140942 (ineligible so not in iarc ds) for 2017 MP
-pid 20180030 reviewed and emailed to KWG cc SF for review as it's blank but has F/U to be done.
+//pid 20180030 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED ABS: emailed to KWG cc SF for review as it's blank but has F/U to be done.
 //pid 20180587 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED ABS
 //pid 20180701 reviewed but no update needed as case ineligible.
 //pid 20180707 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED UPDATE AT MERGE
 //pid 20180731 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
 //pid 20180750 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED ABS
 //pid 20180867 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above
+//pid 20180868 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - INCORRECT NRN
+//pid 20180871 reviewed and NOT abstracted - MISSED ABS: DA doesn't state if tumour was malignant or not; If malignant then was eligible as dx in 2008 - but cannot abstract as uncertain malignancy (09MAR20_KWG Notes seen and case ineligible, Pt first seen in QEH for adrenal tumour in 2008. Record status updated. 07JAN20_KWG Case entered as a DCN from Death Data, traceback for eligibility.).
+//pid 20181095 reviewed and abstracted - contain identifiable data so manually created an update excel sheet and merged with this dataset above - MISSED ABS: emailed to KWG cc SF for review as it's blank but has F/U to be done.
+//pid 20181151 reviewed but no update needed as case ineligible.
+//pid 20181162 reviewed but no update needed as case ineligible.
+//pid 20200239 reviewed but no update needed as case is for 2020 but dxyr incorrectly noted as 2015 - emailed to DA to correct in main db.
+//pid 20200243 reviewed but no update needed as case is for 2020 but dxyr incorrectly noted as 2015 - emailed to DA to correct in main db.
+
+
+
+
+
+
+
 
 
 
@@ -11427,6 +11428,9 @@ NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
 
 
 stop
+** Remove unused variables
+drop pop_bb dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ttdoadotdiff
+
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
 ** See p131 version06 for more info on this data request
 save "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_nonreportable", replace

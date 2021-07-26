@@ -771,7 +771,8 @@ gen reviewed=1 if pid=="20080020"|pid=="20080154"|pid=="20080158"|pid=="20080171
 				  |pid=="20155077"|pid=="20155079"|pid=="20155094"|pid=="20155095"|pid=="20155100"|pid=="20155150"|pid=="20155161" ///
 				  |pid=="20155164"|pid=="20155175"|pid=="20155196"|pid=="20155208"|pid=="20155211"|pid=="20155216"|pid=="20155221" ///
 				  |pid=="20155227"|pid=="20155228"|pid=="20155251"|pid=="20155255"|pid=="20155265"|pid=="20159000"|pid=="20159001" ///
-				  |pid=="20159002"|pid=="20159003"|pid=="20159004"|pid=="20159005"|pid=="20159006"|pid=="20159007"|pid=="20159008" 
+				  |pid=="20159002"|pid=="20159003"|pid=="20159004"|pid=="20159005"|pid=="20159006"|pid=="20159007"|pid=="20159008"
+//916 changes
 replace reviewed=1 if pid=="20159015"|pid=="20159016"|pid=="20159019"|pid=="20159020"|pid=="20159021"|pid=="20159025"|pid=="20159026" ///
 				  |pid=="20159027"|pid=="20159028"|pid=="20159029"|pid=="20159030"|pid=="20159031"|pid=="20159033"|pid=="20159034" ///
 				  |pid=="20159036"|pid=="20159038"|pid=="20159041"|pid=="20159042"|pid=="20159046"|pid=="20159047"|pid=="20159048" ///
@@ -786,23 +787,13 @@ replace reviewed=1 if pid=="20159015"|pid=="20159016"|pid=="20159019"|pid=="2015
 				  |pid=="20159136"|pid=="20159138"|pid=="20159139"|pid=="20159140"|pid=="20159141"|pid=="20159142"|pid=="20159143" ///
 				  |pid=="20159144"|pid=="20159145"|pid=="20159146"|pid=="20159148"|pid=="20159150"|pid=="20160017"|pid=="20160032" ///
 				  |pid=="20160537"|pid=="20160556"|pid=="20172150"|pid=="20180030"|pid=="20180587"|pid=="20180701"|pid=="20180707" ///
-				  |pid=="20180731"|pid=="20180750"|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid=="" ///
-				  |pid==""|pid==""|pid==""|pid==""|pid==""|pid==""|pid==""
-				  
-stop
+				  |pid=="20180731"|pid=="20180750"|pid=="20180867"|pid=="20180868"|pid=="20180871"|pid=="20181095"|pid=="20181151" ///
+				  |pid=="20181162"|pid=="20200239"|pid=="20200243"
+//144 changes				  
+
 drop if dupname_2>1 //6,791 deleted
 
 count //9,231
-
-RE-RUN NAMES AND NRN DUPLICATES CHECKS
-Check if pt deceased but dlc and dod do not match
-Check for resident=2 or 99 then look them up in MedData
 
 save "`datapath'\version02\2-working\2008-2020_cancer_crosschk_dp" ,replace
 label data "BNR-Cancer prepared 2008-2020 cross-check data"
