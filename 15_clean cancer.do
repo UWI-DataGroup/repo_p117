@@ -11397,6 +11397,17 @@ replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 21APR21_KWG Note
 
 
 
+/* 
+	****************************************
+	* Post-cleaning Update Process SUMMARY *
+	****************************************
+	Started on: 02-JUN-2021
+	Completed on: 26-JUL-2021
+		- 494 replaces/updates (i.e. vital status, corrections, etc.)
+		- 5 deletions (i.e. ineligible cases)
+		- 12 full abs (i.e. DA missed abstractions + post-clean abstractions)
+		- 7 partial abs (i.e. updates with identifiable data)
+*/
 
 WHEN RUNNING ABOVE UPDATES, ENSURE ALL HAVE CHANGES.
 IF SOME DON'T THEN CHECK IF THE MERGED PID WAS USED IN IARC DATASET INSTEAD AND UPDATE THE ABOVE CODE.
@@ -11413,7 +11424,11 @@ IF SOME DON'T THEN CHECK IF THE MERGED PID WAS USED IN IARC DATASET INSTEAD AND 
 count if morph==8550 and topography==619 //173
 replace morph=8140 if morph==8550 and topography==619 //173 changes
 
+** Create cancer dataset for matching with 2020 deaths (see dofile 50)
+save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer ds_2020 death matching", replace
 
+** Perform final checks on the post-clean updated + death matched cancer dataset
+use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer ds_2020 deaths matched", clear
 
 Check for persearch=Dup to remove
 RE-RUN FINAL CHECKS
