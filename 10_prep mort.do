@@ -2450,6 +2450,12 @@ gen dodyear=year(dod)
 replace natregno="" if natregno=="." //492 changes
 drop dds2dod
 
+** Create dataset for combining 2015-2020 deaths for matching (change variable names AFTER all datasets are combined and BEFORE matching with cancer dataset)
+label data "BNR MORTALITY data 2015-2018"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\2-working\2015-2018_deaths_norenaming" ,replace
+note: TS This dataset can be used for combining 2015-2018 deaths with 2019,2020 deaths into one dataset for matching with cancer data
+
 rename dod dds2dod
 rename natregno dds2natregno
 rename regnum dds2regnum 
@@ -3200,11 +3206,23 @@ tab sex ,m
       Total |      2,787      100.00
 */
 
+
+drop dodyear
+gen dodyear=year(dod)
+tab dodyear cancer,m
+
+
 ** Remove, relabel certain variables for merging with cancer ds
 gen dd2019_dod=dod
 format dd2019_dod %tdCCYY-NN-DD
 
 order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod
+
+** Create dataset for combining 2015-2020 deaths for matching (change variable names AFTER all datasets are combined and BEFORE matching with cancer dataset)
+label data "BNR MORTALITY data 2019"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\2-working\2019_deaths_norenaming" ,replace
+note: TS This dataset can be used for combining 2019 deaths with 2015-2018,2020 deaths into one dataset for matching with cancer data
 
 ** Change variable names to distinguish between cancer and 2019 death variables
 rename nrn dd2019_nrn
@@ -3277,6 +3295,7 @@ save "`datapath'\version02\3-output\2019_deaths_for_matching" ,replace
 note: TS This dataset can be used for matching 2019 deaths with incidence data
 
 
+
 ***************************
 ** Preparing 2020 deaths **
 ***************************
@@ -3285,9 +3304,9 @@ note: TS This dataset can be used for matching 2019 deaths with incidence data
 ***************
 ** LOAD the cleaned national registry deaths 2008-2020 excel/REDCap dataset
 clear
-import excel using "`datapath'\version02\1-input\BNRDeathData20082020_DATA_2021-07-26_1622_excel.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version02\1-input\BNRDeathData20082020_DATA_2021-07-27_1326_excel.xlsx" , firstrow case(lower)
 
-count //32,466
+count //32,467
 
 *******************
 ** DATA FORMATTING  
@@ -3297,7 +3316,7 @@ count //32,466
 drop if record_id!=31475 & record_id!=31473 & (dod<d(01jan2020) | dod>d(31dec2020)) //29,862 deleted
 
 
-count //2604
+count //2605
 
 ************************
 **  DEATH CERTIFICATE **
@@ -3319,7 +3338,7 @@ label values event event_lab
 ** Remove Tracking Form info
 drop if event==2 //0 deleted - TFs got deleted with dod remove code above
 
-count //2604
+count //2605
 
 ** (3) dddoa: Y-M-D H:M, readonly
 gen double dddoa2 = clock(dddoa, "YMDhm")
@@ -3598,12 +3617,11 @@ order record_id event dddoa ddda odda certtype regnum district pname address par
 
 drop tfdddoa tfdddoatstart tfddda tfddda2 tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfdddoaend tfdddoatend tfddelapsedh tfddelapsedm tfddtxt recstattf
 
-count //2604
+count //2605
 
 label data "BNR MORTALITY data 2020"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
 save "`datapath'\version02\2-working\2020_deaths_prepped_dp" ,replace
-
 
 **************************************
 **     Prep 2019 death variables    **
@@ -3611,7 +3629,7 @@ save "`datapath'\version02\2-working\2020_deaths_prepped_dp" ,replace
 **************************************
 use "`datapath'\version02\2-working\2020_deaths_prepped_dp" ,clear
 
-count //2604
+count //2605
 
 
 *****************
@@ -3638,8 +3656,8 @@ count if name6!="" //2
 count if name5!="" //6
 count if name4!="" //70
 count if name3!="" //742
-count if name2!="" //2604
-count if name1!="" //2604
+count if name2!="" //2605
+count if name1!="" //2605
 
 ** (2) sort name7 field
 replace name7=name3+" "+name4+" "+name5+" "+name6+" "+name7 if record_id==32932
@@ -3723,11 +3741,11 @@ replace tempvarn=5 if (name3!="" & name3!="99") & length(name3)<4 //4 changes
 //list record_id pname fname mname lname if (lname!="" & lname!="99") & length(lname)<3
 
 ** (8) sort cases with NO name in name3 variable
-count if name3=="" //1862
+count if name3=="" //1863
 //list record_id *name* if name3==""
-replace tempvarn=6 if name3=="" //1862 changes
-replace name3=name2 if tempvarn==6 //1862 changes
-replace name2="" if tempvarn==6 //1862 changes
+replace tempvarn=6 if name3=="" //1863 changes
+replace name3=name2 if tempvarn==6 //1863 changes
+replace name2="" if tempvarn==6 //1863 changes
 
 
 ** Now rename, check and remove unnecessary variables
@@ -3741,9 +3759,9 @@ count if fname=="" //0
 count if lname=="" //0
 
 ** Convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //3080 changes
-replace mname = lower(rtrim(ltrim(itrim(mname)))) //691 changes
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //3080 changes
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //2605 changes
+replace mname = lower(rtrim(ltrim(itrim(mname)))) //734 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //2605 changes
 
 rename nm namematch
 order record_id pname fname mname lname namematch
@@ -3765,7 +3783,7 @@ replace cod2a="99" if cod2a=="999" //2 changes
 replace cod2b="99" if cod2b=="999" //2 changes
 count if cod1c!="99" //635
 count if cod1d!="99" //198
-count if cod2a!="99" //1085
+count if cod2a!="99" //1086
 count if cod2b!="99" //531
 //ssc install unique
 //ssc install distinct
@@ -3867,7 +3885,7 @@ record_id==31492
 
 replace cancer=1 if record_id==33524|record_id==32579|record_id==33998|record_id==33453 //4 changes
 
-replace cancer=2 if cancer==. //1901 changes
+replace cancer=2 if cancer==. //1902 changes
 
 ** Create cod variable 
 gen cod=.
@@ -3875,7 +3893,7 @@ label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known" 4 
 label values cod cod_lab
 label var cod "COD categories"
 replace cod=1 if cancer==1 //657 changes
-replace cod=2 if cancer==2 //1947 changes
+replace cod=2 if cancer==2 //1948 changes
 ** one unknown causes of death in 2014 data - record_id 12323
 replace cod=3 if coddeath=="99"|(regexm(coddeath,"INDETERMINATE")|regexm(coddeath,"UNDETERMINED")|regexm(coddeath,"UNKNOWN CAUSE")|regexm(coddeath,"NO ANATOMICAL CAUSE")) //24 changes
 //list record_id coddeath if cod==3
@@ -3887,10 +3905,10 @@ tab sex ,m
 /*
         Sex |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-       Male |      1,329       51.04       51.04
-     Female |      1,275       48.96      100.00
+       Male |      1,330       51.06       51.06
+     Female |      1,275       48.94      100.00
 ------------+-----------------------------------
-      Total |      2,604      100.00
+      Total |      2,605      100.00
 */
 rename sex sex_old
 gen sex=1 if sex_old==2 //2467 changes
@@ -3903,10 +3921,10 @@ tab sex ,m
 /*
         Sex |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-     Female |      1,275       48.96       48.96
-       Male |      1,329       51.04      100.00
+     Female |      1,275       48.94       48.94
+       Male |      1,330       51.06      100.00
 ------------+-----------------------------------
-      Total |      2,604      100.00
+      Total |      2,605      100.00
 */
 
 
@@ -3945,6 +3963,13 @@ gen dd2020_dod=dod
 format dd2020_dod %tdCCYY-NN-DD
 
 order record_id regnum nrn pname fname lname sex age dod cancer cod1a addr parish pod
+
+** Create dataset for combining 2015-2020 deaths for matching (change variable names AFTER all datasets are combined and BEFORE matching with cancer dataset)
+label data "BNR MORTALITY data 2020"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\2-working\2020_deaths_norenaming" ,replace
+note: TS This dataset can be used for combining 2020 deaths with 2015-2019 deaths into one dataset for matching with cancer data
+
 
 ** Change variable names to distinguish between cancer and 2020 death variables
 rename nrn dd2020_nrn
@@ -4009,7 +4034,7 @@ rename dodyear dd2020_dodyear
 //rename cod dd2020_cod
 //rename record_id dd2020_record_id
 
-count //2604
+count //2605
 
 label data "BNR MORTALITY data 2020"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
@@ -4021,9 +4046,93 @@ note: TS This dataset can be used for matching 2020 deaths with incidence data
 ** Prepared for Matching **
 ***************************
 
+clear
+
+use "`datapath'\version02\2-working\2020_deaths_norenaming" ,clear
+
 ** Adding earlier death matching datasets as some deaths added post-cleaning
-append using "`datapath'\version02\3-output\2015-2018_deaths_for_matching"
-append using "`datapath'\version02\3-output\2019_deaths_for_matching"
+append using "`datapath'\version02\2-working\2015-2018_deaths_norenaming"
+append using "`datapath'\version02\2-working\2019_deaths_norenaming"
+
+
+drop dodyear
+gen dodyear=year(dod)
+tab dodyear,m
+/*
+    dodyear |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2015 |      2,482       16.10       16.10
+       2016 |      2,488       16.14       32.24
+       2017 |      2,530       16.41       48.65
+       2018 |      2,525       16.38       65.03
+       2019 |      2,788       18.09       83.11
+       2020 |      2,603       16.89      100.00
+------------+-----------------------------------
+      Total |     15,416      100.00
+*/
+
+replace pod=placeofdeath if pod=="" & placeofdeath!="" // changes
+
+** Remove unnecessary variables
+drop event redcap_event_name recstatdc tempvarn dd2020_dod tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ///
+	 placeofdeath dupname dupdod nrnyear year2 checkage2 dd2019_dod
+
+** Change variable names in prep for matching with cancer dataset
+rename record_id dd6yrs_record_id
+rename regnum dd6yrs_regnum
+rename nrn dd6yrs_nrn
+rename pname dd6yrs_pname
+rename fname dd6yrs_fname
+rename lname dd6yrs_lname
+rename sex dd6yrs_sex
+rename age dd6yrs_age
+rename dod dd6yrs_dod
+rename cancer dd6yrs_cancer
+rename cod1a dd6yrs_cod1a
+rename address dd6yrs_address
+rename parish dd6yrs_parish
+rename pod dd6yrs_pod
+rename coddeath dd6yrs_coddeath
+rename mname dd6yrs_mname
+rename namematch dd6yrs_namematch
+rename dddoa dd6yrs_dddoa
+rename ddda dd6yrs_ddda
+rename odda dd6yrs_odda
+rename certtype dd6yrs_certtype
+rename district dd6yrs_district
+rename agetxt dd6yrs_agetxt
+rename nrnnd dd6yrs_nrnnd
+rename mstatus dd6yrs_mstatus
+rename occu dd6yrs_occu
+rename durationnum dd6yrs_durationnum
+rename durationtxt dd6yrs_durationtxt
+rename onsetnumcod1a dd6yrs_onsetnumcod1a
+rename onsettxtcod1a dd6yrs_onsettxtcod1a
+rename cod1b dd6yrs_cod1b
+rename onsetnumcod1b dd6yrs_onsetnumcod1b
+rename onsettxtcod1b dd6yrs_onsettxtcod1b
+rename cod1c dd6yrs_cod1c
+rename onsetnumcod1c dd6yrs_onsetnumcod1c
+rename onsettxtcod1c dd6yrs_onsettxtcod1c
+rename cod1d dd6yrs_cod1d
+rename onsetnumcod1d dd6yrs_onsetnumcod1d
+rename onsettxtcod1d dd6yrs_onsettxtcod1d
+rename cod2a dd6yrs_cod2a
+rename onsetnumcod2a dd6yrs_onsetnumcod2a
+rename onsettxtcod2a dd6yrs_onsettxtcod2a
+rename cod2b dd6yrs_cod2b
+rename onsetnumcod2b dd6yrs_onsetnumcod2b
+rename onsettxtcod2b dd6yrs_onsettxtcod2b
+rename deathparish dd6yrs_deathparish
+rename regdate dd6yrs_regdate
+rename certifier dd6yrs_certifier
+rename certifieraddr dd6yrs_certifieraddr
+rename cleaned dd6yrs_cleaned
+rename duprec dd6yrs_duprec
+rename elecmatch dd6yrs_elecmatch
+rename cod dd6yrs_cod
+rename natregno dd6yrs_natregno
+rename dodyear dd6yrs_dodyear
 
 label data "BNR MORTALITY data 2015-2020"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database

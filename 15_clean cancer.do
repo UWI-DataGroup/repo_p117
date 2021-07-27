@@ -4557,7 +4557,9 @@ rename dd_dod deathdate
 rename dd_coddeath cods
 rename dd_regnum regnum
 rename dd_district district
-capture export_excel record_id fname lname nationalID deathdate cods dd_certifier placeofdeath regnum district if cancer==1 & dodyear==2015 & _merge_org==2 & cr5db!=1 using "`datapath'\version02\2-working\DCO2015V04.xlsx", sheet("2015 DCOs_deathdata_20200218") firstrow(variables) replace
+capture export_excel record_id fname lname nationalID deathdate cods dd_certifier placeofdeath regnum district ///
+		if cancer==1 & dodyear==2015 & _merge_org==2 & cr5db!=1 ///
+		using "`datapath'\version02\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_deathdata_20210727") firstrow(variables) replace
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 **stop - cancer team needs to check these 163 DCOs before continuing with cleaning and analysis
@@ -8447,7 +8449,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-07-21_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-07-27_DQI.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -8488,7 +8490,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-07-21_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2021-07-27_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace
@@ -8852,7 +8854,8 @@ replace cancer=1 if pid=="20150063"|pid=="20150351"|pid=="20151039"|pid=="201510
 preserve
 drop if basis!=0
 keep pid fname lname natregno dod cr5cod doctor docaddr certifier
-capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier using "`datapath'\version02\2-working\DCO2015V04.xlsx", sheet("2015 DCOs_cr5data_20200902") firstrow(variables)
+capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier ///
+		using "`datapath'\version02\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 
@@ -10606,23 +10609,29 @@ replace icd10="C844" if pid=="20160018" & cr5id=="T1S1"
 preserve
 clear
 import excel using "`datapath'\version02\2-working\PostCleaningPartialUpdates20210721.xlsx" , firstrow case(lower)
-save "`datapath'\version02\2-working\postcleanupdates" ,replace
+tostring pid ,replace
+drop if pid==""
+save "`datapath'\version02\2-working\postcleanpartupdates" ,replace
 restore
-merge 1:1 pid using "`datapath'\version02\2-working\postcleanpartupdates" ,force
+merge 1:1 pid cr5id using "`datapath'\version02\2-working\postcleanpartupdates" ,force
 /*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         4,051
+        from master                     4,051  (_merge==1)
+        from using                          0  (_merge==2)
 
+    matched                                 7  (_merge==3)
+    -----------------------------------------
 */
 drop _merge
 
 preserve
 clear
 import excel using "`datapath'\version02\2-working\PostCleaningFullUpdates20210721.xlsx" , firstrow case(lower)
-save "`datapath'\version02\2-working\postcleanupdates" ,replace
+save "`datapath'\version02\2-working\postcleanfullupdates" ,replace
 restore
 append using "`datapath'\version02\2-working\postcleanfullupdates" ,force
-/*
-
-*/
 
 /*
 	02jun2021 JC: Updates from post-clean cross-check review process.
@@ -10653,9 +10662,10 @@ replace dlc=dod if pid=="20080327" //death certificate added; already matched in
 replace dlc=dod if pid=="20080348" //death rec bk added; already matched in Stata
 replace dlc=d(24jan2019) if pid=="20080390" //path rpt added for recurrent disease
 replace dlc=d(02oct2019) if pid=="20080428" //path rpt added for 2019 MP
-replace natregno=subinstr(natregno,"0030","9999",.) if pid=="20080428"
+replace natregno=subinstr(natregno,"99999","90030",.) if pid=="20080428"
 replace dlc=d(11jul2016) if pid=="20080560" //path rpt added for 2016 MP
 //pid 20080624 reviewed but no update needed as cannot determine any reason for why record was saved 13feb2020, according to TT update date.
+Below updates done already in iarc dataset when this dofile was run
 replace dlc=d(04jul2013) if pid=="20130686" //merged in CR5db on 17mar2021 after dup list review
 replace patient=2 if pid=="20130686" & cr5id=="T1S1"
 replace eidmp=2 if pid=="20130686" & cr5id=="T1S1"
@@ -10724,7 +10734,7 @@ replace pid="20080728" if pid=="20150255"
 replace dlc=d(25nov2014) if pid=="20080753" //merge done for ineligible 2014 MP; DLC obtained from MasterDb frmCF_2009 #3594
 //pid 20080941 reviewed but no update needed as cannot determine any reason for why record was saved 19feb2020, according to TT update date (maybe updating death date).
 //pid 20081031 reviewed but no update needed as cannot determine any reason for why record was saved 21may2021, according to TT update date.
-replace slc=2 if pid=="20081058"
+replace slc=2 if pid=="20081058" //already updated in dataset when this dofile was run
 replace dlc=d(17Nov2019) if pid=="20081058"
 replace dod=d(17Nov2019) if pid=="20081058"
 replace deathid=28983 if pid=="20081058"
@@ -10756,7 +10766,7 @@ replace dlc=dod if pid=="20130038" //merge done with death rec bk added
 replace dlc=dod if pid=="20130055" //merge done with death rec bk added
 replace dlc=dod if pid=="20130063" //merge done with death rec bk added
 replace dlc=dod if pid=="20130073" //merge done with death rec bk added
-replace dlc=(14dec2020) if pid=="20130081" //merge done with path rpt added for recurrent disease
+replace dlc=d(14dec2020) if pid=="20130081" //merge done with path rpt added for recurrent disease
 replace primarysite="SOFT PALATE" if pid=="20130081" & cr5id=="T1S1" //in re-reviewing the original tumour has incorrect info
 replace top="051" if pid=="20130081" & cr5id=="T1S1"
 replace topography=51 if pid=="20130081" & cr5id=="T1S1"
@@ -11395,7 +11405,7 @@ replace comments="JC 21JUL2021: Added in KWG's CR5db comments - 21APR21_KWG Note
 
 
 
-
+STOP
 
 /* 
 	****************************************
@@ -11425,10 +11435,14 @@ count if morph==8550 and topography==619 //173
 replace morph=8140 if morph==8550 and topography==619 //173 changes
 
 ** Create cancer dataset for matching with 2020 deaths (see dofile 50)
+TIDY UP DEATH DATA VARIABLES INTO ONE SET OF VARIABLES
+REMOVE unnecessary VARIABLES
 save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer ds_2020 death matching", replace
 
 ** Perform final checks on the post-clean updated + death matched cancer dataset
 use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer ds_2020 deaths matched", clear
+
+TIDY UP DEATH DATA VARIABLES INTO ONE SET OF VARIABLES
 
 Check for persearch=Dup to remove
 RE-RUN FINAL CHECKS
@@ -11496,7 +11510,7 @@ drop dup_id
 
 count //3484; 3488; 2744
 
-capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV03.xlsx", sheet("2013_2014_2015_20201026") firstrow(varlabels) replace
+capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV05.xlsx", sheet("2013_2014_2015_20210727") firstrow(varlabels) replace
 
 ** Save this corrected dataset with internationally reportable cases
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival", replace

@@ -37,3 +37,13 @@
 * ************************************************************************
 * PREP AND FORMAT
 **************************************************************************
+
+USE CANCER DS
+DROP SLC=DECEASED
+APPEND DEATH DS
+
+DO DUPLICATES SEARCHES
+
+CREATE VARIABLE WHICH HAS MATCH+PID FOR MERGING
+
+REMOVE ALL UNMATCHED RECORDS
