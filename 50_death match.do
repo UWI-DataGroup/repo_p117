@@ -37,7 +37,7 @@
 * ************************************************************************
 * PREP AND FORMAT
 **************************************************************************
-
+use "`datapath'\version02\3-output\2008_2013_2014_2015_cancer ds_2015-2020 death matching", clear
 USE CANCER DS
 DROP SLC=DECEASED
 APPEND DEATH DS
