@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      14-NOV-2019
-    // 	date last modified      27-JUL-2021
+    // 	date last modified      29-JUL-2021
     //  algorithm task          Prep and format death data
     //  status                  Completed
     //  objective               To have multiple datasets with cleaned death data for matching and reporting.
@@ -4073,9 +4073,38 @@ tab dodyear,m
 
 replace pod=placeofdeath if pod=="" & placeofdeath!="" // changes
 
+
 ** Remove unnecessary variables
 drop event redcap_event_name recstatdc tempvarn dd2020_dod tfdddoa tfddda tfregnumstart tfdistrictstart tfregnumend tfdistrictend tfddtxt recstattf ///
 	 placeofdeath dupname dupdod nrnyear year2 checkage2 dd2019_dod
+
+** Populate natregno (string) field with NRNs
+count if length(natregno)==9 //1
+count if length(natregno)==8 //0
+count if length(natregno)==7 //0
+replace natregno="0" + natregno if length(natregno)==9 //1 change
+replace natregno="00" + natregno if length(natregno)==8 //0 changes
+replace natregno="000" + natregno if length(natregno)==7 //0 changes
+
+count if nrn!=. & natregno=="" //5,158
+gen natregno2 = nrn
+tostring natregno2 ,replace
+count if length(natregno2)==9 & natregno=="" //27
+count if length(natregno2)==8 & natregno=="" //0
+count if length(natregno2)==7 & natregno=="" //5
+replace natregno2="0" + natregno2 if length(natregno2)==9 & natregno=="" //27 changes
+replace natregno2="000" + natregno2 if length(natregno2)==7 & natregno=="" //5 changes
+count if natregno2!="" & natregno2!="." & natregno=="" //5,158
+count if nrn!=. & natregno=="" //5,158
+replace natregno=natregno2 if natregno2!="" & natregno2!="." & natregno=="" //5,158 changes
+count if nrn!=. & natregno=="" //0
+drop natregno2
+
+** Create dataset without name changes for matching (see dofile 50)
+label data "BNR MORTALITY data 2015-2020"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version02\3-output\2015-2020_deaths_for_appending" ,replace
+note: TS This dataset can be used for matching 2015-2020 deaths with incidence data
 
 ** Change variable names in prep for matching with cancer dataset
 rename record_id dd6yrs_record_id
