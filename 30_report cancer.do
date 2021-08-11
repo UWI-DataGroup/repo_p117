@@ -34,6 +34,9 @@ cls
     capture log close
     log using "`logpath'\30_report cancer.smcl", replace // error r(603)
 ** HEADER -----------------------------------------------------
+
+CREATE TABLE FOR CASES BY PARISH
+
 *************************
 **  SUMMARY STATISTICS **
 *************************

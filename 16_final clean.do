@@ -55,85 +55,95 @@ merge 1:1 pid cr5id using "`datapath'\version02\2-working\2008_2013_2014_2015_ca
 drop _merge
 count //4066
 
+
 ** Perform final checks on the post-clean updated + death matched cancer dataset
-stop
 
-(1) Combine all death data into one set of death variables
-(1) Perform IARCcrgTools Check + MP
-(2) Perform final checks
-    - slc
-    - dlc
-    - dod
-    - deceased
-    - patient
-    - eidmp
-    - ptrectot
-    - persearch
-    - dcostatus
-    - basis
-    - behaviour
-    - siteiarc
-    - icd10
-    - resident
-    - sex
-    - age
-    - duplicates
-(3) Create datasets
-(4) Update and run dofile 55 - survival
-(5) Update and run dofile 20 - analysis
-(6) Update and run dofile 30 - report (drop 2008 figures) 
+***************************************
+**     Combining death data into     **
+** one set of variables in cancer ds **
+***************************************
 
-Check for persearch=Dup to remove
-RE-RUN FINAL CHECKS
-RE-RUN AGE CHECK + NAMES AND NRN DUPLICATES CHECKS
-Check if pt deceased but dlc and dod do not match -  dod!=dlc & slc==2
-Review DCOs in MedData (basis==0)
-Check for resident=2 or 99 then look them up in MedData
-2020 death prep and matching so can have 5yr survival for 2015 data
-Run data through IARCcrgTools - Check + MP programs
-Re-run 2008-2015 survival code to generate surv ds
-NEED TO RE-RUN ALL IARC ANALYSIS AND 2015 ANN RPT ANALYSIS
+** Creating one set of death data variables
+replace dd_nrn=nrn if dd_nrn==. & nrn!=. //0 changes
+replace dd_coddeath=coddeath if dd_coddeath=="" & coddeath!="" //0 changes
+replace dd_regnum=regnum if dd_regnum==. & regnum!=. //1569 changes
+replace dd_pname=pname if dd_pname=="" & pname!="" //1569 changes
+replace dd_age=age if dd_age==. & age!=. //2194 changes/
+replace dd_parish=parish if dd_parish==. & parish!=. //2192 changes/
+replace dd_namematch=namematch if dd_namematch==. & namematch!=. //505 changes
+replace dd_certifier=certifier if dd_certifier=="" & certifier!="" //1486 changes/
+replace dd_dod=dod if dd_dod==. & dod!=. //0 changes
 
-/*
-** Convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
-replace init = lower(rtrim(ltrim(itrim(init)))) //870 changes
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
-	  
-** Ensure death date is correct IF PATIENT IS DEAD
-count if dlc!=dod & slc==2 //48
-replace dlc=dod if dlc!=dod & slc==2 //48 changes
-format dod %dD_m_CY
+replace cancer=dd_cancer if cancer==. & dd_cancer!=. //0 changes
+replace cod=dd_cod if cod==. & dd_cod!=. //0 changes
 
-count if dodyear==. & dod!=. //70
-replace dodyear=year(dod) if dodyear==. & dod!=. //70 changes
-count if dod==. & slc==2 //0
-//list pid cr5id fname lname nftype dlc if dod==. & slc==2
-/*
-gen cr5dodyear = year(dod)
-label var cr5dodyear "Year of CR5 death"
-*/
-count if slc==2 & recstatus==3 //0
+** Check all dd2019 variables have been combined into 'dd_' variables (performed in dofile 15)
+count if dd_nrn==. & dd2019_nrn!=. //0
+count if dd_coddeath=="" & dd2019_coddeath!="" //0
+count if dd_regnum==. & dd2019_regnum!=. //0
+count if dd_pname=="" & dd2019_pname!="" //0
+count if dd_age==. & dd2019_age!=. //0
+count if dd_cod1a=="" & dd2019_cod1a!="" //0
+count if dd_address=="" & dd2019_address!="" //0
+count if dd_parish==. & dd2019_parish!=. //0
+count if dd_pod=="" & dd2019_pod!="" //0
+count if dd_mname=="" & dd2019_mname!="" //0
+count if dd_namematch==. & dd2019_namematch!=. //0
+count if dd_dddoa==. & dd2019_dddoa!=. //0
+count if dd_ddda==. & dd2019_ddda!=. //0
+count if dd_odda=="" & dd2019_odda!="" //0
+count if dd_certtype==. & dd2019_certtype!=. //0
+count if dd_district==. & dd2019_district!=. //0
+count if dd_agetxt==. & dd2019_agetxt!=. //0
+count if dd_nrnnd==. & dd2019_nrnnd!=. //0
+count if dd_mstatus==. & dd2019_mstatus!=. //0
+count if dd_occu=="" & dd2019_occu!="" //0
+count if dd_durationnum==. & dd2019_durationnum!=. //0
+count if dd_durationtxt==. & dd2019_durationtxt!=. //0
+count if dd_onsetnumcod1a==. & dd2019_onsetnumcod1a!=. //0
+count if dd_onsettxtcod1a==. & dd2019_onsettxtcod1a!=. //0
+count if dd_cod1b=="" & dd2019_cod1b!="" //0
+count if dd_onsetnumcod1b==. & dd2019_onsetnumcod1b!=. //0
+count if dd_onsettxtcod1b==. & dd2019_onsettxtcod1b!=. //0
+count if dd_cod1c=="" & dd2019_cod1c!="" //0
+count if dd_onsetnumcod1c==. & dd2019_onsetnumcod1c!=. //0
+count if dd_onsettxtcod1c==. & dd2019_onsettxtcod1c!=. //0
+count if dd_cod1d=="" & dd2019_cod1d!="" //0
+count if dd_onsetnumcod1d==. & dd2019_onsetnumcod1d!=. //0
+count if dd_onsettxtcod1d==. & dd2019_onsettxtcod1d!=. //0
+count if dd_cod2a=="" & dd2019_cod2a!="" //0
+count if dd_onsetnumcod2a==. & dd2019_onsetnumcod2a!=. //0
+count if dd_onsettxtcod2a==. & dd2019_onsettxtcod2a!=. //0
+count if dd_cod2b=="" & dd2019_cod2b!="" //0
+count if dd_onsetnumcod2b==. & dd2019_onsetnumcod2b!=. //0
+count if dd_onsettxtcod2b==. & dd2019_onsettxtcod2b!=. //0
+count if dd_deathparish==. & dd2019_deathparish!=. //0
+count if dd_regdate==. & dd2019_regdate!=. //0
+count if dd_certifier=="" & dd2019_certifier!="" //0
+count if dd_certifieraddr=="" & dd2019_certifieraddr!="" //0
+count if dd_duprec==. & dd2019_duprec!=. //0
+tab dd_dodyear,m
+count if dd_dod==. & dd2019_dod!=. //0
 
-** Check for cases where cancer=2-not cancer but it has been abstracted
-count if cancer==2 & pid!="" //32
-sort pid deathid
-//list pid deathid fname lname top cr5cod cod if cancer==2 & pid!="", nolabel string(90)
-//list cr5cod if cancer==2 & pid!=""
-//list cod1a if cancer==2 & pid!=""
-** Corrections from above list
-replace cod=1 if pid=="20150063"|pid=="20150351"|pid=="20151023"|pid=="20151039"|pid=="20151050"| ///
-				 pid=="20151095"|pid=="20151113"|pid=="20151278 "|pid=="20155201" //8 changes
-replace cancer=1 if pid=="20150063"|pid=="20150351"|pid=="20151039"|pid=="20151095"|pid=="20151113"|pid=="20151278"|pid=="20155201" //7 changes
-//replace dcostatus=1 if pid=="20140047" //1 change
-preserve
-drop if basis!=0
-keep pid fname lname natregno dod cr5cod doctor docaddr certifier
-capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier ///
-		using "`datapath'\version02\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
-//JC remember to change V01 to V02 when running list a 2nd time!
-restore
+** Remove unnecessary death variables
+drop dd2019_* nrn coddeath regnum pname namematch
 
+
+*****************************
+** IARCcrgTools check + MP **
+*****************************
+
+** Copy the variables needed in Stata's Browse/Edit into an excel sheet in 2-working folder
+//replace mpseq=1 if mpseq==0 //2918 changes
+tab mpseq ,m //3 missing
+//list pid fname lname mptot if mpseq==. //reviewed in Stata's Browse/Edit + CR5db
+replace mptot=1 if mpseq==. & mptot==. //3 changes
+replace mpseq=1 if mpseq==. //3 changes
+
+tab icd10 ,m //none missing
+
+** Create dates for use in IARCcrgTools
+drop dob_iarc dot_iarc
 
 ** Export dataset to run data in IARCcrg Tools (Check Programme)
 gen INCIDYR=year(dot)
@@ -160,665 +170,992 @@ drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
 rename BIRTHD dob_iarc
 label var dob_iarc "IARC BirthDate"
 
-** mpseq was dropped so need to create
-gen mpseq_iarc=0 if persearch==1
-replace mpseq_iarc=1 if persearch!=1 & regexm(cr5id,"T1") //12 changes
-replace mpseq_iarc=2 if persearch!=1 & !(strmatch(strupper(cr5id), "*T1*")) //10 changes
+** Organize the variables to be used in IARCcrgTools to appear at start of the dataset in Browse/Edit
+order pid sex top morph beh grade basis dot_iarc dob_iarc age mpseq mptot cr5id
+** Note: to copy results without value labels, I had to right-click Browse/Edit data, select Preferences --> Data Editor --> untick 'Copy value labels to the Clipboard instead of values'.
+//Excel saved as .csv in 2-working\iarccrgtoolsV01.csv
+//Excel saved as .csv in 2-working\iarccrgtoolsV02.csv - added in mptot + cr5id to spot any errors in these fields
 
-export delimited pid mpseq_iarc sex topography morph beh grade basis dot_iarc dob_iarc age cr5id eidmp dxyr persearch ///
-using "`datapath'\version02\2-working\2015_nonsurvival_iarccrgtools.txt", nolabel replace
-
+** Using the IARC Hub's guide, I prepared the excel sheet for use in IARCcrgTools, i.e. re-inserted leading zeros into topography.
+** IARCcrgTools Check results
 /*
-IARC crg Tools - see SOP for steps on how to perform below checks:
+4066 records processed. Summary statistics:
 
-(1) Perform file transfer using '2015_nonsuvival_iarccrgtools.txt'
-(2) Perform check using '2015_iarccrgtools_to check.prn'
-(3) Perform multiple primary check using ''
+2 errors (2 individual records) recorded in X:\The University of the West Indies\DataGroup - repo_data\data_p117\version02\2-working\iarccrgtoolsFileTransfer.err:
 
-Results of IARC Check Program:
-(Titles for each data column: pid sex top morph beh grade basis dot dob age)
-    973 records processed
-	0 errors
-        
-	32 warnings
-        - 19 unlikely hx/site
-		- 2 unlikely grade/hx
-        - 10 unlikely basis/hx
-		- 1 unlikely age/site/hx
+2 invalid age
+
+
+98 warnings (97 individual records) recorded in X:\The University of the West Indies\DataGroup - repo_data\data_p117\version02\2-working\iarccrgtoolsFileTransfer.chk:
+
+31 unlikely histology/site combination
+1 unlikely behaviour/histology combination
+40 unlikely grade/histology combination
+25 unlikely basis/histology combination
+1 unlikely age/site/histology combination
 */
-/*	
-Results of IARC MP Program:
-	21 excluded (non-malignant)
-	24 MPs (multiple tumours)
-	 0 Duplicate registration
-*/
+
+** Corrections from IARCcrgTools Check
+replace age=87 if pid=="20159118" //2 changes
+replace morph=8081 if pid=="20080741" & cr5id=="T2S1" //1 change
+replace morphcat=3 if pid=="20080741" & cr5id=="T2S1" //1 change
+
+** IARCcrgTools MP results
 /*
-Convert ICD-O-3 DCOs (153) to ICD10, ICCCcode:
-
+Records:	4066
+Excluded:	 141
+MPs:		 267
+Duplicate:	  67
 */
-** Below updates from warnings/errors report
-replace grade=9 if pid=="20151100"
-replace grade=9 if pid=="20155222"
-
 ** Only report non-duplicate MPs (see IARC MP rules on recording and reporting)
 display `"{browse "http://www.iacr.com.fr/images/doc/MPrules_july2004.pdf":IARC-MP}"'
+
+** Corrections from IARCcrgTools MP
+
+//incidental correction
+replace mptot=2 if pid=="20159029" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20159029" & cr5id=="T1S1"
+replace mptot=2 if pid=="20159029" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20159029" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20151020" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20151020" & cr5id=="T1S1"
+replace mptot=2 if pid=="20151020" & cr5id=="T3S1"
+replace mpseq=2 if pid=="20151020" & cr5id=="T3S1"
+replace cr5id="T2S1" if pid=="20151020" & cr5id=="T3S1"
+
+//incidental correction
+replace mptot=2 if pid=="20145070" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20145070" & cr5id=="T1S1"
+replace mptot=2 if pid=="20145070" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20145070" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20141379" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20141379" & cr5id=="T1S1"
+replace mptot=2 if pid=="20141379" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20141379" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20141288" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20141288" & cr5id=="T1S1"
+replace mptot=2 if pid=="20141288" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20141288" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20130539" & cr5id=="T1S1"
+
+//incidental correction
+replace mptot=2 if pid=="20130410" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20130410" & cr5id=="T1S1"
+replace mptot=2 if pid=="20130410" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20130410" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20130294" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20130294" & cr5id=="T1S1"
+replace mptot=2 if pid=="20130294" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20130294" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20130275" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20130275" & cr5id=="T1S1"
+replace mptot=2 if pid=="20130275" & cr5id=="T3S1"
+replace mpseq=2 if pid=="20130275" & cr5id=="T3S1"
+replace cr5id="T2S1" if pid=="20130275" & cr5id=="T3S1"
+
+//incidental correction
+replace mptot=2 if pid=="20130175" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20130175" & cr5id=="T1S1"
+replace mptot=2 if pid=="20130175" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20130175" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20130162" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20130162" & cr5id=="T1S1"
+replace mptot=2 if pid=="20130162" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20130162" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20130323" & cr5id=="T1S1"
+replace mptot=1 if pid=="20130323" & cr5id=="T1S1"
+drop if pid=="20130323" & cr5id=="T2S1"
+
+drop if pid=="20130160" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20081104" & cr5id=="T1S1"
+replace mptot=1 if pid=="20081104" & cr5id=="T1S1"
+drop if pid=="20081104" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20081089" & cr5id=="T1S1"
+replace mptot=1 if pid=="20081089" & cr5id=="T1S1"
+drop if pid=="20081089" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20081085" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20081085" & cr5id=="T1S1"
+replace mptot=2 if pid=="20081085" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20081085" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20081083" & cr5id=="T1S1"
+replace mptot=1 if pid=="20081083" & cr5id=="T1S1"
+drop if pid=="20081083" & cr5id=="T2S1"
+drop if pid=="20081083" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20081076" & cr5id=="T1S1"
+replace mptot=1 if pid=="20081076" & cr5id=="T1S1"
+drop if pid=="20081076" & cr5id=="T2S1"
+drop if pid=="20081076" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080790" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080790" & cr5id=="T1S1"
+drop if pid=="20080790" & cr5id=="T2S1"
+
+replace mptot=2 if pid=="20080766" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080766" & cr5id=="T2S1"
+drop if pid=="20080766" & cr5id=="T3S1"
+drop if pid=="20080766" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080740" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080740" & cr5id=="T1S1"
+drop if pid=="20080740" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080739" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080739" & cr5id=="T1S1"
+drop if pid=="20080739" & cr5id=="T2S1"
+drop if pid=="20080739" & cr5id=="T3S1"
+drop if pid=="20080739" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080738" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080738" & cr5id=="T1S1"
+drop if pid=="20080738" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080734" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080734" & cr5id=="T1S1"
+drop if pid=="20080734" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080733" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080733" & cr5id=="T1S1"
+drop if pid=="20080733" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080731" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080731" & cr5id=="T1S1"
+drop if pid=="20080731" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080730"
+
+replace mptot=3 if pid=="20080728" & cr5id=="T1S1"
+replace mptot=3 if pid=="20080728" & cr5id=="T2S1"
+replace mptot=3 if pid=="20080728" & cr5id=="T5S1"
+replace mpseq=3 if pid=="20080728" & cr5id=="T5S1"
+drop if pid=="20080728" & cr5id=="T3S1"
+drop if pid=="20080728" & cr5id=="T4S1"
+replace cr5id="T3S1" if pid=="20080728" & cr5id=="T5S1"
+
+replace mpseq=0 if pid=="20080725" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080725" & cr5id=="T1S1"
+drop if pid=="20080725" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080709" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080709" & cr5id=="T1S1"
+drop if pid=="20080709" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080708" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080708" & cr5id=="T4S1"
+replace mpseq=2 if pid=="20080708" & cr5id=="T4S1"
+replace cr5id="T2S1" if pid=="20080708" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080705" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080705" & cr5id=="T2S1"
+drop if pid=="20080705" & cr5id=="T1S1"
+replace cr5id="T1S1" if pid=="20080705" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080696" & cr5id=="T1S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080690" & cr5id=="T2S1"
+replace mpseq=1 if pid=="20080690" & cr5id=="T2S1"
+replace mptot=2 if pid=="20080690" & cr5id=="T3S1"
+replace mpseq=2 if pid=="20080690" & cr5id=="T3S1"
+replace cr5id="T1S1" if pid=="20080690" & cr5id=="T2S1"
+replace cr5id="T2S1" if pid=="20080690" & cr5id=="T3S1"
+
+replace mptot=2 if pid=="20080667" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080667" & cr5id=="T2S1"
+drop if pid=="20080667" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080662" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080662" & cr5id=="T2S1"
+drop if pid=="20080662" & cr5id=="T1S1"
+replace cr5id="T1S1" if pid=="20080662" & cr5id=="T2S1"
+replace patient=1 if pid=="20080662" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080662" & cr5id=="T1S1"
+replace ptrectot=1 if pid=="20080662" & cr5id=="T1S1"
+
+replace mpseq=0 if pid=="20080655" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080655" & cr5id=="T1S1"
+drop if pid=="20080655" & cr5id=="T2S1"
+
+replace mptot=3 if pid=="20080626" & cr5id=="T1S1"
+replace mptot=3 if pid=="20080626" & cr5id=="T2S1"
+replace mptot=3 if pid=="20080626" & cr5id=="T7S1"
+replace mpseq=3 if pid=="20080626" & cr5id=="T7S1"
+drop if pid=="20080626" & cr5id=="T3S1"
+drop if pid=="20080626" & cr5id=="T4S1"
+drop if pid=="20080626" & cr5id=="T5S1"
+drop if pid=="20080626" & cr5id=="T6S1"
+replace cr5id="T3S1" if pid=="20080626" & cr5id=="T7S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080567" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20080567" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080567" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20080567" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080499" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080499" & cr5id=="T1S1"
+drop if pid=="20080499" & cr5id=="T3S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080477" & cr5id=="T3S1"
+replace mpseq=1 if pid=="20080477" & cr5id=="T3S1"
+replace mptot=2 if pid=="20080477" & cr5id=="T4S1"
+replace mpseq=2 if pid=="20080477" & cr5id=="T4S1"
+replace cr5id="T1S1" if pid=="20080477" & cr5id=="T3S1"
+replace cr5id="T2S1" if pid=="20080477" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080475" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080475" & cr5id=="T1S1"
+drop if pid=="20080475" & cr5id=="T3S1"
+
+replace mptot=2 if pid=="20080465" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080465" & cr5id=="T3S1"
+replace mpseq=2 if pid=="20080465" & cr5id=="T3S1"
+drop if pid=="20080465" & cr5id=="T2S1"
+drop if pid=="20080465" & cr5id=="T4S1"
+replace cr5id="T2S1" if pid=="20080465" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080464" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080464" & cr5id=="T1S1"
+drop if pid=="20080464" & cr5id=="T2S1"
+
+replace mptot=2 if pid=="20080463" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080463" & cr5id=="T3S1"
+replace mpseq=2 if pid=="20080463" & cr5id=="T3S1"
+drop if pid=="20080463" & cr5id=="T2S1"
+replace cr5id="T2S1" if pid=="20080463" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080460" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080460" & cr5id=="T2S1"
+drop if pid=="20080460" & cr5id=="T1S1"
+replace cr5id="T1S1" if pid=="20080460" & cr5id=="T2S1"
+replace patient=1 if pid=="20080460" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080460" & cr5id=="T1S1"
+replace ptrectot=1 if pid=="20080460" & cr5id=="T1S1"
+
+replace mptot=2 if pid=="20080457" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080457" & cr5id=="T4S1"
+replace mpseq=2 if pid=="20080457" & cr5id=="T4S1"
+drop if pid=="20080457" & cr5id=="T2S1"
+drop if pid=="20080457" & cr5id=="T3S1"
+replace cr5id="T2S1" if pid=="20080457" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080449" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080449" & cr5id=="T1S1"
+drop if pid=="20080449" & cr5id=="T2S1"
+drop if pid=="20080449" & cr5id=="T3S1"
+drop if pid=="20080449" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080446" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080446" & cr5id=="T1S1"
+drop if pid=="20080446" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080443"
+
+replace mpseq=0 if pid=="20080441" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080441" & cr5id=="T1S1"
+drop if pid=="20080441" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080440" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080440" & cr5id=="T1S1"
+drop if pid=="20080440" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080432" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080432" & cr5id=="T1S1"
+drop if pid=="20080432" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080401" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080401" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20080401" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080386" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080386" & cr5id=="T1S1"
+drop if pid=="20080386" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080381" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080381" & cr5id=="T2S1"
+drop if pid=="20080381" & cr5id=="T1S1"
+replace cr5id="T1S1" if pid=="20080381" & cr5id=="T2S1"
+replace patient=1 if pid=="20080381" & cr5id=="T1S1"
+replace eidmp=1 if pid=="20080381" & cr5id=="T1S1"
+replace ptrectot=1 if pid=="20080381" & cr5id=="T1S1"
+
+replace mpseq=0 if pid=="20080378" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080378" & cr5id=="T1S1"
+drop if pid=="20080378" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080372" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080372" & cr5id=="T1S1"
+drop if pid=="20080372" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080365" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080365" & cr5id=="T3S1"
+replace mpseq=2 if pid=="20080365" & cr5id=="T3S1"
+replace persearch=2 if pid=="20080365" & cr5id=="T3S1"
+replace cr5id="T2S1" if pid=="20080365" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080364" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080364" & cr5id=="T1S1"
+drop if pid=="20080364" & cr5id=="T2S1"
+
+replace mptot=3 if pid=="20080363" & cr5id=="T1S1"
+replace mptot=3 if pid=="20080363" & cr5id=="T2S1"
+replace mptot=3 if pid=="20080363" & cr5id=="T5S1"
+replace mpseq=3 if pid=="20080363" & cr5id=="T5S1"
+drop if pid=="20080363" & cr5id=="T3S1"
+drop if pid=="20080363" & cr5id=="T4S1"
+replace cr5id="T3S1" if pid=="20080363" & cr5id=="T5S1"
+
+replace mptot=2 if pid=="20080362" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080362" & cr5id=="T2S1"
+drop if pid=="20080362" & cr5id=="T3S1"
+drop if pid=="20080362" & cr5id=="T4S1"
+
+replace mpseq=0 if pid=="20080360" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080360" & cr5id=="T1S1"
+drop if pid=="20080360" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080336" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20080336" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080336" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20080336" & cr5id=="T2S1"
+replace persearch=2 if pid=="20080336" & cr5id=="T2S1"
+
+replace mptot=2 if pid=="20080317" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080317" & cr5id=="T2S1"
+drop if pid=="20080317" & cr5id=="T3S1"
+drop if pid=="20080317" & cr5id=="T4S1"
+drop if pid=="20080317" & cr5id=="T5S1"
+drop if pid=="20080317" & cr5id=="T6S1"
+
+replace mpseq=0 if pid=="20080310" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080310" & cr5id=="T2S1"
+drop if pid=="20080310" & cr5id=="T3S1"
+drop if pid=="20080310" & cr5id=="T4S1"
+drop if pid=="20080310" & cr5id=="T7S1"
+replace cr5id="T1S1" if pid=="20080310" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080308" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080308" & cr5id=="T1S1"
+drop if pid=="20080308" & cr5id=="T2S1"
+drop if pid=="20080308" & cr5id=="T3S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080242" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20080242" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080242" & cr5id=="T2S1"
+replace mpseq=2 if pid=="20080242" & cr5id=="T2S1"
+
+//incidental correction
+replace mptot=2 if pid=="20080215" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20080215" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080215" & cr5id=="T3S1"
+replace mpseq=2 if pid=="20080215" & cr5id=="T3S1"
+replace cr5id="T2S1" if pid=="20080215" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080196" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080196" & cr5id=="T1S1"
+drop if pid=="20080196" & cr5id=="T2S1"
+
+
+count //4,000
+
+
+******************
+** FINAL CHECKS **
+******************
+order pid top morph mpseq mptot persearch cr5id
+
+
+******************
+** MP variables **
+******************
+***************
+** PERSEARCH **
+***************
+
+** persearch is used to identify MPs
+** Check 1
+count if persearch!=1 & (mpseq==0|mpseq==1) //144 - checked for any (1) in-situ NOT=Done: Exclude; (2) malignant NOT=Done: OK
+//list pid mptot mpseq persearch beh cr5id if persearch!=1 & (mpseq==0|mpseq==1)
+
+replace persearch=1 if pid=="20080381" & cr5id=="T1S1"
+replace persearch=1 if pid=="20080460" & cr5id=="T1S1"
+replace persearch=1 if pid=="20080662" & cr5id=="T1S1"
+replace persearch=1 if pid=="20080733" & cr5id=="T1S1"
+replace persearch=1 if pid=="20080738" & cr5id=="T1S1"
+replace persearch=1 if pid=="20080739" & cr5id=="T1S1"
+
+** Check 2
+count if persearch==1 & cr5id!="T1S1" //28
+//list pid mptot mpseq persearch beh cr5id if persearch==1 & cr5id!="T1S1"
+
+replace mpseq=0 if pid=="20080384" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080384" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080384" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080387" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080387" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080387" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080438" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080438" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080438" & cr5id=="T2S1"
+
+replace mpseq=2 if pid=="20080607" & cr5id=="T2S1"
+replace mptot=2 if pid=="20080607" & cr5id=="T2S1"
+
+replace mpseq=2 if pid=="20080677" & cr5id=="T2S1"
+replace mptot=2 if pid=="20080677" & cr5id=="T2S1"
+
+replace persearch=2 if pid=="20081085" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20090016" & cr5id=="T2S1"
+replace mptot=1 if pid=="20090016" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20090016" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20090045" & cr5id=="T3S1"
+replace mptot=1 if pid=="20090045" & cr5id=="T3S1"
+replace cr5id="T1S1" if pid=="20090045" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20130169" & cr5id=="T2S1"
+replace mptot=1 if pid=="20130169" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20130169" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20130172" & cr5id=="T2S1"
+replace mptot=1 if pid=="20130172" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20130172" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20130727" & cr5id=="T2S1"
+replace mptot=1 if pid=="20130727" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20130727" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20130798" & cr5id=="T2S1"
+replace mptot=1 if pid=="20130798" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20130798" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20140490" & cr5id=="T2S1"
+replace mptot=1 if pid=="20140490" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20140490" & cr5id=="T2S1"
+
+replace mpseq=1 if pid=="20140822" & cr5id=="T1S1"
+replace mptot=2 if pid=="20140822" & cr5id=="T1S1"
+
+replace mpseq=0 if pid=="20140966" & cr5id=="T2S1"
+replace mptot=1 if pid=="20140966" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20140966" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20141021" & cr5id=="T2S1"
+replace mptot=1 if pid=="20141021" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20141021" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20141258" & cr5id=="T2S1"
+replace mptot=1 if pid=="20141258" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20141258" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20141409" & cr5id=="T2S1"
+replace mptot=1 if pid=="20141409" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20141409" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150169" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150169" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150169" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150234" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150234" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150234" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150314" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150314" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150314" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150350" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150350" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150350" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150356" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150356" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150356" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150376" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150376" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150376" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150431" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150431" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150431" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150485" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150485" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150485" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150519" & cr5id=="T2S1"
+replace mptot=1 if pid=="20150519" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20150519" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20151103" & cr5id=="T2S1"
+replace mptot=1 if pid=="20151103" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20151103" & cr5id=="T2S1"
+
+** Check 3
+count if persearch==1 & mpseq>1 //5 - 2 incorrect
+//list pid mptot mpseq persearch beh cr5id if persearch==1 & mpseq>1
+
+replace mpseq=1 if pid=="20140570" & cr5id=="T1S1"
+replace mptot=2 if pid=="20140570" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20140570" & cr5id=="T2S1"
+replace mptot=2 if pid=="20140570" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20150385" & cr5id=="T1S1"
+replace mptot=1 if pid=="20150385" & cr5id=="T1S1"
+
+** Check 4
 tab persearch ,m
-//list pid cr5id if persearch==3 //3
-
-** Updates from multiple primary report (define which is the MP so can remove in survival dataset):
-//no updates needed as none to exclude
-
-** Updates from MP exclusion report (excludes in-situ/unreportable cancers)
-label drop persearch_lab
-label define persearch_lab 0 "Not done" 1 "Done: OK" 2 "Done: MP" 3 "Done: Duplicate" 4 "Done: Non-IARC MP" 5 "Done: IARCcrgTools Excluded", modify
-label values persearch persearch_lab
-tab beh ,m
-replace persearch=5 if beh<3 //21 changes
-
-tab persearch ,m
-//list pid cr5id if persearch==2
-replace persearch=1 if pid=="20151369" //1 change
-
-** Check DCOs
-tab basis ,m
-** Re-assign dcostatus for cases with updated death trace-back: still pending as of 19feb2020 TBD by NS
-tab dcostatus ,m
-replace dcostatus=1 if pid=="20150468" & dcostatus==. //1 change; 0 changes
-count if dcostatus==2 & basis!=0
-//list pid basis if dcostatus==2 & basis!=0 - autopsy w/ hx
 /*
-replace basis=1 if pid=="20140672" & cr5id=="T2S1"
-replace dcostatus=1 if pid=="20140672" & cr5id=="T2S1"
-replace nsdate=d(24jul2018) if pid=="20140672" & cr5id=="T2S1"
+
+              Person Search |      Freq.     Percent        Cum.
+----------------------------+-----------------------------------
+                   Done: OK |      3,773       94.35       94.35
+                   Done: MP |         83        2.08       96.42
+              Done: Exclude |        143        3.58      100.00
+----------------------------+-----------------------------------
+                      Total |      3,999      100.00
 */
 
-** Rename cod in prep for death data matching
-rename cod codcancer
 
-** Remove non-residents (see IARC validity presentation)
-tab resident ,m //45 missing
-label drop resident_lab
-label define resident_lab 1 "Yes" 2 "No" 99 "Unknown", modify
-label values resident resident_lab
-replace resident=99 if resident==9 //45 changes
-//list pid natregno nrn addr dd_address if resident==99
-replace resident=1 if resident==99 & addr!="99" & addr!="" //29 changes
-replace resident=1 if resident==99 & dd_address!="99" & dd_address!="" //0
-//replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
-replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //1 change
-** Check electoral list and CR5db for those resident=99
-//list pid fname lname nrn natregno dob if resident==99
-//list pid fname lname addr if resident==99
-tab resident ,m //15 unknown
+*************
+** PATIENT **
+*************
+order pid cr5id top morph mpseq mptot persearch patient eidmp ptrectot dcostatus
 
-** Check parish
+** Check 1
+count if patient==1 & persearch==2 //3
+//list pid cr5id patient persearch eidmp ptrectot if patient==1 & persearch==2
+replace patient=2 if pid=="20080336" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080336" & cr5id=="T2S1"
+replace ptrectot=3 if pid=="20080336" & cr5id=="T2S1"
+
+replace patient=2 if pid=="20080365" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20080365" & cr5id=="T2S1"
+replace ptrectot=3 if pid=="20080365" & cr5id=="T2S1"
+
+replace patient=2 if pid=="20081085" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20081085" & cr5id=="T2S1"
+replace ptrectot=3 if pid=="20081085" & cr5id=="T2S1"
+
+** Check 2
+count if patient==2 & persearch==1 //0
+
+** Check 3
+tab patient ,m
+tab patient persearch ,m
+
+***********
+** EIDMP **
+***********
+** Check 1
+count if eidmp==1 & persearch==2 //0
+
+** Check 2
+count if eidmp==1 & patient!=1 //0
+
+** Check 3
+count if eidmp==2 & patient!=2 //0
+
+** Check 4
+tab eidmp ,m
+tab eidmp persearch ,m
+
+**************
+** PTRECTOT **
+**************
+** Check 1
+count if ptrectot<3 & patient==2 //5
+//list pid cr5id patient persearch eidmp ptrectot if ptrectot<3 & patient==2
+replace ptrectot=3 if ptrectot<3 & patient==2 //5 changes
+
+** Check 2
+count if ptrectot<3 & persearch==2 //0
+
+** Check 3
+tab ptrectot ,m
+
+*******************
+** MPSEQ + MPTOT **
+*******************
+** Check 1
+count if mptot==. & mpseq==0 //863
+replace mptot=1 if mptot==. & mpseq==0 //863 changes
+
+** Check 2
+count if mptot==. & mpseq!=0 //19
+//list pid cr5id mpseq mptot persearch patient eidmp ptrectot if mptot==. & mpseq!=0
+replace mptot=2 if pid=="20140077"
+replace cr5id="T2S1" if pid=="20140077" & cr5id=="T3S1"
+
+replace mptot=2 if pid=="20140176"
+replace cr5id="T2S1" if pid=="20140176" & cr5id=="T3S1"
+
+replace mptot=2 if pid=="20140339"
+
+replace mpseq=0 if pid=="20140474" & cr5id=="T1S1"
+replace mptot=1 if pid=="20140474" & cr5id=="T1S1"
+
+replace mptot=2 if pid=="20140526"
+
+replace mptot=2 if pid=="20140566"
+
+replace mptot=2 if pid=="20140672"
+
+replace mptot=3 if pid=="20140690"
+replace mpseq=1 if pid=="20140690" & cr5id=="T1S1"
+replace mpseq=2 if pid=="20140690" & cr5id=="T4S1"
+replace mpseq=3 if pid=="20140690" & cr5id=="T5S1"
+replace cr5id="T2S1" if pid=="20140690" & cr5id=="T4S1"
+replace cr5id="T3S1" if pid=="20140690" & cr5id=="T5S1"
+
+replace mptot=2 if pid=="20140786"
+
+replace mpseq=0 if pid=="20140887" & cr5id=="T1S1"
+replace mptot=1 if pid=="20140887" & cr5id=="T1S1"
+
+replace mpseq=0 if pid=="20141351" & cr5id=="T1S1"
+replace mptot=1 if pid=="20141351" & cr5id=="T1S1"
+
+replace mpseq=1 if pid=="20080539" & cr5id=="T1S1"
+replace mptot=2 if pid=="20080539" & cr5id=="T1S1"
+
+** Check 3
+count if mpseq!=0 & mptot==1 //593
+replace mpseq=0 if mpseq!=0 & mptot==1 //593 changes
+
+** Check 5
+tab mptot ,m
+tab mpseq ,m
+tab mpseq mptot ,m
+
+** Check 6
+count if mptot>3 //4
+//list pid cr5id mpseq mptot persearch patient eidmp ptrectot if mptot>3
+
+replace mpseq=0 if pid=="20080706" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080706" & cr5id=="T1S1"
+
+replace mpseq=0 if pid=="20080715" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080715" & cr5id=="T1S1"
+
+replace mpseq=0 if pid=="20080746" & cr5id=="T1S1"
+replace mptot=1 if pid=="20080746" & cr5id=="T1S1"
+
+replace mpseq=0 if pid=="20130341" & cr5id=="T1S1"
+replace mptot=1 if pid=="20130341" & cr5id=="T1S1"
+
+******************
+** Vital Status **
+******************
+
+** Check 1
+count if dlc!=dod & slc==2 //238
+replace dlc=dod if dlc!=dod & slc==2 //48 changes
+
+** Check 2
+count if dod!=. & slc!=2 //0
+
+** Check 3
+count if slc==2 & deceased!=1 //6
+replace deceased=1 if slc==2 & deceased!=1 //6 changes
+
+** Check 4
+gen dodyear=year(dod)
+count if dd_dodyear==. & dod!=. //6 - not found in death data but pt deceased
+
+** Check 5
+count if dod==. & slc==2 //0
+
+** Check 6
+count if dod==. & deceased==1 //0
+
+** Check 7
+count if dcostatus!=6 & slc!=2 //3
+replace dcostatus=6 if dcostatus!=6 & slc!=2 //3 changes
+
+** Check 8
+count if dcostatus!=2 & basis==0 //1
+replace dcostatus=2 if dcostatus!=2 & basis==0 //1 change
+
+** Check 9
+tab slc ,m
+tab deceased ,m
+tab dod ,m
+tab dcostatus ,m
+tab dcostatus basis ,m
+
+***************
+** RECSTATUS **
+***************
+** Check 1
+count if recstatus!=1 //0
+
+** Check 2
+tab recstatus ,m
+
+***********
+** BASIS **
+***********
+** Check 1
+count if basis==. //0
+
+** Check 2
+tab basis ,m
+
+***************
+** BEHAVIOUR **
+***************
+** Check 1
+count if beh==. //0
+
+** Check 2
+tab beh ,m
+
+
+**************
+** SITEIARC **
+**************
+** Check 1
+tab siteiarc ,m
+
+***********
+** ICD10 **
+***********
+** Check 1
+count if icd10=="" //0
+
+** Check 2
+tab siteicd10 ,m
+
+
+************
+** PARISH **
+************
+** Check 1
+count if parish==. //2
+replace parish=99 if pid=="20151156"
+** Correct address flagged above
+preserve
+clear
+import excel using "`datapath'\version02\2-working\AddressUpdate20210811.xlsx" , firstrow case(lower)
+tostring pid ,replace
+save "`datapath'\version02\2-working\addressupdate" ,replace
+restore
+merge 1:1 pid cr5id using "`datapath'\version02\2-working\addressupdate" ,update replace
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         3,998
+        from master                     3,998  (_merge==1)
+        from using                          0  (_merge==2)
+
+    matched                                 1
+        not updated                         0  (_merge==3)
+        missing updated                     1  (_merge==4)
+        nonmissing conflict                 0  (_merge==5)
+    -----------------------------------------
+*/
+drop _merge
+
+** Check 2
 count if parish!=. & parish!=99 & addr=="" //0
-count if parish==. & addr!="" & addr!="99" //0
-//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
-//bysort pid (cr5id) : replace addr = addr[_n-1] if missing(addr) //1 change - 20140566/
 
-** Check missing sex
+** Check 3
+count if parish==. & addr!="" & addr!="99" //0
+
+** Check 4
+count if parish==. & dd_parish!=.
+
+** Check 5
+tab parish ,m
+tab parish resident ,m
+
+**************
+** RESIDENT **
+**************
+** Check 1
+count if resident==. //0
+
+** Check 2
+count if resident!=1 //58
+
+** Check 3
+count if resident!=1 & addr!="99" & addr!="" //2 - correct
+
+** Check 4
+count if resident!=1 & dd_address!="99" & dd_address!="" //2
+
+** Check 5
+count if resident!=1 & natregno!="" & natregno!="9999999999" //37 - correct
+
+** Check 6
+tab resident ,m
+
+** Reviewed all non-residents using MedData
+order pid cr5id fname lname init age dob natregno resident slc dlc dod top morph mpseq mptot persearch patient eidmp ptrectot dcostatus
+
+** Correct resident flagged above
+preserve
+clear
+import excel using "`datapath'\version02\2-working\ResidentUpdate20210811.xlsx" , firstrow case(lower)
+tostring pid ,replace
+tostring natregno ,replace
+save "`datapath'\version02\2-working\residentupdate" ,replace
+restore
+merge 1:1 pid cr5id using "`datapath'\version02\2-working\residentupdate" ,update replace
+/*
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         3,998
+        from master                     3,998  (_merge==1)
+        from using                          0  (_merge==2)
+
+    matched                                 1
+        not updated                         0  (_merge==3)
+        missing updated                     0  (_merge==4)
+        nonmissing conflict                 1  (_merge==5)
+    -----------------------------------------
+*/
+drop _merge
+
+
+*********
+** SEX **
+*********
+** Check 1
 tab sex ,m //none missing
 
-** Check for missing age & 100+
-tab age ,m //2 missing - none are 100+: f/u was done but age not found
-//list pid natregno dd_natregno if age==999
+*********
+** AGE **
+*********
+** Check 1
+count if age==.|age==999 //3
 
-** Check for missing follow-up
-label drop slc_lab
-label define slc_lab 1 "Alive" 2 "Deceased" 3 "Emigrated" 99 "Unknown", modify
-label values slc slc_lab
-replace slc=99 if slc==9 //0 changes
-tab slc ,m 
-** Check missing in CR5db
-//list pid if slc==99
-count if dlc==. //0
-//tab dlc ,m
+** Check 2
+tab age ,m //3 missing - 4 are 100+: f/u was done but age not found
 
-** Check for non-malignant
-tab beh ,m //3 benign; 18 in-situ
-replace recstatus=3 if pid=="20151095" & cr5id=="T1S1" //1 change
-replace recstatus=3 if pid=="20151221" & cr5id=="T1S1" //1 change
-replace recstatus=3 if pid=="20151270" & cr5id=="T1S1" //1 change
-tab morph if beh!=3 //18 CIN III
-
-** Check for ineligibles
-tab recstatus ,m
-drop if recstatus==3 //3 deleted
-
-** Check for duplicate tumours
-tab persearch ,m //18 excluded
-
-** Check dob
-count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //0
-//list pid natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*-9999*"))
-
-** Check age
+** Check 3
 gen age2 = (dot - dob)/365.25
 gen checkage2=int(age2)
-drop age2
-count if dob!=. & dot!=. & age!=checkage2 //3; 13
+count if dob!=. & dot!=. & age!=checkage2 //6
 //list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2
-replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //13 changes
+replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //6 changes
+drop age2 checkage2
 
-** Check no missing dxyr so this can be used in analysis
-tab dxyr ,m //0 missing
 
-** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
+*********
+** NRN **
+********* 
+count if length(natregno)==9 //0
+count if length(natregno)==8 //0
+count if length(natregno)==7 //0
+
+** Identify possible matches using NRN
+preserve
+drop if natregno==""|natregno=="9999999999"|regexm(natregno,"9999") 
+//remove blank/missing NRNs as these will be flagged as duplicates of each other
+//216 deleted
+sort natregno 
+quietly by natregno : gen dup = cond(_N==1,0,_n)
+sort natregno lname fname pid 
+count if dup>0 //168 - all MPs: reviewed in Stata's Browse/Edit window
+order pid cr5id natregno fname lname
+restore
+
+
+*********
+** DOB **
+********* 
+preserve
+count if dob_iarc=="99999999" //0
+replace dob_iarc="" if dob_iarc=="99999999" //0 changes
+replace dob_iarc = lower(rtrim(ltrim(itrim(dob_iarc)))) //0 changes
+gen dobyear = substr(dob_iarc,1,4)
+gen dobmonth = substr(dob_iarc,5,2)
+gen dobday = substr(dob_iarc,7,2)
+drop if dobyear=="9999" | dobmonth=="99" | dobday=="99" //0 deleted
+drop dobday dobmonth dobyear
+drop if dob_iarc=="" | dob_iarc=="99999999" //84 deleted
+
+** Look for duplicates - METHOD #1
+sort lname fname dob_iarc
+quietly by lname fname dob_iarc : gen dup = cond(_N==1,0,_n)
+sort lname fname dob_iarc pid
+count if dup>0 //182 - mostly MPs: reviewed PIDs in Stata's Browse/Edit
+restore
+
+** Corrections from above
+drop if pid=="20151107" //1 deleted - this is a duplicate of pid 20155185
+
+
+***********
+** NAMES **
+***********
+** Convert names to lower case and strip possible leading/trailing blanks
 replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
 replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
-//replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
 replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
 
-count //1117
 
-** Updates to non-2015 dx
-** First check in 2008_2013_2014_cancer_nonsurvival_bnr_reportable.dta if to keep/remove them
-count if dxyr!=2015 //43
-//list pid cr5id fname lname primarysite morph dxyr slc dlc dot if dxyr!=2015
-drop if pid=="20080292"|pid=="20080563"|pid=="20140817"|pid=="20141288" & cr5id=="T1S1" //4 deleted
+****************
+** DOT + DXYR **
+****************
+** Check 1
+count if dxyr==. //0
 
-** Create new site variable with CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
-display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
-
-rename ICCCcode iccc
-rename ICD10 icd10
-
-gen siteiarc=.
-label define siteiarc_lab ///
-1 "Lip (C00)" 2 "Tongue (C01-02)" 3 "Mouth (C03-06)" ///
-4 "Salivary gland (C07-08)" 5 "Tonsil (C09)" 6 "Other oropharynx (C10)" ///
-7 "Nasopharynx (C11)" 8 "Hypopharynx (C12-13)" 9 "Pharynx unspecified (C14)" ///
-10 "Oesophagus (C15)" 11 "Stomach (C16)" 12 "Small intestine (C17)" ///
-13 "Colon (C18)" 14 "Rectum (C19-20)" 15 "Anus (C21)" ///
-16 "Liver (C22)" 17 "Gallbladder etc. (C23-24)" 18 "Pancreas (C25)" ///
-19 "Nose, sinuses etc. (C30-31)" 20 "Larynx (C32)" ///
-21 "Lung (incl. trachea and bronchus) (C33-34)" 22 "Other thoracic organs (C37-38)" ///
-23 "Bone (C40-41)" 24 "Melanoma of skin (C43)" 25 "Other skin (C44)" ///
-26 "Mesothelioma (C45)" 27 "Kaposi sarcoma (C46)" 28 "Connective and soft tissue (C47+C49)" ///
-29 "Breast (C50)" 30 "Vulva (C51)" 31 "Vagina (C52)" 32 "Cervix uteri (C53)" ///
-33 "Corpus uteri (C54)" 34 "Uterus unspecified (C55)" 35 "Ovary (C56)" ///
-36 "Other female genital organs (C57)" 37 "Placenta (C58)" ///
-38 "Penis (C60)" 39 "Prostate (C61)" 40 "Testis (C62)" 41 "Other male genital organs (C63)" ///
-42 "Kidney (C64)" 43 "Renal pelvis (C65)" 44 "Ureter (C66)" 45 "Bladder (C67)" ///
-46 "Other urinary organs (C68)" 47 "Eye (C69)" 48 "Brain, nervous system (C70-72)" ///
-49 "Thyroid (C73)" 50 "Adrenal gland (C74)" 51 "Other endocrine (C75)" ///
-52 "Hodgkin lymphoma (C81)" 53 "Non-Hodgkin lymphoma (C82-86,C96)" ///
-54 "Immunoproliferative diseases (C88)" 55 "Multiple myeloma (C90)" ///
-56 "Lymphoid leukaemia (C91)" 57 "Myeloid leukaemia (C92-94)" 58 "Leukaemia unspecified (C95)" ///
-59 "Myeloproliferative disorders (MPD)" 60 "Myelodysplastic syndromes (MDS)" ///
-61 "Other and unspecified (O&U)" ///
-62 "All sites(ALL)" 63 "All sites but skin (ALLbC44)" ///
-64 "D069: CIN 3"
-label var siteiarc "IARC CI5-XI sites"
-label values siteiarc siteiarc_lab
-
-replace siteiarc=1 if regexm(icd10,"C00") //0 changes
-replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //7 changes
-replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //4 changes
-replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //2 changes
-replace siteiarc=5 if regexm(icd10,"C09") //4 changes
-replace siteiarc=6 if regexm(icd10,"C10") //2 changes
-replace siteiarc=7 if regexm(icd10,"C11") //5 changes
-replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //0 changes
-replace siteiarc=9 if regexm(icd10,"C14") //1 change
-replace siteiarc=10 if regexm(icd10,"C15") //12 changes
-replace siteiarc=11 if regexm(icd10,"C16") //37 changes
-replace siteiarc=12 if regexm(icd10,"C17") //8 changes
-replace siteiarc=13 if regexm(icd10,"C18") //117 changes
-replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //49 changes
-replace siteiarc=15 if regexm(icd10,"C21") //6 changes
-replace siteiarc=16 if regexm(icd10,"C22") //7 changes
-replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //12 changes
-replace siteiarc=18 if regexm(icd10,"C25") //27 changes
-replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //2 changes
-replace siteiarc=20 if regexm(icd10,"C32") //7 changes
-replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //32 changes
-replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //1 change
-replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
-replace siteiarc=24 if regexm(icd10,"C43") //10 changes
-replace siteiarc=25 if regexm(icd10,"C44") //0 changes
-replace siteiarc=26 if regexm(icd10,"C45") //0 changes
-replace siteiarc=27 if regexm(icd10,"C46") //0 changes
-replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //5 changes
-replace siteiarc=29 if regexm(icd10,"C50") //209 changes
-replace siteiarc=30 if regexm(icd10,"C51") //2 changes
-replace siteiarc=31 if regexm(icd10,"C52") //4 changes
-replace siteiarc=32 if regexm(icd10,"C53") //19 changes
-replace siteiarc=33 if regexm(icd10,"C54") //46 changes
-replace siteiarc=34 if regexm(icd10,"C55") //7 changes
-replace siteiarc=35 if regexm(icd10,"C56") //19 changes
-replace siteiarc=36 if regexm(icd10,"C57") //2 changes
-replace siteiarc=37 if regexm(icd10,"C58") //0 changes
-replace siteiarc=38 if regexm(icd10,"C60") //1 change
-replace siteiarc=39 if regexm(icd10,"C61") //228 changes
-replace siteiarc=40 if regexm(icd10,"C62") //2 changes
-replace siteiarc=41 if regexm(icd10,"C63") //0 changes
-replace siteiarc=42 if regexm(icd10,"C64") //17 changes
-replace siteiarc=43 if regexm(icd10,"C65") //0 changes
-replace siteiarc=44 if regexm(icd10,"C66") //1 change
-replace siteiarc=45 if regexm(icd10,"C67") //17 changes
-replace siteiarc=46 if regexm(icd10,"C68") //1 change
-replace siteiarc=47 if regexm(icd10,"C69") //2 changes
-replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
-replace siteiarc=49 if regexm(icd10,"C73") //12 changes
-replace siteiarc=50 if regexm(icd10,"C74") //0 changes
-replace siteiarc=51 if regexm(icd10,"C75") //0 changes
-replace siteiarc=52 if regexm(icd10,"C81") //6 changes
-replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //30 changes
-replace siteiarc=54 if regexm(icd10,"C88") //0 changes
-replace siteiarc=55 if regexm(icd10,"C90") //32 changes
-replace siteiarc=56 if regexm(icd10,"C91") //5 changes
-replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //6 changes
-replace siteiarc=58 if regexm(icd10,"C95") //4 changes
-replace siteiarc=59 if morphcat==54|morphcat==55 //6 changes
-replace siteiarc=60 if morphcat==56 //6 changes
-replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //40 changes
-**replace siteiarc=62 if siteiarc<62
-**replace siteiarc=63 if siteiarc<62 & siteiarc!=25
-replace siteiarc=64 if morph==8077 //18 changes
-
-tab siteiarc ,m //1 missing
-//list pid cr5id primarysite top hx morph icd10 if siteiarc==.
-replace iccc="11f" if pid=="20150298" & cr5id=="T1S1" //1 change
-replace icd10="C059" if pid=="20150298" & cr5id=="T1S1" //1 change
-replace siteiarc=3 if pid=="20150298" & cr5id=="T1S1" //1 change
-
-gen allsites=1 if siteiarc<62 //951 changes - 18 missing values=CIN 3
-label var allsites "All sites (ALL)"
-
-gen allsitesbC44=1 if siteiarc<62 & siteiarc!=25
-//951 changes - 18 missing values=CIN 3
-label var allsitesbC44 "All sites but skin (ALLbC44)"
-
-** Create site variable for lymphoid and haematopoietic diseases for conversion of these from ICD-O-3 1st edition (M9590-M9992)
-** (see chapter 3 Table 3.2 of CI5-XI)
-gen siteiarchaem=.
-label define siteiarchaem_lab ///
-1 "Malignant lymphomas,NOS or diffuse" ///
-2 "Hodgkin lymphoma" ///
-3 "Mature B-cell lymphomas" ///
-4 "Mature T- and NK-cell lymphomas" ///
-5 "Precursor cell lymphoblastic lymphoma" ///
-6 "Plasma cell tumours" ///
-7 "Mast cell tumours" ///
-8 "Neoplasms of histiocytes and accessory lymphoid cells" ///
-9 "Immunoproliferative diseases" ///
-10 "Leukemias, NOS" ///
-11 "Lymphoid leukemias" ///
-12 "Myeloid leukemias" ///
-13 "Other leukemias" ///
-14 "Chronic myeloproliferative disorders" ///
-15 "Other hematologic disorders" ///
-16 "Myelodysplastic syndromes"
-label var siteiarchaem "IARC CI5-XI lymphoid & haem diseases"
-label values siteiarchaem siteiarchaem_lab
-
-** Note that morphcat is based on ICD-O-3 edition 3.1. so e.g. morphcat54
-replace siteiarchaem=1 if morphcat==41 //7 changes
-replace siteiarchaem=2 if morphcat==42 //6 changes
-replace siteiarchaem=3 if morphcat==43 //16 changes
-replace siteiarchaem=4 if morphcat==44 //5 changes
-replace siteiarchaem=5 if morphcat==45 //1 change
-replace siteiarchaem=6 if morphcat==46 //32 changes
-replace siteiarchaem=7 if morphcat==47 //0 changes
-replace siteiarchaem=8 if morphcat==48 //0 changes
-replace siteiarchaem=9 if morphcat==49 //0 changes
-replace siteiarchaem=10 if morphcat==50 //4 changes
-replace siteiarchaem=11 if morphcat==51 //5 changes
-replace siteiarchaem=12 if morphcat==52 //6 changes
-replace siteiarchaem=13 if morphcat==53 //0 changes
-replace siteiarchaem=14 if morphcat==54 //5 changes
-replace siteiarchaem=15 if morphcat==55 //1 change
-replace siteiarchaem=16 if morphcat==56 //6 changes
-
-tab siteiarchaem ,m //882 missing - correct!
-count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //1
-//list pid cr5id primarysite top hx morph morphcat iccc icd10 if (siteiarc>51 & siteiarc<59) & siteiarchaem==.
-replace iccc="12b" if pid=="20159040" & cr5id=="T1S1" //0 changes
-replace icd10="C80" if pid=="20159040" & cr5id=="T1S1" //1 change
-replace siteiarchaem=15 if pid=="20159040" & cr5id=="T1S1" //1 change
+** Check 2
+count if dot==. //0
 
 
-** Create ICD-10 groups according to analysis tables in CR5 db (added after analysis dofiles 4,6)
-gen sitecr5db=.
-label define sitecr5db_lab ///
-1 "Mouth & pharynx (C00-14)" ///
-2 "Oesophagus (C15)" ///
-3 "Stomach (C16)" ///
-4 "Colon, rectum, anus (C18-21)" ///
-5 "Liver (C22)" ///
-6 "Pancreas (C25)" ///
-7 "Larynx (C32)" ///
-8 "Lung, trachea, bronchus (C33-34)" ///
-9 "Melanoma of skin (C43)" ///
-10 "Breast (C50)" ///
-11 "Cervix (C53)" ///
-12 "Corpus & Uterus NOS (C54-55)" ///
-13 "Ovary & adnexa (C56)" ///
-14 "Prostate (C61)" ///
-15 "Testis (C62)" ///
-16 "Kidney & urinary NOS (C64-66,68)" ///
-17 "Bladder (C67)" ///
-18 "Brain, nervous system (C70-72)" ///
-19 "Thyroid (C73)" ///
-20 "O&U (C26,39,48,76,80)" ///
-21 "Lymphoma (C81-85,88,90,96)" ///
-22 "Leukaemia (C91-95)" ///
-23 "Other digestive (C17,23-24)" ///
-24 "Nose, sinuses (C30-31)" ///
-25 "Bone, cartilage, etc (C40-41,45,47,49)" ///
-26 "Other skin (C44)" ///
-27 "Other female organs (C51-52,57-58)" ///
-28 "Other male organs (C60,63)" ///
-29 "Other endocrine (C74-75)" ///
-30 "Myeloproliferative disorders (MPD)" ///
-31 "Myelodysplastic syndromes (MDS)" ///
-32 "D069: CIN 3" ///
-33 "Eye,Heart,etc (C69,C38)" ///
-34 "All sites but C44"
-label var sitecr5db "CR5db sites"
-label values sitecr5db sitecr5db_lab
+** Remove unnecessary variables
+drop dot_iarc birthdate
+rename dob_iarc birthdate
 
-replace sitecr5db=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
-					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
-					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
-					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //26 changes
-replace sitecr5db=2 if regexm(icd10,"C15") //12 changes
-replace sitecr5db=3 if regexm(icd10,"C16") //37 changes
-replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //172 changes
-replace sitecr5db=5 if regexm(icd10,"C22") //7 changes
-replace sitecr5db=6 if regexm(icd10,"C25") //27 changes
-replace sitecr5db=7 if regexm(icd10,"C32") //7 changes
-replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //32 changes
-replace sitecr5db=9 if regexm(icd10,"C43") //10 changes
-replace sitecr5db=10 if regexm(icd10,"C50") //209 changes
-replace sitecr5db=11 if regexm(icd10,"C53") //19 changes
-replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //53 changes
-replace sitecr5db=13 if regexm(icd10,"C56") //19 changes
-replace sitecr5db=14 if regexm(icd10,"C61") //228 changes
-replace sitecr5db=15 if regexm(icd10,"C62") //2 changes
-replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //19 changes
-replace sitecr5db=17 if regexm(icd10,"C67") //17 changes
-replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
-replace sitecr5db=19 if regexm(icd10,"C73") //12 changes
-replace sitecr5db=20 if siteiarc==61 //40 changes
-replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //67 changes
-replace sitecr5db=22 if (regexm(icd10,"C91")|regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")) //15 changes
-replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //20 changes
-replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //2 changes
-replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //7 changes
-replace sitecr5db=26 if siteiarc==25 //0 changes
-replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //8 changes
-replace sitecr5db=28 if (regexm(icd10,"C60")|regexm(icd10,"C63")) //1 change
-replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //0 changes
-replace sitecr5db=30 if siteiarc==59 //6 changes
-replace sitecr5db=31 if siteiarc==60 //6 changes
-replace sitecr5db=32 if siteiarc==64 //18 changes
-replace sitecr5db=33 if (regexm(icd10,"C38")|regexm(icd10,"C69")) //3 changes
-
-tab sitecr5db ,m
-//list pid cr5id top morph icd10 if sitecr5db==.
-replace sitecr5db=21 if pid=="20159040" & cr5id=="T1S1" //1 change
-
-
-***********************
-** Create ICD10 site **
-***********************
-** Create variable based on ICD-10 2010 version to use in graphs (dofile 12) - may not use
-gen siteicd10=.
-label define siteicd10_lab ///
-1 "C00-C14: lip,oral cavity & pharynx" ///
-2 "C15-C26: digestive organs" ///
-3 "C30-C39: respiratory & intrathoracic organs" ///
-4 "C40-C41: bone & articular cartilage" ///
-5 "C43: melanoma" ///
-6 "C44: other skin" ///
-7 "C45-C49: mesothelial & soft tissue" ///
-8 "C50: breast" ///
-9 "C51-C58: female genital organs" ///
-10 "C61: prostate" ///
-11 "C60-C62,C63: male genital organs" ///
-12 "C64-C68: urinary tract" ///
-13 "C69-C72: eye,brain,other CNS" ///
-14 "C73-C75: thyroid & other endocrine glands" ///
-15 "C76-C79: ill-defined sites" ///
-16 "C80: primary site unknown" ///
-17 "C81-C96: lymphoid & haem"
-label var siteicd10 "ICD-10 site of tumour"
-label values siteicd10 siteicd10_lab
-
-
-replace siteicd10=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
-					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
-					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
-					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //26 changes
-replace siteicd10=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
-					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
-					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
-					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) //280 changes
-replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //42 changes
-replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
-replace siteicd10=5 if siteiarc==24 //10 changes
-replace siteicd10=6 if siteiarc==25 //0 changes
-replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //6 changes
-replace siteicd10=8 if regexm(icd10,"C50") //209 changes
-replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //99 changes
-replace siteicd10=10 if regexm(icd10,"C61") //228 changes
-replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //3 changes
-replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //36 changes
-replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //13 changes
-replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //12 changes
-replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //0 changess
-replace siteicd10=16 if regexm(icd10,"C80") //35 changes
-replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
-					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
-					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
-					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
-					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")|regexm(icd10,"C96")) //82 changes
-
-
-tab siteicd10 ,m // missing - CIN3, beh /0,/1,/2 and MPDs
-//list pid cr5id top morph icd10 if siteicd10==.
-
-** Check non-2015 dxyrs are reportable
-count if resident==2 & dxyr!=2015 //0
-count if resident==99 & dxyr!=2015 //0
-count if recstatus==3 & dxyr!=2015 //0
-count if sex==9 & dxyr!=2015 //0
-count if beh!=3 & dxyr!=2015 //0
-count if persearch>2 & dxyr!=2015 //0
-count if siteiarc==25 & dxyr!=2015 //0
-** Remove non-reportable-non-2015 dx
-//none to be removed
-
-tab dxyr ,m
-
-** Check parish
-count if parish!=. & parish!=99 & addr=="" //0
-count if parish==. & addr!="" & addr!="99" //0
-//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
-
-** Check missing sex
-tab sex ,m //none missing
-
-** Check for missing age & 100+
-tab age ,m //3 missing - 4 are 100+; 2 are 0 age
-
-** Check for missing follow-up
-tab slc ,m //none missing
-tab deceased ,m //none missing and parallels slc correctly
-//tab dlc ,m //none missing
-** Check missing in CR5db
-//list pid if slc==99
-
-** Check DCOs
-tab basis ,m //146; 267; 272
-** Re-assign dcostatus for cases with updated death trace-back
-tab dcostatus ,m
-//list pid basis dcostatus if basis==0 & dcostatus!=2
-count if basis!=0 & dcostatus==2 //4-correct as autop w/ hx
-replace dcostatus=2 if basis==0
-//list pid cr5id basis dcostatus if basis!=0 & dcostatus==2
-
-replace dcostatus=1 if slc==2 & basis!=0 //33; 35; 65 changes
-replace dcostatus=6 if slc!=2 //0 changes
-replace dcostatus=2 if basis==0 //0 changes
-
-** Check for ineligibles
-tab recstatus ,m //0 ineligible
-
-** Check for non-malignant
-tab beh ,m
+** Breakdown of in-situ for SF
+tab beh dxyr ,m
 /*
-  Behaviour |      Freq.     Percent        Cum.
-------------+-----------------------------------
-     Benign |          8        0.20        0.20
-  Uncertain |         10        0.25        0.44
-    In situ |        134        3.30        3.74
-  Malignant |      3,908       96.26      100.00
-------------+-----------------------------------
-      Total |      4,060      100.00
-*/
-
-** Check for duplicate tumours
-tab persearch ,m //56; 60 MPs; 0 dups; 18 excluded (in-situ)
-
-** Check dob
-count if dob==. //27; 37; 156 -all missing natregno
-//list pid cr5id age natregno nrn birthdate if dob==.
-//count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //0
-//list pid age natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
-/*
-gen birthd=substr(natregno,1,6) if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*"))
-destring birthd, replace
-format birthd %06.0f
-nsplit birthd, digits(2 2 2) gen(year month day)
-format year month day %02.0f
-tostring year, replace
-replace year="19"+year
-destring year, replace
-gen dob2=mdy(month, day, year)
-format dob2 %dD_m_CY
-replace dob=dob2 if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*99-*")) //47 changes
-drop birthd year month day dob2
-*/
-
-** Check age
-gen age2 = (dot - dob)/365.25
-drop checkage2
-gen checkage2=int(age2)
-drop age2
-count if dob!=. & dot!=. & age!=checkage2 //1
-//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2 //0 correct
-replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //1 change
-
-** Check no missing dxyr so this can be used in analysis
-tab dxyr ,m 
-/*
-DiagnosisYe |
-         ar |      Freq.     Percent        Cum.
-------------+-----------------------------------
-       2008 |      1,217       29.98       29.98
-       2013 |        883       21.75       51.72
-       2014 |        898       22.12       73.84
-       2015 |      1,062       26.16      100.00
-------------+-----------------------------------
-      Total |      4,060      100.00
-*/
-
-** Check for missing for cancer field
-/*
-replace natregno=subinstr(natregno,"-","",.)
-rename address address_cancer
-replace addr=subinstr(addr,"9999 ","",.)
-replace addr=subinstr(addr,"99 ","",.)
-count if regexm(address,"99") //0 - didn't replace true value for house #=99
-rename cod1a cod1a_cancer
-*/
-count if cancer==. & slc==2 //47
-//list pid deathid fname lname natregno dod if cancer==. & slc==2
-tab notindd dxyr,m
-count if cancer==. & slc==2 & notindd==. //34; 33
-replace notindd=1 if cancer==. & slc==2 & notindd==. //34; 33 changes
-count if cancer==1 & slc==2 & notindd==. //1781; 1794; 1964; 2006
-replace notindd=2 if cancer==1 & slc==2 & notindd==. //1781; 1794; 1964; 2006 changes
-count if cancer==2 & slc==2 & notindd==. //165; 164; 220
-replace notindd=2 if cancer==2 & slc==2 & notindd==. //165; 164; 220 changes
-count if notindd==. & slc!=2 //1339; 1784
-/*
-gen notindd=1 if cancer==. & slc==2 //14
-replace notindd=2 if pid=="20130331"|pid=="20080885"
-label var notindd "Not found in death data"
-label define notindd_lab 1 "Searched, not found" 2 "Searched, found", modify
-label values notindd notindd_lab
-*/
-count if cancer!=. & slc!=2 //0
-//list pid deathid fname lname natregno dod if cancer!=. & slc!=2
-replace cancer=. if cancer!=. & slc!=2 //387; 0 changes
-
-** Update cancer variable if cod indicates cancer (check against 2008-2020 death data file)
-count if cancer==. & slc==2 //47
-//list pid deathid fname lname dd_coddeath if cancer==. & slc==2, string(100)
-replace cod1a_cancer="REFRACTORY MULTIPLE MYELOMA ACUTE CONGESTIVE CARDIAC FAILURE CARDIAC AMYLOIDOSIS" if pid=="20150005"
-replace cod1a_cancer="ASPIRATION PNEUMONIA DYSPHAGIA MULTIPLE MYELOMA" if pid=="20150007"
-replace cod1a_cancer="REFRACTORY MULTIPLE MYELOMA" if pid=="20150031"
-replace cod1a_cancer=cr5cod if cancer==. & slc==2 & cod1a_cancer=="" & cr5cod!="" //37 changes
-label define cancer 1 "cancer" 2 "not cancer" 3 "unknown" ,modify
-replace cancer=3 if cancer==. & slc==2 & cod1a_cancer=="99" //15 changes
-replace cancer=1 if cancer==. & slc==2 //32 changes
-
-
-** Check missing for cod field
-count if cod==. & slc==2 //2175; 2274
-count if dd_cod==. & slc==2 //2113; 2212
-replace cod=dd_cod if dd_cod!=. & cod==. //63 changes
-count if cod==. & slc==2 //2112; 2211
-replace cod=1 if cancer==1 //1944; 1986 changes
-replace cod=2 if cancer==2 //154; 210 changes
-** one unknown causes of death in 2014 data - record_id 12323
-replace cod=3 if cod1a_cancer=="99"|(regexm(cod1a_cancer,"INDETERMINATE")|regexm(cod1a_cancer,"UNDETERMINED")) //14; 15 changes
-count if cod==. & slc==2 //0
-
-
-count if slc==2 & dod==. //0
-drop dodyear
-gen dodyear_cancer=year(dod)
-tab dodyear ,m
-count if slc!=2 & dod!=. //0
-
-drop dotyear
-gen dotyear=year(dot)
-tab dotyear ,m
-/*
-    dotyear |      Freq.     Percent        Cum.
-------------+-----------------------------------
-       2008 |      1,217       29.98       29.98
-       2013 |        883       21.75       51.72
-       2014 |        898       22.12       73.84
-       2015 |      1,062       26.16      100.00
-------------+-----------------------------------
-      Total |      4,060      100.00
-*/
-
-** Check dot
-count if dot>dlc //1
-//list pid cr5id dot dlc if dot>dlc
-replace dlc=d(07feb2013) if pid=="20080340"
-
-
-** Check resident=yes if there's a local address (added on 12-Oct-2020 based on feedback from SF: see IARC, IARC-HUB, SEER publications)
-count if resident!=1 & addr!="" & addr!="99" //6
-//list pid fname lname resident addr if resident!=1 & addr!="" & addr!="99"
-replace resident=1 if pid=="20081112"
-replace resident=1 if pid=="20130397"
-//replace resident=1 if pid=="20140456" - addr listed as QEH
-replace resident=1 if pid=="20140545"
-replace resident=1 if pid=="20140563"
-//replace resident=1 if pid=="20140608" - addr listed as a guest house
-
+           |                DiagnosisYear
+ Behaviour |      2008       2013       2014       2015 |     Total
+-----------+--------------------------------------------+----------
+    Benign |         8          0          0          0 |         8 
+ Uncertain |        10          0          0          0 |        10 
+   In situ |        83          9         24         19 |       135 
+ Malignant |     1,054        876        877      1,038 |     3,845 
+-----------+--------------------------------------------+----------
+     Total |     1,155        885        901      1,057 |     3,998
 */
 
 ** JC 26-Oct-2020: For quality assessment by IARC Hub, save this corrected dataset with all malignant + non-malignant tumours 2008, 2013-2015
@@ -830,18 +1167,76 @@ note: TS Excludes ineligible case definition
 note: TS Includes unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
 ** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
-drop if resident==2 //4 deleted - nonresident
-drop if resident==99 //40 deleted - resident unknown
+drop if resident==2 //3 deleted - nonresident
+drop if resident==99 //54 deleted - resident unknown
 drop if recstatus==3 //0 deleted - ineligible case definition
 drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //51 deleted - non malignant
-drop if persearch>2 //3 deleted
-drop if siteiarc==25 //0 - non reportable skin cancers
+drop if beh!=3 //151 deleted - non malignant
+drop if persearch>2 //0 deleted
+drop if siteiarc==25 //228 - non reportable skin cancers
 
 ** Check for cases wherein the non-reportable cancer had the below MP categories as the primary options
-tag duplicate pid
-using tag check if patient=separate event for a single pid
-same for eidmp ptrectot
+duplicates tag pid, gen(dup_pid)
+count if dup_pid>0 //119
+count if dup_pid==0 //3443
+//list pid cr5id dup_pid persearch patient eidmp ptrectot mpseq mptot if dup_pid>0, nolabel sepby(pid)
+//list pid cr5id dup_pid persearch patient eidmp ptrectot mpseq mptot if dup_pid==0, nolabel sepby(pid)
+
+replace mptot=2 if pid=="20140690" //2 changes
+
+count if dup_pid==0 & persearch>1 //6
+//list pid cr5id dup_pid persearch patient eidmp ptrectot mpseq mptot if dup_pid==0 & persearch>1
+
+replace mpseq=0 if pid=="20080336" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080336" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080336" & cr5id=="T2S1"
+replace patient=1 if pid=="20080336" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080336" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080336" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080336" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080365" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080365" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080365" & cr5id=="T2S1"
+replace patient=1 if pid=="20080365" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080365" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080365" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080365" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080626" & cr5id=="T3S1"
+replace mptot=1 if pid=="20080626" & cr5id=="T3S1"
+replace persearch=1 if pid=="20080626" & cr5id=="T3S1"
+replace patient=1 if pid=="20080626" & cr5id=="T3S1"
+replace eidmp=1 if pid=="20080626" & cr5id=="T3S1"
+replace ptrectot=1 if pid=="20080626" & cr5id=="T3S1"
+replace cr5id="T1S1" if pid=="20080626" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080696" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080696" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080696" & cr5id=="T2S1"
+replace patient=1 if pid=="20080696" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080696" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080696" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080696" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080728" & cr5id=="T3S1"
+replace mptot=1 if pid=="20080728" & cr5id=="T3S1"
+replace persearch=1 if pid=="20080728" & cr5id=="T3S1"
+replace patient=1 if pid=="20080728" & cr5id=="T3S1"
+replace eidmp=1 if pid=="20080728" & cr5id=="T3S1"
+replace ptrectot=1 if pid=="20080728" & cr5id=="T3S1"
+replace cr5id="T1S1" if pid=="20080728" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20081085" & cr5id=="T2S1"
+replace mptot=1 if pid=="20081085" & cr5id=="T2S1"
+replace persearch=1 if pid=="20081085" & cr5id=="T2S1"
+replace patient=1 if pid=="20081085" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20081085" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20081085" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20081085" & cr5id=="T2S1"
+
+drop dup_pid
+
 
 ** JC 03-Jun-2021: For quality assessment by IARC Hub, save this corrected dataset with all malignant (non-reportable skin + non-malignant tumours removed) for 2008, 2013-2015
 ** See p131 version06 for more info on this data request
@@ -852,180 +1247,122 @@ note: TS Excludes ineligible case definition
 note: TS Excludes ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
 ** For 2015 annaul report remove 2008 cases as decided by NS on 06-Oct-2020, email subject: BNR-C: 2015 cancer stats tables completed
-drop if dxyr==2008
+drop if dxyr==2008 //812 deleted
 
 
 ** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
-**drop dup_id
-sort pid
-duplicates tag pid, gen(dup_id)
-list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
-drop if resident==2 //4 deleted - nonresident
-drop if resident==99 //40 deleted - resident unknown
+drop if resident==2 //0 deleted - nonresident
+drop if resident==99 //0 deleted - resident unknown
 drop if recstatus==3 //0 deleted - ineligible case definition
 drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //51 deleted - non malignant
-drop if persearch>2 //3 deleted
+drop if beh!=3 //0 deleted - non malignant
+drop if persearch>2 //0 deleted
 drop if siteiarc==25 //0 - non reportable skin cancers
-drop dup_id
 
-count //3484; 3488; 2744
+** Check for cases wherein the non-reportable cancer had the below MP categories as the primary options
+duplicates tag pid, gen(dup_pid)
+count if dup_pid>0 //84
+count if dup_pid==0 //2666
+//list pid cr5id dup_pid persearch patient eidmp ptrectot mpseq mptot if dup_pid>0, nolabel sepby(pid)
+//list pid cr5id dup_pid persearch patient eidmp ptrectot mpseq mptot if dup_pid==0, nolabel sepby(pid)
 
-capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV05.xlsx", sheet("2013_2014_2015_20210727") firstrow(varlabels) replace
+count if dup_pid==0 & persearch>1 //11
+//list pid cr5id dup_pid persearch patient eidmp ptrectot mpseq mptot if dup_pid==0 & persearch>1
+
+replace mpseq=0 if pid=="20080048" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080048" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080048" & cr5id=="T2S1"
+replace patient=1 if pid=="20080048" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080048" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080048" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080048" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080242" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080242" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080242" & cr5id=="T2S1"
+replace patient=1 if pid=="20080242" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080242" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080242" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080242" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080295" & cr5id=="T3S1"
+replace mptot=1 if pid=="20080295" & cr5id=="T3S1"
+replace persearch=1 if pid=="20080295" & cr5id=="T3S1"
+replace patient=1 if pid=="20080295" & cr5id=="T3S1"
+replace eidmp=1 if pid=="20080295" & cr5id=="T3S1"
+replace ptrectot=1 if pid=="20080295" & cr5id=="T3S1"
+replace cr5id="T1S1" if pid=="20080295" & cr5id=="T3S1"
+
+replace mpseq=0 if pid=="20080340" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080340" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080340" & cr5id=="T2S1"
+replace patient=1 if pid=="20080340" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080340" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080340" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080340" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080401" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080401" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080401" & cr5id=="T2S1"
+replace patient=1 if pid=="20080401" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080401" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080401" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080401" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080539" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080539" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080539" & cr5id=="T2S1"
+replace patient=1 if pid=="20080539" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080539" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080539" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080539" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080567" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080567" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080567" & cr5id=="T2S1"
+replace patient=1 if pid=="20080567" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080567" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080567" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080567" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080636" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080636" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080636" & cr5id=="T2S1"
+replace patient=1 if pid=="20080636" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080636" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080636" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080636" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080679" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080679" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080679" & cr5id=="T2S1"
+replace patient=1 if pid=="20080679" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080679" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080679" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080679" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20080690" & cr5id=="T2S1"
+replace mptot=1 if pid=="20080690" & cr5id=="T2S1"
+replace persearch=1 if pid=="20080690" & cr5id=="T2S1"
+replace patient=1 if pid=="20080690" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20080690" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20080690" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20080690" & cr5id=="T2S1"
+
+replace mpseq=0 if pid=="20081058" & cr5id=="T2S1"
+replace mptot=1 if pid=="20081058" & cr5id=="T2S1"
+replace persearch=1 if pid=="20081058" & cr5id=="T2S1"
+replace patient=1 if pid=="20081058" & cr5id=="T2S1"
+replace eidmp=1 if pid=="20081058" & cr5id=="T2S1"
+replace ptrectot=1 if pid=="20081058" & cr5id=="T2S1"
+replace cr5id="T1S1" if pid=="20081058" & cr5id=="T2S1"
+
+count //2750
+
+capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV06.xlsx", sheet("2013_2014_2015_20210811") firstrow(varlabels) replace
 
 ** Save this corrected dataset with internationally reportable cases
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival", replace
 label data "2013 2014 2015 BNR-Cancer analysed data - Non-survival Dataset"
 note: TS This dataset was used for 2015 annual report
 note: TS Excludes ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
-
-/*
-********************
-** Death Matching **
-**  with CF data  **
-********************
-
-** To reduce the # of DCOs and trace-back I performed below on data from MasterDb
-** Check CF data to see if any match with unmatched 2015 death certificates (aim: to reduce DCO %)
-use "`datapath'\version02\2-working\2015_death certificates_DCOs" ,clear
-gen dco_deaths=1
-count //163
-
-preserve
-use "`datapath'\version02\2-working\2015_cancer_nonsurvival" ,clear
-drop if basis!=0 & basis!=. //891 deleted
-gen dco_cancer=1
-count //13
-save "`datapath'\version02\2-working\2015_cancer_DCOs" ,replace
-restore
-
-append using "`datapath'\version02\2-working\2015_cancer_DCOs"
-
-count //176
-
-preserve
-clear
-
-import excel using "`datapath'\version02\1-input\20200220tblCaseFinding.xlsx", firstrow
-rename No cfid_2008
-rename FirstName fname
-rename LastName lname
-rename Age age
-rename Sex sex
-rename AbstrStatus absstatus
-rename NRN natregno
-rename NFDxYear cfdxyr
-rename Comments comments_2008
-replace natregno=subinstr(natregno,"-","",.)
-replace fname = lower(rtrim(ltrim(itrim(fname))))
-replace lname = lower(rtrim(ltrim(itrim(lname))))
-replace absstatus="0" if absstatus=="Pending"
-replace absstatus="1" if regexm(absstatus,"Abstracted -")|absstatus=="Abstracted"
-replace absstatus="2" if regexm(absstatus,"Ineligible")
-replace absstatus="3" if absstatus=="Not Abstracted"
-destring absstatus ,replace
-label define absstatus_lab 0 "pending" 1 "abstracted" 2 "abstracted-ineligible" 3 "not abstracted" , modify
-label values absstatus absstatus_lab
-keep cfid_2008 fname lname age sex natregno absstatus comments_2008 cfdxyr
-count //4821
-save "`datapath'\version02\2-working\2008_cancer_CF" ,replace
-restore
-
-preserve
-clear
-import excel using "`datapath'\version02\1-input\20200220tblCaseFinding_2009.xlsx", firstrow
-rename No cfid_2013
-rename FirstName fname
-rename LastName lname
-rename Age age
-rename Sex sex
-rename AbstrStatus absstatus
-rename NRN natregno
-rename DxYear cfdxyr
-rename Comments comments_2013
-replace natregno=subinstr(natregno,"-","",.)
-replace fname = lower(rtrim(ltrim(itrim(fname))))
-replace lname = lower(rtrim(ltrim(itrim(lname))))
-replace absstatus="0" if absstatus=="Pending"
-replace absstatus="1" if regexm(absstatus,"Abstracted -")|absstatus=="Abstracted"
-replace absstatus="2" if regexm(absstatus,"Ineligible")
-replace absstatus="3" if absstatus=="Not Abstracted"
-destring absstatus ,replace
-label define absstatus_lab 0 "pending" 1 "abstracted" 2 "abstracted-ineligible" 3 "not abstracted" , modify
-label values absstatus absstatus_lab
-keep cfid_2013 fname lname age sex natregno absstatus comments_2013 cfdxyr
-count //4171
-save "`datapath'\version02\2-working\2013_cancer_CF" ,replace
-restore
-
-preserve
-clear
-import excel using "`datapath'\version02\1-input\20200220tblCF_2014.xlsx", firstrow
-rename cfid cfid_2014
-rename abstatus absstatus
-rename dxyear cfdxyr
-rename comments comments_2014
-replace natregno=subinstr(natregno,"-","",.)
-replace fname = lower(rtrim(ltrim(itrim(fname))))
-replace lname = lower(rtrim(ltrim(itrim(lname))))
-replace absstatus="0" if absstatus=="Pending"
-replace absstatus="1" if regexm(absstatus,"Abstracted -")|absstatus=="Abstracted"
-replace absstatus="2" if regexm(absstatus,"Ineligible")
-replace absstatus="3" if absstatus=="Not Abstracted"
-destring absstatus ,replace
-label define absstatus_lab 0 "pending" 1 "abstracted" 2 "abstracted-ineligible" 3 "not abstracted" , modify
-label values absstatus absstatus_lab
-keep cfid_2014 fname lname age sex natregno absstatus comments_2014 cfdxyr
-count //788
-save "`datapath'\version02\2-working\2014_cancer_CF" ,replace
-append using "`datapath'\version02\2-working\2008_cancer_CF"
-count //5609
-append using "`datapath'\version02\2-working\2013_cancer_CF"
-
-replace sex="1" if sex=="Female"
-replace sex="2" if sex=="Male"
-replace sex="99" if sex=="Not Stated"
-destring sex ,replace
-label define sex_lab 1 "Female" 2 "Male" 99 "ND" , modify
-label values sex sex_lab
-
-count //9780
-save "`datapath'\version02\2-working\2008_2013_2014_cancer_CF" ,replace
-restore
-
-drop _merge
-merge m:m fname lname using "`datapath'\version02\2-working\2008_2013_2014_cancer_CF"
-/*
-    Result                           # of obs.
-    -----------------------------------------
-    not matched                         9,915
-        from master                       162  (_merge==1)
-        from using                      9,753  (_merge==2)
-
-    matched                                27  (_merge==3)
-    -----------------------------------------
-*/
-count //9942
-
-//list pid record_id cfid_* fname lname absstatus cfdxyr dxyr comments_* if _merge==3 ,string(80)
-
-drop duppt
-sort lname fname record_id pid
-quietly by lname fname :  gen duppt = cond(_N==1,0,_n)
-sort lname fname
-count if duppt>0 //7021
-sort lname fname pid record_id
-//list pid record_id fname lname natregno dotyear dodyear if duppt>0 //only CR5 records
-
-//list pid record_id cfid_* fname lname absstatus cfdxyr dxyr comments_2008 comments_2013 if _merge==3 ,string(25)
-
-replace cr5db=1 if dco_deaths==1 & cr5db==. & _merge==3 //25 changes
-replace cr5db=1 if dco_cancer==1 & cr5db==. & _merge==3 //2 changes
-
-drop if cr5db!=1 //9915 deleted
-count //27
-
-//capture export_excel pid record_id cfid_2008 cfid_2013 cfid_2014 fname lname absstatus cfdxyr comments_2008 comments_2013 if cr5db==1 using "`datapath'\version02\2-working\CFFoundDCO2015V01.xlsx", sheet("2015DCOs_death&cr5_20200220") firstrow(variables)  replace
-//JC remember to change V01 to V02 when running list a 2nd time!
-
-save "`datapath'\version02\2-working\CF_matched_2015DCOs" ,replace

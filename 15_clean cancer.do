@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      02-DEC-2019
-    // 	date last modified      30-JUN-2021
+    // 	date last modified      10-AUG-2021
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -11492,6 +11492,7 @@ drop matchdone dd_dcstatus tfdddoa tfddda tfregnumstart tfdistrictstart tfregnum
 	 rx4month_2 rx4day_2 rx4d_2 stdoa_2 stdyear_2 stdmonth_2 stdday_2 sampledate_2 rdyear_2 rdmonth_2 rdday_2 recvdate_2 ///
 	 rptyear_2 rptmonth_2 rptday_2 rptdate_2 admyear_2 admmonth_2 admday_2 admdate_2 dfcyear_2 dfcmonth_2 dfcday_2 dfc_2 ///
 	 rtyear_2 rtmonth_2 rtday_2 rtdate_2 dupname_2 duppid_2 dupobs1do16 dd_event dd2019_event notindd dd2019_recstatdc pop_bb
+
 ** Creating one set of death data variables
 replace dd_nrn=dd2019_nrn if dd_nrn==. & dd2019_nrn!=. // changes
 replace dd_coddeath=dd2019_coddeath if dd_coddeath=="" & dd2019_coddeath!="" // changes

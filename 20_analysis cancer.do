@@ -36,7 +36,7 @@ cls
     log using "`logpath'/20_analysis cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
-
+CREATE TABLE FOR CASES BY PARISH
 
 ***************************************************************************
 * SECTION 1: NUMBERS 
