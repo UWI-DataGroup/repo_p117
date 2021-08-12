@@ -3,8 +3,8 @@
     //  algorithm name          002_prep prev lists.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      26-JUL-2021
-    // 	date last modified      26-JUL-2021
+    //  date first created      11-AUG-2021
+    // 	date last modified      11-AUG-2021
     //  algorithm task          Flagging previously-checked duplicates from CanReg5 dataset in prep for comparison with newly-generated lists (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have a dataset with previously-checked duplicates to flag these and append the DA's comments to new duplicates list where applicable.
@@ -58,7 +58,7 @@ capture erase "`datapath'\version07\2-working\prevNAMES_dups.dta"
 ** LOAD, SAVE previously-checked duplicates list as separate datasets, labelling each sheet using a new variable to indicate which list they were on and that they were previously checked
 
 ** NRN list
-import excel using "`datapath'\version07\1-input\CancerDuplicates20210629.xlsx" , sheet(NRN) firstrow case(lower)
+import excel using "`datapath'\version07\1-input\CancerDuplicates20210726.xlsx" , sheet(NRN) firstrow case(lower)
 replace nrnlist="1"
 destring nrnlist ,replace
 gen checked=1
@@ -73,12 +73,12 @@ rename datedatookaction str_dadate
 rename actiontaken str_action
 //destring birthdate ,replace
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action nrnlist checked
-count //16
+count //4
 save "`datapath'\version07\2-working\prevNRN_dups" ,replace
 clear
 
 ** DOB list
-import excel using "`datapath'\version07\1-input\CancerDuplicates20210629.xlsx" , sheet(DOB) firstrow case(lower)
+import excel using "`datapath'\version07\1-input\CancerDuplicates20210726.xlsx" , sheet(DOB) firstrow case(lower)
 replace doblist="1"
 destring doblist ,replace
 gen checked=1
@@ -92,12 +92,12 @@ rename datotakeaction str_da
 rename datedatookaction str_dadate
 rename actiontaken str_action
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action doblist checked
-count //6
+count //4
 save "`datapath'\version07\2-working\prevDOB_dups" ,replace
 clear
 
 ** Hosp# list
-import excel using "`datapath'\version07\1-input\CancerDuplicates20210629.xlsx" , sheet(Hosp#) firstrow case(lower)
+import excel using "`datapath'\version07\1-input\CancerDuplicates20210726.xlsx" , sheet(Hosp#) firstrow case(lower)
 replace hosplist="1"
 destring hosplist ,replace
 gen checked=1
@@ -116,7 +116,7 @@ save "`datapath'\version07\2-working\prevHOSP_dups" ,replace
 clear
 
 ** Names list
-import excel using "`datapath'\version07\1-input\CancerDuplicates20210629.xlsx" , sheet(Names) firstrow case(lower)
+import excel using "`datapath'\version07\1-input\CancerDuplicates20210726.xlsx" , sheet(Names) firstrow case(lower)
 replace nameslist="1"
 destring nameslist ,replace
 gen checked=1
@@ -131,10 +131,10 @@ rename datedatookaction str_dadate
 rename actiontaken str_action
 //destring birthdate ,replace
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action nameslist checked
-count //480
+count //37
 save "`datapath'\version07\2-working\prevNAMES_dups" ,replace
-gen checked29jun21=1
-save "`datapath'\version07\2-working\29jun21NAMES_dups" ,replace
+//gen checked29jun21=1
+//save "`datapath'\version07\2-working\29jun21NAMES_dups" ,replace
 clear
 
 /* 
