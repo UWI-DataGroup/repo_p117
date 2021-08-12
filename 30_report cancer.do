@@ -580,7 +580,7 @@ putdocx table tbl1(7,.), bold shading("yellow")
 putdocx table tbl1(8,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
-putdocx table tbl1(13,.), bold shading("yellow")
+putdocx table tbl1(12,.), bold shading("yellow")
 //putdocx table tbl1(17,.), bold shading("yellow")
 putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
@@ -745,7 +745,7 @@ putdocx text ("ASIRs"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=1,035)"), bold font(Helvetica,14,"blue")
+putdocx text ("Basis (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -781,7 +781,7 @@ putdocx text ("ASIRs"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=1,035)"), bold font(Helvetica,14,"blue")
+putdocx text ("Basis (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -937,7 +937,7 @@ putdocx paragraph, halign(center)
 putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=276,633)"), bold font(Helvetica,10,"blue")
 putdocx textblock begin
 Date Prepared: 15-Oct-2020.
-Prepared by: JC using Stata & Redcap data release date: 21-May-2021. 
+Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
 Generated using Dofile: 25_analysis mort.do
 putdocx textblock end
 putdocx paragraph
@@ -990,7 +990,7 @@ putdocx paragraph, halign(center)
 putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=285,327)"), bold font(Helvetica,10,"blue")
 putdocx textblock begin
 Date Prepared: 07-Jan-2021.
-Prepared by: JC using Stata & Redcap data release date: 21-May-2021.
+Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019.
 Generated using Dofile: 25_analysis mort.do
 putdocx textblock end
 putdocx paragraph
@@ -1066,7 +1066,6 @@ use "`datapath'\version02\2-working\2015_top10mort_age+sex_rates", clear
 
 putdocx clear
 putdocx begin
-putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
@@ -1091,7 +1090,7 @@ restore
 
 
 ** Output for cases by PARISH
-preserve
+clear
 use "`datapath'\version02\2-working\2013_2014_2015_cancer_numbers", clear
 				*******************************
 				*	     MS WORD REPORT       *
@@ -1121,7 +1120,7 @@ putdocx table tbl_parish = data("Parish Total_Records Percent"), varnames  ///
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_parish(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2013-2015_cases_parish.dta" ,replace
@@ -1292,7 +1291,7 @@ save "`datapath'\version02\2-working\2015_cases_parish+site.dta" ,replace
 label data "BNR-Cancer 2015 Cases by Parish"
 notes _dta :These data prepared for Natasha Sobers - 2015 annual report
 restore
-restore
+
 
 
 /*
