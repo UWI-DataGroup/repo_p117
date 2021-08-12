@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      02-DEC-2019
-    // 	date last modified      10-AUG-2021
+    // 	date last modified      12-AUG-2021
     //  algorithm task          Preparing 2015 cancer dataset for cleaning; Preparing previous years for combined dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -8449,7 +8449,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_DQI.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", replace
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
@@ -8490,7 +8490,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_DQI.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace

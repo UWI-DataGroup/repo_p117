@@ -6,7 +6,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL / Kern ROCKE
     //  date first created      02-DEC-2019
-    // 	date last modified      11-AUG-2021
+    // 	date last modified      12-AUG-2021
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASIRs (3) Survival
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2013, 2014 data for inclusion in 2015 cancer report.
@@ -358,6 +358,729 @@ tab age_10 ,m
 label data "2013-2015 BNR-Cancer analysed data - Numbers"
 note: TS This dataset does NOT include population data 
 save "`datapath'\version02\2-working\2013_2014_2015_cancer_numbers", replace
+
+
+*******************************************************************************************************************
+* *********************************************
+* ANALYSIS: SECTION 3 - cancer sites
+* Covering:
+*  3.1  Classification of cancer by site
+*  3.2 	ASIRs by site; overall, men and women
+* *********************************************
+** NOTE: bb popn and WHO popn data prepared by IH are ALL coded M=2 and F=1
+** Above note by AR from 2008 dofile
+
+** Load the dataset
+use "`datapath'\version02\2-working\2013_2014_2015_cancer_numbers", clear
+
+****************************************************************************** 2015 ****************************************************************************************
+
+drop if dxyr!=2015 //1709 deleted
+count //1035
+
+***********************
+** 3.1 CANCERS BY SITE
+***********************
+tab icd10 if beh<3 ,m //18 in-situ
+
+tab icd10 ,m //0 missing
+
+tab siteiarc ,m //0 missing
+
+tab sex ,m
+
+** Note: O&U, NMSCs (non-reportable skin cancers) and in-situ tumours excluded from top ten analysis
+tab siteiarc if siteiarc!=25 & siteiarc!=64
+tab siteiarc ,m //1030 - 38 O&U
+tab siteiarc patient
+
+** NS decided on 18march2019 to use IARC site groupings so variable siteiarc will be used instead of sitear
+** IARC site variable created based on CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
+display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
+
+
+** For annual report - Section 1: Incidence - Table 2a
+** Below top 10 code added by JC for 2015
+** All sites excl. in-situ, O&U, non-reportable skin cancers
+** THIS USED IN ANNUAL REPORT TABLE 1
+preserve
+drop if siteiarc==25 | siteiarc>60 //38 deleted
+tab siteiarc ,m
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag=(_n==1)
+replace tag = sum(tag)
+sum tag , meanonly
+gen top10 = (tag>=(`r(max)'-9))
+sum n if tag==(`r(max)'-9), meanonly
+replace top10 = 1 if n==`r(max)'
+tab siteiarc top10 if top10!=0
+contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
+summ
+describe
+gsort -count
+drop top10
+/*
+siteiarc									count	percentage
+Prostate (C61)								216		28.24
+Breast (C50)								198		25.88
+Colon (C18)									112		14.64
+Rectum (C19-20)								 48		 6.27
+Corpus uteri (C54)							 44		 5.75
+Stomach (C16)								 36		 4.71
+Lung (incl. trachea and bronchus) (C33-34)	 30		 3.92
+Multiple myeloma (C90)						 29		 3.79
+Non-Hodgkin lymphoma (C82-86,C96)			 26		 3.40
+Pancreas (C25)								 26		 3.40
+*/
+total count //765
+restore
+
+labelbook sex_lab
+tab sex ,m
+
+** For annual report - unsure which section of report to be used in
+** Below top 10 code added by JC for 2015
+** All sites excl. in-situ, O&U, non-reportable skin cancers
+** Requested by SF on 16-Oct-2020: Numbers of top 10 by sex
+preserve
+drop if siteiarc==25 | siteiarc>60 //38 deleted
+tab siteiarc ,m
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag=(_n==1)
+replace tag = sum(tag)
+sum tag , meanonly
+gen top10 = (tag>=(`r(max)'-9))
+sum n if tag==(`r(max)'-9), meanonly
+replace top10 = 1 if n==`r(max)'
+gsort -top10
+tab siteiarc top10 if top10!=0
+tab siteiarc top10 if top10!=0 & sex==1 //female
+tab siteiarc top10 if top10!=0 & sex==2 //male
+contract siteiarc top10 sex if top10!=0, freq(count) percent(percentage)
+summ
+describe
+gsort -count
+drop top10
+/*
+year	cancer_site									number	sex
+2015	Stomach (C16)								19		female
+2015	Stomach (C16)								17		male
+2015	Colon (C18)									53		female
+2015	Colon (C18)									59		male
+2015	Rectum (C19-20)								26		female
+2015	Rectum (C19-20)								22		male
+2015	Pancreas (C25)								14		female
+2015	Pancreas (C25)								12		male
+2015	Lung (incl. trachea and bronchus) (C33-34)	 9		female
+2015	Lung (incl. trachea and bronchus) (C33-34)	21		male
+2015	Breast (C50)								197		female
+2015	Breast (C50)								  1		male
+2015	Corpus uteri (C54)							 44		female
+2015	Prostate (C61)								216		male
+2015	Non-Hodgkin lymphoma (C82-86,C96)			 14		female
+2015	Non-Hodgkin lymphoma (C82-86,C96)			 12		male
+2015	Multiple myeloma (C90)						 21		female
+2015	Multiple myeloma (C90)						  8		male
+*/
+total count //765
+drop percentage
+gen year=2015
+rename count number
+rename siteiarc cancer_site
+sort cancer_site sex
+order year cancer_site number
+save "`datapath'\version02\2-working\2015_top10_sex" ,replace
+restore
+
+labelbook sex_lab
+tab sex ,m
+
+** For annual report - Section 1: Incidence - Table 1
+** FEMALE - using IARC's site groupings (excl. in-situ)
+preserve
+drop if sex==2 //486 deleted
+drop if siteiarc>60 //21 deleted
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag5=(_n==1)
+replace tag5 = sum(tag5)
+sum tag5 , meanonly
+gen top5 = (tag5>=(`r(max)'-4))
+sum n if tag5==(`r(max)'-4), meanonly
+replace top5 = 1 if n==`r(max)'
+gsort -top5
+tab siteiarc top5 if top5!=0
+contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
+gsort -count
+drop top5
+
+gen totpercent=(count/545)*100 //all cancers excl. male(490)
+gen alltotpercent=(count/1035)*100 //all cancers
+/*
+siteiarc				count	percentage	totpercent	alltotpercent
+Breast (C50)			197		57.77		36.14679	19.03382
+Colon (C18)				 53		15.54		 9.724771	 5.120773
+Corpus uteri (C54)		 44		12.90		 8.073395	 4.251208
+Rectum (C19-20)			 26		 7.62		 4.770642	 2.512077
+Multiple myeloma (C90)	 21		 6.16		 3.853211	 2.028986
+
+*/
+total count //341
+restore
+
+** For annual report - Section 1: Incidence - Table 1
+** Below top 5 code added by JC for 2015
+** MALE - using IARC's site groupings
+preserve
+drop if sex==1 //544 deleted
+drop if siteiarc==25 | siteiarc>60 //17 deleted
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag5=(_n==1)
+replace tag5 = sum(tag5)
+sum tag5 , meanonly
+gen top5 = (tag5>=(`r(max)'-4))
+sum n if tag5==(`r(max)'-4), meanonly
+replace top5 = 1 if n==`r(max)'
+gsort -top5
+tab siteiarc top5 if top5!=0
+contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
+gsort -count
+drop top5
+
+gen totpercent=(count/490)*100 //all cancers excl. female(545)
+gen alltotpercent=(count/1035)*100 //all cancers
+/*
+siteiarc									count	percentage	totpercent	alltotpercent
+Prostate (C61)								216		64.48		44.08163	20.86957
+Colon (C18)									 59		17.61		12.04082	 5.700483
+Rectum (C19-20)								 22		 6.57		 4.489796	 2.125604
+Lung (incl. trachea and bronchus) (C33-34)	 21		 6.27		 4.285714	 2.028986
+Stomach (C16)								 17		 5.07		 3.469388	 1.642512
+*/
+total count //335
+restore
+
+
+*****************************
+**   Data Quality Indices  **
+*****************************
+** Added on 04-June-2019 by JC as requested by NS for 2014 cancer annual report
+
+*****************************
+** Identifying & Reporting **
+** 	 Data Quality Index	   **
+** MV,DCO,O+U,UnkAge,CLIN  **
+*****************************
+
+tab basis ,m
+tab siteicd10 basis ,m 
+tab sex ,m //0 missing
+tab age ,m //3 missing=999
+tab sex age if age==.|age==999 //used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+tab sex if sitecr5db==20 //site=O&U; used this table in annual report (see excel 2014 data quality indicators in BNR OneDrive)
+
+
+tab basis ,m
+gen boddqi=1 if basis>4 & basis <9 //245 changes; 
+replace boddqi=2 if basis==0 //134 changes
+replace boddqi=3 if basis>0 & basis<5 //86 changes
+replace boddqi=4 if basis==9 //25 changes
+label define boddqi_lab 1 "MV" 2 "DCO"  3 "CLIN" 4 "UNK.BASIS" , modify
+label var boddqi "basis DQI"
+label values boddqi boddqi_lab
+
+gen siteagedqi=1 if siteiarc==61 //38 changes
+replace siteagedqi=2 if age==.|age==999 //1 change
+replace siteagedqi=3 if dob==. & siteagedqi!=2 //11 changes
+replace siteagedqi=4 if siteiarc==61 & siteagedqi!=1 //0 changes
+replace siteagedqi=5 if sex==.|sex==99 //0 changes
+label define siteagedqi_lab 1 "O&U SITE" 2 "UNK.AGE" 3 "UNK.DOB" 4 "O&U+UNK.AGE/DOB" 5 "UNK.SEX", modify
+label var siteagedqi "site/age DQI"
+label values siteagedqi siteagedqi_lab
+
+tab boddqi ,m
+generate rectot=_N //1062
+tab boddqi rectot,m
+
+tab siteagedqi ,m
+tab siteagedqi rectot,m
+
+
+** Create variables for table by basis (DCO% + MV%) in Data Quality section of annual report
+** This was done manually in excel for 2014 annual report so the above code has now been updated to be automated in Stata
+tab sitecr5db boddqi if boddqi!=. & sitecr5db!=. & sitecr5db<23 & sitecr5db!=2 & sitecr5db!=5 & sitecr5db!=7 & sitecr5db!=9 & sitecr5db!=13 & sitecr5db!=15 & sitecr5db!=16 & sitecr5db!=17 & sitecr5db!=18 & sitecr5db!=19 & sitecr5db!=20
+/*
+                      |                  basis DQI
+          CR5db sites |        MV        DCO       CLIN  UNK.BASIS |     Total
+----------------------+--------------------------------------------+----------
+Mouth & pharynx (C00- |        23          0          0          0 |        23 
+        Stomach (C16) |        23          7          6          0 |        36 
+Colon, rectum, anus ( |       143         12          9          2 |       166 
+       Pancreas (C25) |         7          7         11          1 |        26 
+Lung, trachea, bronch |        13          6         11          0 |        30 
+         Breast (C50) |       179         11          5          3 |       198 
+         Cervix (C53) |        14          2          0          0 |        16 
+Corpus & Uterus NOS ( |        43          2          6          0 |        51 
+       Prostate (C61) |       169         25         16          6 |       216 
+Lymphoma (C81-85,88,9 |        44          6          5          5 |        60 
+   Leukaemia (C91-95) |        11          2          1          2 |        16 
+----------------------+--------------------------------------------+----------
+                Total |       669         80         70         19 |       838
+*/
+** All BOD options
+preserve
+drop if boddqi==. | sitecr5db==. | sitecr5db>22 | sitecr5db==20 | sitecr5db==2 | sitecr5db==5 | sitecr5db==7 | sitecr5db==9 | sitecr5db==13 | (sitecr5db>14 & sitecr5db<21) //260 deleted
+contract sitecr5db boddqi, freq(count) percent(percentage)
+input
+40	1	669	0
+40	2	 80	0
+40	3	 70 0
+40	4	 19 0
+end
+
+label define sitecr5db_lab ///
+1 "Mouth & pharynx" ///
+2 "Oesophagus" ///
+3 "Stomach" ///
+4 "Colon, rectum, anus" ///
+5 "Liver" ///
+6 "Pancreas" ///
+7 "Larynx" ///
+8 "Lung, trachea, bronchus" ///
+9 "Melanoma of skin" ///
+10 "Breast" ///
+11 "Cervix" ///
+12 "Corpus & Uterus NOS" ///
+13 "Ovary & adnexa" ///
+14 "Prostate" ///
+15 "Testis" ///
+16 "Kidney & urinary NOS" ///
+17 "Bladder" ///
+18 "Brain, nervous system" ///
+19 "Thyroid" ///
+20 "O&U" ///
+21 "Lymphoma" ///
+22 "Leukaemia" ///
+23 "Other digestive" ///
+24 "Nose, sinuses" ///
+25 "Bone, cartilage, etc" ///
+26 "Other skin" ///
+27 "Other female organs" ///
+28 "Other male organs" ///
+29 "Other endocrine" ///
+30 "Myeloproliferative disorders (MPD)" ///
+31 "Myelodysplastic syndromes (MDS)" ///
+32 "D069: CIN 3" ///
+33 "Eye,Heart,etc" ///
+40 "All sites (in this table)" , modify
+label var sitecr5db "CR5db sites"
+label values sitecr5db sitecr5db_lab
+drop percentage
+gen percentage=(count/23)*100 if sitecr5db==1 & boddqi==1
+replace percentage=(count/23)*100 if sitecr5db==1 & boddqi==2
+replace percentage=(count/23)*100 if sitecr5db==1 & boddqi==3
+replace percentage=(count/23)*100 if sitecr5db==1 & boddqi==4
+replace percentage=(count/36)*100 if sitecr5db==3 & boddqi==1
+replace percentage=(count/36)*100 if sitecr5db==3 & boddqi==2
+replace percentage=(count/36)*100 if sitecr5db==3 & boddqi==3
+replace percentage=(count/36)*100 if sitecr5db==3 & boddqi==4
+replace percentage=(count/166)*100 if sitecr5db==4 & boddqi==1
+replace percentage=(count/166)*100 if sitecr5db==4 & boddqi==2
+replace percentage=(count/166)*100 if sitecr5db==4 & boddqi==3
+replace percentage=(count/166)*100 if sitecr5db==4 & boddqi==4
+replace percentage=(count/26)*100 if sitecr5db==6 & boddqi==1
+replace percentage=(count/26)*100 if sitecr5db==6 & boddqi==2
+replace percentage=(count/26)*100 if sitecr5db==6 & boddqi==3
+replace percentage=(count/26)*100 if sitecr5db==6 & boddqi==4
+replace percentage=(count/30)*100 if sitecr5db==8 & boddqi==1
+replace percentage=(count/30)*100 if sitecr5db==8 & boddqi==2
+replace percentage=(count/30)*100 if sitecr5db==8 & boddqi==3
+replace percentage=(count/30)*100 if sitecr5db==8 & boddqi==4
+replace percentage=(count/198)*100 if sitecr5db==10 & boddqi==1
+replace percentage=(count/198)*100 if sitecr5db==10 & boddqi==2
+replace percentage=(count/198)*100 if sitecr5db==10 & boddqi==3
+replace percentage=(count/198)*100 if sitecr5db==10 & boddqi==4
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==1
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==2
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==3
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==4
+replace percentage=(count/51)*100 if sitecr5db==12 & boddqi==1
+replace percentage=(count/51)*100 if sitecr5db==12 & boddqi==2
+replace percentage=(count/51)*100 if sitecr5db==12 & boddqi==3
+replace percentage=(count/51)*100 if sitecr5db==12 & boddqi==4
+replace percentage=(count/216)*100 if sitecr5db==14 & boddqi==1
+replace percentage=(count/216)*100 if sitecr5db==14 & boddqi==2
+replace percentage=(count/216)*100 if sitecr5db==14 & boddqi==3
+replace percentage=(count/216)*100 if sitecr5db==14 & boddqi==4
+replace percentage=(count/60)*100 if sitecr5db==21 & boddqi==1
+replace percentage=(count/60)*100 if sitecr5db==21 & boddqi==2
+replace percentage=(count/60)*100 if sitecr5db==21 & boddqi==3
+replace percentage=(count/60)*100 if sitecr5db==21 & boddqi==4
+replace percentage=(count/16)*100 if sitecr5db==22 & boddqi==1
+replace percentage=(count/16)*100 if sitecr5db==22 & boddqi==2
+replace percentage=(count/16)*100 if sitecr5db==22 & boddqi==3
+replace percentage=(count/16)*100 if sitecr5db==22 & boddqi==4
+replace percentage=(count/838)*100 if sitecr5db==40 & boddqi==1
+replace percentage=(count/838)*100 if sitecr5db==40 & boddqi==2
+replace percentage=(count/838)*100 if sitecr5db==40 & boddqi==3
+replace percentage=(count/838)*100 if sitecr5db==40 & boddqi==4
+format percentage %04.1f
+
+gen icd10dqi="C00-14" if sitecr5db==1
+replace icd10dqi="C16" if sitecr5db==3
+replace icd10dqi="C18-21" if sitecr5db==4
+replace icd10dqi="C25" if sitecr5db==6
+replace icd10dqi="C33-34" if sitecr5db==8
+replace icd10dqi="C50" if sitecr5db==10
+replace icd10dqi="C53" if sitecr5db==11
+replace icd10dqi="C54-55" if sitecr5db==12
+replace icd10dqi="C61" if sitecr5db==14
+replace icd10dqi="C81-85,88,90,96" if sitecr5db==21
+replace icd10dqi="C91-95" if sitecr5db==22
+replace icd10dqi="All" if sitecr5db==40
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2015 Annual Report: DQI"), bold
+putdocx textblock begin
+Date Prepared: 12-AUG-2021. 
+Prepared by: JC using Stata & Redcap data release date: 21-May-2021. 
+Generated using Dofiles: 15_clean cancer.do and 20_analysis cancer.do
+putdocx textblock end
+putdocx paragraph, style(Heading1)
+putdocx text ("Basis - MV%, DCO%, CLIN%, UNK%"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename sitecr5db Cancer_Site
+rename boddqi Total_DQI
+rename count Cases
+rename percentage Pct_DQI
+rename icd10dqi ICD10
+putdocx table tbl_bod = data("Cancer_Site Total_DQI Cases Pct_DQI ICD10"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_bod(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_basis.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Basis"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+/*
+tab sitecr5db boddqi if boddqi!=. & boddqi<3 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=2 & sitecr5db!=5 & sitecr5db!=7 & sitecr5db!=9 & sitecr5db!=13 & sitecr5db!=15 & sitecr5db!=16 & sitecr5db!=17 & sitecr5db!=18 & sitecr5db!=19 & sitecr5db!=20
+/*
+                      |       basis DQI
+          CR5db sites |        MV        DCO |     Total
+----------------------+----------------------+----------
+Mouth & pharynx (C00- |        23          0 |        23 
+        Stomach (C16) |        23          7 |        30 
+Colon, rectum, anus ( |       143         12 |       155 
+       Pancreas (C25) |         7          7 |        14 
+Lung, trachea, bronch |        13          6 |        19 
+         Breast (C50) |       179         11 |       190 
+         Cervix (C53) |        14          2 |        16 
+Corpus & Uterus NOS ( |        43          2 |        45 
+       Prostate (C61) |       169         25 |       194 
+Lymphoma (C81-85,88,9 |        44          6 |        50 
+   Leukaemia (C91-95) |        11          2 |        13 
+----------------------+----------------------+----------
+                Total |       669         80 |       749
+*/
+labelbook sitecr5db_lab
+
+** MV + DCO %
+preserve
+drop if boddqi==. | boddqi>2 | sitecr5db==. | sitecr5db>22 | sitecr5db==20 | sitecr5db==2 | sitecr5db==5 | sitecr5db==7 | sitecr5db==9 | sitecr5db==13 | (sitecr5db>14 & sitecr5db<21) //260 deleted
+contract sitecr5db boddqi, freq(count) percent(percentage)
+input
+34	1	669	0
+34	2	 80	0
+end
+
+label define sitecr5db_lab ///
+1 "Mouth & pharynx" ///
+2 "Oesophagus" ///
+3 "Stomach" ///
+4 "Colon, rectum, anus" ///
+5 "Liver" ///
+6 "Pancreas" ///
+7 "Larynx" ///
+8 "Lung, trachea, bronchus" ///
+9 "Melanoma of skin" ///
+10 "Breast" ///
+11 "Cervix" ///
+12 "Corpus & Uterus NOS" ///
+13 "Ovary & adnexa" ///
+14 "Prostate" ///
+15 "Testis" ///
+16 "Kidney & urinary NOS" ///
+17 "Bladder" ///
+18 "Brain, nervous system" ///
+19 "Thyroid" ///
+20 "O&U" ///
+21 "Lymphoma" ///
+22 "Leukaemia" ///
+23 "Other digestive" ///
+24 "Nose, sinuses" ///
+25 "Bone, cartilage, etc" ///
+26 "Other skin" ///
+27 "Other female organs" ///
+28 "Other male organs" ///
+29 "Other endocrine" ///
+30 "Myeloproliferative disorders (MPD)" ///
+31 "Myelodysplastic syndromes (MDS)" ///
+32 "D069: CIN 3" ///
+33 "Eye,Heart,etc" ///
+34 "All sites (in this table)" , modify
+label var sitecr5db "CR5db sites"
+label values sitecr5db sitecr5db_lab
+drop percentage
+gen percentage=(count/23)*100 if sitecr5db==1 & boddqi==1
+replace percentage=(count/23)*100 if sitecr5db==1 & boddqi==2
+replace percentage=(count/30)*100 if sitecr5db==3 & boddqi==1
+replace percentage=(count/30)*100 if sitecr5db==3 & boddqi==2
+replace percentage=(count/155)*100 if sitecr5db==4 & boddqi==1
+replace percentage=(count/155)*100 if sitecr5db==4 & boddqi==2
+replace percentage=(count/14)*100 if sitecr5db==6 & boddqi==1
+replace percentage=(count/14)*100 if sitecr5db==6 & boddqi==2
+replace percentage=(count/19)*100 if sitecr5db==8 & boddqi==1
+replace percentage=(count/19)*100 if sitecr5db==8 & boddqi==2
+replace percentage=(count/190)*100 if sitecr5db==10 & boddqi==1
+replace percentage=(count/190)*100 if sitecr5db==10 & boddqi==2
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==1
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==2
+replace percentage=(count/45)*100 if sitecr5db==12 & boddqi==1
+replace percentage=(count/45)*100 if sitecr5db==12 & boddqi==2
+replace percentage=(count/194)*100 if sitecr5db==14 & boddqi==1
+replace percentage=(count/194)*100 if sitecr5db==14 & boddqi==2
+replace percentage=(count/50)*100 if sitecr5db==21 & boddqi==1
+replace percentage=(count/50)*100 if sitecr5db==21 & boddqi==2
+replace percentage=(count/13)*100 if sitecr5db==22 & boddqi==1
+replace percentage=(count/13)*100 if sitecr5db==22 & boddqi==2
+replace percentage=(count/749)*100 if sitecr5db==34 & boddqi==1
+replace percentage=(count/749)*100 if sitecr5db==34 & boddqi==2
+format percentage %04.1f
+
+gen icd10dqi="C00-14" if sitecr5db==1
+replace icd10dqi="C16" if sitecr5db==3
+replace icd10dqi="C18-21" if sitecr5db==4
+replace icd10dqi="C25" if sitecr5db==6
+replace icd10dqi="C33-34" if sitecr5db==8
+replace icd10dqi="C50" if sitecr5db==10
+replace icd10dqi="C53" if sitecr5db==11
+replace icd10dqi="C54-55" if sitecr5db==12
+replace icd10dqi="C61" if sitecr5db==14
+replace icd10dqi="C81-85,88,90,96" if sitecr5db==21
+replace icd10dqi="C91-95" if sitecr5db==22
+replace icd10dqi="All" if sitecr5db==34
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2015 Annual Report: DQI"), bold
+putdocx textblock begin
+Date Prepared: 12-AUG-2021. 
+Prepared by: JC using Stata & Redcap data release date: 21-May-2021. 
+Generated using Dofiles: 15_clean cancer.do and 20_analysis cancer.do
+putdocx textblock end
+putdocx paragraph, style(Heading1)
+putdocx text ("Basis - MV% + DCO%"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename sitecr5db Cancer_Site
+rename boddqi Total_DQI
+rename count Cases
+rename percentage Pct_DQI
+rename icd10dqi ICD10
+putdocx table tbl_bod = data("Cancer_Site Total_DQI Cases Pct_DQI ICD10"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_bod(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_basis_mvdco.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Basis"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+
+
+tab sitecr5db boddqi if boddqi!=. & boddqi>2 & sitecr5db!=. & sitecr5db<23 & sitecr5db!=2 & sitecr5db!=5 & sitecr5db!=7 & sitecr5db!=9 & sitecr5db!=13 & sitecr5db!=15 & sitecr5db!=16 & sitecr5db!=17 & sitecr5db!=18 & sitecr5db!=19 & sitecr5db!=20
+/*
+                      |       basis DQI
+          CR5db sites |      CLIN  UNK.BASIS |     Total
+----------------------+----------------------+----------
+        Stomach (C16) |         6          0 |         6 
+Colon, rectum, anus ( |         9          2 |        11 
+       Pancreas (C25) |        11          1 |        12 
+Lung, trachea, bronch |        11          0 |        11 
+         Breast (C50) |         5          3 |         8 
+Corpus & Uterus NOS ( |         6          0 |         6 
+       Prostate (C61) |        16          6 |        22 
+Lymphoma (C81-85,88,9 |         5          5 |        10 
+   Leukaemia (C91-95) |         1          2 |         3 
+----------------------+----------------------+----------
+                Total |        70         19 |        89
+*/
+** CLIN + UNK %
+preserve
+drop if boddqi==. | boddqi<3 | sitecr5db==. | sitecr5db>22 | sitecr5db==20 | sitecr5db==2 | sitecr5db==5 | sitecr5db==7 | sitecr5db==9 | sitecr5db==13 | (sitecr5db>14 & sitecr5db<21) //260 deleted
+contract sitecr5db boddqi, freq(count) percent(percentage)
+input
+34	3	70	0
+34	4	19	0
+end
+
+label define sitecr5db_lab ///
+1 "Mouth & pharynx" ///
+2 "Oesophagus" ///
+3 "Stomach" ///
+4 "Colon, rectum, anus" ///
+5 "Liver" ///
+6 "Pancreas" ///
+7 "Larynx" ///
+8 "Lung, trachea, bronchus" ///
+9 "Melanoma of skin" ///
+10 "Breast" ///
+11 "Cervix" ///
+12 "Corpus & Uterus NOS" ///
+13 "Ovary & adnexa" ///
+14 "Prostate" ///
+15 "Testis" ///
+16 "Kidney & urinary NOS" ///
+17 "Bladder" ///
+18 "Brain, nervous system" ///
+19 "Thyroid" ///
+20 "O&U" ///
+21 "Lymphoma" ///
+22 "Leukaemia" ///
+23 "Other digestive" ///
+24 "Nose, sinuses" ///
+25 "Bone, cartilage, etc" ///
+26 "Other skin" ///
+27 "Other female organs" ///
+28 "Other male organs" ///
+29 "Other endocrine" ///
+30 "Myeloproliferative disorders (MPD)" ///
+31 "Myelodysplastic syndromes (MDS)" ///
+32 "D069: CIN 3" ///
+33 "Eye,Heart,etc" ///
+34 "All sites (in this table)" , modify
+label var sitecr5db "CR5db sites"
+label values sitecr5db sitecr5db_lab
+drop percentage
+gen percentage=(count/23)*100 if sitecr5db==1 & boddqi==3
+replace percentage=(count/23)*100 if sitecr5db==1 & boddqi==4
+replace percentage=(count/30)*100 if sitecr5db==3 & boddqi==3
+replace percentage=(count/30)*100 if sitecr5db==3 & boddqi==4
+replace percentage=(count/155)*100 if sitecr5db==4 & boddqi==3
+replace percentage=(count/155)*100 if sitecr5db==4 & boddqi==4
+replace percentage=(count/14)*100 if sitecr5db==6 & boddqi==3
+replace percentage=(count/14)*100 if sitecr5db==6 & boddqi==4
+replace percentage=(count/19)*100 if sitecr5db==8 & boddqi==3
+replace percentage=(count/19)*100 if sitecr5db==8 & boddqi==4
+replace percentage=(count/190)*100 if sitecr5db==10 & boddqi==3
+replace percentage=(count/190)*100 if sitecr5db==10 & boddqi==4
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==3
+replace percentage=(count/16)*100 if sitecr5db==11 & boddqi==4
+replace percentage=(count/45)*100 if sitecr5db==12 & boddqi==3
+replace percentage=(count/45)*100 if sitecr5db==12 & boddqi==4
+replace percentage=(count/194)*100 if sitecr5db==14 & boddqi==3
+replace percentage=(count/194)*100 if sitecr5db==14 & boddqi==4
+replace percentage=(count/50)*100 if sitecr5db==21 & boddqi==3
+replace percentage=(count/50)*100 if sitecr5db==21 & boddqi==4
+replace percentage=(count/13)*100 if sitecr5db==22 & boddqi==3
+replace percentage=(count/13)*100 if sitecr5db==22 & boddqi==4
+replace percentage=(count/749)*100 if sitecr5db==34 & boddqi==3
+replace percentage=(count/749)*100 if sitecr5db==34 & boddqi==4
+format percentage %04.1f
+
+gen icd10dqi="C00-14" if sitecr5db==1
+replace icd10dqi="C16" if sitecr5db==3
+replace icd10dqi="C18-21" if sitecr5db==4
+replace icd10dqi="C25" if sitecr5db==6
+replace icd10dqi="C33-34" if sitecr5db==8
+replace icd10dqi="C50" if sitecr5db==10
+replace icd10dqi="C53" if sitecr5db==11
+replace icd10dqi="C54-55" if sitecr5db==12
+replace icd10dqi="C61" if sitecr5db==14
+replace icd10dqi="C81-85,88,90,96" if sitecr5db==21
+replace icd10dqi="C91-95" if sitecr5db==22
+replace icd10dqi="All" if sitecr5db==34
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2015 Annual Report: DQI"), bold
+putdocx textblock begin
+Date Prepared: 12-AUG-2021. 
+Prepared by: JC using Stata & Redcap data release date: 21-May-2021. 
+Generated using Dofiles: 15_clean cancer.do and 20_analysis cancer.do
+putdocx textblock end
+putdocx paragraph, style(Heading1)
+putdocx text ("Basis - CLIN% + UNK%"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename sitecr5db Cancer_Site
+rename boddqi Total_DQI
+rename count Cases
+rename percentage Pct_DQI
+rename icd10dqi ICD10
+putdocx table tbl_bod = data("Cancer_Site Total_DQI Cases Pct_DQI ICD10"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_bod(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_basis_clinunk.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Basis"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+*/
+
+preserve
+** % tumours - site,age
+tab siteagedqi
+contract siteagedqi, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Unknown - Site, DOB & Age"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Site,DOB,Age (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename siteagedqi Total_DQI
+rename count Total_Records
+rename percentage Pct_DQI
+putdocx table tbl_site = data("Total_DQI Total_Records Pct_DQI"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_siteage.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Site,Age"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+** Missing sex %
+** Missing age %
 
 * *********************************************
 * ANALYSIS: SECTION 3 - cancer sites

@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL/ Kern ROCKE
     //  date first created      17-NOV-2019
-    // 	date last modified      11-AUG-2021
+    // 	date last modified      12-AUG-2021
     //  algorithm task          Preparing 2013-2015 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2015 data for 2015 annual report.
@@ -385,7 +385,7 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2015 Annual Report: Stata Results"), bold
 putdocx textblock begin
-Date Prepared: 11-AUG-2021. 
+Date Prepared: 12-AUG-2021. 
 Prepared by: JC using Stata & Redcap data release date: 21-May-2021.
 Generated using Dofile: 30_report cancer.do
 putdocx textblock end
@@ -457,7 +457,7 @@ putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2013_2014_2015summstats" ,replace
@@ -498,7 +498,7 @@ putdocx table tbl1(1,8), bold shading(lightgray)
 putdocx table tbl1(1,9), bold shading(lightgray)
 putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -540,7 +540,7 @@ putdocx table tbl1(9,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -582,7 +582,7 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 putdocx table tbl1(12,.), bold shading("yellow")
 //putdocx table tbl1(17,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -624,7 +624,7 @@ putdocx table tbl1(12,.), bold shading("yellow")
 //putdocx table tbl1(13,.), bold shading("yellow")
 putdocx table tbl1(14,.), bold shading("yellow")
 //putdocx table tbl1(15,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -655,7 +655,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -686,7 +686,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -717,7 +717,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -754,7 +754,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -790,7 +790,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -828,7 +828,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -866,7 +866,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -904,7 +904,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -957,7 +957,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\3-output\2013_2014_2015_summstats" ,replace
@@ -1010,7 +1010,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\3-output\2013_2014_2015_summstats" ,replace
@@ -1047,7 +1047,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -1084,7 +1084,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -1120,7 +1120,7 @@ putdocx table tbl_parish = data("Parish Total_Records Percent"), varnames  ///
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_parish(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2013-2015_cases_parish.dta" ,replace
@@ -1156,7 +1156,7 @@ putdocx table tbl_year = data("Parish Year Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_year(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2013-2015_cases_parish+dxyr.dta" ,replace
@@ -1188,7 +1188,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2013-2015_cases_parish+site.dta" ,replace
@@ -1220,7 +1220,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2013_cases_parish+site.dta" ,replace
@@ -1252,7 +1252,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2014_cases_parish+site.dta" ,replace
@@ -1284,7 +1284,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-12_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\2-working\2015_cases_parish+site.dta" ,replace

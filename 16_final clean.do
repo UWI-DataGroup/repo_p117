@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      09-AUG-2021
-    // 	date last modified      09-AUG-2021
+    // 	date last modified      12-AUG-2021
     //  algorithm task          Final cleaning of 2008,2013-2015 cancer dataset; Preparing datasets for analysis
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -1360,7 +1360,7 @@ replace cr5id="T1S1" if pid=="20081058" & cr5id=="T2S1"
 count //2750
 
 ** Export the data for SF to use to create graphs
-capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV06.xlsx", sheet("2013_2014_2015_20210811") firstrow(varlabels) replace
+capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV07.xlsx", sheet("2013_2014_2015_20210812") firstrow(varlabels) replace
 
 ** Save this corrected dataset with internationally reportable cases
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival", replace
