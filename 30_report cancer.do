@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL/ Kern ROCKE
     //  date first created      17-NOV-2019
-    // 	date last modified      06-APR-2021
+    // 	date last modified      11-AUG-2021
     //  algorithm task          Preparing 2013-2015 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2015 data for 2015 annual report.
@@ -35,7 +35,6 @@ cls
     log using "`logpath'\30_report cancer.smcl", replace // error r(603)
 ** HEADER -----------------------------------------------------
 
-CREATE TABLE FOR CASES BY PARISH
 
 *************************
 **  SUMMARY STATISTICS **
@@ -103,14 +102,16 @@ egen surv3yr_2013_dead=count(surv3yr_2013) if surv3yr_2013==1
 drop surv3yr_2013
 gen surv3yr_2013=surv3yr_2013_censor/pttotsurv_2013*100
 ** 5-yr survival
-gen surv5yr_2015=.
+egen surv5yr_2015_censor=count(surv5yr_2015) if surv5yr_2015==0
+egen surv5yr_2015_dead=count(surv5yr_2015) if surv5yr_2015==1
 egen surv5yr_2014_censor=count(surv5yr_2014) if surv5yr_2014==0
 egen surv5yr_2014_dead=count(surv5yr_2014) if surv5yr_2014==1
 egen surv5yr_2013_censor=count(surv5yr_2013) if surv5yr_2013==0
 egen surv5yr_2013_dead=count(surv5yr_2013) if surv5yr_2013==1
-drop surv5yr_2013 surv5yr_2014
+drop surv5yr_2013 surv5yr_2014 surv5yr_2015
 gen surv5yr_2013=surv5yr_2013_censor/pttotsurv_2013*100
 gen surv5yr_2014=surv5yr_2014_censor/pttotsurv_2014*100
+gen surv5yr_2015=surv5yr_2015_censor/pttotsurv_2015*100
 format surv1yr_2015 surv1yr_2014 surv1yr_2013 surv3yr_2015 surv3yr_2014 surv3yr_2013 surv5yr_2015 surv5yr_2014 surv5yr_2013 %2.1f
 ** Input 1yr, 3yr, 5yr, 10yr survival variables from survival ds to nonsurvival ds
 frame change nonsurv
@@ -384,8 +385,8 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2015 Annual Report: Stata Results"), bold
 putdocx textblock begin
-Date Prepared: 20-JAN-2021. 
-Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
+Date Prepared: 11-AUG-2021. 
+Prepared by: JC using Stata & Redcap data release date: 21-May-2021.
 Generated using Dofile: 30_report cancer.do
 putdocx textblock end
 putdocx paragraph, halign(center)
@@ -456,7 +457,7 @@ putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", replace
 putdocx clear
 
 save "`datapath'\version02\3-output\2013_2014_2015summstats" ,replace
@@ -497,7 +498,7 @@ putdocx table tbl1(1,8), bold shading(lightgray)
 putdocx table tbl1(1,9), bold shading(lightgray)
 putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -539,7 +540,7 @@ putdocx table tbl1(9,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -581,7 +582,7 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 putdocx table tbl1(13,.), bold shading("yellow")
 //putdocx table tbl1(17,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -623,7 +624,7 @@ putdocx table tbl1(12,.), bold shading("yellow")
 //putdocx table tbl1(13,.), bold shading("yellow")
 putdocx table tbl1(14,.), bold shading("yellow")
 //putdocx table tbl1(15,.), bold shading("yellow")
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -654,7 +655,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -685,7 +686,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -716,7 +717,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -753,7 +754,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -789,7 +790,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -827,7 +828,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -865,7 +866,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -903,7 +904,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -936,7 +937,7 @@ putdocx paragraph, halign(center)
 putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=276,633)"), bold font(Helvetica,10,"blue")
 putdocx textblock begin
 Date Prepared: 15-Oct-2020.
-Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
+Prepared by: JC using Stata & Redcap data release date: 21-May-2021. 
 Generated using Dofile: 25_analysis mort.do
 putdocx textblock end
 putdocx paragraph
@@ -956,7 +957,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\3-output\2013_2014_2015_summstats" ,replace
@@ -989,7 +990,7 @@ putdocx paragraph, halign(center)
 putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=285,327)"), bold font(Helvetica,10,"blue")
 putdocx textblock begin
 Date Prepared: 07-Jan-2021.
-Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
+Prepared by: JC using Stata & Redcap data release date: 21-May-2021.
 Generated using Dofile: 25_analysis mort.do
 putdocx textblock end
 putdocx paragraph
@@ -1009,7 +1010,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 
 save "`datapath'\version02\3-output\2013_2014_2015_summstats" ,replace
@@ -1046,7 +1047,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
 
@@ -1084,9 +1085,215 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version02\3-output\2021-04-06_annual_report_stats.docx", append
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
 putdocx clear
 restore
+
+
+** Output for cases by PARISH
+preserve
+use "`datapath'\version02\2-working\2013_2014_2015_cancer_numbers", clear
+				*******************************
+				*	     MS WORD REPORT       *
+				*   ANNUAL REPORT STATISTICS  *
+                * Cases by parish + yr + site *
+				*******************************
+
+
+** All cases by parish
+preserve
+tab parish
+contract parish, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=2,750)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_parish = data("Parish Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_parish(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", replace
+putdocx clear
+
+save "`datapath'\version02\2-working\2013-2015_cases_parish.dta" ,replace
+label data "BNR-Cancer 2013-2015 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+
+
+** All cases by parish + dxyr
+preserve
+tab parish dxyr
+contract parish dxyr, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Year"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (2013: # tumours/n=859)"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (2014: # tumours/n=861)"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (2015: # tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename dxyr Year
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_year = data("Parish Year Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_year(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2013-2015_cases_parish+dxyr.dta" ,replace
+label data "BNR-Cancer 2013-2015 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+
+
+** All cases by parish + site
+preserve
+tab siteiarc parish
+contract siteiarc parish, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Site"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=2,750)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename siteiarc Site
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2013-2015_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2013-2015 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+
+
+** All cases by parish + site (2013)
+preserve
+drop if dxyr!=2013
+tab siteiarc parish
+contract siteiarc parish, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Site: 2013"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=859)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename siteiarc Site
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2013_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2013 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+
+** All cases by parish + site (2014)
+preserve
+drop if dxyr!=2014
+tab siteiarc parish
+contract siteiarc parish, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Site: 2014"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=861)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename siteiarc Site
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2014_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2014 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+
+** All cases by parish + site (2015)
+preserve
+drop if dxyr!=2015
+tab siteiarc parish
+contract siteiarc parish, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Site: 2015"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename siteiarc Site
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-11_annual_report_stats.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2015 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+restore
+restore
+
 
 /*
 ** Output for above ASIRs comparison using BSS vs WPP populations

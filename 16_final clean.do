@@ -1359,6 +1359,7 @@ replace cr5id="T1S1" if pid=="20081058" & cr5id=="T2S1"
 
 count //2750
 
+** Export the data for SF to use to create graphs
 capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV06.xlsx", sheet("2013_2014_2015_20210811") firstrow(varlabels) replace
 
 ** Save this corrected dataset with internationally reportable cases
