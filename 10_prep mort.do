@@ -4087,6 +4087,13 @@ replace natregno="00" + natregno if length(natregno)==8 //0 changes
 replace natregno="000" + natregno if length(natregno)==7 //0 changes
 
 ** Reminder to JC (19-Aug-2021): For 2016 annual report cleaning, re-do below code when creating natregno string variable using gen double code as this changes the NRNs
+/*
+//format nrn %10.0g
+gen double nrn2=nrn
+format nrn2 %15.0g
+rename nrn2 natregno
+tostring natregno ,replace
+*/
 count if nrn!=. & natregno=="" //5,158
 gen natregno2 = nrn
 tostring natregno2 ,replace
