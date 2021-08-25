@@ -3,8 +3,8 @@
     //  algorithm name          003c_compare lists_Hosp#.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      11-AUG-2021
-    // 	date last modified      11-AUG-2021
+    //  date first created      25-AUG-2021
+    // 	date last modified      25-AUG-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //9,846
+count //9,941
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
-count if dup>0 //4
+count if dup>0 //2
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 5,288 deleted
-count //4
+count //2
 
 
 ** STEP #6
@@ -92,7 +92,7 @@ count //4
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //10
+count //6
 
 
 ** STEP #7
@@ -114,7 +114,7 @@ list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate s
 ** Remove previously-checked records
 drop if checked==1 & duppid==0 //6 deleted
 //drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
-
+drop if registrynumber==20161021|registrynumber==20150164 //4 deleted - these were matched to each other and came from the previously-checked list
 
 ** STEP #9
 ** Prepare this dataset for export to excel
