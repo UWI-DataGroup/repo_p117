@@ -3624,7 +3624,7 @@ notes _dta :These data prepared from BB national death register & Redcap deathda
 save "`datapath'\version02\2-working\2020_deaths_prepped_dp" ,replace
 
 **************************************
-**     Prep 2019 death variables    **
+**     Prep 2020 death variables    **
 ** for matching with cancer dataset **
 **************************************
 use "`datapath'\version02\2-working\2020_deaths_prepped_dp" ,clear
