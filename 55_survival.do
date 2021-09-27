@@ -164,6 +164,12 @@ gen time_3yr=dod-dot if (dod!=. & deceased_3yr==1 & dod<dot+(365.25*3))
 gen time_5yr=dod-dot if (dod!=. & deceased_5yr==1 & dod<dot+(365.25*5))
 gen time_10yr=dod-dot if (dod!=. & deceased_10yr==1 & dod<dot+(365.25*10) & dxyr==2008)
 
+** For IARC-CRICCS submission 31-oct-2021, create time variable for time from:
+** (1) incidence date to death
+** (2) incidence date to 31-dec-2020 (death data being included in submission)
+gen time_criccs=dod-dot if dod!=.
+replace time_criccs=d(31dec2020)-dot if dod==.
+
 ** (2) next use 1, 3, 5 yrs as time, if died >1, >3, >5, >10 yrs from incidence
 count if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0
 replace time_1yr=enddate_1yr-dot if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0 changes
