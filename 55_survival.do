@@ -169,6 +169,7 @@ gen time_10yr=dod-dot if (dod!=. & deceased_10yr==1 & dod<dot+(365.25*10) & dxyr
 ** (2) incidence date to 31-dec-2020 (death data being included in submission)
 gen time_criccs=dod-dot if dod!=.
 replace time_criccs=d(31dec2020)-dot if dod==.
+label var time_criccs "Survival Time in Days"
 
 ** (2) next use 1, 3, 5 yrs as time, if died >1, >3, >5, >10 yrs from incidence
 count if (enddate_1yr<dod & dod!=. & deceased_1yr==1) //0
