@@ -4,7 +4,7 @@
 	//  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-OCT-2021
-    // 	date last modified      06-OCT-2021
+    // 	date last modified      07-OCT-2021
     //  algorithm task          Creating for mortality:incidence ratios per year then grouped for 2013-2015
     //  status                  Completed
     //  objective               To assess completeness of incidence data for BNR-Cancer for 2013-2015
@@ -385,9 +385,9 @@ replace mir_2015 = mort_2015/incid_2015 if sitecr5db==22
 
 ** Condense dataset
 preserve
-keep sitecr5db sex mir_2013 mir_2014 mir_2015
+keep sitecr5db sex mir_2013 mort_2013 incid_2013 mir_2014 mort_2014 incid_2014 mir_2015 mort_2015 incid_2015
 sort sitecr5db sex
-contract sitecr5db sex mir_2013 mir_2014 mir_2015
+contract sitecr5db sex mir_2013 mort_2013 incid_2013 mir_2014 mort_2014 incid_2014 mir_2015 mort_2015 incid_2015
 drop _freq
 gen id = _n
 drop if id==2|id==3|id==5|id==6|id==8|id==9|id==11|id==13|id==14 ///
@@ -404,7 +404,7 @@ gen mir_iarc_2013 = mir_2013*100
 gen mir_iarc_2014 = mir_2014*100
 gen mir_iarc_2015 = mir_2015*100
 format mir_iarc_2013 mir_iarc_2014 mir_iarc_2015 %3.1f
-order sitecr5db sex mir_2013 mir_2014 mir_2015 mir_iarc_2013 mir_iarc_2014 mir_iarc_2015
+order sitecr5db sex mir_iarc_2013 mort_2013 incid_2013 mir_iarc_2014 mort_2014 incid_2014 mir_iarc_2015 mort_2015 incid_2015
 save "`datapath'\version02\3-output\2013_2014_2015_mir", replace
 
 ** Create MS Word results table with absolute case totals + the MIRs for ungrouped years (2013, 2014, 2015), by site, by sex
@@ -449,7 +449,7 @@ putdocx textblock begin
 (4) Sites that had a M:I ratio exceeding a value of 1 (one) were checked case by case using the Mortality data + the Casefinding database to determine why that death case was excluded from the incidence dataset. The outcome of this investigation can be found in the excel workbook saved in the pathway: '....'.
 putdocx textblock end
 putdocx pagebreak
-putdocx table tbl1 = data(sitecr5db sex mir_iarc_2013 mir_iarc_2014 mir_iarc_2015 mir_2013 mir_2014 mir_2015), halign(center) varnames
+putdocx table tbl1 = data(sitecr5db sex mir_iarc_2013 mort_2013 incid_2013 mir_iarc_2014 mort_2014 incid_2014 mir_iarc_2015 mort_2015 incid_2015), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -458,8 +458,11 @@ putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 putdocx table tbl1(1,8), bold shading(lightgray)
+putdocx table tbl1(1,9), bold shading(lightgray)
+putdocx table tbl1(1,10), bold shading(lightgray)
+putdocx table tbl1(1,11), bold shading(lightgray)
 
-putdocx save "`datapath'\version02\3-output\2021-10-06_mir_ungrouped_stats_V01.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-10-07_mir_ungrouped_stats_V02.docx", replace
 putdocx clear
 restore
 
@@ -761,5 +764,5 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
-putdocx save "`datapath'\version02\3-output\2021-10-06_mir_grouped_stats_V01.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-10-07_mir_grouped_stats_V02.docx", replace
 putdocx clear
