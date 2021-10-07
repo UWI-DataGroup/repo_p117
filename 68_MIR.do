@@ -446,7 +446,7 @@ putdocx textblock begin
 (4) The calculation used for the M:I ratio was number of death cases per site per sex / number of incident cases per site per sex.
 putdocx textblock end
 putdocx textblock begin
-(4) Sites that had a M:I ratio exceeding a value of 1 (one) were checked case by case using the Mortality data + the Casefinding database to determine why that death case was excluded from the incidence dataset. The outcome of this investigation can be found in the excel workbook saved in the pathway: '....'.
+(4) Sites that had a M:I ratio exceeding a value of 1 (one) or >99% were checked case by case using the Mortality data + the Casefinding database to determine why that death case was excluded from the incidence dataset.  The datasets and database used for this comparison review process are: MORTALITY:"`datapath'\version02\2-working\2013_mir_mort_prep"; INCIDENCE:"`datapath'\version02\2-working\2013_mir_incid_prep" and "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_nonreportable"; CASEFINDING DATABASES:"...Sync\Cancer\CF Database\MasterDb\SyncDb\Databases\Master" and CanReg5 database. The outcome of this investigation can be found in the excel workbook saved in the pathway: '...The University of the West Indies\FORDE, Shelly-Ann - BNR\REPORTS\Annual Reports\2015 Cancer Report\2021-10-07_mir_ungrouped_reviews.xlsx'.
 putdocx textblock end
 putdocx pagebreak
 putdocx table tbl1 = data(sitecr5db sex mir_iarc_2013 mort_2013 incid_2013 mir_iarc_2014 mort_2014 incid_2014 mir_iarc_2015 mort_2015 incid_2015), halign(center) varnames
@@ -753,7 +753,7 @@ putdocx textblock begin
 (4) The calculation used for the M:I ratio was number of death cases per site per sex / number of incident cases per site per sex.
 putdocx textblock end
 putdocx textblock begin
-(4) Sites that had a M:I ratio exceeding a value of 1 (one) were checked case by case using the Mortality data + the Casefinding database to determine why that death case was excluded from the incidence dataset. The outcome of this investigation can be found in the excel workbook saved in the pathway: '....'.
+(4) Sites that had a M:I ratio exceeding a value of 1 (one) or >99% were checked case by case using the Mortality data + the Casefinding database to determine why that death case was excluded from the incidence dataset.  The datasets and database used for this comparison review process are: MORTALITY:"`datapath'\version02\2-working\2013_mir_mort_prep"; INCIDENCE:"`datapath'\version02\2-working\2013_mir_incid_prep" and "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_nonreportable"; CASEFINDING DATABASES:"...Sync\Cancer\CF Database\MasterDb\SyncDb\Databases\Master" and CanReg5 database. The outcome of this investigation can be found in the excel workbook saved in the pathway: '...The University of the West Indies\FORDE, Shelly-Ann - BNR\REPORTS\Annual Reports\2015 Cancer Report\2021-10-07_mir_ungrouped_reviews.xlsx'.
 putdocx textblock end
 putdocx pagebreak
 putdocx table tbl1 = data(sitecr5db sex mir_all mir_iarc cases_mort_all cases_incid_all), halign(center) varnames
