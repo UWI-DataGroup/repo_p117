@@ -3,8 +3,8 @@
     //  algorithm name          003b_compare lists_DOB.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      16-SEP-2021
-    // 	date last modified      16-SEP-2021
+    //  date first created      07-OCT-2021
+    // 	date last modified      07-OCT-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,058
+count //10,150
 
 
 ** STEP #3
@@ -155,25 +155,25 @@ count //2
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevDOB_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //4
+count //0
 
 ** STEP #8
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 drop if registrynumber==20201053 //2 deleted - this was already merged with 20151033 but it's still coming into exported file and can't open record in CR5db to delete it
 sort registrynumber
-quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //0
+capture quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
+capture count if duppid>0 //0
 
 
 ** STEP #9
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //4 deleted
+capture drop if checked==1 & duppid==0 //4 deleted
 //drop if registrynumber==20151033 //2 deleted - these were matched to each other and came from the previously-checked list
 
 ** STEP #10
 ** Prepare this dataset for export to excel
 drop sourcerecordid surgicalfindings surgicalfindingsdate imagingresults imagingresultsdate physicalexam physicalexamdate ///
-     cr5id middleinitials mptot tumourid duplicatecheck dup duppid flag*
+     cr5id middleinitials mptot tumourid duplicatecheck dup flag* //duppid
 
 label var checked "Previously Checked?"
 label define checked_lab 1 "Yes" 2 "No",modify

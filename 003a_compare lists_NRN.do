@@ -3,8 +3,8 @@
     //  algorithm name          003a_compare lists_NRN.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      16-SEP-2021
-    // 	date last modified      16-SEP-2021
+    //  date first created      07-OCT-2021
+    // 	date last modified      07-OCT-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,058
+count //10,150
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if nrn==""|nrn=="999999-9999"|regexm(nrn,"9999") //remove blank/missing NRN
 sort nrn 
 quietly by nrn : gen dup = cond(_N==1,0,_n)
 sort nrn registrynumber lastname firstname
-count if dup>0 //6
+count if dup>0 //2
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the NRN non-duplicates - 8,115 deleted
-count //10
+count //2
 
 ** STEP #6
 /* 
@@ -91,14 +91,14 @@ count //10
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevNRN_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //16
+count //8
 
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //0
+count if duppid>0 //4
 
 
 ** STEP #8

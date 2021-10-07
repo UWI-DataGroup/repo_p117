@@ -3,8 +3,8 @@
     //  algorithm name          003c_compare lists_Hosp#.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      16-SEP-2021
-    // 	date last modified      16-SEP-2021
+    //  date first created      07-OCT-2021
+    // 	date last modified      07-OCT-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,058
+count //10,150
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
-count if dup>0 //8
+count if dup>0 //22
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 5,288 deleted
-count //2
+count //22
 
 
 ** STEP #6
@@ -92,7 +92,7 @@ count //2
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //8
+count //28
 
 
 ** STEP #7
@@ -100,7 +100,7 @@ count //8
 //drop if registrynumber==20141171 //2 deleted - this was already merged with 20130865but it's still coming into exported file and can't open record in CR5db to delete it
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //0
+count if duppid>0 //4
 sort hospitalnumber lastname firstname
 list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate str_action dup checked if duppid>0 , string(50)
 
@@ -112,9 +112,9 @@ list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate s
 */
 //drop if registrynumber!=20130865 & registrynumber!=20141171
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //0 deleted
+drop if checked==1 & duppid==0 //4 deleted
 //drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
-drop if registrynumber==20161021|registrynumber==20150164 //2 deleted - these were matched to each other and came from the previously-checked list
+//drop if registrynumber==20161021|registrynumber==20150164 //2 deleted - these were matched to each other and came from the previously-checked list
 
 ** STEP #9
 ** Prepare this dataset for export to excel
