@@ -171,6 +171,9 @@ drop if pid=="20080023"|pid=="20080048" & regexm(cr5id,"T1")|pid=="20080169"|pid
 		|pid=="20141379" & regexm(cr5id,"T1")|pid=="20141434" & regexm(cr5id,"T1")|pid=="20141523" ///
 		|pid=="20145070" & regexm(cr5id,"T1")|pid=="20145142"|pid=="20150037"|pid=="20155202"
 
+** Check if dxyr and incidence year do not match and review these before dropping the ineligible years
+IMPORTANT CHECK TO ADD AS NOTED WITH MISSED ELIGIBLE 2015 CASE PID 20151008
+
 ** Remove cases NOT diagnosed in 2008, 2013, 2014, 2015
 tab dxyr ,m
 drop if dxyr!=2008 & dxyr!=2013 & dxyr!=2014 & dxyr!=2015 //112 deleted

@@ -588,6 +588,11 @@ drop if pid=="20080196" & cr5id=="T2S1"
 count //4,000
 
 
+** Import 2013 missed eligible DCOs 
+** from 2013 annual report code path: data_cleaning/2013/cancer/versions/version03/data/clean/2013_cancer_tumours_with_deaths
+** filter above dataset for 23 missed cases: regexm(eid,"201399")
+
+
 ******************
 ** FINAL CHECKS **
 ******************
