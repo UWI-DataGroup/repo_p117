@@ -3,8 +3,8 @@
     //  algorithm name          003b_compare lists_DOB.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      07-OCT-2021
-    // 	date last modified      07-OCT-2021
+    //  date first created      21-OCT-2021
+    // 	date last modified      21-OCT-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,150
+count //10,191
 
 
 ** STEP #3
@@ -145,7 +145,7 @@ gen checked=2
 ** STEP #6
 count if dup==0 //8700
 drop if dup==0 //remove all the DOB non-duplicates - 8700 deleted
-count //2
+count //0
 
 ** STEP #7
 /* 
