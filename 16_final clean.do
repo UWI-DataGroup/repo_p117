@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      09-AUG-2021
-    // 	date last modified      12-AUG-2021
+    // 	date last modified      28-OCT-2021
     //  algorithm task          Final cleaning of 2008,2013-2015 cancer dataset; Preparing datasets for analysis
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
@@ -585,18 +585,89 @@ replace mptot=1 if pid=="20080196" & cr5id=="T1S1"
 drop if pid=="20080196" & cr5id=="T2S1"
 
 
-count //4,000
+count //3,999
 
 
 ** Import 2013 missed eligible DCOs 
 ** from 2013 annual report code path: data_cleaning/2013/cancer/versions/version03/data/clean/2013_cancer_tumours_with_deaths
 ** filter above dataset for 23 missed cases: regexm(eid,"201399")
+** Also 12 cases also identified during the Mortality:Incidence Ratio process
 
+preserve
+clear
+import excel using "`datapath'\version02\2-working\MissedMIRsDCOs20211018.xlsx" , firstrow case(lower)
+tostring pid ,replace
+tostring natregno ,replace
+tostring top ,replace
+format eid %14.0g
+tostring eid, gen(eid_full) format("%12.0f")
+drop eid
+rename eid_full eid
+format sid %16.0g
+tostring sid, gen(sid_full) format("%14.0f")
+drop sid
+rename sid_full sid
+tostring recnum ,replace
+tostring labnum ,replace
+tostring cytofinds ,replace
+tostring consrpt ,replace
+tostring certifier ,replace
+tostring duration ,replace
+tostring onsetint ,replace
+tostring orx2 ,replace
+tostring hospnum ,replace
+tostring sourcetotal ,replace
+//tostring pname ,replace
+tostring updatenotes1 ,replace
+tostring updatenotes2 ,replace
+tostring updatenotes3 ,replace
+//tostring dot_iarc ,replace
+//tostring dob_iarc ,replace
+tostring dd_odda ,replace
+tostring dd_cod1c ,replace
+tostring dd_cod1d ,replace
+//tostring tfdistrictstart ,replace
+//tostring tfdistrictend ,replace
+//tostring tfddtxt ,replace
+tostring dd_natregno ,replace
+tostring dd_coddeath ,replace
+tostring dd_pname ,replace
+tostring dd_cod1a ,replace
+tostring dd_address ,replace
+tostring dd_pod ,replace
+tostring dd_mname ,replace
+tostring dd_odda ,replace
+tostring dd_occu ,replace
+tostring dd_cod1b ,replace
+tostring dd_cod1c ,replace
+tostring dd_cod1d ,replace
+tostring dd_cod2a ,replace
+tostring dd_cod2b ,replace
+tostring dd_certifier ,replace
+tostring dd_certifieraddr ,replace
+//tostring meddata ,replace
+gen double deathid_full=deathid
+drop deathid
+rename deathid_full deathid
+save "`datapath'\version02\2-working\missedMIRs" ,replace
+restore
+append using "`datapath'\version02\2-working\missedMIRs"
 
+count //4,034
+
+STOP
 ******************
 ** FINAL CHECKS **
 ******************
 order pid top morph mpseq mptot persearch cr5id
+
+*******************
+** CLL/SLL M9823 **
+*******************
+count if morph==9823 & topography==421
+//Review these cases - If unk if bone marrow involved then topography=lymph node-unk (C779)
+display `"{browse "https://seer.cancer.gov/tools/heme/Hematopoietic_Instructions_and_Rules.pdf":HAEM-RULES}"'
+
 
 
 ******************
