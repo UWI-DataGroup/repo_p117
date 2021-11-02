@@ -1520,6 +1520,13 @@ replace eidmp=1 if pid=="20080714" & cr5id=="T2S1"
 replace ptrectot=2 if pid=="20080714" & cr5id=="T2S1"
 replace cr5id="T1S1" if pid=="20080714" & cr5id=="T2S1"
 
+count if dup_pid==0 & mptot>1 //206
+count if dup_pid==0 & mpseq>0 //206
+//list pid cr5id fname lname mpseq mptot eidmp if dup_pid==0 & mptot>1
+
+replace mpseq=0 if dup_pid==0 & mpseq>0 //206 changes
+replace mptot=1 if dup_pid==0 & mptot>1 //206 changes
+
 count //2750; 2775
 
 ** Save this corrected dataset with internationally reportable cases
