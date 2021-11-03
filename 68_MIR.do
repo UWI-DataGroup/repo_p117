@@ -956,7 +956,7 @@ putdocx textblock begin
 (1) For the incidence dataset, the 2015 annual report incidence dataset was used to organize the data into a format to perform the M:I analysis (cancer dataset used: "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_reportable"; Note: 2008 cases were ultimately excluded)
 putdocx textblock end
 putdocx textblock begin
-(2) For the mortality dataset, the 2013, 2014 and 2015 annual report mortality datasets were used to organize the data into a format to perform the M:I analysis (cancer dataset used: (2013) "`datapath'\version02\1-input\2013_cancer_for_MR_only"; (2014) "`datapath'\version02\1-input\2014_cancer_mort_dc"; (2015) "`datapath'\version02\3-output\2015_prep mort").
+(2) For the mortality dataset, the 2013, 2014 and 2015 annual report mortality datasets were used to organize the data into a format to perform the M:I analysis. The mortality data is based on all deaths collected by the BNR from the national Registration Department (cancer dataset used: (2013) "`datapath'\version02\1-input\2013_cancer_for_MR_only"; (2014) "`datapath'\version02\1-input\2014_cancer_mort_dc"; (2015) "`datapath'\version02\3-output\2015_prep mort").
 putdocx textblock end
 putdocx textblock begin
 (3) All the incidence and mortality datasets were checked to ensure the site variable, sitecr5db, was not missing and site codes were assigned if it was missing in the dataset.
