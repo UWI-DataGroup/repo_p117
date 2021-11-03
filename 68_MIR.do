@@ -979,5 +979,5 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
-putdocx save "`datapath'\version02\3-output\2021-10-13_adjusted_mir_grouped_stats_V03.docx", replace
+putdocx save "`datapath'\version02\3-output\2021-11-03_adjusted_mir_grouped_stats_V03.docx", replace
 putdocx clear
