@@ -3,8 +3,8 @@
     //  algorithm name          003a_compare lists_NRN.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      21-OCT-2021
-    // 	date last modified      21-OCT-2021
+    //  date first created      04-NOV-2021
+    // 	date last modified      04-NOV-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,191
+count //10,214
 
 
 ** STEP #3
@@ -91,24 +91,24 @@ count //0
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevNRN_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //4
+count //0
 
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //4
+capture count if duppid>0 //0
 
 
 ** STEP #8
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //0 deleted
+capture drop if checked==1 & duppid==0 //0 deleted
 //drop if duppid!=0 //4 deleted the cases pulled in from the last list
 
 ** STEP #9
 ** Prepare this dataset for export to excel
-drop sourcerecordid surgicalfindings surgicalfindingsdate imagingresults imagingresultsdate physicalexam physicalexamdate ///
+capture drop sourcerecordid surgicalfindings surgicalfindingsdate imagingresults imagingresultsdate physicalexam physicalexamdate ///
      cr5id middleinitials mptot tumourid duplicatecheck dup duppid flag*
 
 label var checked "Previously Checked?"
@@ -124,7 +124,7 @@ drop str_no
 gen str_no= _n
 label var str_no "No."
 
-order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nrnlist
+capture order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nrnlist
 
 
 ** STEP #10

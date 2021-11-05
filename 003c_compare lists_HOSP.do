@@ -3,8 +3,8 @@
     //  algorithm name          003c_compare lists_Hosp#.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      21-OCT-2021
-    // 	date last modified      21-OCT-2021
+    //  date first created      04-NOV-2021
+    // 	date last modified      04-NOV-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,191
+count //10,214
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
-count if dup>0 //4
+count if dup>0 //0
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 5,288 deleted
-count //4
+count //0
 
 
 ** STEP #6
@@ -92,7 +92,7 @@ count //4
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //28
+count //9
 
 
 ** STEP #7
@@ -102,7 +102,7 @@ sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
 count if duppid>0 //6
 sort hospitalnumber lastname firstname
-list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate str_action dup checked if duppid>0 , string(50)
+//list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate str_action dup checked if duppid>0 , string(50)
 
 
 ** STEP #8
@@ -112,7 +112,8 @@ list registrynumber lastname firstname hospitalnumber str_no str_da str_dadate s
 */
 //drop if registrynumber!=20130865 & registrynumber!=20141171
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //19 deleted
+drop if checked==1 & duppid==0 //3 deleted
+//drop if checked==1 //6 deleted these are from 21oct2021 list as CR5db wasn't updated properly from the list before that one
 //drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
 //drop if registrynumber==20161021|registrynumber==20150164 //2 deleted - these were matched to each other and came from the previously-checked list
 

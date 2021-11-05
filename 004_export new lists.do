@@ -3,8 +3,8 @@
     //  algorithm name          004_export new lists.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      21-OCT-2021
-    // 	date last modified      21-OCT-2021
+    //  date first created      04-NOV-2021
+    // 	date last modified      04-NOV-2021
     //  algorithm task          Exporting newly-generated duplicates lists (see dofiles '003a, 003b, 003c, 003d...')
     //  status                  Completed
     //  objective               (1) To have one excel workbook with 5 tabs - ERRORS, NRN, DOB, HOSP#, NAMES.
@@ -71,7 +71,7 @@ restore
 preserve
 use "`datapath'\version07\3-output\DOB_dups.dta" , clear
 
-count //0
+count //2
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
@@ -90,7 +90,7 @@ restore
 preserve
 use "`datapath'\version07\3-output\HOSP_dups.dta" , clear
 
-count //9
+count //0
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
@@ -109,7 +109,7 @@ restore
 preserve
 use "`datapath'\version07\3-output\NAMES_dups.dta" , clear
 
-count //34
+count //64
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
