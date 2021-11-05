@@ -1643,13 +1643,573 @@ tab iarcflag ,m
 
 replace iarcflag=1 if iarcflag==. //2680 changes
 
-count //2775
+count if sourcetotal=="" //1,919
+count if sourcetot==. //1,042
+//Don't correct missing as not needed for CI5 Call for Data
 
-** Export the data for SF to use to create graphs
-capture export_excel using "`datapath'\version02\3-output\2013-2015BNRnonsurvivalV08.xlsx", sheet("2013_2014_2015_20210812") firstrow(varlabels) replace
+count //2,774
+
+append using "`datapath'\version02\2-working\criccs_preappend"
+
+count //2,798
+** 
+destring sourcetotal ,replace
+
+** 03nov2021 JC: Updating individual records based on review of CRICCS age<20 cases in CR5db, MEDData + DeathDb
+replace sourcetotal=4 if pid=="20151381" & cr5id=="T1S1"
+replace rx1=3 if pid=="20151381" & cr5id=="T1S1"
+replace grade=6 if pid=="20151381" & cr5id=="T1S1"
+replace rx1d=d(15dec2015) if pid=="20151381" & cr5id=="T1S1"
+replace dlc=d(23jul2021) if pid=="20151381" & cr5id=="T1S1"
+replace consrpt="FACILITY: DEPARTMENT OF ... LABORATORY MEDICINE DIVISION OF PATHOLOGY. CASE #: S16-879. FINDINGS: Lymph node biopsy (right cervical)-pre B cell lymphoblastic leukemia / lymphoma (see comment)." if pid=="20151381" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20150314" & cr5id=="T1S1"
+replace rx2=3 if pid=="20150314" & cr5id=="T1S1"
+replace rx2d=d(29feb2016) if pid=="20150314" & cr5id=="T1S1" //used unk day code as MEDData only had month and yr
+
+replace sourcetotal=3 if pid=="20150303" & cr5id=="T1S1"
+replace rx2=2 if pid=="20150303" & cr5id=="T1S1"
+replace rx2d=d(11dec2018) if pid=="20150303" & cr5id=="T1S1"
+replace dlc=d(01nov2021) if pid=="20150303" & cr5id=="T1S1"
+
+replace sourcetotal=2 if pid=="20150096" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20150094" & cr5id=="T1S1"
+replace consrpt="FACILITY: UHealth Pathology CASE #:UT15-3834...IHC: PLAP amd C-Kit postive, Keratin, CD30 and AFP negative." if pid=="20150094" & cr5id=="T1S1"
+replace dot=d(04aug2015) if pid=="20150094" & cr5id=="T1S1"
+replace dlc=d(19sep2021) if pid=="20150094" & cr5id=="T1S1"
+replace rx1=3 if pid=="20150094" & cr5id=="T1S1"
+replace rx1d=d(24aug2015) if pid=="20150094" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20150093" & cr5id=="T1S1"
+replace dlc=d(03sep2021) if pid=="20150093" & cr5id=="T1S1"
+replace rx1=3 if pid=="20150093" & cr5id=="T1S1"
+replace rx1d=d(04jan2016) if pid=="20150093" & cr5id=="T1S1"
+replace rx1=2 if pid=="20150093" & cr5id=="T1S1"
+replace rx1d=d(12aug2016) if pid=="20150093" & cr5id=="T1S1"
+replace mpseq=1 if pid=="20150093" & cr5id=="T1S1"
+replace mptot=2 if pid=="20150093" & cr5id=="T1S1"
+replace ptrectot=3 if pid=="20150093" & cr5id=="T1S1"
+replace persearch=1 if pid=="20150093" & cr5id=="T1S1"
+
+replace mpseq=2 if pid=="20150093" & cr5id=="T2S1"
+replace mptot=2 if pid=="20150093" & cr5id=="T2S1"
+replace patient=2 if pid=="20150093" & cr5id=="T2S1"
+replace eidmp=2 if pid=="20150093" & cr5id=="T2S1"
+replace persearch=2 if pid=="20150093" & cr5id=="T2S1"
+replace ptrectot=3 if pid=="20150093" & cr5id=="T2S1"
+replace dcostatus=6 if pid=="20150093" & cr5id=="T2S1"
+
+**
+
+replace sourcetotal=4 if pid=="20150092" & cr5id=="T1S1"
+replace consrpt="...IHC shows loss of INI-1, confirming this tumour." if pid=="20150092" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20150091" & cr5id=="T1S1"
+replace consrpt="FACILITY: UHealth Pathology...IHC: Desmin, Myogenin and MYO-D1 positive." if pid=="20150091" & cr5id=="T1S1"
+replace dlc=d(07oct2021) if pid=="20150091" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20150063" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20150013" & cr5id=="T1S1"
+replace dot=d(04apr2015) if pid=="20150013" & cr5id=="T1S1"
+replace top="414" if pid=="20150013" & cr5id=="T1S1"
+replace topography=414 if pid=="20150013" & cr5id=="T1S1"
+replace topcat=37 if pid=="20150013" & cr5id=="T1S1"
+replace primarysite="BONE-ACETABULUM" if pid=="20150013" & cr5id=="T1S1"
+replace rx1=3 if pid=="20150013" & cr5id=="T1S1"
+replace rx1d=d(07dec2015) if pid=="20150013" & cr5id=="T1S1"
+replace rx2=1 if pid=="20150013" & cr5id=="T1S1"
+replace rx2d=d(29dec2017) if pid=="20150013" & cr5id=="T1S1"
+replace grade=1 if pid=="20150013" & cr5id=="T1S1"
+
+replace sourcetotal=9 if pid=="20150012" & cr5id=="T1S1"
+replace rx1=3 if pid=="20150012" & cr5id=="T1S1"
+replace rx1d=d(10sep2015) if pid=="20150012" & cr5id=="T1S1"
+
+replace sourcetotal=7 if pid=="20150011" & cr5id=="T1S1"
+replace rx1=3 if pid=="20150011" & cr5id=="T1S1"
+replace rx1d=d(14jun2015) if pid=="20150011" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20141499" & cr5id=="T1S1"
+
+replace sourcetotal=1 if pid=="20141482" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20141117" & cr5id=="T1S1"
+
+replace sourcetotal=5 if pid=="20140838" & cr5id=="T1S1"
+replace rx1=2 if pid=="20140838" & cr5id=="T1S1"
+replace rx1d=d(30apr2016) if pid=="20140838" & cr5id=="T1S1"
+replace rx1=3 if pid=="20140838" & cr5id=="T1S1"
+replace rx1d=d(30jun2016) if pid=="20140838" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20140829" & cr5id=="T1S1"
+replace rx1=3 if pid=="20140829" & cr5id=="T1S1"
+replace rx1d=d(29mar2015) if pid=="20140829" & cr5id=="T1S1"
+
+replace sourcetotal=2 if pid=="20140827" & cr5id=="T1S1"
+
+replace sourcetotal=2 if pid=="20140826" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20140825" & cr5id=="T1S1"
+replace dlc=d(25sep2021) if pid=="20140825" & cr5id=="T1S1"
+replace rx1=3 if pid=="20140825" & cr5id=="T1S1"
+replace rx1d=d(09apr2015) if pid=="20140825" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20140817" & cr5id=="T1S1"
+replace dlc=d(03oct2021) if pid=="20140817" & cr5id=="T1S1"
+replace rx1=3 if pid=="20140817" & cr5id=="T1S1"
+replace rx1d=d(07mar2016) if pid=="20140817" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20140699" & cr5id=="T1S1"
+replace grade=4 if pid=="20140699" & cr5id=="T1S1"
+replace dlc=d(15oct2021) if pid=="20140699" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20140676" & cr5id=="T1S1"
+replace grade=6 if pid=="20140676" & cr5id=="T1S1"
+replace rx1=3 if pid=="20140676" & cr5id=="T1S1"
+replace rx1d=d(31mar2015) if pid=="20140676" & cr5id=="T1S1"
+
+replace sourcetotal=2 if pid=="20140434" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20140395" & cr5id=="T1S1"
+replace grade=5 if pid=="20140395" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20130694" & cr5id=="T1S1"
+replace grade=3 if pid=="20130694" & cr5id=="T1S1"
+replace natregno=subinstr(natregno,"9999","0196",.) if pid=="20130694" & cr5id=="T1S1"
+replace dlc=d(30sep2021) if pid=="20130694" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20130373" & cr5id=="T1S1"
+
+replace sourcetotal=3 if pid=="20130369" & cr5id=="T1S1"
+
+replace sourcetotal=5 if pid=="20130084" & cr5id=="T1S1"
+replace dlc=d(29oct2021) if pid=="20130084" & cr5id=="T1S1"
+
+replace sourcetotal=4 if pid=="20130072" & cr5id=="T1S1"
+
+
+** For IARC-CRICCS submission 31-oct-2021, create time variable for time from:
+** (1) incidence date to death
+** (2) incidence date to 31-dec-2020 (death data being included in submission)
+gen survtime_days=dod-dot
+replace survtime_days=d(31dec2020)-dot
+label var survtime_days "Survival Time in Days"
+
+gen survtime_months=dod-dot
+replace survtime_months=(d(31dec2020)-dot)/(365/12)
+label var survtime_months "Survival Time in Months"
+
+
+** Identify duplicate pids to assist with death matching
+sort pid cr5id
+drop dup_pid
+duplicates tag pid, gen(dup_pid)
+count if dup_pid>0 //88
+count if dup_pid==0 //2710
+//list pid cr5id dup_pid age if dup_pid>0, nolabel sepby(pid)
+//list pid cr5id dup_pid age if dup_pid==0, nolabel sepby(pid)
+count if age<20 & dup_pid>0  //2 - pid 20150093
+//list pid cr5id fname lname patient if age<20 & dup_pid>0
+
+count if age<20 //54
+
+count //2798
+
+** Create LONG dataset as per CRICCS Call for Data
+preserve
+
+gen mpseq2=mpseq
+tostring mpseq2 ,replace
+replace mpseq2="0"+mpseq2
+
+tab sex ,m
+labelbook sex_lab
+label drop sex_lab
+rename sex sex_old
+gen sex=1 if sex_old==2
+replace sex=2 if sex_old==1
+drop sex_old
+label define sex_lab 1 "male" 2 "female" 99 "unknown", modify
+label values sex sex_lab
+label var sex "Sex"
+tab sex ,m
+
+count if dob==. //27
+gen BIRTHYR=year(dob)
+tostring BIRTHYR, replace
+gen BIRTHMONTH=month(dob)
+gen str2 BIRTHMM = string(BIRTHMONTH, "%02.0f")
+gen BIRTHDAY=day(dob)
+gen str2 BIRTHDD = string(BIRTHDAY, "%02.0f")
+gen BIRTHD=BIRTHYR+BIRTHMM+BIRTHDD
+replace BIRTHD="" if BIRTHD=="..." //17 changes
+drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
+rename BIRTHD dob_criccs
+label var dob_criccs "CRICCS BirthDate"
+count if dob_criccs=="" //27
+gen nrnyr1="19" if dob_criccs==""
+gen nrnyr2 = substr(natregno,1,2) if dob_criccs==""
+gen nrnyr = nrnyr1 + nrnyr2 + "9999" if dob_criccs==""
+
+gen INCIDYR=year(dot)
+tostring INCIDYR, replace
+gen INCIDMONTH=month(dot)
+gen str2 INCIDMM = string(INCIDMONTH, "%02.0f")
+gen INCIDDAY=day(dot)
+gen str2 INCIDDD = string(INCIDDAY, "%02.0f")
+gen INCID=INCIDYR+INCIDMM+INCIDDD
+replace INCID="" if INCID=="..." //0 changes
+drop INCIDMONTH INCIDDAY INCIDYR INCIDMM INCIDDD
+rename INCID dot_criccs
+label var dot_criccs "CRICCS IncidenceDate"
+
+gen age_criccs_d = dot-dob
+gen age_criccs_m = (dot-dob)/(365.25/12)
+gen age_criccs_y = (dot-dob)/365.25
+ 
+gen icdo=3 if dxyr==2013
+label define icdo_lab 1 "ICD-O" 2 "ICD-O-2" 3 "ICD-O-3" ///
+					  4 "ICD-O-3.1" 5 "ICD-O-3.2" 9 "unknown" , modify
+label values icdo icdo_lab
+replace icdo=4 if dxyr>2013 & dxyr<2020
+
+label drop slc_lab
+label define slc_lab 1 "alive" 2 "deceased" 9 "unknown", modify
+label values slc slc_lab
+replace slc=9 if slc==99 //0 changes
+tab slc ,m 
+
+replace dlc=dod if slc==2 //0 changes
+gen DLCYR=year(dlc)
+tostring DLCYR, replace
+gen DLCMONTH=month(dlc)
+gen str2 DLCMM = string(DLCMONTH, "%02.0f")
+gen DLCDAY=day(dlc)
+gen str2 DLCDD = string(DLCDAY, "%02.0f")
+gen DLC=DLCYR+DLCMM+DLCDD
+replace DLC="" if DLC=="..." //0 changes
+drop DLCMONTH DLCDAY DLCYR DLCMM DLCDD
+rename DLC dlc_criccs
+label var dlc_criccs "CRICCS Date at Last Contact"
+
+count if survtime_days==. & slc!=2 //0
+count if survtime_months==. & slc!=2 //0
+
+label drop iarcflag_lab
+label define iarcflag_lab 0 "failed" 1 "OK" 2 "OK after verification" 9 "unknown", modify
+label values iarcflag iarcflag_lab
+replace iarcflag=9 if iarcflag==99 //0 changes
+tab iarcflag ,m 
+
+rename pid v03
+rename mpseq2 v04
+rename sex v05
+rename dob_criccs v06
+rename dot_criccs v07
+rename age_criccs_d v09
+rename age_criccs_m v10
+rename age_criccs_y v11
+rename topography v12
+rename morph v13
+rename beh v14
+rename basis v16
+rename icdo v17
+rename slc v23
+rename dlc_criccs v24
+rename survtime_days v25
+rename survtime_months v26
+rename iarcflag v57
+
+keep v*
+order v03 v04 v05 v06 v07 v09 v10 v11 v12 v13 v14 v16 v17 v23 v24 v25 v26 v57
+count //2798
+capture export_excel using "`datapath'\version02\3-output\CRICCS_LONG_V01.xlsx", sheet("2013-2015all_2016-2018child") firstrow(variables) nolabel replace
+
+restore
+
+
+** Create WIDE dataset as per CRICCS Call for Data
+preserve
+
+drop if age>19 //2744 deleted
+count //54
+
+gen mpseq2=mpseq
+tostring mpseq2 ,replace
+replace mpseq2="0"+mpseq2
+
+tab sex ,m
+labelbook sex_lab
+label drop sex_lab
+rename sex sex_old
+gen sex=1 if sex_old==2
+replace sex=2 if sex_old==1
+drop sex_old
+label define sex_lab 1 "male" 2 "female" 99 "unknown", modify
+label values sex sex_lab
+label var sex "Sex"
+tab sex ,m
+
+count if dob==. //27
+gen BIRTHYR=year(dob)
+tostring BIRTHYR, replace
+gen BIRTHMONTH=month(dob)
+gen str2 BIRTHMM = string(BIRTHMONTH, "%02.0f")
+gen BIRTHDAY=day(dob)
+gen str2 BIRTHDD = string(BIRTHDAY, "%02.0f")
+gen BIRTHD=BIRTHYR+BIRTHMM+BIRTHDD
+replace BIRTHD="" if BIRTHD=="..." //17 changes
+drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
+rename BIRTHD dob_criccs
+label var dob_criccs "CRICCS BirthDate"
+count if dob_criccs=="" //27
+gen nrnyr1="19" if dob_criccs==""
+gen nrnyr2 = substr(natregno,1,2) if dob_criccs==""
+gen nrnyr = nrnyr1 + nrnyr2 + "9999" if dob_criccs==""
+
+gen INCIDYR=year(dot)
+tostring INCIDYR, replace
+gen INCIDMONTH=month(dot)
+gen str2 INCIDMM = string(INCIDMONTH, "%02.0f")
+gen INCIDDAY=day(dot)
+gen str2 INCIDDD = string(INCIDDAY, "%02.0f")
+gen INCID=INCIDYR+INCIDMM+INCIDDD
+replace INCID="" if INCID=="..." //0 changes
+drop INCIDMONTH INCIDDAY INCIDYR INCIDMM INCIDDD
+rename INCID dot_criccs
+label var dot_criccs "CRICCS IncidenceDate"
+
+gen CFYR=year(ptdoa)
+tostring CFYR, replace
+gen CFMONTH=month(ptdoa)
+gen str2 CFMM = string(CFMONTH, "%02.0f")
+gen CFDAY=day(ptdoa)
+gen str2 CFDD = string(CFDAY, "%02.0f")
+gen CF=CFYR+CFMM+CFDD
+replace CF="" if CF=="..." //0 changes
+drop CFMONTH CFDAY CFYR CFMM CFDD
+rename CF ptdoa_criccs
+label var ptdoa_criccs "CRICCS Casefinding Date"
+count if ptdoa_criccs=="20000101" //7
+replace ptdoa_criccs="20140310" if pid=="20130072" //1 change
+replace ptdoa_criccs="20140505" if pid=="20130084" //1 change
+replace ptdoa_criccs="20141215" if pid=="20130369" //1 change
+replace ptdoa_criccs="20141013" if pid=="20130373" //1 change
+replace ptdoa_criccs="20140310" if pid=="20130694" //1 change
+replace ptdoa_criccs="20160219" if pid=="20140395" //1 change
+replace ptdoa_criccs="20181129" if pid=="20140434" //1 change
+
+gen age_criccs_d = dot-dob
+gen age_criccs_m = (dot-dob)/(365.25/12)
+gen age_criccs_y = (dot-dob)/365.25
+ 
+gen icdo=3 if dxyr==2013
+label define icdo_lab 1 "ICD-O" 2 "ICD-O-2" 3 "ICD-O-3" ///
+					  4 "ICD-O-3.1" 5 "ICD-O-3.2" 9 "unknown" , modify
+label values icdo icdo_lab
+replace icdo=4 if dxyr>2013 & dxyr<2020
+
+label drop slc_lab
+label define slc_lab 1 "alive" 2 "deceased" 9 "unknown", modify
+label values slc slc_lab
+replace slc=9 if slc==99 //0 changes
+tab slc ,m 
+
+replace dlc=dod if slc==2 //0 changes
+gen DLCYR=year(dlc)
+tostring DLCYR, replace
+gen DLCMONTH=month(dlc)
+gen str2 DLCMM = string(DLCMONTH, "%02.0f")
+gen DLCDAY=day(dlc)
+gen str2 DLCDD = string(DLCDAY, "%02.0f")
+gen DLC=DLCYR+DLCMM+DLCDD
+replace DLC="" if DLC=="..." //0 changes
+drop DLCMONTH DLCDAY DLCYR DLCMM DLCDD
+rename DLC dlc_criccs
+label var dlc_criccs "CRICCS Date at Last Contact"
+
+count if survtime_days==. & slc!=2 //0
+count if survtime_months==. & slc!=2 //0
+
+label drop lat_lab
+label define lat_lab 1 "unilateral, any side" 2 "bilateral" 3 "right" 4 "left" 9 "unknown", modify
+label values lat lat_lab
+replace lat=9 if lat==0 //40 changes
+replace lat=3 if lat==1 //7 changes
+replace lat=2 if lat==4 //0 changes
+replace lat=4 if lat==2 //4 changes
+replace lat=9 if lat==99 //0 changes
+replace lat=9 if lat==8 //3 changes
+tab lat ,m
+
+gen stagesys=88
+label define stagesys_lab 01 "Ann Arbor" 02 "Breslow" 03 "Dukes" 04"FIGO" 05 "Gleason" ///
+						  06 "INGRSS" 07 "IRSS" 08 "Murphy" 09 "PRETEXT" 10 "St Jude" ///
+						  11 "TNM" 12 "Toronto" 88 "other" 99 "not collected or unknown", modify
+label values stagesys stagesys_lab
+replace stagesys=99 if staging==8 //33 changes
+
+replace staging=9 if staging==8|staging==. //48 changes
+replace staging=3 if staging==3 //0 changes
+replace staging=4 if staging==7 //2 changes
+label drop staging_lab
+label define staging_lab 0 "stage 0, stage 0a, stage 0is, carcinoma in situ, non-invasive" ///
+						 1 "stage I, FIGO I, localized, localized limited (L), limited, Dukes A" ///
+						 2 "stage II, FIGO II, localized advanced (A), locally advanced, advanced, direct extension, Dukes B" ///
+						 3 "stage III, FIGO III, regional (with or without direct extension), R+, N+, Dukes C" ///
+						 4 "stage IV, FIGO IV, metastatic, distant, M+, Dukes D" 9 "unknown" , modify
+label values staging staging_lab
+tab staging ,m
+
+replace rx1d=. if rx1d==d(01jan2000)
+replace rx2d=. if rx2d==d(01jan2000)
+replace rx3d=. if rx3d==d(01jan2000)
+replace rx4d=. if rx4d==d(01jan2000)
+replace rx5d=. if rx5d==d(01jan2000)
+
+gen sx=1 if rx1==1|rx2==1|rx3==1
+replace sx=9 if sx==. //44 changes
+label define sx_lab 1 "yes" 2 "no" 9 "unknown", modify
+label values sx sx_lab
+
+gen RX1YR=year(rx1d)
+tostring RX1YR, replace
+gen RX1MONTH=month(rx1d)
+gen str2 RX1MM = string(RX1MONTH, "%02.0f")
+gen RX1DAY=day(rx1d)
+gen str2 RX1DD = string(RX1DAY, "%02.0f")
+gen RX1=RX1YR+RX1MM+RX1DD
+replace RX1="" if RX1=="..." //0 changes
+drop RX1MONTH RX1DAY RX1YR RX1MM RX1DD
+rename RX1 rx1d_criccs
+label var rx1d_criccs "CRICCS Rx1 Date"
+
+gen RX2YR=year(rx2d)
+tostring RX2YR, replace
+gen RX2MONTH=month(rx2d)
+gen str2 RX2MM = string(RX2MONTH, "%02.0f")
+gen RX2DAY=day(rx2d)
+gen str2 RX2DD = string(RX2DAY, "%02.0f")
+gen RX2=RX2YR+RX2MM+RX2DD
+replace RX2="" if RX2=="..." //0 changes
+drop RX2MONTH RX2DAY RX2YR RX2MM RX2DD
+rename RX2 rx2d_criccs
+label var rx2d_criccs "CRICCS Rx2 Date"
+
+gen RX3YR=year(rx3d)
+tostring RX3YR, replace
+gen RX3MONTH=month(rx3d)
+gen str2 RX3MM = string(RX3MONTH, "%02.0f")
+gen RX3DAY=day(rx3d)
+gen str2 RX3DD = string(RX3DAY, "%02.0f")
+gen RX3=RX3YR+RX3MM+RX3DD
+replace RX3="" if RX3=="..." //0 changes
+drop RX3MONTH RX3DAY RX3YR RX3MM RX3DD
+rename RX3 rx3d_criccs
+label var rx3d_criccs "CRICCS Rx3 Date"
+
+gen sxd=rx1d_criccs if rx1==1
+replace sxd=rx2d_criccs if rx2==1
+replace sxd=rx3d_criccs if rx3==1
+
+gen chemo=1 if rx1==3|rx2==3|rx3==3
+replace chemo=9 if chemo==. //32 changes
+label define chemo_lab 1 "yes" 2 "no" 9 "unknown", modify
+label values chemo chemo_lab
+
+gen chemod=rx1d_criccs if rx1==3 //20 changes
+replace chemod=rx2d_criccs if rx2==3 //2 changes
+replace chemod=rx3d_criccs if rx3==3 //0 changes
+
+gen rt=1 if rx1==2|rx2==2|rx3==2
+replace rt=9 if rt==. //4 changes
+label define rt_lab 1 "yes" 2 "no" 9 "unknown", modify
+label values rt rt_lab
+
+gen rtd=rx1d_criccs if rx1==2 //2 changes
+replace rtd=rx2d_criccs if rx2==2 //2 changes
+replace rtd=rx3d_criccs if rx3==2 //0 changes
+
+gen rtunit=9 if rx1==2|rx2==2|rx3==2
+label define rtunit_lab 1 "miliGray (mGy)" 2 "centiGray (cGy)" 3 "Gray (Gy)" 9 "unknown", modify
+label values rtunit rtunit_lab
+
+gen rtdose=99999 if rx1==2|rx2==2|rx3==2
+
+gen rtmeth=9 if rx1==2|rx2==2|rx3==2
+label define rtmeth_lab 1 "brachytherapy" 2 "stereotactic radiotherapy" 3 "RT2D (Conventional radiotherapy, bidimensional)" 4 "RT3D (Conformal radiotherapy, tridimensional)" 5 "IMRT (Intensity-modulated radiation therapy)" 6 "IGRT (Image-guided radiation therapy)" 7 "IORT (Intraoperative radiation therapy)" 8 "other" 9 "unknown", modify
+label values rtmeth rtmeth_lab
+
+gen rtbody=9 if rx1==2|rx2==2|rx3==2
+label define rtbody_lab 01 "head / brain" 02 "neck" 03 "spine" 04 "thorax" 05 "abdomen" 06 "pelvis" 07 "testicular" 08 "arms" 09 "legs" 10 "total body irradiation (TBI)" 11 "combined fields" 88 "other" 99 "unknown", modify
+label values rtbody rtbody_lab
+
+gen rxend=9 if rx1!=. & rx1!=9 //34 changes
+replace rxend=9 if rx2!=. & rx2!=9 //0 changes
+replace rxend=9 if rx3!=. & rx3!=9 //0 changes
+label define rxend_lab 1 "end of treatment" 2 "death" 3 "abandonment or refusal" 4 "side effects" 5 "migration" 6 "disease progression" 8 "other" 9 "unknown", modify
+label values rxend rxend_lab
+
+label drop iarcflag_lab
+label define iarcflag_lab 0 "failed" 1 "OK" 2 "OK after verification" 9 "unknown", modify
+label values iarcflag iarcflag_lab
+replace iarcflag=9 if iarcflag==99 //0 changes
+tab iarcflag ,m 
+
+rename pid v03
+rename mpseq2 v04
+rename sex v05
+rename dob_criccs v06
+rename dot_criccs v07
+rename ptdoa_criccs v08
+rename age_criccs_d v09
+rename age_criccs_m v10
+rename age_criccs_y v11
+rename topography v12
+rename morph v13
+rename beh v14
+rename grade v15
+rename basis v16
+rename icdo v17
+rename lat v18
+rename stagesys v19
+rename staging v20
+rename slc v23
+rename dlc_criccs v24
+rename survtime_days v25
+rename survtime_months v26
+rename sx v33
+rename sxd v34
+rename chemo v46
+rename chemod v47
+rename rt v50
+rename rtd v51
+rename rtunit v52
+rename rtdose v53
+rename rtmeth v54
+rename rtbody v55
+rename rxend v56
+rename iarcflag v57
+
+keep v* mpseq
+order v03 v04 v05 v06 v07 v08 v09 v10 v11 v12 v13 v14 v15 v16 v17 v18 v19 v20 v23 v24 v25 v26 v33 v34 v46 v47 v50 v51 v52 v53 v54 v55 v56 v57
+count //54
+
+/*
+destring v03 ,replace
+reshape wide v04 v05 v06 v07 v08 v09 v10 v11 v12 v13 v14 v15 v16 v17 v18 v19 v20 v23 v24 v25 v26 v33 v34 v46 v47 v50 v51 v52 v53 v54 v55 v56 v57, i(v03) j(mpseq)
+*/
+
+drop mpseq
+** I'll manually make it a wide dataset
+capture export_excel using "`datapath'\version02\3-output\CRICCS_WIDE_V01.xlsx", sheet("2013-2018child") firstrow(variables) nolabel replace
+
+restore
 
 ** Save this corrected dataset with internationally reportable cases
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_ci5", replace
 label data "2013 2014 2015 BNR-Cancer analysed data - CI5 Vol.XII Submission Dataset"
-note: TS This dataset was used for 2013-2015 CI5 submission Vol. XII
+note: TS This dataset was used for 2013-2015 CI5 submission Vol. XII + CRICCS submission
 note: TS Excludes ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
