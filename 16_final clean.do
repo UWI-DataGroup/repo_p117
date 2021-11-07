@@ -1831,7 +1831,7 @@ rename sex sex_old
 gen sex=1 if sex_old==2
 replace sex=2 if sex_old==1
 drop sex_old
-label define sex_lab 1 "male" 2 "female" 99 "unknown", modify
+label define sex_lab 1 "male" 2 "female" 9 "unknown", modify
 label values sex sex_lab
 label var sex "Sex"
 tab sex ,m
@@ -1852,6 +1852,7 @@ count if dob_criccs=="" //27
 gen nrnyr1="19" if dob_criccs==""
 gen nrnyr2 = substr(natregno,1,2) if dob_criccs==""
 gen nrnyr = nrnyr1 + nrnyr2 + "9999" if dob_criccs==""
+replace dob_criccs=nrnyr if dob_criccs=="" //27 changes
 
 gen INCIDYR=year(dot)
 tostring INCIDYR, replace
@@ -1924,8 +1925,27 @@ rename iarcflag v57
 
 keep v*
 order v03 v04 v05 v06 v07 v09 v10 v11 v12 v13 v14 v16 v17 v23 v24 v25 v26 v57
+count if v05==. //0
+count if v06=="" //0
+count if v07=="" //0
+count if v09==. //27
+replace v09=99999 if v09==. //27 changes
+count if v10==. //27
+replace v10=9999 if v10==. //27 changes
+count if v11==. //27
+replace v11=999 if v11==. //27 changes
+count if v12==. //0
+count if v13==. //0
+count if v14==. //0
+count if v16==. //0
+count if v17==. //0
+count if v23==. //0
+count if v24=="" //0
+count if v25==. //0
+count if v26==. //0
+count if v57==. //0
 count //2798
-capture export_excel using "`datapath'\version02\3-output\CRICCS_LONG_V01.xlsx", sheet("2013-2015all_2016-2018child") firstrow(variables) nolabel replace
+capture export_excel using "`datapath'\version02\3-output\CRICCS_LONG_V02.xlsx", sheet("2013-2015all_2016-2018child") firstrow(variables) nolabel replace
 
 restore
 
@@ -1947,12 +1967,12 @@ rename sex sex_old
 gen sex=1 if sex_old==2
 replace sex=2 if sex_old==1
 drop sex_old
-label define sex_lab 1 "male" 2 "female" 99 "unknown", modify
+label define sex_lab 1 "male" 2 "female" 9 "unknown", modify
 label values sex sex_lab
 label var sex "Sex"
 tab sex ,m
 
-count if dob==. //27
+count if dob==. //0
 gen BIRTHYR=year(dob)
 tostring BIRTHYR, replace
 gen BIRTHMONTH=month(dob)
@@ -1968,6 +1988,7 @@ count if dob_criccs=="" //27
 gen nrnyr1="19" if dob_criccs==""
 gen nrnyr2 = substr(natregno,1,2) if dob_criccs==""
 gen nrnyr = nrnyr1 + nrnyr2 + "9999" if dob_criccs==""
+//replace dob_criccs=nrnyr if dob_criccs=="" // changes
 
 gen INCIDYR=year(dot)
 tostring INCIDYR, replace
@@ -2142,7 +2163,7 @@ gen rtmeth=9 if rx1==2|rx2==2|rx3==2
 label define rtmeth_lab 1 "brachytherapy" 2 "stereotactic radiotherapy" 3 "RT2D (Conventional radiotherapy, bidimensional)" 4 "RT3D (Conformal radiotherapy, tridimensional)" 5 "IMRT (Intensity-modulated radiation therapy)" 6 "IGRT (Image-guided radiation therapy)" 7 "IORT (Intraoperative radiation therapy)" 8 "other" 9 "unknown", modify
 label values rtmeth rtmeth_lab
 
-gen rtbody=9 if rx1==2|rx2==2|rx3==2
+gen rtbody=99 if rx1==2|rx2==2|rx3==2
 label define rtbody_lab 01 "head / brain" 02 "neck" 03 "spine" 04 "thorax" 05 "abdomen" 06 "pelvis" 07 "testicular" 08 "arms" 09 "legs" 10 "total body irradiation (TBI)" 11 "combined fields" 88 "other" 99 "unknown", modify
 label values rtbody rtbody_lab
 
@@ -2195,6 +2216,49 @@ rename iarcflag v57
 
 keep v* mpseq
 order v03 v04 v05 v06 v07 v08 v09 v10 v11 v12 v13 v14 v15 v16 v17 v18 v19 v20 v23 v24 v25 v26 v33 v34 v46 v47 v50 v51 v52 v53 v54 v55 v56 v57
+
+count if v05==. //0
+count if v06=="" //0
+count if v07=="" //0
+count if v08=="" //0
+count if v09==. //0
+count if v10==. //0
+count if v11==. //0
+count if v12==. //0
+count if v13==. //0
+count if v14==. //0
+count if v15==. //0
+count if v16==. //0
+count if v17==. //0
+count if v18==. //0
+count if v19==. //0
+count if v20==. //0
+count if v23==. //0
+count if v24=="" //0
+count if v25==. //0
+count if v26==. //0
+
+count if v33==. //0
+count if v34=="" //44
+replace v34="99999999" if v34=="" //44 changes
+count if v46==. //0
+count if v47=="" //32
+replace v47="99999999" if v47=="" //32 changes
+count if v50==. //0
+count if v51=="" //50
+replace v51="99999999" if v51=="" //32 changes
+count if v52==. //50
+replace v52=9 if v52==. //50 changes
+count if v53==. //50
+replace v53=99999 if v53==. //50 changes
+count if v54==. //50
+replace v54=9 if v54==. //50 changes
+count if v55==. //50
+replace v55=99 if v55==. //50 changes
+count if v56==. //20
+replace v56=9 if v56==. //20 changes
+count if v57==. //0
+
 count //54
 
 /*
@@ -2204,7 +2268,7 @@ reshape wide v04 v05 v06 v07 v08 v09 v10 v11 v12 v13 v14 v15 v16 v17 v18 v19 v20
 
 drop mpseq
 ** I'll manually make it a wide dataset
-capture export_excel using "`datapath'\version02\3-output\CRICCS_WIDE_V01.xlsx", sheet("2013-2018child") firstrow(variables) nolabel replace
+capture export_excel using "`datapath'\version02\3-output\CRICCS_WIDE_V02.xlsx", sheet("2013-2018child") firstrow(variables) nolabel replace
 
 restore
 
