@@ -2272,6 +2272,158 @@ capture export_excel using "`datapath'\version02\3-output\CRICCS_WIDE_V02.xlsx",
 
 restore
 
+** Corrections for 2013-2015 CI5 dataset
+drop if dxyr >2015 //21 deleted - removed CRICCS 2016-2018 cases
+replace staging=1 if staging==0 //2 changes
+
+** Create LONG (case listing) dataset as per CI5 Call for Data - save as .csv
+preserve
+
+count if pid=="" //0
+label var pid "Patient ID"
+
+gen mpseq2=mpseq
+tostring mpseq2 ,replace
+replace mpseq2="0"+mpseq2
+drop mpseq
+rename mpseq2 mpseq
+
+count if mpseq=="" //0
+label var mpseq "Tumour sequence #"
+
+count if dob==. //27
+gen BIRTHYR=year(dob)
+tostring BIRTHYR, replace
+gen BIRTHMONTH=month(dob)
+gen str2 BIRTHMM = string(BIRTHMONTH, "%02.0f")
+gen BIRTHDAY=day(dob)
+gen str2 BIRTHDD = string(BIRTHDAY, "%02.0f")
+gen BIRTHD=BIRTHYR+BIRTHMM+BIRTHDD
+replace BIRTHD="" if BIRTHD=="..." //17 changes
+drop BIRTHDAY BIRTHMONTH BIRTHYR BIRTHMM BIRTHDD
+rename BIRTHD dob_ci5
+label var dob_ci5 "CI5 BirthDate"
+count if dob_ci5=="" //27
+gen nrnyr1="19" if dob_ci5==""
+gen nrnyr2 = substr(natregno,1,2) if dob_ci5==""
+gen nrnyr = nrnyr1 + nrnyr2 + "9999" if dob_ci5==""
+replace dob_ci5=nrnyr if dob_ci5=="" //27 changes
+count if dob_ci5=="" //0
+label var dob_ci5 "Date of Birth"
+
+tab sex ,m
+labelbook sex_lab
+label drop sex_lab
+rename sex sex_old
+gen sex=1 if sex_old==2
+replace sex=2 if sex_old==1
+drop sex_old
+label define sex_lab 1 "Male" 2 "Female" 9 "Unknown", modify
+label values sex sex_lab
+label var sex "Sex"
+tab sex ,m
+
+count if dot==. //0
+gen INCIDYR=year(dot)
+tostring INCIDYR, replace
+gen INCIDMONTH=month(dot)
+gen str2 INCIDMM = string(INCIDMONTH, "%02.0f")
+gen INCIDDAY=day(dot)
+gen str2 INCIDDD = string(INCIDDAY, "%02.0f")
+gen INCID=INCIDYR+INCIDMM+INCIDDD
+replace INCID="" if INCID=="..." //0 changes
+drop INCIDMONTH INCIDDAY INCIDYR INCIDMM INCIDDD
+rename INCID dot_ci5
+label var dot_ci5 "Date of Incidence"
+
+count if age==. //0
+label var age "Age in Years"
+/*
+gen age_ci5 = (dot-dob)/365.25
+label var age_ci5 "CI5 Age"
+tab age_ci5 ,m
+*/
+
+count if top=="" //0
+replace top="C"+top
+count if !(strmatch(strupper(top), "C*")) //0
+label var top "ICDO-3 Topography"
+
+count if morph==. //0
+label var morph "ICDO-3 Morphology"
+
+count if beh==. //0
+label var beh "ICDO-3 Behaviour"
+
+count if basis==. //0
+count if basis >7 //143
+tab basis ,m
+** reviewed 19 cases with code 8 to determine if to put them in code 6 or 7 field as CI5 doesn't collect code 8
+replace basis=2 if basis==3 //20 changes
+replace basis=6 if pid=="20130527" & cr5id=="T1S1" | pid=="20130724" & cr5id=="T1S1" //2 changes
+replace basis=7 if basis==8 //17 changes
+tab basis ,m
+
+label drop basis_lab
+label define basis_lab 0 "Death certificate only" 1 "Clinical" 2 "Clinical investigation" 4 "Specific tumor markers" ///
+					   5 "Cytology" 6 "Histology of a metastasis" 7 "Histology of a primary tumor" 9 "Unknown", modify
+label values basis basis_lab
+label var basis "Basis of Diagnosis"
+tab basis ,m
+
+count if slc==. //0
+tab slc ,m
+label drop slc_lab
+label define slc_lab 1 "Alive" 2 "Dead" 3 "Lost to follow-up" 9 "Vital status not known" , modify
+label values slc slc_lab
+label var slc "Vital Status"
+tab slc ,m
+
+count if dlc==. //0
+count if dod==. & slc==2 //0
+replace dlc=dod if slc==2 //0 changes
+gen DLCYR=year(dlc)
+tostring DLCYR, replace
+gen DLCMONTH=month(dlc)
+gen str2 DLCMM = string(DLCMONTH, "%02.0f")
+gen DLCDAY=day(dlc)
+gen str2 DLCDD = string(DLCDAY, "%02.0f")
+gen DLC=DLCYR+DLCMM+DLCDD
+replace DLC="" if DLC=="..." //0 changes
+drop DLCMONTH DLCDAY DLCYR DLCMM DLCDD
+rename DLC dlc_ci5
+label var dlc_ci5 "Date of Last Contact"
+
+count if iarcflag==. //0
+tab iarcflag ,m
+
+count if staging==. & dxyr==2013 //0
+tab staging dxyr ,m
+replace staging=9 if staging==8 | staging==. //1942 changes
+replace staging=1 if staging==0 //2 cahnges already made above
+replace staging=2 if staging >2 & staging <7 //97 changes
+replace staging=3 if staging==7 //164 changes
+tab staging dxyr ,m
+
+label drop staging_lab
+label define staging_lab 1 "Localized" 2 "Regional" 3 "Distant metastases" ///
+						 9 "Unknown if extension or metastasis (unstaged, unknown, or unspecified) Death certificate only case" , modify
+label values staging staging_lab
+label var staging "Clinical extent of disease"
+tab staging ,m
+
+order pid mpseq dob_ci5 sex dot_ci5 age top morph beh basis slc dlc_ci5 iarcflag staging
+keep pid mpseq dob_ci5 sex dot_ci5 age top morph beh basis slc dlc_ci5 iarcflag staging
+//outsheet using "`datapath'\version02\3-output\CI5_V01.csv" , comma nolabel replace
+capture export_excel using "`datapath'\version02\3-output\CI5_tocheck_V01.xlsx", sheet("2013-2015") firstrow(varlabels) nolabel replace
+clear
+import excel  using "`datapath'\version02\3-output\CI5_tocheck_V01.xlsx", firstrow
+export delimited using "`datapath'\version02\3-output\CI5_tosubmit_V01.txt", replace
+//manually created .csv file from the above excel file so that leading zeros can be kept in
+restore
+
+
+
 ** Save this corrected dataset with internationally reportable cases
 save "`datapath'\version02\3-output\2013_2014_2015_cancer_ci5", replace
 label data "2013 2014 2015 BNR-Cancer analysed data - CI5 Vol.XII Submission Dataset"
