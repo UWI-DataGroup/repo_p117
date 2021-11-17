@@ -1801,6 +1801,61 @@ gen survtime_months=dod-dot
 replace survtime_months=(d(31dec2020)-dot)/(365/12)
 label var survtime_months "Survival Time in Months"
 
+**************************************************************************
+** Corrections based on feedback from IARC CI5's submission 17-Nov-2021 **
+**************************************************************************
+drop _merge
+
+preserve
+clear
+import excel using "`datapath'\version02\2-working\CI5corrections20211117.xlsx" , firstrow case(lower)
+tostring pid ,replace
+tostring elec_nrn ,replace
+save "`datapath'\version02\2-working\ci5update" ,replace
+restore
+merge 1:1 pid cr5id using "`datapath'\version02\2-working\ci5update" ,update replace
+/*
+
+*/
+** Added DOB info to above excel sheet for pid 20139991 based on KWG's feedback via WhatsApp 17-Nov-2021
+** Update variables with above corrected info
+replace natregno = elec_nrn if elec_nrn!="" //21 changes
+replace dob = elec_dob if elec_dob!=. //21 changes
+replace addr = elec_addr if elec_addr!="" //10 changes
+replace parish = elec_parish if elec_parish!=. //8 changes
+replace dlc = elec_dlc if elec_dlc!=. //10 changes
+
+** Update age with above corrected DOBs
+gen elec_age = (dot - dob)/365.25 if elec_dob!=.
+replace age = elec_age if elec_age!=. //21 changes
+
+drop elec_* _merge
+
+** Update other variables based on re-review of IARC CI5's queries
+replace primarysite="BONE MARROW" if pid=="20139991" & cr5id=="T1S1"
+replace top="421" if pid=="20139991" & cr5id=="T1S1"
+replace topography=421 if pid=="20139991" & cr5id=="T1S1"
+replace topcat=38 if pid=="20139991" & cr5id=="T1S1"
+
+replace primarysite="BONE MARROW" if pid=="20150574" & cr5id=="T1S1"
+replace top="421" if pid=="20150574" & cr5id=="T1S1"
+replace topography=421 if pid=="20150574" & cr5id=="T1S1"
+replace topcat=38 if pid=="20150574" & cr5id=="T1S1"
+
+replace primarysite="BONE MARROW" if pid=="20180030" & cr5id=="T1S1"
+replace top="421" if pid=="20180030" & cr5id=="T1S1"
+replace topography=421 if pid=="20180030" & cr5id=="T1S1"
+replace topcat=38 if pid=="20180030" & cr5id=="T1S1"
+
+/*
+replace basis=1 if pid=="20140228" cr5id=="T1S1"
+replace basis=1 if pid=="20140256" cr5id=="T1S1"
+replace basis=1 if pid=="20140570" & cr5id=="T2S1"
+replace basis=1 if pid=="20140573" cr5id=="T1S1"
+replace basis=1 if pid=="20140622" cr5id=="T1S1"
+replace basis=1 if pid=="20141542" cr5id=="T1S1"
+*/
+*******************************************************************************
 
 ** Identify duplicate pids to assist with death matching
 sort pid cr5id
@@ -1945,7 +2000,7 @@ count if v25==. //0
 count if v26==. //0
 count if v57==. //0
 count //2798
-capture export_excel using "`datapath'\version02\3-output\CRICCS_LONG_V02.xlsx", sheet("2013-2015all_2016-2018child") firstrow(variables) nolabel replace
+capture export_excel using "`datapath'\version02\3-output\CRICCS_LONG_V03.xlsx", sheet("2013-2015all_2016-2018child") firstrow(variables) nolabel replace
 
 restore
 
@@ -2268,7 +2323,7 @@ reshape wide v04 v05 v06 v07 v08 v09 v10 v11 v12 v13 v14 v15 v16 v17 v18 v19 v20
 
 drop mpseq
 ** I'll manually make it a wide dataset
-capture export_excel using "`datapath'\version02\3-output\CRICCS_WIDE_V02.xlsx", sheet("2013-2018child") firstrow(variables) nolabel replace
+capture export_excel using "`datapath'\version02\3-output\CRICCS_WIDE_V03.xlsx", sheet("2013-2018child") firstrow(variables) nolabel replace
 
 restore
 
@@ -2415,10 +2470,10 @@ tab staging ,m
 order pid mpseq dob_ci5 sex dot_ci5 age top morph beh basis slc dlc_ci5 iarcflag staging
 keep pid mpseq dob_ci5 sex dot_ci5 age top morph beh basis slc dlc_ci5 iarcflag staging
 //outsheet using "`datapath'\version02\3-output\CI5_V01.csv" , comma nolabel replace
-capture export_excel using "`datapath'\version02\3-output\CI5_tocheck_V01.xlsx", sheet("2013-2015") firstrow(varlabels) nolabel replace
+capture export_excel using "`datapath'\version02\3-output\CI5_tocheck_V02.xlsx", sheet("2013-2015") firstrow(varlabels) nolabel replace
 clear
-import excel  using "`datapath'\version02\3-output\CI5_tocheck_V01.xlsx", firstrow
-export delimited using "`datapath'\version02\3-output\CI5_tosubmit_V01.txt", replace
+import excel  using "`datapath'\version02\3-output\CI5_tocheck_V02.xlsx", firstrow
+export delimited using "`datapath'\version02\3-output\CI5_tosubmit_V02.txt", replace
 //manually created .csv file from the above excel file so that leading zeros can be kept in
 restore
 
