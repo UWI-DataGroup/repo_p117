@@ -3,8 +3,8 @@
     //  algorithm name          003b_compare lists_DOB.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      04-NOV-2021
-    // 	date last modified      04-NOV-2021
+    //  date first created      17-NOV-2021
+    // 	date last modified      17-NOV-2021
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,214
+count //10,233
 
 
 ** STEP #3
@@ -109,7 +109,7 @@ drop if birthdate==. | birthdate==99999999
 sort lastname firstname birthdate
 quietly by lastname firstname birthdate : gen dup = cond(_N==1,0,_n)
 sort lastname firstname birthdate registrynumber
-count if dup>0 //2 - true DOB duplicates
+count if dup>0 //4 - true DOB duplicates
 
 /*
 ** Look for duplicates - METHOD #2
@@ -145,7 +145,7 @@ gen checked=2
 ** STEP #6
 count if dup==0 //8700
 drop if dup==0 //remove all the DOB non-duplicates - 8700 deleted
-count //0
+count //4
 
 ** STEP #7
 /* 
@@ -162,12 +162,12 @@ count //2
 drop if registrynumber==20201053 //2 deleted - this was already merged with 20151033 but it's still coming into exported file and can't open record in CR5db to delete it
 sort registrynumber
 capture quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-capture count if duppid>0 //0
+capture count if duppid>0 //6
 
 
 ** STEP #9
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //0 deleted
+drop if checked==1 & duppid==0 //2 deleted
 //drop if registrynumber==20151033 //2 deleted - these were matched to each other and came from the previously-checked list
 
 ** STEP #10
