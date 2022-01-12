@@ -3,8 +3,8 @@
     //  algorithm name          003a_compare lists_NRN.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      16-DEC-2021
-    // 	date last modified      16-DEC-2021
+    //  date first created      12-JAN-2022
+    // 	date last modified      12-JAN-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,267
+count //10,300
 
 
 ** STEP #3
@@ -91,7 +91,7 @@ count //0
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevNRN_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //4
+count //0
 
 
 ** STEP #7

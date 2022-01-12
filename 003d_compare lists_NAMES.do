@@ -3,8 +3,8 @@
     //  algorithm name          003d_compare lists_NAMES.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      16-DEC-2021
-    // 	date last modified      16-DEC-2021
+    //  date first created      12-JAN-2022
+    // 	date last modified      12-JAN-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,267
+count //10,300
 
 
 ** STEP #3
@@ -66,7 +66,7 @@ drop if lastname==""
 sort lastname firstname
 quietly by lastname firstname:  gen dup = cond(_N==1,0,_n)
 sort lastname firstname registrynumber
-count if dup>0 //551
+count if dup>0 //561
 
 
 ** STEP #4 
@@ -80,7 +80,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Names non-duplicates - 9,187 deleted
-count //551
+count //561
 
 ** STEP #6
 /* 
@@ -90,7 +90,7 @@ count //551
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevNAMES_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //585
+count //327
 /*
 ** ADD IN EXTRA STEP TO CREATE A STATIC NAMES TAB DATASET FROM THIS 20210629 LIST FOR FUTURE MATCHING IN ADDITION TO THE USUAL PREVIOUS LIST DATASET
 capture append using "`datapath'\version07\2-working\29jun21NAMES_dups" ,force
@@ -103,17 +103,17 @@ count //1,015
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //62
+count if duppid>0 //120
 order registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked
 //list registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked if duppid>0 , string(50)
 
 sort lastname firstname registrynumber
 quietly by lastname firstname registrynumber:  gen dupnmpid = cond(_N==1,0,_n)
-count if dupnmpid>0 //62
+count if dupnmpid>0 //120
 order registrynumber lastname firstname checked dupnmpid str_no str_da str_dadate str_action
 
-count if checked==2 & dupnmpid>0 //31 - so all 60 don't have a corresponding pid that's from previously-checked list so can no new dups found in this list
-count if checked==1 & duppid==0 //3 - check these in Stata Browse/Edit window: previously-checked and merged cases
+count if checked==2 & dupnmpid>0 //60 - so all 60 don't have a corresponding pid that's from previously-checked list so no new dups found in this list
+count if checked==1 & duppid==0 //6 - check these in Stata Browse/Edit window: previously-checked and merged cases
 
 
 ** STEP #8
@@ -122,16 +122,17 @@ count if checked==1 & duppid==0 //3 - check these in Stata Browse/Edit window: p
 	(2) Remove previously-checked records according to review
 */
 drop if checked==1 & duppid==0 //3 deleted
-drop if duppid>0 //62 deleted
+drop if duppid>0 //120 deleted
+//drop if checked==2 & dupnmpid>0 //0 deleted
 //drop if duppid==0 //446 deleted
 //all observations deleted as no new duplicates for this list
-count //520
+count //501
 
 
 ** ADD IN EXTRA STEP TO CREATE A STATIC NAMES TAB DATASET FROM THIS 20210629 LIST FOR FUTURE MATCHING IN ADDITION TO THE USUAL PREVIOUS LIST DATASET
 capture append using "`datapath'\version07\2-working\29jun21NAMES_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //1000
+count //981
 
 drop dupnmpid
 sort lastname firstname registrynumber
@@ -142,7 +143,7 @@ order registrynumber lastname firstname checked dupnmpid checked29jun21 str_no s
 count if checked==2 & dupnmpid>0 //454 - so all 29 have a corresponding pid that's from previously-checked list so can no new dups found in this list
 count if checked==1 & duppid==0 //0 - check these in Stata Browse/Edit window: previously-checked and merged cases
 count if dupnmpid>0 //908 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records; those with 4 records are previously-checked ones
-count if dupnmpid==0 //92 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records
+count if dupnmpid==0 //73 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records
 
 /*
 
@@ -163,43 +164,33 @@ drop if dupnmpid>0 & registrynumber!= & registrynumber!= & registrynumber!= & re
 				   & registrynumber!= & registrynumber!= & registrynumber!= & registrynumber!= ///
 				   & registrynumber!= & registrynumber!= & registrynumber!= & registrynumber!=
 */
-drop if dupnmpid>0 & registrynumber!=20190695 & registrynumber!=20200411 & registrynumber!=20190668 & registrynumber!=20191240 ///
-				   & registrynumber!=20141271 & registrynumber!=20200492 & registrynumber!=20130726 & registrynumber!=20200526 ///
-				   & registrynumber!=20191279 & registrynumber!=20201253 & registrynumber!=20080954 & registrynumber!=20190682 ///
-				   & registrynumber!=20140156 & registrynumber!=20201172 & registrynumber!=20080232 & registrynumber!=20200316 ///
-				   & registrynumber!=20140517 & registrynumber!=20172156 & registrynumber!=20200610 & registrynumber!=20181064 ///
-				   & registrynumber!=20200320 & registrynumber!=20140620 & registrynumber!=20200668 & registrynumber!=20200117 ///
-				   & registrynumber!=20200317 & registrynumber!=20200639 & registrynumber!=20141528 & registrynumber!=20200309 ///
-				   & registrynumber!=20160918 & registrynumber!=20172157 & registrynumber!=20140757 & registrynumber!=20190661 ///
-				   & registrynumber!=20201078 & registrynumber!=20201179 & registrynumber!=20172158 & registrynumber!=20159021 ///
-				   & registrynumber!=20200425 & registrynumber!=20160372 & registrynumber!=20190730 & registrynumber!=20200417 ///
-				   & registrynumber!=20200710 & registrynumber!=20200129 & registrynumber!=20200726 & registrynumber!=20081019 ///
-				   & registrynumber!=20172159 & registrynumber!=20172160 & registrynumber!=20182248 & registrynumber!=20190761 ///
-				   & registrynumber!=20145060 & registrynumber!=20190782 & registrynumber!=20200244 & registrynumber!=20200699 ///
-				   & registrynumber!=20090003 & registrynumber!=20200684 & registrynumber!=20151145 & registrynumber!=20200540 ///
-				   & registrynumber!=20150033 & registrynumber!=20190718 & registrynumber!=20201175 & registrynumber!=20190688 ///
-				   & registrynumber!=20180265 & registrynumber!=20200517 & registrynumber!=20180319 & registrynumber!=20200692 ///
-				   & registrynumber!=20140100 & registrynumber!=20201225
+drop if dupnmpid>0 & registrynumber!=20200361 & registrynumber!=20200749 & registrynumber!=20100003 & registrynumber!=20190765 ///
+				   & registrynumber!=20170904 & registrynumber!=20200595 & registrynumber!=20190536 & registrynumber!=20200604 ///
+				   & registrynumber!=20160282 & registrynumber!=20200164 & registrynumber!=20080324 & registrynumber!=20190751 ///
+				   & registrynumber!=20190426 & registrynumber!=20200768 & registrynumber!=20191263 & registrynumber!=20200766 ///
+				   & registrynumber!=20140998 & registrynumber!=20200750 & registrynumber!=20200131 & registrynumber!=20200747 ///
+				   & registrynumber!=20200057 & registrynumber!=20200745 & registrynumber!=20141310 & registrynumber!=20190747 ///
+				   & registrynumber!=20080362 & registrynumber!=20200734 & registrynumber!=20190500 & registrynumber!=20200471 ///
+				   & registrynumber!=20200503 & registrynumber!=20080125 & registrynumber!=20150575 & registrynumber!=20130868 ///
+				   & registrynumber!=20170404 & registrynumber!=20150364 & registrynumber!=20200607 & registrynumber!=20141295 ///
+				   & registrynumber!=20170405 & registrynumber!=20182316 & registrynumber!=20200694 & registrynumber!=20170021 ///
+				   & registrynumber!=20200609 & registrynumber!=20170406 & registrynumber!=20180855 & registrynumber!=20160758 ///
+				   & registrynumber!=20200484 & registrynumber!=20170407 & registrynumber!=20191035
 //908 deleted
-drop if dupnmpid==0 & registrynumber!=20190695 & registrynumber!=20200411 & registrynumber!=20190668 & registrynumber!=20191240 ///
-				   & registrynumber!=20141271 & registrynumber!=20200492 & registrynumber!=20130726 & registrynumber!=20200526 ///
-				   & registrynumber!=20191279 & registrynumber!=20201253 & registrynumber!=20080954 & registrynumber!=20190682 ///
-				   & registrynumber!=20140156 & registrynumber!=20201172 & registrynumber!=20080232 & registrynumber!=20200316 ///
-				   & registrynumber!=20140517 & registrynumber!=20172156 & registrynumber!=20200610 & registrynumber!=20181064 ///
-				   & registrynumber!=20200320 & registrynumber!=20140620 & registrynumber!=20200668 & registrynumber!=20200117 ///
-				   & registrynumber!=20200317 & registrynumber!=20200639 & registrynumber!=20141528 & registrynumber!=20200309 ///
-				   & registrynumber!=20160918 & registrynumber!=20172157 & registrynumber!=20140757 & registrynumber!=20190661 ///
-				   & registrynumber!=20201078 & registrynumber!=20201179 & registrynumber!=20172158 & registrynumber!=20159021 ///
-				   & registrynumber!=20200425 & registrynumber!=20160372 & registrynumber!=20190730 & registrynumber!=20200417 ///
-				   & registrynumber!=20200710 & registrynumber!=20200129 & registrynumber!=20200726 & registrynumber!=20081019 ///
-				   & registrynumber!=20172159 & registrynumber!=20172160 & registrynumber!=20182248 & registrynumber!=20190761 ///
-				   & registrynumber!=20145060 & registrynumber!=20190782 & registrynumber!=20200244 & registrynumber!=20200699 ///
-				   & registrynumber!=20090003 & registrynumber!=20200684 & registrynumber!=20151145 & registrynumber!=20200540 ///
-				   & registrynumber!=20150033 & registrynumber!=20190718 & registrynumber!=20201175 & registrynumber!=20190688 ///
-				   & registrynumber!=20180265 & registrynumber!=20200517 & registrynumber!=20180319 & registrynumber!=20200692 ///
-				   & registrynumber!=20140100 & registrynumber!=20201225
+drop if dupnmpid==0 & registrynumber!=20200361 & registrynumber!=20200749 & registrynumber!=20100003 & registrynumber!=20190765 ///
+				   & registrynumber!=20170904 & registrynumber!=20200595 & registrynumber!=20190536 & registrynumber!=20200604 ///
+				   & registrynumber!=20160282 & registrynumber!=20200164 & registrynumber!=20080324 & registrynumber!=20190751 ///
+				   & registrynumber!=20190426 & registrynumber!=20200768 & registrynumber!=20191263 & registrynumber!=20200766 ///
+				   & registrynumber!=20140998 & registrynumber!=20200750 & registrynumber!=20200131 & registrynumber!=20200747 ///
+				   & registrynumber!=20200057 & registrynumber!=20200745 & registrynumber!=20141310 & registrynumber!=20190747 ///
+				   & registrynumber!=20080362 & registrynumber!=20200734 & registrynumber!=20190500 & registrynumber!=20200471 ///
+				   & registrynumber!=20200503 & registrynumber!=20080125 & registrynumber!=20150575 & registrynumber!=20130868 ///
+				   & registrynumber!=20170404 & registrynumber!=20150364 & registrynumber!=20200607 & registrynumber!=20141295 ///
+				   & registrynumber!=20170405 & registrynumber!=20182316 & registrynumber!=20200694 & registrynumber!=20170021 ///
+				   & registrynumber!=20200609 & registrynumber!=20170406 & registrynumber!=20180855 & registrynumber!=20160758 ///
+				   & registrynumber!=20200484 & registrynumber!=20170407 & registrynumber!=20191035
 //26 deleted
-count //66
+count //47
 
 ** STEP #9
 ** Prepare this dataset for export to excel

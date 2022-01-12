@@ -3,8 +3,8 @@
     //  algorithm name          003c_compare lists_Hosp#.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      16-DEC-2021
-    // 	date last modified      16-DEC-2021
+    //  date first created      12-JAN-2022
+    // 	date last modified      12-JAN-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,267
+count //10,300
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
-count if dup>0 //0
+count if dup>0 //2
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 5,288 deleted
-count //0
+count //2
 
 
 ** STEP #6
@@ -92,7 +92,7 @@ count //0
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //4
+count //2
 
 
 ** STEP #7
@@ -112,7 +112,7 @@ sort hospitalnumber lastname firstname
 */
 //drop if registrynumber!=20130865 & registrynumber!=20141171
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //4 deleted
+drop if checked==1 & duppid==0 //0 deleted
 //drop if checked==1 //6 deleted these are from 21oct2021 list as CR5db wasn't updated properly from the list before that one
 //drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
 //drop if registrynumber==20161021|registrynumber==20150164 //2 deleted - these were matched to each other and came from the previously-checked list
