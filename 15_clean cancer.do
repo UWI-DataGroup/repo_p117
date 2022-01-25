@@ -174,6 +174,9 @@ drop if pid=="20080023"|pid=="20080048" & regexm(cr5id,"T1")|pid=="20080169"|pid
 ** Check if dxyr and incidence year do not match and review these before dropping the ineligible years
 IMPORTANT CHECK TO ADD AS NOTED WITH MISSED ELIGIBLE 2015 CASE PID 20151008
 
+** Analysis point to look for raised at cancer mtg on 25jan2022
+CHECK FOR BOD=CLINICAL AND TIME BETWEEN DOT AND DOD as KWG noticed alot of cases where pts sought medical attention late and seemed like an increase from previous yrs.
+
 ** Remove cases NOT diagnosed in 2008, 2013, 2014, 2015
 tab dxyr ,m
 drop if dxyr!=2008 & dxyr!=2013 & dxyr!=2014 & dxyr!=2015 //112 deleted
