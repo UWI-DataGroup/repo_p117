@@ -3,7 +3,7 @@
     //  algorithm name			0_population.do
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
-    //  date first created      28-OCT-2019
+    //  date first created      28-OCT-2022
     // 	date last modified	    02-DEC-2019
     //  algorithm task			Prep for external population for incidence and mortality analyses
     //  status                  Completed
