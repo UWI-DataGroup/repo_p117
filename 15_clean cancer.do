@@ -177,6 +177,9 @@ IMPORTANT CHECK TO ADD AS NOTED WITH MISSED ELIGIBLE 2015 CASE PID 20151008
 ** Analysis point to look for raised at cancer mtg on 25jan2022
 CHECK FOR BOD=CLINICAL AND TIME BETWEEN DOT AND DOD as KWG noticed alot of cases where pts sought medical attention late and seemed like an increase from previous yrs.
 
+**  Add in additional staging check 27jan2022 as comparing 2013 and 2018 colorectal staging for possible research paper on late stage presentation
+stagecheckcat=... if staging==8 & dxyr==2013
+
 ** Remove cases NOT diagnosed in 2008, 2013, 2014, 2015
 tab dxyr ,m
 drop if dxyr!=2008 & dxyr!=2013 & dxyr!=2014 & dxyr!=2015 //112 deleted
