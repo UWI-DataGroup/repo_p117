@@ -2153,7 +2153,8 @@ replace cancer=1 if regexm(coddeath,"ASTROCYTOMA") &  cancer==. //2 changes
 replace cancer=1 if regexm(coddeath,"CARCINOME") &  cancer==. //1 change
 replace cancer=1 if regexm(coddeath,"MALIGANCY") &  cancer==. //1 change
 replace cancer=1 if regexm(coddeath,"MULTIFORME") &  cancer==. //1 change
-//replace cancer=1 if regexm(coddeath,"GLIOMA") &  cancer==. //add in for next dc year
+//replace cancer=1 if regexm(coddeath,"GLIOMA") & cancer==. //add in for next dc year
+//replace cancer=1 if regexm(coddeath,"GLIORRIA") & regexm(coddeath,"BRAIN") & cancer==. //(deathid 26355) add in for next dc year
 
 ** Strip possible leading/trailing blanks in cod1a
 replace coddeath = rtrim(ltrim(itrim(coddeath))) //0 changes
