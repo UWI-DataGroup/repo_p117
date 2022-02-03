@@ -73,6 +73,15 @@ Lab test (biochem/imm |         5          5          3 |        13
 ----------------------+---------------------------------+----------
                 Total |       876        862      1,036 |     2,774
 */
+/*
+tabout basis dxyr using "`datapath'\version08\3-output\2022-01-27_research_stage_stats.docx", append cells(freq row) format(0 1) ///
+stats(chi2) layout(row) ///
+clab(%) style(tex) bt font(bold) topstr(14cm) topf(top.tex) botf(bot.tex) ///
+botstr(.)
+stop
+tabout basis dxyr using "`datapath'\version08\3-output\2022-01-27_research_stage_stats.docx", append
+stop
+*/
 preserve
 gen x = 1 
 collapse (count) x, by(basis dxyr)
@@ -115,6 +124,13 @@ rename x count
 order basis dxyr count
 save "`datapath'\version08\2-working\basis_colorectal_2013-2015" ,replace
 restore
+
+
+** Save this colorectal dataset
+save "`datapath'\version08\3-output\2013-2015_colorectal_nonsurvival", replace
+label data "2013-2015 BNR-Cancer analysed data - COLORECTAL Non-survival BNR Reportable Dataset"
+note: TS This dataset was used for research paper on late stage presentation
+note: TS Excludes all sites except C18-C20, ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
 
 
 ** Remove non-2013 cases

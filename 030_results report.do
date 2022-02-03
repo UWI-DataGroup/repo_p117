@@ -72,8 +72,20 @@ Excludes non-2013 cases and all sites except colorectal (C18-C20) - dataset used
 Dofile: 005_prep stata.do
 putdocx textblock end
 putdocx textblock begin
+(2a-2j) Table 2a-2j. 2013 Staging by EACH Basis of Diagnosis Totals: Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version08\1-input\2013_2014_2015_cancer_nonsurvival"); 
+Excludes non-2013 cases and all sites except colorectal (C18-C20) - dataset used: "`datapath'\version08\2-working\stagingbasis_2013"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command; 
+Dofile: 005_prep stata.do
+putdocx textblock end
+putdocx textblock begin
 (3) Table 3. 2013-2015 Basis of Diagnosis Totals (ALL SITES): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version08\1-input\2013_2014_2015_cancer_nonsurvival"); 
 Includes all sites - dataset used: "`datapath'\version08\2-working\basis_allsites_2013-2015"); 
+Dofile: 005_prep stata.do
+putdocx textblock end
+putdocx textblock begin
+(3a-3c) Table 3a-3c. 2013-2015 Basis of Diagnosis Totals (ALL SITES by YEAR): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version08\1-input\2013_2014_2015_cancer_nonsurvival"); 
+Includes all sites - dataset used: "`datapath'\version08\2-working\basis_allsites_2013-2015"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command; 
 Dofile: 005_prep stata.do
 putdocx textblock end
 putdocx textblock begin
@@ -82,32 +94,18 @@ Excludes all sites except colorectal (C18-C20) - dataset used: "`datapath'\versi
 Dofile: 005_prep stata.do
 putdocx textblock end
 putdocx textblock begin
+(4a-4c) Table 4a-4c. 2013-2015 Basis of Diagnosis Totals (COLORECTAL by YEAR): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version08\1-input\2013_2014_2015_cancer_nonsurvival"); 
+Excludes all sites except colorectal (C18-C20) - dataset used: "`datapath'\version08\2-working\basis_colorectal_2013-2015"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command; 
+Dofile: 005_prep stata.do
+putdocx textblock end
+putdocx textblock begin
 (5)  Table 5. 2013 Staging Pathology Report Totals: Data from CaseFinding MasterDb (dataset used: "`datapath'\version08\1-input\20220127tblCaseFinding_2009.xlsx"); 
 Excludes non-2013 cases and all sites except colorectal (C18-C20) - dataset used: "`datapath'\version08\2-working\pathrpts _2013"); 
 Dofile: 006_prep mdb.do
 putdocx textblock end
-putdocx textblock begin
-(5) Site Order: These tables show where the order of 2015 top 10 sites in 2015,2014,2013, respectively; site order datasets used: "`datapath'\version02\2-working\siteorder_2015; siteorder_2014; siteorder_2013")
-putdocx textblock end
-putdocx textblock begin
-(6) ASIR by sex: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; unk/missing ages were included in the median age group; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version02\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version02\2-working\2013_2014_2015_cancer_numbers")
-putdocx textblock end
-putdocx textblock begin
-(7) Population text files (WPP): saved in: "`datapath'\version02\2-working\WPP_population by sex_yyyy"
-putdocx textblock end
-putdocx textblock begin
-(8) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
-putdocx textblock end
-putdocx textblock begin
-(9) No.(DCOs): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs. (variable used: basis. dataset used: "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival")
-putdocx textblock end
-putdocx textblock begin
-(10) % of tumours: Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version02\3-output\2013_2014_2015_cancer_nonsurvival")
-putdocx textblock end
-putdocx textblock begin
-(11) 1-yr, 3-yr, 5-yr (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2013, surv5yr_2014; dataset used: "`datapath'\version02\3-output\2013_2014_2015_cancer_survival")
-putdocx textblock end
-//putdocx pagebreak
+
+putdocx pagebreak
 putdocx paragraph, halign(center)
 putdocx text ("Table 1. SEER Summary Staging, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
@@ -116,6 +114,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
+//putdocx table basis dxyr = table, title("Table 1. SEER Summary Staging, 2013 (ICD-10: C18-C20)")
 putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats.docx", replace
 putdocx clear
 restore
@@ -136,7 +135,7 @@ putdocx clear
 putdocx begin
 
 // Create a paragraph
-putdocx pagebreak
+//putdocx pagebreak
 putdocx paragraph, halign(center)
 putdocx text ("Table 2. SEER Summary Staging by Basis of Diagnosis, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
@@ -150,6 +149,53 @@ putdocx clear
 restore
 
 clear
+
+
+use "`datapath'\version08\3-output\2013_colorectal_nonsurvival", clear
+
+preserve
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+putdocx paragraph, halign(center)
+putdocx text ("Table 2a. SEER Summary Staging by DCO, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==0
+putdocx paragraph, halign(center)
+putdocx text ("Table 2b. SEER Summary Staging by Clinical, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==1
+putdocx paragraph, halign(center)
+putdocx text ("Table 2c. SEER Summary Staging by Clinical Investigation, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==2
+putdocx paragraph, halign(center)
+putdocx text ("Table 2d. SEER Summary Staging by Exploratory Sx/Autopsy, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==3
+putdocx paragraph, halign(center)
+putdocx text ("Table 2e. SEER Summary Staging by Lab Test, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==4
+putdocx paragraph, halign(center)
+putdocx text ("Table 2f. SEER Summary Staging by Cytology/Haematology, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==5
+putdocx paragraph, halign(center)
+putdocx text ("Table 2g. SEER Summary Staging by Histology of Mets, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==6
+putdocx pagebreak
+putdocx paragraph, halign(center)
+putdocx text ("Table 2h. SEER Summary Staging by Histology of Primary, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==7
+putdocx paragraph, halign(center)
+putdocx text ("Table 2i. SEER Summary Staging by Autopsy w/ Histology, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==8
+putdocx paragraph, halign(center)
+putdocx text ("Table 2j. SEER Summary Staging by Unknown, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
+capture tab2docx staging if basis==9
+putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats.docx", append
+putdocx clear
+restore
+
+clear
+
 
 
 ** Output for 2013-2015 Basis of Diagnosis (ALL SITES)
@@ -179,6 +225,29 @@ restore
 
 clear
 
+use "`datapath'\version08\1-input\2013_2014_2015_cancer_nonsurvival", clear
+
+preserve
+
+putdocx clear
+putdocx begin
+
+putdocx paragraph, halign(center)
+putdocx text ("Table 3a. Basis of Diagnosis, 2013 (ALL SITES)"), bold font(Helvetica,8,"blue")
+tab2docx basis if dxyr==2013
+putdocx paragraph, halign(center)
+putdocx text ("Table 3b. Basis of Diagnosis, 2014 (ALL SITES)"), bold font(Helvetica,8,"blue")
+tab2docx basis if dxyr==2014
+putdocx paragraph, halign(center)
+putdocx text ("Table 3c. Basis of Diagnosis, 2015 (ALL SITES)"), bold font(Helvetica,8,"blue")
+tab2docx basis if dxyr==2015
+putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats.docx", append
+putdocx clear
+restore
+
+clear
+
+
 ** Output for 2013-2015 Basis of Diagnosis (COLORECTAL)
 preserve
 use "`datapath'\version08\2-working\basis_colorectal_2013-2015", clear
@@ -207,6 +276,30 @@ restore
 clear
 
 
+use "`datapath'\version08\3-output\2013-2015_colorectal_nonsurvival", clear
+
+preserve
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+putdocx paragraph, halign(center)
+putdocx text ("Table 4a. Basis of Diagnosis, 2013 (COLORECTAL)"), bold font(Helvetica,8,"blue")
+tab2docx basis if dxyr==2013
+putdocx paragraph, halign(center)
+putdocx text ("Table 4b. Basis of Diagnosis, 2014 (COLORECTAL)"), bold font(Helvetica,8,"blue")
+tab2docx basis if dxyr==2014
+putdocx paragraph, halign(center)
+putdocx text ("Table 4c. Basis of Diagnosis, 2015 (COLORECTAL)"), bold font(Helvetica,8,"blue")
+tab2docx basis if dxyr==2015
+putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats.docx", append
+putdocx clear
+restore
+
+clear
+
+
 ** Output for 2013 Staging in Pathology Reports
 preserve
 use "`datapath'\version08\2-working\pathrpts_2013", clear
@@ -219,11 +312,16 @@ use "`datapath'\version08\2-working\pathrpts_2013", clear
 
 putdocx clear
 putdocx begin
+//putdocx pagebreak
+putdocx paragraph
 
 // Create a paragraph
-//putdocx pagebreak
 putdocx paragraph, halign(center)
 putdocx text ("Table 5. Staging in Pathology Reports, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx textblock begin
+Note: The pathology reports that are staged are usually only the surgical path reports and the total path reports represents both diagnostic and surgical reports.
+putdocx textblock end
 putdocx paragraph
 putdocx table tbl1 = data(year tot_tnm tot_pathrpt percent_tnm), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
