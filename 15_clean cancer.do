@@ -180,6 +180,9 @@ CHECK FOR BOD=CLINICAL AND TIME BETWEEN DOT AND DOD as KWG noticed alot of cases
 **  Add in additional staging check 27jan2022 as comparing 2013 and 2018 colorectal staging for possible research paper on late stage presentation
 stagecheckcat=... if staging==8 & dxyr==2013
 
+** JC 07feb2022: Correct basis for PID 20130187 from 9 to 3 - picked up while doing NAACCR 2022 abstract
+basis=3 if pid=="20130187" & cr5id=="T1S1"
+
 ** Remove cases NOT diagnosed in 2008, 2013, 2014, 2015
 tab dxyr ,m
 drop if dxyr!=2008 & dxyr!=2013 & dxyr!=2014 & dxyr!=2015 //112 deleted
