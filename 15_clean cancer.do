@@ -1577,15 +1577,27 @@ gen stagecheckcat=.
 replace stagecheckcat=1 if (basis!=0 & basis!=9) & staging==9
 replace stagecheckcat=2 if beh!=2 & staging==0
 replace stagecheckcat=3 if topography==778 & staging==1
-replace stagecheckcat=4 if (staging!=. & staging!=8) & dxyr!=2013
+replace stagecheckcat=4 if (staging!=. & staging!=8) & dxyr!=2013 & dxyr!=2018
 replace stagecheckcat=5 if (staging!=. & staging!=9) & topography==809 & dxyr==2013
 replace stagecheckcat=6 if (basis==0|basis==9) & staging!=9 & dxyr==2013
 replace stagecheckcat=7 if beh==2 & staging!=0 & dxyr==2013
+replace stagecheckcat=8 if staging==8 & dxyr==2013
+replace stagecheckcat=9 if tnmcatstage=="" & tnmantstage==. & etnmcatstage=="" & etnmantstage==. & staging==. & ///
+						   topography>179 & topography<210 & dxyr==2018
+JC 08feb2022: Add the below checks in for 2016-2018 cleaning
+/*
+replace stagecheckcat=9 if tnmcatstage=="" & tnmantstage==. & etnmcatstage=="" & etnmantstage==. & staging==. & ///
+						   (topography==619|(topography>499 & topography<510)|(topography>179 & topography<210)) & dxyr==2018
+replace stagecheckcat=10 if tnmcatstage=="" & tnmantstage==. & etnmcatstage=="" & etnmantstage==. & staging!=8 & ///
+						   topography!=619 & topography<500 & topography>509 & topography<180 & topography>209 & dxyr==2018
+*/
 label var stagecheckcat "Staging Check Category"
 label define stagecheckcat_lab 1 "Check 1: basis!=0(DCO) or 9(unk) & staging=9(DCO)" 2 "Check 2: beh!=2(in-situ) & staging=0(in-situ)" ///
-							   3 "Check 3: topog=778(overlap LNs) & staging=1(local.)" 4 "Check 4: staging!=8(NA) & dxyr!=2013" ///
+							   3 "Check 3: topog=778(overlap LNs) & staging=1(local.)" 4 "Check 4: staging!=8(NA) & dxyr!=2013/2018" ///
 							   5 "Check 5: staging!=9(NK) & topog=809 & dxyr=2013" 6 "Check 6: basis=0(DCO)/9(unk) & staging!=9(DCO) & dxyr=2013" ///
-							   7 "Check 7: beh==2(in-situ) & staging!=0(in-situ) & dxyr=2013" ,modify
+							   7 "Check 7: beh==2(in-situ) & staging!=0(in-situ) & dxyr=2013" 8 "Check 8: staging=8(NA) & dxyr=2013" ///
+							   9 "Check 9: TNM, Essential TNM and Summary Staging are all missing & dxyr=2018"
+							   10 "Check 10: Summary Staging!=8(NA) & Site!=Prostate/Breast/Colorectal & dxyr=2018" ,modify
 label values stagecheckcat stagecheckcat_lab
 
 ** Create category for incidence date check
@@ -3421,19 +3433,49 @@ count if bascheckcat==9 //0
 //list pid basis dxyr cr5id comment if bascheckcat==9 ,string(100)
 
 
-*********************
-** Summary Staging **
-*********************
+*************
+** Staging **
+*************
 ** NOTE 1: Staging only done at 5 year intervals so staging done on 2013 data then 2018 and so on;
 ** NOTE 2: In upcoming years of data collection (2018 dc year), more stagecheckcat checks will be compiled based on site in SEER Summary Staging manual.
 
 ** Check 99 - For 2014 data, replace blank and non-blank stage with code 'NA'
-count if staging==. & dot!=. & dxyr!=2013 //108
+count if staging==. & dot!=. & dxyr!=2013 & dxyr!=2018 //108
 //list pid cr5id recstatus dxyr if staging==. & dot!=. & dxyr!=2013
-replace staging=8 if staging==. & dot!=. & dxyr!=2013 //108 changes
-count if staging!=8 & dot!=. & dxyr==2015 //8
+replace staging=8 if staging==. & dot!=. & dxyr!=2013 & dxyr!=2018 //108 changes
+count if staging!=8 & dot!=. & dxyr>2013 & dxyr!=2018 //8
 //list pid cr5id staging recstatus dxyr if staging!=8 & dot!=. & dxyr==2015
-replace staging=8 if staging!=8 & dot!=. & dxyr==2015 //8 changes
+replace replace staging=8 if staging!=8 & dot!=. & dxyr>2013 & dxyr!=2018 //8 changes
+
+** stagecheckcat 1: basis!=0(DCO) or 9(unk) & staging=9(DCO)
+count if stagecheckcat==1 //
+order pid basis
+//list pid cr5id dxyr topography basis *stage staging if stagecheckcat==1
+
+** stagecheckcat 2: beh!=2(in-situ) & staging=0(in-situ)
+count if stagecheckcat==2 //
+
+** stagecheckcat 3: topog=778(overlap LNs) & staging=1(local.)
+count if stagecheckcat==3 //
+
+** stagecheckcat 4: staging!=8(NA) & dxyr!=2013 & dxyr!=2018
+count if stagecheckcat==4 //
+//list pid cr5id dxyr topography basis *stag* if stagecheckcat==4
+
+** stagecheckcat 5: staging!=9(NK) & topog=809 & dxyr=2013
+count if stagecheckcat==5 //
+
+** stagecheckcat 6: basis=0(DCO)/9(unk) & staging!=9(DCO) & dxyr=2013
+count if stagecheckcat==6 //
+
+** stagecheckcat 7: beh==2(in-situ) & staging!=0(in-situ) & dxyr=2013
+count if stagecheckcat==7 //
+
+** stagecheckcat 8: staging=8(NA) & dxyr=2013
+count if stagecheckcat==8 //
+
+** stagecheckcat 9: TNM, Essential TNM and Summary Staging are all missing & dxyr=2018
+count if stagecheckcat==9 //
 
 ********************
 ** Incidence Date **
