@@ -3648,11 +3648,11 @@ count if orx2!=. & dxyr!=2013 & dxyr!=2018 //3
 
 
 ** Check 119 - For 2014 data, replace non-blank no treatment with missing value
-count if norx1!=. & dxyr==2014 //5
+count if norx1!=. & dxyr!=2013 & dxyr!=2018 //5
 //list pid norx1 dxyr cr5id if norx1!=. & dxyr==2014
 //replace norx1=. if norx1!=. & dxyr==2014 //5 changes
 
-count if norx2!=. & dxyr==2014 //0
+count if norx2!=. & dxyr!=2013 & dxyr!=2018 //0
 
 
 
