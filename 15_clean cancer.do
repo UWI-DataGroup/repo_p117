@@ -3633,9 +3633,9 @@ count if rx5d!=. & dxyr==2014 //0
 ** NOTE 2: In upcoming years of data collection (2018 dc year), more rxcheckcat checks will be compiled based on data.
 
 ** Check 116 - For 2014 data, replace non-blank other treatment with missing value
-count if orx1!=. & dxyr==2014 //0
+count if orx1!=. & dxyr!=2013 & dxyr!=2018 //0
 
-count if orx2!=. & dxyr==2014 //3
+count if orx2!=. & dxyr!=2013 & dxyr!=2018 //3
 //list pid orx2 dxyr cr5id if orx2!="" & dxyr==2014
 //replace orx2="" if orx2!="" & dxyr==2014 //3 changes
 
