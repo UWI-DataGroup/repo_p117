@@ -183,6 +183,8 @@ stagecheckcat=... if staging==8 & dxyr==2013
 ** JC 07feb2022: Correct basis for PID 20130187 from 9 to 3 - picked up while doing NAACCR 2022 abstract
 basis=3 if pid=="20130187" & cr5id=="T1S1"
 
+** JC 08feb2022: Updated Check 33 of topcheckcat to include rectosigmoid junction if not then this incorrectly flags correct cases.
+
 ** Remove cases NOT diagnosed in 2008, 2013, 2014, 2015
 tab dxyr ,m
 drop if dxyr!=2008 & dxyr!=2013 & dxyr!=2014 & dxyr!=2015 //112 deleted
@@ -839,7 +841,7 @@ replace topcheckcat=29 if !(strmatch(strupper(primarysite), "*OVERLAP*")) & topo
 replace topcheckcat=30 if regexm(primarysite, "COLON") & !(strmatch(strupper(primarysite), "*RECT*")) & (topography<180|topography>189)
 replace topcheckcat=31 if !(strmatch(strupper(primarysite), "*OVERLAP*")) & topography==188
 replace topcheckcat=32 if regexm(primarysite, "RECTO") & topography!=199
-replace topcheckcat=33 if regexm(primarysite, "RECTUM") & !(strmatch(strupper(primarysite), "*AN*")) & topography!=209
+replace topcheckcat=33 if regexm(primarysite, "RECTUM") & !(strmatch(strupper(primarysite), "*AN*"))  & !(strmatch(strupper(primarysite), "*SIGMOID*")) & topography!=209
 replace topcheckcat=34 if regexm(primarysite, "ANUS") & !(strmatch(strupper(primarysite), "*RECT*")) & (topography<210|topography>212)
 replace topcheckcat=35 if !(strmatch(strupper(primarysite), "*OVERLAP*")|strmatch(strupper(primarysite), "*RECT*")|strmatch(strupper(primarysite), "*AN*")|strmatch(strupper(primarysite), "*JUNCT*")) & topography==218
 replace topcheckcat=36 if (regexm(primarysite, "LIVER")|regexm(primarysite, "HEPTO")) & !(strmatch(strupper(primarysite), "*GLAND*")) & (topography<220|topography>221)
