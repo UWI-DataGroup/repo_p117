@@ -184,6 +184,22 @@ stagecheckcat=... if staging==8 & dxyr==2013
 basis=3 if pid=="20130187" & cr5id=="T1S1"
 
 ** JC 08feb2022: Updated Check 33 of topcheckcat to include rectosigmoid junction if not then this incorrectly flags correct cases.
+** JC 10feb2022: use below code to clean dd_coddeath
+count if slc==2 & dd_coddeath=="" //26
+count if dd_coddeath=="" & dd_cod1a!="" //11
+count if dd_coddeath=="" & cr5cod!="" & cr5cod!="99" //14
+replace cr5cod = upper(rtrim(ltrim(itrim(cr5cod)))) //595 changes
+count if slc!=2 & dd_cod1a!="" //1 - it's a dot
+replace dd_cod1a="" if slc!=2 & dd_cod1a!="" //1 change
+count if slc!=2 & cr5cod!="" & cr5cod!="99" //0
+
+replace dd_coddeath=cr5cod if dd_coddeath==""  & cr5cod!="" & cr5cod!="99" //14 changes
+replace dd_coddeath=dd_cod1a if dd_coddeath=="" & dd_cod1a!="" //8 changes
+
+count if slc==2 & dd_coddeath=="" //4 - check these individually in REDCap death db - pids 20080611, 20130167, 20130690 cannot be found in death data
+replace dd_coddeath="METASTATIC COLON CANCER" if pid=="20155029"
+count if slc==2 & dd_coddeath=="" //3 - PIDs 20080611, 20130167, 20130690 cannot be found in death data
+
 
 ** Remove cases NOT diagnosed in 2008, 2013, 2014, 2015
 tab dxyr ,m
