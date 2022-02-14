@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      07-FEB-2022
-    // 	date last modified      09-FEB-2022
+    // 	date last modified      14-FEB-2022
     //  algorithm task          Preparing 2018 colorectal CanReg5 dataset for research analysis
     //  status                  Completed
     //  objective               To have one dataset with cleaned 2018 colorectal data
@@ -76,7 +76,7 @@
  (5) import the .xlsx file into Stata and save dataset in Stata
  (6) Output: 291 records but really 141 colorectal cases for 2018
 */
-import excel using "`datapath'\version08\1-input\2022-02-08_MAIN Source+Tumour+Patient_2018_JC_excel.xlsx", firstrow
+import excel using "`datapath'\version08\1-input\2022-02-14_MAIN Source+Tumour+Patient_2018_JC_excel.xlsx", firstrow
 
 ** Format incidence date to create tumour year
 nsplit IncidenceDate, digits(4 2 2) gen(dotyear dotmonth dotday)
@@ -87,7 +87,7 @@ label var dot "IncidenceDate"
 label var dotyear "Incidence year"
 drop IncidenceDate
 
-count //291
+count //291; 312
 
 ** Renaming CanReg5 variables
 rename Personsearch persearch
@@ -171,7 +171,7 @@ rename TumourIDSourceTable tumouridsourcetable
 ** Check if dxyr and incidence year do not match and review these before dropping the ineligible years
 count if dxyr!=dotyear //0
 
-count //291
+count //291; 312
 
 ** JC 08feb2022: need to find a way to assign cr5id based on obs ID
 count if pid=="" //0
@@ -184,28 +184,37 @@ gen obsid = _n
 replace cr5id="" if cr5id!="" //2 changes
 
 duplicates tag pid, gen(dup)
-count if dup>0 //206
-count if dup==0 //31
+count if dup>0 //206; 287
+count if dup==0 //31; 25
 //list pid obsid cr5id dup if dup>0, nolabel sepby(pid)
 //list pid obsid cr5id dup if dup==0, nolabel sepby(pid)
 
-replace cr5id="T1S1" if dup==0 //31 changes
+replace cr5id="T1S1" if dup==0 //31; 25 changes
 
 drop dup
 sort pid
 quietly by pid :  gen dup = cond(_N==1,0,_n)
-count if dup==0 //31
-count if dup>0 //206
+count if dup==0 //31; 25
+count if dup>0 //206; 287
 
 //list pid obsid cr5id dup if dup>0, nolabel sepby(pid)
-replace cr5id="T1S1" if dup==1 //110
-replace cr5id="T1S2" if dup==2 //110
-replace cr5id="T1S3" if dup==3 //39
-replace cr5id="T1S4" if dup==4 //1
+replace cr5id="T1S1" if dup==1 //110; 116
+replace cr5id="T1S2" if dup==2 //110; 116
+replace cr5id="T1S3" if dup==3 //39; 50
+replace cr5id="T1S4" if dup==4 //1; 5
 
 count if cr5id=="" //0
 tab cr5id
 /*
+      cr5id |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       T1S1 |        141       45.19       45.19
+       T1S2 |        116       37.18       82.37
+       T1S3 |         50       16.03       98.40
+       T1S4 |          5        1.60      100.00
+------------+-----------------------------------
+      Total |        312      100.00
+
       cr5id |      Freq.     Percent        Cum.
 ------------+-----------------------------------
        T1S1 |        141       48.45       48.45
@@ -4917,6 +4926,11 @@ replace dlc=d(15dec2021) if pid=="20182276"
 replace dlc=d(25jan2022) if pid=="20182290"
 replace dlc=d(03nov2021) if pid=="20182376"
 
+** Missing stage for pid 20182181
+replace tnmcatstage="pT2 pN0 pMX" if pid=="20182181" & cr5id=="T1S1"
+replace tnmantstage=1 if pid=="20182181" & cr5id=="T1S1"
+replace staging=1 if pid=="20182181" & cr5id=="T1S1"
+
 ** For NAACCR 2022 abstract, create time variable for time from:
 ** incidence date to death/last contact
 gen time_alive=dlc-dot if slc==1
@@ -4927,6 +4941,18 @@ label var time_dead "Deceased Cases: Time between incidence and last contact in 
 
 tab tnmantstage ,m
 /*
+    TNM Ant |
+      Stage |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          I |          8        5.67        5.67
+         II |         19       13.48       19.15
+        III |         48       34.04       53.19
+         IV |         17       12.06       65.25
+          . |         49       34.75      100.00
+------------+-----------------------------------
+      Total |        141      100.00
+
+
     TNM Ant |
       Stage |      Freq.     Percent        Cum.
 ------------+-----------------------------------
@@ -4945,6 +4971,18 @@ tab etnmantstage ,m
     TNM Ant |
       Stage |      Freq.     Percent        Cum.
 ------------+-----------------------------------
+          I |          9        6.38        6.38
+         II |         19       13.48       19.86
+        III |         48       34.04       53.90
+         IV |         18       12.77       66.67
+          . |         47       33.33      100.00
+------------+-----------------------------------
+      Total |        141      100.00
+
+  Essential |
+    TNM Ant |
+      Stage |      Freq.     Percent        Cum.
+------------+-----------------------------------
           I |          4        2.84        2.84
          II |          5        3.55        6.38
         III |         10        7.09       13.48
@@ -4957,6 +4995,20 @@ tab etnmantstage
 
 tab staging ,m
 /*
+
+              Summary Staging |      Freq.     Percent        Cum.
+------------------------------+-----------------------------------
+               Localised only |         12        8.51        8.51
+        Regional: direct ext. |         14        9.93       18.44
+           Regional: LNs only |         36       25.53       43.97
+Regional: both dir. ext & LNs |         12        8.51       52.48
+          Distant site(s)/LNs |         18       12.77       65.25
+                           NA |          9        6.38       71.63
+            Unknown; DCO case |         40       28.37      100.00
+------------------------------+-----------------------------------
+                        Total |        141      100.00
+
+
               Summary Staging |      Freq.     Percent        Cum.
 ------------------------------+-----------------------------------
                            NA |         96       68.09       68.09
@@ -4965,6 +5017,18 @@ tab staging ,m
 ------------------------------+-----------------------------------
                         Total |        141      100.00
 */
+
+preserve
+contract staging, freq(count) percent(percentage)
+summ 
+describe
+gsort -count
+gen year=2018
+list year staging
+sort staging
+order year staging count percentage
+save "`datapath'\version08\2-working\staging_2018" ,replace
+restore
 
 tab time_alive tnmantstage
 tab time_alive etnmantstage
@@ -4985,6 +5049,20 @@ Clinical Invest./Ult Sound |          4        2.84        4.26
 */
 tab staging basis ,m
 /*
+                       |         BasisOfDiagnosis
+      Summary Staging | Clinical   Clinical   Hx of pri |     Total
+----------------------+---------------------------------+----------
+       Localised only |         0          0         12 |        12 
+Regional: direct ext. |         0          1         13 |        14 
+   Regional: LNs only |         0          0         36 |        36 
+Regional: both dir. e |         0          0         12 |        12 
+  Distant site(s)/LNs |         0          3         15 |        18 
+                   NA |         0          0          9 |         9 
+    Unknown; DCO case |         2          0         38 |        40 
+----------------------+---------------------------------+----------
+                Total |         2          4        135 |       141
+
+
                       |         BasisOfDiagnosis
       Summary Staging | Clinical   Clinical   Hx of pri |     Total
 ----------------------+---------------------------------+----------
@@ -4994,9 +5072,33 @@ tab staging basis ,m
 ----------------------+---------------------------------+----------
                 Total |         2          4        135 |       141 
 */
-replace staging=8 if staging==. & (tnmantstage!=.|etnmantstage!=.) //8 changes
+
+preserve
+gen x = 1 
+collapse (count) x, by(staging basis)
+list
+rename x count
+gen year=2018
+order year staging basis count
+save "`datapath'\version08\2-working\stagingbasis_2018" ,replace
+restore
+
+replace staging=8 if staging==. & (tnmantstage!=.|etnmantstage!=.) //8; 0 changes
 tab staging ,m
 /*
+              Summary Staging |      Freq.     Percent        Cum.
+------------------------------+-----------------------------------
+               Localised only |         12        8.51        8.51
+        Regional: direct ext. |         14        9.93       18.44
+           Regional: LNs only |         36       25.53       43.97
+Regional: both dir. ext & LNs |         12        8.51       52.48
+          Distant site(s)/LNs |         18       12.77       65.25
+                           NA |          9        6.38       71.63
+            Unknown; DCO case |         40       28.37      100.00
+------------------------------+-----------------------------------
+                        Total |        141      100.00
+
+
               Summary Staging |      Freq.     Percent        Cum.
 ------------------------------+-----------------------------------
                            NA |        104       73.76       73.76

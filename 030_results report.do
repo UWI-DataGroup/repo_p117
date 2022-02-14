@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      27-JAN-2022
-    // 	date last modified      09-FEB-2022
+    // 	date last modified      14-FEB-2022
     //  algorithm task          Preparing 2013 + 2018 colorectal staging datasets for reporting
     //  status                  Completed
     //  objective               To have one dataset with report outputs for 2013 + 2018 data to compare staging for colorectal data.
@@ -55,8 +55,8 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER Staging Report: 2018 COLORECTAL"), bold
 putdocx textblock begin
-Date Prepared: 09-FEB-2022. 
-Prepared by: JC using Stata & Redcap data release date: 2022-02-07_KWG CR5db XML backup. 
+Date Prepared: 14-FEB-2022. 
+Prepared by: JC using Stata & Redcap data release date: 2022-02-14_KWG CR5db XML backup. 
 Generated using Dofile: 007_prep cr5db.do & 030_results report.do of data_p117 version08
 putdocx textblock end
 putdocx paragraph, halign(center)
@@ -196,7 +196,7 @@ putdocx textblock end
 putdocx textblock begin
 •	Unstaged pathology reports.
 putdocx textblock end
-putdocx save "`datapath'\version08\3-output\2022-02-09_research_stage_stats_2018.docx", replace
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2018V02.docx", replace
 putdocx clear
 restore
 
@@ -282,7 +282,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 //putdocx table basis dxyr = table, title("Table 1. SEER Summary Staging, 2013 (ICD-10: C18-C20)")
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", replace
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", replace
 putdocx clear
 restore
 
@@ -311,7 +311,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", append
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", append
 putdocx clear
 restore
 
@@ -357,7 +357,7 @@ capture tab2docx staging if basis==8
 putdocx paragraph, halign(center)
 putdocx text ("Table 2j. SEER Summary Staging by Unknown, 2013 (ICD-10: C18-C20)"), bold font(Helvetica,8,"blue")
 capture tab2docx staging if basis==9
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", append
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", append
 putdocx clear
 restore
 
@@ -386,7 +386,7 @@ putdocx table tbl1 = data(basis dxyr count), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", append
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", append
 putdocx clear
 restore
 
@@ -408,7 +408,7 @@ tab2docx basis if dxyr==2014
 putdocx paragraph, halign(center)
 putdocx text ("Table 3c. Basis of Diagnosis, 2015 (ALL SITES)"), bold font(Helvetica,8,"blue")
 tab2docx basis if dxyr==2015
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", append
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", append
 putdocx clear
 restore
 
@@ -436,7 +436,7 @@ putdocx table tbl1 = data(basis dxyr count), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", append
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", append
 putdocx clear
 restore
 
@@ -460,7 +460,7 @@ tab2docx basis if dxyr==2014
 putdocx paragraph, halign(center)
 putdocx text ("Table 4c. Basis of Diagnosis, 2015 (COLORECTAL)"), bold font(Helvetica,8,"blue")
 tab2docx basis if dxyr==2015
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", append
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", append
 putdocx clear
 restore
 
@@ -495,7 +495,7 @@ putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version08\3-output\2022-01-27_research_stage_stats_2013.docx", append
+putdocx save "`datapath'\version08\3-output\2022-02-14_research_stage_stats_2013V02.docx", append
 putdocx clear
 restore
 
