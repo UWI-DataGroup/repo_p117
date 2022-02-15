@@ -103,6 +103,53 @@ drop if RegNo!="20130010" & RegNo!="20130014" & RegNo!="20130016" & RegNo!="2013
 
 count //343
 
+** Determine % of eligible cases where the notes were seen (2013)
+preserve
+
+gen obsid = _n
+rename RegNo pid
+rename No mdbid
+rename NotesSeen notesseen
+gen cr5id=""
+
+//replace cr5id="" if cr5id!="" //2 changes
+
+duplicates tag pid, gen(dup)
+count if dup>0 //315
+count if dup==0 //28
+//list pid obsid cr5id dup if dup>0, nolabel sepby(pid)
+//list pid obsid cr5id dup if dup==0, nolabel sepby(pid)
+
+replace cr5id="T1S1" if dup==0 //28 changes
+
+drop dup
+sort pid
+quietly by pid :  gen dup = cond(_N==1,0,_n)
+count if dup==0 //28
+count if dup>0 //315
+
+//list pid obsid cr5id dup if dup>0, nolabel sepby(pid)
+replace cr5id="T1S1" if dup==1 //120
+replace cr5id="T1S2" if dup==2 //120
+replace cr5id="T1S3" if dup==3 //55
+replace cr5id="T1S4" if dup==4 //16
+replace cr5id="T1S5" if dup==5 //4
+
+count if cr5id=="" //0
+tab cr5id
+tab notesseen if cr5id=="T1S1"
+
+count //343
+
+** Save this colorectal NotesSeen dataset
+save "`datapath'\version08\3-output\2013_colorectal_notesseen", replace
+label data "2013 BNR-Cancer Notes Seen data - COLORECTAL MasterDb Dataset"
+note: TS This dataset was used for research paper on late stage presentation
+note: TS Excludes all sites except C18-C20
+
+restore
+
+
 ** Remove all non-pathology cases
 drop if NFType!="Pathology Report" & NFType!="Post Mortem Report" //152 deleted
 

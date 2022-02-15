@@ -1947,6 +1947,12 @@ list pid cr5id dlc duration onsetint if recstatus==3 & dxyr==2014 & (nftype==8|n
 list comments if recstatus==3 & dxyr==2014 & (nftype==8|nftype==9)
 list cr5cod if recstatus==3 & dxyr==2014 & (nftype==8|nftype==9)
 */
+
+** Check for NotesSeen=No but Comments=Notes
+count if regexm(comments, "Notes")|regexm(comments, "notes")|regexm(comments, "NOTES") //12
+replace notesseen=1 if regexm(comments, "Notes")|regexm(comments, "notes")|regexm(comments, "NOTES") //5 changes
+
+
 ********************************
 ** First, Middle & Last Names **
 ********************************
@@ -5106,8 +5112,19 @@ Regional: both dir. ext & LNs |         12        8.51       52.48
 ------------------------------+-----------------------------------
                         Total |        141      100.00
 */
+
+tab notesseen ,m
+/*
+                             NotesSeen |      Freq.     Percent        Cum.
+---------------------------------------+-----------------------------------
+                                   Yes |         12        8.51        8.51
+                                    No |        129       91.49      100.00
+---------------------------------------+-----------------------------------
+                                 Total |        141      100.00
+*/
 ** JC 09feb2022: Emailed SF manual output to MS Word of the above along with my write up for the process of staging in a C'bbean registry
 ** Word doc saved in: "`datapath'\version08\3-output\NAACCRabstractResults_images_20220209V02.docx"
+
 
 ** Put variables in order they are to appear	  
 order pid cr5id fname lname init age sex dob natregno resident slc dlc dod dot /// 
