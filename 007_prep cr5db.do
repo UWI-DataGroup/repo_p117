@@ -4245,7 +4245,7 @@ replace record_id=31752 if pid=="20180546"
 replace record_id=32700 if pid=="20180554"
 replace record_id=28977 if pid=="20180647"
 replace record_id=34035 if pid=="20182010"
-replace record_id=27339 if pid=="20182026"
+replace record_id=27339 if pid=="20182028"
 replace record_id=33264 if pid=="20182247"
 replace record_id=29783 if pid=="20182259"
 //23 changes
