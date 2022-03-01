@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JAN-2022
-    // 	date last modified      12-JAN-2022
+    // 	date last modified      01-MAR-2022
     //  algorithm task          Exporting newly-generated duplicates lists (see dofiles '003a, 003b, 003c, 003d...')
     //  status                  Completed
     //  objective               (1) To have one excel workbook with 5 tabs - ERRORS, NRN, DOB, HOSP#, NAMES.
@@ -13,7 +13,7 @@
 	//							This dofile is also saved in the path: L:\Sync\Cancer\CanReg5\DA Duplicates
 
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off
@@ -90,7 +90,7 @@ restore
 preserve
 use "`datapath'\version07\3-output\HOSP_dups.dta" , clear
 
-count //2
+count //6
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
@@ -109,7 +109,7 @@ restore
 preserve
 use "`datapath'\version07\3-output\NAMES_dups.dta" , clear
 
-count //47
+count //25
 
 ** Use below example code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )

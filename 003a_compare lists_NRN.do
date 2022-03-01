@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JAN-2022
-    // 	date last modified      12-JAN-2022
+    // 	date last modified      01-MAR-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -15,7 +15,7 @@
 	//							This dofile is also saved in the path: L:\Sync\Cancer\CanReg5\DA Duplicates
 
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off
@@ -57,13 +57,13 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,300
+count //10,400
 
 
 ** STEP #3
 ** Identify possible duplicates using NRN 
 drop if nrn==""|nrn=="999999-9999"|regexm(nrn,"9999") //remove blank/missing NRNs as these will be flagged as duplicates of each other
-//1,756 deleted
+//1,883 deleted
 sort nrn 
 quietly by nrn : gen dup = cond(_N==1,0,_n)
 sort nrn registrynumber lastname firstname
@@ -97,13 +97,13 @@ count //0
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
-quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //0
+capture quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
+capture count if duppid>0 //0
 
 
 ** STEP #8
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //4 deleted
+capture drop if checked==1 & duppid==0 //4 deleted
 //drop if duppid!=0 //4 deleted the cases pulled in from the last list
 
 ** STEP #9

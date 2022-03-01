@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JAN-2022
-    // 	date last modified      12-JAN-2022
+    // 	date last modified      01-MAR-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -15,7 +15,7 @@
 	//							This dofile is also saved in the path: L:\Sync\Cancer\CanReg5\DA Duplicates
 
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,300
+count //10,400
 
 
 ** STEP #3
@@ -155,7 +155,7 @@ count //2
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevDOB_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //2
+count //4
 
 ** STEP #8
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
@@ -167,7 +167,7 @@ count if duppid>0 //0
 
 ** STEP #9
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //0 deleted
+drop if checked==1 & duppid==0 //2 deleted
 //drop if registrynumber==20151033 //2 deleted - these were matched to each other and came from the previously-checked list
 
 ** STEP #10
