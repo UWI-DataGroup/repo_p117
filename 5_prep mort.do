@@ -125,7 +125,7 @@ count if nrn!=. & natregno=="" //0
 ** In combining the previously-prepared dataset and the REDCap export, the below errors in record_id need to be corrected
 replace record_id=18490 if record_id==18489
 replace record_id=27642 if record_id==27644
-drop if record_id==25341 //record is 34120 in REDCapdb but with different pname - checked MedData and Electoral list and cannot find this pt is deceased in either.
+drop if record_id==25341 //record is 34120 in REDCapdb but with different pname - checked MedData and Electoral list and cannot find this pt is deceased in either; manually deleted 25341 from REDCapdb.
 
 ** Remove variables not needed for this corrective process
 keep record_id pname nrnnd nrn dod dodyear natregno
@@ -260,11 +260,13 @@ merge 1:1 record_id using "`datapath'\version04\2-working\2015-2020_deaths_redca
 */
 //list record_id dd_pname rc_pname if _merge==1|_merge==2
 
+** Correcting NRN ND variable
 count if dd_nrnnd!=rc_nrnnd //2
 list record_id dd_nrnnd rc_nrnnd dd_nrn rc_nrn if dd_nrnnd!=rc_nrnnd
 replace dd_nrnnd=2 if record_id==26253
 replace dd_nrnnd=1 if record_id==27600
 
+** Correcting NRN variable
 count if dd_nrn!=rc_nrn //10
 //list record_id dd_nrn rc_nrn if dd_nrn!=rc_nrn
 replace dd_nrn=rc_nrn if dd_nrn!=rc_nrn & record_id!=28513 //9 changes
@@ -272,6 +274,43 @@ count if rc_nrn!=dd_nrn //1
 replace rc_nrn=dd_nrn if rc_nrn!=dd_nrn //updated 28513 directly in REDCapdb
 count if dd_natregno!=rc_natregno //5,137
 replace dd_natregno=rc_natregno if dd_natregno!=rc_natregno //5,137 changes
+
+** Correcting Pt Name variable
+count if rc_pname!=dd_pname //137
+count if dd_pname!=rc_pname //137
+list record_id dd_nrn dd_pname rc_pname if rc_pname!=dd_pname
+gen fixpname=1 if rc_pname!=dd_pname
+replace dd_pname=rc_pname if rc_pname!=dd_pname //137 changes
+count if dd_pname!=rc_pname //0
+
+** Correcting First, Middle and Last Names variables
+gen ptname=dd_pname if fixpname==1
+split ptname, parse(", "" ") gen(name)
+order record_id ptname name1 name2 name3 name4 name5 dd_pname dd_fname dd_mname dd_lname
+sort record_id
+
+replace name5=name2 if name2!="" & name3=="" & name4=="" & name5=="" & fixpname==1 //95 changes
+replace name2="" if name5==name2 & fixpname==1 //95 changes
+replace name5=name3 if name3!="" & name4=="" & name5=="" & fixpname==1 //36 changes
+replace name3="" if name5==name3 & fixpname==1 //36 changes
+replace name5=name4+" "+name5 if name4!="" & fixpname==1 //6 changes
+replace name5=name2+name5 if (name2=="MC"|name2=="MAC"|name2=="ST.") & fixpname==1 //6 changes
+replace name5=name2+" "+name5 if name2=="ST" & fixpname==1 //1 change
+replace name2="" if (name2=="MC"|name2=="MAC"|name2=="ST."|name2=="ST") & fixpname==1 //7 changes
+replace name5=name3+name5 if (name3=="MC"|name3=="MAC"|name3=="ST.") & fixpname==1 //3 changes
+replace name5=name3+" "+name5 if name3=="ST" & fixpname==1 //1 change
+replace name3="" if (name3=="MC"|name3=="MAC"|name3=="ST."|name3=="ST") & fixpname==1 //4 changes
+replace name5=name2+" "+name5 if name5=="JR" & fixpname==1 //1 change
+replace name2=name2+" "+name3 if record_id==26864|record_id==27422
+replace name2="" if record_id==30079
+replace dd_fname=name1 if fixpname==1 //137 changes
+replace dd_mname=name2 if fixpname==1 //44 changes
+replace dd_lname=name5 if fixpname==1 //137 changes
+
+replace dd_fname = lower(rtrim(ltrim(itrim(dd_fname)))) if fixpname==1 //137 changes
+replace dd_mname = lower(rtrim(ltrim(itrim(dd_mname)))) if fixpname==1 //34 changes
+replace dd_lname = lower(rtrim(ltrim(itrim(dd_lname)))) if fixpname==1 //137 changes
+drop ptname fixpname name1 name2 name3 name4 name5
 
 ** Remove redcap variables
 drop rc_pname rc_nrnnd rc_nrn rc_dod rc_dodyear rc_natregno _merge
