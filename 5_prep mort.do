@@ -4,9 +4,9 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-MAY-2022
-    // 	date last modified      06-MAY-2022
+    // 	date last modified      10-MAY-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
-    //  status                  Completed
+    //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
 	//							(1) matching with incidence data and 
 	//							(2) analysis/reporting mortality rates.
@@ -55,7 +55,7 @@
 	(2) prep of cleaned 2021 death data for matching with incidence data 
 		(2021 data to be appended to 2015-2020_deaths_for_matching.dta)
 */
-/*
+
 ***************
 ** DATA IMPORT  
 ***************
@@ -321,7 +321,7 @@ notes _dta :These data prepared from BB national death register & Redcap deathda
 save "`datapath'\version04\3-output\2015-2020_deaths_for_matching" ,replace
 note: TS This dataset can be used for matching 2015-2020 deaths with incidence data
 
-*/
+
 *********************
 **     Preparing   **
 ** 	  2018 Deaths  **
