@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          10_analysis_mort.do
+    //  algorithm name          10b_analysis_mort 2016+2017.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      10-MAY-2022

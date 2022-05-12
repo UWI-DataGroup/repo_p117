@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          5_prep_mort.do
+    //  algorithm name          5a_prep_mort.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-MAY-2022
