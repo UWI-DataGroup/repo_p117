@@ -4,7 +4,7 @@
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      10-MAY-2022
-    // 	date last modified	    10-MAY-2022
+    // 	date last modified	    12-MAY-2022
     //  algorithm task			Prep for external population for incidence and mortality analyses
     //  status                  Completed
     //  objective               To have one dataset with 2008, 2013, 2014, 2015, 2018 population data for 2018 cancer report.
@@ -838,7 +838,7 @@ clear
 ***************
 ** LOAD the 2019 WPP 2008,2013-2018 excel dataset, multiple sheets at once
 import excel using "`datapath'\version04\1-input\wpp.xlsx" , describe
-forvalues i=7(-1)1 {  
+forvalues i=9(-1)1 {  
 import excel using "`datapath'\version04\1-input\wpp.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D37) clear
 import excel using "`datapath'\version04\1-input\wpp.xlsx", ///
@@ -851,7 +851,11 @@ import excel using "`datapath'\version04\1-input\wpp.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D37) clear
 import excel using "`datapath'\version04\1-input\wpp.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D37) clear
-if `i'==7 {
+import excel using "`datapath'\version04\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+import excel using "`datapath'\version04\1-input\wpp.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+if `i'==9 {
     save "`datapath'\version04\2-working\pop_wpp", replace
   }
   else {
@@ -1014,4 +1018,58 @@ collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2018: 10-year age bands"
 save "`datapath'\version04\2-working\pop_wpp_2018-10" , replace
 note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2018
+drop year age_10
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2018: 5-year age bands"
+save "`datapath'\version04\2-working\pop_wpp_2018-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2018
+drop year age5
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2018: 10-year age bands"
+save "`datapath'\version04\2-working\pop_wpp_2018-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
+restore
+
+preserve
+drop if year!=2019
+drop year age_10
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2019: 5-year age bands"
+save "`datapath'\version04\2-working\pop_wpp_2019-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+restore
+
+preserve
+drop if year!=2019
+drop year age5
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2019: 10-year age bands"
+save "`datapath'\version04\2-working\pop_wpp_2019-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+restore
+
+preserve
+drop if year!=2020
+drop year age_10
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2020: 5-year age bands"
+save "`datapath'\version04\2-working\pop_wpp_2020-5" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+restore
+
+preserve
+drop if year!=2020
+drop year age5
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2020: 10-year age bands"
+save "`datapath'\version04\2-working\pop_wpp_2020-10" , replace
+note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
 restore
