@@ -715,34 +715,55 @@ order record_id coddeath //check Stata Browse window for MPs in CODs
 STOP
 
 ** Create duplicate observations for MPs in CODs
-expand=2 if record_id==24223, gen (dupobs1)
-expand=2 if record_id==24310, gen (dupobs2)
-expand=2 if record_id==25389, gen (dupobs3)
-//(GIST not stated as malignant so ineligible?? - yes, see CR5db pid 20130343)
-expand=2 if record_id==25402, gen (dupobs4)
-expand=2 if record_id==25618, gen (dupobs5)
-expand=2 if record_id==25628, gen (dupobs6)
-expand=2 if record_id==25822, gen (dupobs7)
-expand=2 if record_id==25914, gen (dupobs8)
-expand=2 if record_id==25942, gen (dupobs9)
-expand=2 if record_id==26148, gen (dupobs10)
-expand=2 if record_id==26172, gen (dupobs11)
-expand=2 if record_id==26258, gen (dupobs12)
-expand=2 if record_id==26407, gen (dupobs13)
-expand=2 if record_id==26408, gen (dupobs14)
-expand=2 if record_id==26540, gen (dupobs15)
+expand=2 if record_id==21507, gen (dupobs1)
+expand=2 if record_id==20093, gen (dupobs2)
+expand=2 if record_id==19971, gen (dupobs3)
+expand=2 if record_id==23215, gen (dupobs4)
+expand=2 if record_id==20230, gen (dupobs5)
+expand=2 if record_id==24170, gen (dupobs6) //COD with 3 cancers
+expand=2 if record_id==24170, gen (dupobs7) //COD with 3 cancers
+expand=2 if record_id==20755, gen (dupobs8)
+expand=2 if record_id==19914, gen (dupobs9)
+expand=2 if record_id==22445, gen (dupobs10)
+expand=2 if record_id==21899, gen (dupobs11)
+expand=2 if record_id==23183, gen (dupobs12)
+expand=2 if record_id==19709, gen (dupobs13)
+expand=2 if record_id==21921, gen (dupobs14)
+expand=2 if record_id==20532, gen (dupobs15)
+expand=2 if record_id==20638, gen (dupobs16)
+expand=2 if record_id==21407, gen (dupobs17)
+expand=2 if record_id==21266, gen (dupobs18) //ask SF, NS re if this is 3 cancers or 2
+expand=2 if record_id==21266, gen (dupobs19)
+expand=2 if record_id==23247, gen (dupobs20) //ask SF, NS re if this is 2 cancers
+expand=2 if record_id==22472, gen (dupobs21)
+expand=2 if record_id==21631, gen (dupobs22)
+expand=2 if record_id==23599, gen (dupobs23)
+expand=2 if record_id==20087, gen (dupobs24)
+expand=2 if record_id==20184, gen (dupobs25)
+expand=2 if record_id==22218, gen (dupobs26)
+expand=2 if record_id==24121, gen (dupobs27)
+expand=2 if record_id==20880, gen (dupobs28)
+expand=2 if record_id==23574, gen (dupobs29)
+expand=2 if record_id==19584, gen (dupobs30)
+expand=2 if record_id==21871, gen (dupobs31)
+expand=2 if record_id==19891, gen (dupobs32)
+expand=2 if record_id==21968, gen (dupobs33)
+expand=2 if record_id==22022, gen (dupobs34) //ask SF, NS re if this is 2 cancers
+expand=2 if record_id==23483, gen (dupobs35)
+expand=2 if record_id==22730, gen (dupobs36)
+drop if record_id==23381 //meningioma, NOS is considered benign
+
 //M9811(9) vs M9837(10) and M9875(8)
 //pid 20130770 CML in 2013 that transformed to either T-ALL or B-ALL in 2015 COD states C-CELL!
 //M9811 (B-ALL) chosen as research shows "With few exceptions, Ph-positive ALL patients are diagnosed with B-ALL "
 //https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4896164/
 display `"{browse "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4896164/":Ph+ALL}"'
 
-replace coddeath=subinstr(coddeath,"OLON","COLON",.) if record_id==26655 //colon spelt olon when checking above list
-replace coddeath=subinstr(coddeath,"STOMALIA","STOMACH",.) if record_id==25971 //stomach spelt stomalia when checking above list
+replace coddeath=subinstr(coddeath,"VANCER","CANCER",.) if record_id==20525 //cancer spelt vancer when checking above list
 
 
 count //2,543
-
+STOP
 ** Create variables to identify patients vs tumours
 gen ptrectot=.
 replace ptrectot=1 if dupobs1==0|dupobs2==0|dupobs3==0|dupobs4==0 ///
