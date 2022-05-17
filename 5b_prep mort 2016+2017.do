@@ -1,10 +1,10 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          5_prep_mort 2016+2017.do
+    //  algorithm name          5b_prep_mort 2016+2017.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-MAY-2022
-    // 	date last modified      12-MAY-2022
+    // 	date last modified      17-MAY-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -712,7 +712,6 @@ drop if cancer!=1 //3,724 deleted
 sort coddeath record_id
 order record_id coddeath //check Stata Browse window for MPs in CODs
 
-STOP
 
 ** Create duplicate observations for MPs in CODs
 expand=2 if record_id==21507, gen (dupobs1)
@@ -720,38 +719,40 @@ expand=2 if record_id==20093, gen (dupobs2)
 expand=2 if record_id==19971, gen (dupobs3)
 expand=2 if record_id==23215, gen (dupobs4)
 expand=2 if record_id==20230, gen (dupobs5)
-expand=2 if record_id==24170, gen (dupobs6) //COD with 3 cancers
-expand=2 if record_id==24170, gen (dupobs7) //COD with 3 cancers
-expand=2 if record_id==20755, gen (dupobs8)
-expand=2 if record_id==19914, gen (dupobs9)
-expand=2 if record_id==22445, gen (dupobs10)
-expand=2 if record_id==21899, gen (dupobs11)
-expand=2 if record_id==23183, gen (dupobs12)
-expand=2 if record_id==19709, gen (dupobs13)
-expand=2 if record_id==21921, gen (dupobs14)
-expand=2 if record_id==20532, gen (dupobs15)
-expand=2 if record_id==20638, gen (dupobs16)
-expand=2 if record_id==21407, gen (dupobs17)
-expand=2 if record_id==21266, gen (dupobs18) //ask SF, NS re if this is 3 cancers or 2
-expand=2 if record_id==21266, gen (dupobs19)
-expand=2 if record_id==23247, gen (dupobs20) //ask SF, NS re if this is 2 cancers
-expand=2 if record_id==22472, gen (dupobs21)
-expand=2 if record_id==21631, gen (dupobs22)
-expand=2 if record_id==23599, gen (dupobs23)
-expand=2 if record_id==20087, gen (dupobs24)
-expand=2 if record_id==20184, gen (dupobs25)
-expand=2 if record_id==22218, gen (dupobs26)
-expand=2 if record_id==24121, gen (dupobs27)
-expand=2 if record_id==20880, gen (dupobs28)
-expand=2 if record_id==23574, gen (dupobs29)
-expand=2 if record_id==19584, gen (dupobs30)
-expand=2 if record_id==21871, gen (dupobs31)
-expand=2 if record_id==19891, gen (dupobs32)
-expand=2 if record_id==21968, gen (dupobs33)
-expand=2 if record_id==22022, gen (dupobs34) //ask SF, NS re if this is 2 cancers
-expand=2 if record_id==23483, gen (dupobs35)
-expand=2 if record_id==22730, gen (dupobs36)
-drop if record_id==23381 //meningioma, NOS is considered benign
+expand=3 if record_id==24170, gen (dupobs6) //COD with 3 cancers
+expand=2 if record_id==20755, gen (dupobs7)
+expand=2 if record_id==19914, gen (dupobs8)
+expand=2 if record_id==22445, gen (dupobs9)
+expand=2 if record_id==21899, gen (dupobs10)
+expand=2 if record_id==23183, gen (dupobs11)
+expand=2 if record_id==19709, gen (dupobs12)
+expand=2 if record_id==21921, gen (dupobs13)
+expand=2 if record_id==20532, gen (dupobs14)
+expand=2 if record_id==20638, gen (dupobs15)
+expand=2 if record_id==21407, gen (dupobs16)
+expand=3 if record_id==21266, gen (dupobs17) //ask SF, NS re if this is 3 cancers or 2 - 17may2022: checked CR5db + MedData - all 3 are primaries
+//expand=2 if record_id==23247, gen (dupobs20) //ask SF, NS re if this is 2 cancers - 17may2022: checked CR5db + MedData - lung ca is mets
+expand=2 if record_id==22472, gen (dupobs18)
+expand=2 if record_id==21631, gen (dupobs19)
+expand=2 if record_id==23599, gen (dupobs20)
+expand=2 if record_id==20087, gen (dupobs21)
+expand=2 if record_id==20184, gen (dupobs22)
+expand=2 if record_id==22218, gen (dupobs23)
+expand=2 if record_id==24121, gen (dupobs24)
+expand=2 if record_id==20880, gen (dupobs25)
+expand=2 if record_id==23574, gen (dupobs26)
+expand=2 if record_id==19584, gen (dupobs27)
+expand=2 if record_id==21871, gen (dupobs28)
+expand=2 if record_id==19891, gen (dupobs29)
+expand=2 if record_id==21968, gen (dupobs30)
+expand=2 if record_id==22022, gen (dupobs31) //ask SF, NS re if this is 2 cancers - 17may2022: checked CR5db + MedData - both are primaries
+expand=2 if record_id==23483, gen (dupobs32)
+expand=2 if record_id==22730, gen (dupobs33)
+expand=2 if record_id==21584, gen (dupobs34) //found in below ICD10 lists
+expand=2 if record_id==22760, gen (dupobs35) //found in below ICD10 lists
+
+drop if record_id==23381 //meningioma, NOS is considered benign - 1 deleted
+drop if record_id==24251 //tumour, uncertain/unk behaviour - 1 deleted (JC 17may2022: checked CR5 + MedData)
 
 //M9811(9) vs M9837(10) and M9875(8)
 //pid 20130770 CML in 2013 that transformed to either T-ALL or B-ALL in 2015 COD states C-CELL!
@@ -762,18 +763,28 @@ display `"{browse "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4896164/":Ph+ALL
 replace coddeath=subinstr(coddeath,"VANCER","CANCER",.) if record_id==20525 //cancer spelt vancer when checking above list
 
 
-count //2,543
-STOP
+count //1328
+
 ** Create variables to identify patients vs tumours
 gen ptrectot=.
 replace ptrectot=1 if dupobs1==0|dupobs2==0|dupobs3==0|dupobs4==0 ///
 					 |dupobs5==0|dupobs6==0|dupobs7==0|dupobs8==0 ///
 					 |dupobs9==0|dupobs10==0|dupobs11==0|dupobs12==0 ///
-					 |dupobs13==0|dupobs14==0|dupobs15==0 //2,542 changes
+					 |dupobs13==0|dupobs14==0|dupobs15==0|dupobs16==0 ///
+					 |dupobs17==0|dupobs18==0|dupobs19==0|dupobs20==0 ///
+					 |dupobs21==0|dupobs22==0|dupobs23==0|dupobs24==0 ///
+					 |dupobs25==0|dupobs26==0|dupobs27==0|dupobs28==0 ///
+					 |dupobs29==0|dupobs30==0|dupobs31==0|dupobs32==0 ///
+					 |dupobs33==0|dupobs34==0|dupobs35==0 //1328 changes
 replace ptrectot=2 if dupobs1>0|dupobs2>0|dupobs3>0|dupobs4>0 ///
 					 |dupobs5>0|dupobs6>0|dupobs7>0|dupobs8>0 ///
 					 |dupobs9>0|dupobs10>0|dupobs11>0|dupobs12>0 ///
-					 |dupobs13>0|dupobs14>0|dupobs15>0 //15 changes
+					 |dupobs13>0|dupobs14>0|dupobs15>0|dupobs16>0 ///
+					 |dupobs17>0|dupobs18>0|dupobs19>0|dupobs20>0 ///
+					 |dupobs21>0|dupobs22>0|dupobs23>0|dupobs24>0 ///
+					 |dupobs25>0|dupobs26>0|dupobs27>0|dupobs28>0 ///
+					 |dupobs29>0|dupobs30>0|dupobs31>0|dupobs32>0 ///
+					 |dupobs33>0|dupobs34>0|dupobs35>0 //37 changes
 label define ptrectot_lab 1 "COD with single event" 2 "COD with multiple events" , modify
 label values ptrectot ptrectot_lab
 
@@ -781,7 +792,9 @@ tab ptrectot ,m
 
 ** Now create id in this dataset so when merging icd10 for siteiarc variable at end of this dofile
 gen did="T1" if ptrectot==1
-replace did="T2" if ptrectot==2 //15 changes
+replace did="T2" if ptrectot==2 //37 changes
+replace did="T3" in 1298
+replace did="T3" in 1310
 
 ***********************************
 ** 1.4 Number of cases by age-group
@@ -812,8 +825,9 @@ tab age_10 sex ,m
 ************************
 ** Creating IARC Site **
 ************************
-count //2543
-tab cancer ,m //661 cancers
+count //1328
+tab cancer ,m //1328 cancers
+tab cancer dodyear,m //659 cancers in 2016; 669 cancers in 2017
 
 ** Note: Although siteiarc doesn't need sub-site, the specific icd10 code was used, where applicable
 display `"{browse "https://icd.who.int/browse10/2015/en#/C09":ICD10,v2015}"'
@@ -824,22 +838,25 @@ sort record_id
 
 gen icd10=""
 
-count if regexm(coddeath,"LIP") & icd10=="" //2 - not lip so no replace
+count if regexm(coddeath,"LIP") & icd10=="" //8 - not lip so no replace
 //list record_id coddeath if regexm(coddeath,"LIP"),string(120)
+replace icd10="C001" if record_id==21143 //1 change
+replace icd10="C009" if record_id==23739 //1 change
 
-count if regexm(coddeath,"TONGUE") & icd10=="" //2 - all tongue, NOS
+count if regexm(coddeath,"TONGUE") & icd10=="" //4 - all tongue, NOS
 //list record_id coddeath if regexm(coddeath,"TONGUE"),string(120)
-replace icd10="C029" if regexm(coddeath,"TONGUE") & icd10=="" //5 changes
+replace icd10="C029" if regexm(coddeath,"TONGUE") & icd10=="" //4 changes
 
 count if regexm(coddeath,"MOUTH") & icd10=="" //0
 //list record_id coddeath if regexm(coddeath,"MOUTH"),string(120)
 
-count if regexm(coddeath,"SALIVARY") & icd10=="" //0
+count if regexm(coddeath,"SALIVARY") & icd10=="" //1
 //list record_id coddeath if regexm(coddeath,"SALIVARY"),string(120)
+replace icd10="C089" if regexm(coddeath,"SALIVARY") & icd10=="" //1 change
 
-count if regexm(coddeath,"TONSIL") & icd10=="" //1
+count if regexm(coddeath,"TONSIL") & icd10=="" //4
 //list record_id coddeath if regexm(coddeath,"TONSIL"),string(120)
-replace icd10="C099" if regexm(coddeath,"TONSIL") & icd10=="" //1 change
+replace icd10="C099" if regexm(coddeath,"TONSIL") & icd10=="" //4 changes
 
 count if regexm(coddeath,"OROPHARYNX") & icd10=="" //2
 //list record_id coddeath if regexm(coddeath,"OROPHARYNX"),string(120)
@@ -848,109 +865,137 @@ replace icd10="C109" if regexm(coddeath,"OROPHARYNX") & icd10=="" //2 changes
 count if regexm(coddeath,"NASOPHARYNX") & icd10=="" //0
 //list record_id coddeath if regexm(coddeath,"NASOPHARYNX"),string(120)
 
-count if regexm(coddeath,"HYPOPHARYNX") & icd10=="" //1
+count if regexm(coddeath,"HYPOPHARYNX") & icd10=="" //0
 //list record_id coddeath if regexm(coddeath,"HYPOPHARYNX"),string(120)
-replace icd10="C139" if regexm(coddeath,"HYPOPHARYNX") & icd10=="" //1 change
+//replace icd10="C139" if regexm(coddeath,"HYPOPHARYNX") & icd10=="" //1 change
 
-count if (regexm(coddeath,"PHARYNX")|regexm(coddeath,"PHARNYX")) & icd10=="" //0
+count if (regexm(coddeath,"PHARYNX")|regexm(coddeath,"PHARNYX")) & icd10=="" //1
 //list record_id coddeath if (regexm(coddeath,"PHARYNX")|regexm(coddeath,"PHARNYX")) & icd10=="",string(120)0
+replace icd10="C140" if (regexm(coddeath,"PHARYNX")|regexm(coddeath,"PHARNYX")) & icd10=="" //1 change
 
-count if (regexm(coddeath,"OESOPHAG")|regexm(coddeath,"ESOPHAG")) & icd10=="" //9
-replace icd10="C159" if (regexm(coddeath,"OESOPHAG")|regexm(coddeath,"ESOPHAG")) & icd10=="" & record_id!=26695 //8 changes
-replace icd10="C160" if record_id==26695
+count if (regexm(coddeath,"OESOPHAG")|regexm(coddeath,"ESOPHAG")) & icd10=="" //22
+replace icd10="C320" if record_id==19584 & did=="T2"
+replace icd10="C56" if record_id==20880 & did=="T2"
+replace icd10="C160" if record_id==23386
+replace icd10="C159" if (regexm(coddeath,"OESOPHAG")|regexm(coddeath,"ESOPHAG")) & icd10=="" & record_id!=19807 & record_id!=19933 //17 changes
 
-count if (regexm(coddeath,"STOMACH")|regexm(coddeath,"GASTR"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL BLEED*"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL HAEMORR*"))  & !(strmatch(strupper(coddeath), "*GASTROENTER*")) & icd10=="" //33
-replace icd10="C169" if (regexm(coddeath,"STOMACH")|regexm(coddeath,"GASTR"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL BLEED*"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL HAEMORR*"))  & !(strmatch(strupper(coddeath), "*GASTROENTER*")) & icd10=="" //33 changes
-replace icd10="C164" if record_id==25025 //pylorus
-replace icd10="C509" if record_id==26172 & did=="T2" //breast MP
-replace icd10="C189" if record_id==25813 //colon
-replace icd10="C269" if record_id==25906|record_id==25826|record_id==26392 //gastronintestinal malignancy
-replace icd10="C349" if record_id==25438 //lung
-replace icd10="C61" if record_id==25829 //prostate
+count if (regexm(coddeath,"STOMACH")|regexm(coddeath,"GASTR"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL BLEED*"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL HAEMORR*"))  & !(strmatch(strupper(coddeath), "*GASTROENTER*")) & icd10=="" //64
+replace icd10="C169" if (regexm(coddeath,"STOMACH")|regexm(coddeath,"GASTR"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL BLEED*"))  & !(strmatch(strupper(coddeath), "*GASTROINTESTINAL HAEMORR*"))  & !(strmatch(strupper(coddeath), "*GASTROENTER*")) & icd10=="" //64 changes
+replace icd10="C541" if record_id==21800 //endometrium
+replace icd10="C509" if record_id==19891 & did=="T2" //breast MP
+replace icd10="C859" if record_id==22017 //lymphoma
+replace icd10="C833" if record_id==23594 //diffuse large cell NHL
+replace icd10="C269" if record_id==19493|record_id==19663|(record_id==19709 & did=="T1") ///
+						|record_id==20309|record_id==21047|record_id==21317|record_id==21431 ///
+						|record_id==22049|(record_id==22218 & did=="T1")|record_id==22641 ///
+						|record_id==22831|record_id==23081|record_id==23450|record_id==24127 ///
+						|record_id==24155 //gastronintestinal malignancy
+replace icd10="C61" if (record_id==19709 & did=="T2")|(record_id==22218 & did=="T2") //prostate
+replace icd10="C159" if record_id==21584 & did=="T1" //oesophagus
+replace icd10="C579" if record_id==23444 //gynae
 
-count if (regexm(coddeath,"DUODEN")|regexm(coddeath,"JEJUN")|regexm(coddeath,"ILEUM")|regexm(coddeath,"SMALL")) & !(strmatch(strupper(coddeath), "*SMALL CEL*")) & !(strmatch(strupper(coddeath), "*LARYNGEAL*")) & icd10=="" //8
-replace icd10="C179" if (regexm(coddeath,"DUODEN")|regexm(coddeath,"JEJUN")|regexm(coddeath,"ILEUM")|regexm(coddeath,"SMALL")) & !(strmatch(strupper(coddeath), "*SMALL CEL*")) & !(strmatch(strupper(coddeath), "*LARYNGEAL*")) & icd10=="" //8 changes
-replace icd10="C509" if record_id==24603 //breast
-replace icd10="C349" if record_id==26102 //lung
-replace icd10="C259" if record_id==26747 //pancreas
-replace icd10="C56" if record_id==25125 //ovary
-replace icd10="C61" if record_id==25400 //prostate
+count if (regexm(coddeath,"DUODEN")|regexm(coddeath,"JEJUN")|regexm(coddeath,"ILEUM")|regexm(coddeath,"SMALL")) & !(strmatch(strupper(coddeath), "*SMALL CEL*")) & !(strmatch(strupper(coddeath), "*LARYNGEAL*")) & icd10=="" //5
+replace icd10="C179" if (regexm(coddeath,"DUODEN")|regexm(coddeath,"JEJUN")|regexm(coddeath,"ILEUM")|regexm(coddeath,"SMALL")) & !(strmatch(strupper(coddeath), "*SMALL CEL*")) & !(strmatch(strupper(coddeath), "*LARYNGEAL*")) & icd10=="" //5 changes
+replace icd10="C187" if record_id==19419 //sigmoid colon
+replace icd10="C189" if record_id==21560 //colon, NOS
 
-count if (regexm(coddeath,"CECUM")|regexm(coddeath,"APPEND")|regexm(coddeath,"COLON")) & !(strmatch(strupper(coddeath), "*COLONIC POLYPS*")) & icd10=="" //62
-replace icd10="C189" if (regexm(coddeath,"CECUM")|regexm(coddeath,"APPEND")|regexm(coddeath,"COLON")) & !(strmatch(strupper(coddeath), "*COLONIC POLYPS*")) & icd10=="" //62 changes
-replace icd10="C182" if record_id==24470|record_id==24707 //2 changes
-replace icd10="C187" if record_id==25405|record_id==26229|record_id==26567 //3 changes
-replace icd10="C61" if record_id==25402 & did=="T2" //prostate MP
-replace icd10="C439" if record_id==25822 & did=="T2" //melanoma MP
-replace icd10="C20" if record_id==26103 //rectum
-replace icd10="C19" if record_id==25053 //colorectal
+count if (regexm(coddeath,"CECUM")|regexm(coddeath,"APPEND")|regexm(coddeath,"COLON")) & !(strmatch(strupper(coddeath), "*COLONIC POLYPS*")) & icd10=="" //147
+replace icd10="C189" if (regexm(coddeath,"CECUM")|regexm(coddeath,"APPEND")|regexm(coddeath,"COLON")) & !(strmatch(strupper(coddeath), "*COLONIC POLYPS*")) & icd10=="" //147 changes
+replace icd10="C180" if record_id==19333 //caecum
+replace icd10="C182" if record_id==20534|record_id==21041|record_id==21412|record_id==21777|record_id==23731 //right or ascending colon
+replace icd10="C183" if record_id==20274 //hepatic flexure colon
+replace icd10="C184" if record_id==21762 //transverse colon
+replace icd10="C187" if record_id==19544|record_id==19679|record_id==20855|record_id==21408 //sigmoid colon
+replace icd10="C509" if record_id==19971 & did=="T1" //breast MP
+replace icd10="C259" if record_id==21407 & did=="T2" //pancreas MP
+replace icd10="C20" if record_id==22760 & did=="T2" //rectum
+replace icd10="C19" if record_id==22255 //colorectal
+replace icd10="C64" if record_id==20184 & did=="T2" //kidney
+replace icd10="C61" if (record_id==20532 & did=="T2")|(record_id==21899 & did=="T1")|(record_id==23183 & did=="T1") //prostate
+replace icd10="C229" if record_id==21507 & did=="T1" //liver
+replace icd10="C349" if record_id==23483 & did=="T1" //lung
 
-count if (regexm(coddeath,"COLORECTAL")|regexm(coddeath,"RECTO")) & icd10=="" //7
-replace icd10="C19" if (regexm(coddeath,"COLORECT")|regexm(coddeath,"RECTO")) & icd10=="" //7 changes
+count if (regexm(coddeath,"COLORECTAL")|regexm(coddeath,"RECTO")) & icd10=="" //18
+replace icd10="C19" if (regexm(coddeath,"COLORECT")|regexm(coddeath,"RECTO")) & icd10=="" //18 changes
+replace icd10="C20" if record_id==19370 //rectum
+replace icd10="C349" if record_id==21266 & did=="T2" //lung
+replace icd10="C64" if record_id==21266 & did=="T3" //kidney
 
-count if (regexm(coddeath,"RECTUM")|regexm(coddeath,"RECTAL")) & !(strmatch(strupper(coddeath), "*ANORECT*")) & icd10=="" //17
-replace icd10="C20" if (regexm(coddeath,"RECTUM")|regexm(coddeath,"RECTAL")) & !(strmatch(strupper(coddeath), "*ANORECT*")) & icd10=="" //17 changes
+count if (regexm(coddeath,"RECTUM")|regexm(coddeath,"RECTAL")) & !(strmatch(strupper(coddeath), "*ANORECT*")) & icd10=="" //30
+replace icd10="C20" if (regexm(coddeath,"RECTUM")|regexm(coddeath,"RECTAL")) & !(strmatch(strupper(coddeath), "*ANORECT*")) & icd10=="" //30 changes
+replace icd10="C19" if record_id==23038 //colorectal
 
-count if (regexm(coddeath,"ANUS")|regexm(coddeath,"ANORECT")|regexm(coddeath,"ANAL")) & icd10=="" //1 - no replace
-//replace icd10="C218" if (regexm(coddeath,"ANUS")|regexm(coddeath,"ANORECT")|regexm(coddeath,"ANAL")) & icd10=="" //2 changes
-replace icd10="C349" if record_id==24625 //lung
+count if (regexm(coddeath,"ANUS")|regexm(coddeath,"ANORECT")|regexm(coddeath,"ANAL")) & icd10=="" //5
+replace icd10="C218" if (regexm(coddeath,"ANUS")|regexm(coddeath,"ANORECT")|regexm(coddeath,"ANAL")) & icd10=="" //5 changes
+replace icd10="C800" if record_id==23445 //occult malignancy
 
-count if (regexm(coddeath,"LIVER")|regexm(coddeath,"BILE")|regexm(coddeath,"HEPATO")) & !(strmatch(strupper(coddeath), "*CHOLANGIOCAR*")) & icd10=="" //16
-replace icd10="C250" if record_id==24300 //pancreas
-replace icd10="C259" if record_id==25085|record_id==25892|record_id==26701 //pancreas
-replace icd10="C809" if record_id==25545|record_id==24654|record_id==25492 //PSU, NOS
-replace icd10="C800" if record_id==26808 //PSU
-replace icd10="C61" if record_id==25915 //prostate
-replace icd10="C509" if record_id==26418|record_id==26663 //breast
-replace icd10="C220" if record_id==24331|record_id==25171|record_id==25414|record_id==26597|record_id==26849
+count if (regexm(coddeath,"LIVER")|regexm(coddeath,"BILE")|regexm(coddeath,"HEPATO")) & !(strmatch(strupper(coddeath), "*CHOLANGIOCAR*")) & icd10=="" //34
+replace icd10="C229" if (regexm(coddeath,"LIVER")|regexm(coddeath,"BILE")|regexm(coddeath,"HEPATO")) & !(strmatch(strupper(coddeath), "*CHOLANGIOCAR*")) & icd10=="" //34 changes
+replace icd10="C23" if record_id==19731|record_id==21952 //gall bladder
+replace icd10="C676" if record_id==20760 //ureteric
+replace icd10="C248" if record_id==22740 //hepatobiliary
+replace icd10="C809" if record_id==21723|record_id==22510|record_id==23062|record_id==23974 //PSU, NOS
+replace icd10="C800" if record_id==22817|record_id==23431|record_id==23798 //PSU
+replace icd10="C61" if record_id==21454|record_id==22231|record_id==22342 //prostate
+replace icd10="C509" if record_id==20967|record_id==21653|record_id==22709|record_id==22779 //breast
+replace icd10="C220" if record_id==19953|record_id==20271|record_id==20636|record_id==20938 ///
+						|record_id==21482|record_id==21599|record_id==21813|record_id==21873 ///
+						|record_id==21936|record_id==23466|record_id==23872 //liver, specified/hepatocellular
 
-count if regexm(coddeath,"CHOLANGIO") & icd10=="" //4
-replace icd10="C221" if regexm(coddeath,"CHOLANGIO") & icd10=="" //4 changes
+count if regexm(coddeath,"CHOLANGIO") & icd10=="" //12
+replace icd10="C221" if regexm(coddeath,"CHOLANGIO") & icd10=="" //12 changes
 
-count if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //3
-replace icd10="C23" if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //3 changes
+count if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //8
+replace icd10="C23" if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //8 changes
 
-count if regexm(coddeath,"BILIARY") & icd10=="" //0
+count if regexm(coddeath,"BILIARY") & icd10=="" //2
+replace icd10="C249" if regexm(coddeath,"BILIARY") & icd10=="" //2 changes
 
-count if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //0
-//replace icd10="C250" if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //3 changes
-count if regexm(coddeath,"PANCREA") & icd10=="" //28
-replace icd10="C259" if regexm(coddeath,"PANCREA") & icd10=="" //28 changes
-replace icd10="C509" if record_id==25389 & did=="T2" //breast MP
+count if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //1
+replace icd10="C250" if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //1 change
+
+count if regexm(coddeath,"PANCREA") & icd10=="" //51
+replace icd10="C259" if regexm(coddeath,"PANCREA") & icd10=="" //51 changes
+replace icd10="C61" if record_id==23574 & did=="T2" //prostate MP
 
 count if (regexm(coddeath,"NASAL")|regexm(coddeath,"EAR")) & icd10=="" //23-no nasal/ear so no replace
 
-count if regexm(coddeath,"SINUS") & icd10=="" //3-not sinus so no replace
+count if regexm(coddeath,"SINUS") & icd10=="" //0
 
 count if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //4
 replace icd10="C329" if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //4 changes
-replace icd10="C61" if record_id==25618 & did=="T2" //prostate
 
-count if regexm(coddeath,"TRACHEA") & icd10=="" //1- no trachea so no replace
+count if regexm(coddeath,"TRACHEA") & icd10=="" //0
 
-count if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //48
-replace icd10="C349" if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //48 changes
-replace icd10="C809" if record_id==24265|record_id==24569 //PSU, NOS
-replace icd10="C509" if record_id==24368|record_id==24774|record_id==25448|record_id==25652|record_id==25751|record_id==25820|record_id==25939 //breast
-replace icd10="C541" if record_id==24593|record_id==25253 //endometrium
-replace icd10="C539" if record_id==25223 //cervix
-replace icd10="C61" if (record_id==25942 & did=="T2") | (record_id==26148 & did=="T2") | record_id==26861 //prostate + MPs
-replace icd10="C55" if record_id==26451 //uterus
-replace icd10="C56" if record_id==26473 //ovary
-replace icd10="C73" if record_id==26520 //thyroid
+count if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //80
+replace icd10="C349" if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //80 changes
+replace icd10="C809" if record_id==19408|record_id==22374|record_id==24142 //PSU, NOS
+replace icd10="C509" if record_id==19565|record_id==19755|record_id==21201|record_id==21325|record_id==21938 ///
+						|record_id==21949|record_id==21956|record_id==23093|record_id==23123 //breast
+replace icd10="C900" if record_id==19812 //MM
+replace icd10="C541" if record_id==21871 & did=="T2" //endometrium
+replace icd10="C61" if record_id==20002|record_id==21321|record_id==21735|record_id==23247|record_id==23709 //prostate
+replace icd10="C829" if record_id==22483 //follicular lymphoma
+replace icd10="C830" if record_id==22249 //small cell lymphoma
+replace icd10="C845" if record_id==20014 //t-cell lymphoma
+replace icd10="C56" if record_id==22668 //ovary
+replace icd10="C679" if record_id==21747 //bladder
+replace icd10="C07" if record_id==22729 //parotid gland
+replace icd10="C119" if record_id==24170 & did=="T2" //nasopharynx
+replace icd10="C61" if record_id==24170 & did=="T3" //prostate
 
 count if regexm(coddeath,"THYMUS") & icd10=="" //0
 
-count if (regexm(coddeath,"HEART")|regexm(coddeath,"MEDIASTIN")|regexm(coddeath,"PLEURA")) & icd10=="" //28-none found so no replace
-replace icd10="C809" if record_id==25753|record_id==26083|record_id==26191 //PSU, NOS
+count if (regexm(coddeath,"HEART")|regexm(coddeath,"MEDIASTIN")|regexm(coddeath,"PLEURA")) & icd10=="" //26-none found so no replace
+replace icd10="C383" if record_id==20575 //mediastinal
 
-count if (regexm(coddeath,"BONE")|regexm(coddeath,"OSTEO")|regexm(coddeath,"CARTILAGE")) & icd10=="" //5-none found so no replace
-replace icd10="C56" if record_id==25332 //ovary
-replace icd10="C509" if record_id==25352 //breast
-replace icd10="C541" if record_id==25453 //endometrium
-replace icd10="C229" if record_id==26826 //liver
+count if (regexm(coddeath,"BONE")|regexm(coddeath,"OSTEO")|regexm(coddeath,"CARTILAGE")) & icd10=="" //15-none found so no replace
+replace icd10="C410" if record_id==22371 //maxilla
+replace icd10="C413" if record_id==20378 //rib
+replace icd10="C419" if record_id==24205 //bone, NOS
 
-count if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //12
+count if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //16
+STOP
 replace icd10="C439" if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //12 changes
 replace icd10="C449" if record_id==24430 | (record_id==26407 & did=="T1") //SCC, BCC, NOS
 replace icd10="C61" if record_id==26407 & did=="T2" //prostate MP
