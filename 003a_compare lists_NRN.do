@@ -3,8 +3,8 @@
     //  algorithm name          003a_compare lists_NRN.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JAN-2022
-    // 	date last modified      01-MAR-2022
+    //  date first created      19-MAY-2022
+    // 	date last modified      19-MAY-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,400
+count //10,627
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if nrn==""|nrn=="999999-9999"|regexm(nrn,"9999") //remove blank/missing NRN
 sort nrn 
 quietly by nrn : gen dup = cond(_N==1,0,_n)
 sort nrn registrynumber lastname firstname
-count if dup>0 //0
+count if dup>0 //8
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the NRN non-duplicates - 8,115 deleted
-count //0
+count //8
 
 ** STEP #6
 /* 
@@ -89,7 +89,7 @@ count //0
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
 //destring birthdate ,replace
-capture append using "`datapath'\version07\2-working\prevNRN_dups" ,force
+append using "`datapath'\version07\2-working\prevNRN_dups" ,force
 format str_dadate %tdnn/dd/CCYY
 count //0
 
@@ -97,18 +97,18 @@ count //0
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
-capture quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-capture count if duppid>0 //0
+quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
+count if duppid>0 //0
 
 
 ** STEP #8
 ** Remove previously-checked records
-capture drop if checked==1 & duppid==0 //4 deleted
+drop if checked==1 & duppid==0 //0 deleted
 //drop if duppid!=0 //4 deleted the cases pulled in from the last list
 
 ** STEP #9
 ** Prepare this dataset for export to excel
-capture drop sourcerecordid surgicalfindings surgicalfindingsdate imagingresults imagingresultsdate physicalexam physicalexamdate ///
+drop sourcerecordid surgicalfindings surgicalfindingsdate imagingresults imagingresultsdate physicalexam physicalexamdate ///
      cr5id middleinitials mptot tumourid duplicatecheck dup duppid flag*
 
 label var checked "Previously Checked?"

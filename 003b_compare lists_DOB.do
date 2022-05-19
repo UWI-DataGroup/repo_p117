@@ -3,8 +3,8 @@
     //  algorithm name          003b_compare lists_DOB.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JAN-2022
-    // 	date last modified      01-MAR-2022
+    //  date first created      19-MAY-2022
+    // 	date last modified      19-MAY-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -32,7 +32,7 @@
     local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
     ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
     local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
-
+	
     ** Close any open log file and open a new log file
     capture log close
     log using "`logpath'\003_compare lists_DOB.smcl", replace
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,400
+count //10,627
 
 
 ** STEP #3
@@ -109,7 +109,7 @@ drop if birthdate==. | birthdate==99999999
 sort lastname firstname birthdate
 quietly by lastname firstname birthdate : gen dup = cond(_N==1,0,_n)
 sort lastname firstname birthdate registrynumber
-count if dup>0 //2 - true DOB duplicates
+count if dup>0 //6 - true DOB duplicates
 
 /*
 ** Look for duplicates - METHOD #2
@@ -145,7 +145,7 @@ gen checked=2
 ** STEP #6
 count if dup==0 //9,282
 drop if dup==0 //remove all the DOB non-duplicates - 8700 deleted
-count //2
+count //6
 
 ** STEP #7
 /* 
@@ -155,7 +155,7 @@ count //2
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevDOB_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //4
+count //8
 
 ** STEP #8
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s

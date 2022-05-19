@@ -2,9 +2,9 @@
 **  DO-FILE METADATA
     //  algorithm name          001_flag errors.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JAN-2022
-    // 	date last modified      01-MAR-2022
+    //  analysts:               Jacqueline CAMPBELL + Kirt GILL
+    //  date first created      19-MAY-2022
+    // 	date last modified      19-MAY-2022
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -63,12 +63,12 @@
 	(9) Under 'File format'section, select 'Tab Separated Values'
 	(10) Click 'Export'
 	(11) Save export with current date onto:
-		 e.g. `datapath'\version07\1-input\yyyy-mm-dd_MAIN Source+Tumour+Patient_JC.txt
+		 e.g. `datapath'\version07version07\1-input\yyyy-mm-dd_MAIN Source+Tumour+Patient_JC.txt
 */
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version07\1-input\2022-03-01_MAIN Source+Tumour+Patient_JC.txt"
+insheet using "`datapath'\version07\1-input\2022-05-19_MAIN Source+Tumour+Patient_JC.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -174,6 +174,28 @@ replace nrn=nrn2 if nrn2!="" //0 changes
 drop nrn2
 replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //0 changes
 
+replace nrn="" if length(nrn)==1
+
+preserve
+clear
+import excel using "`datapath'\version07\2-working\NRNelectoral_dups.xlsx" , firstrow case(lower)
+save "`datapath'\version07\2-working\electoral_nrn_dups" ,replace
+restore
+
+merge 1:1 registrynumber using "`datapath'\version07\2-working\electoral_nrn_dups" ,force
+/*
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                        10,625
+        from master                    10,625  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                                 2  (_merge==3)
+    -----------------------------------------
+*/
+replace nrn=elec_nrn if _merge==3 //2 changes
+drop elec_* _merge
+erase "`datapath'\version07\2-working\electoral_nrn_dups.dta"
 
 ** STEP #13
 ** Identify corrected NRNs in prep for export to excel ERRORS list
@@ -202,11 +224,11 @@ replace flag4=birthdate if regexm(birthdate,"-") //0 changes
 /*
 preserve
 clear
-import excel using "`datapath'\version07\2-working\DOBNRNelectoral_dups.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version07version07\2-working\DOBNRNelectoral_dups.xlsx" , firstrow case(lower)
 tostring elec_dob ,replace
-save "`datapath'\version07\2-working\electoral_dobnrn_dups" ,replace
+save "`datapath'\version07version07\2-working\electoral_dobnrn_dups" ,replace
 restore
-merge 1:1 registrynumber using "`datapath'\version07\2-working\electoral_dobnrn_dups" ,force
+merge 1:1 registrynumber using "`datapath'\version07version07\2-working\electoral_dobnrn_dups" ,force
 /*
     Result                           # of obs.
     -----------------------------------------
@@ -236,17 +258,18 @@ replace flag9="delete blank record" if registrynumber==20159999 //0 changes
 ** Check for invalid length Hosp#
 count if length(hospitalnumber)==1 //1
 list registrynumber firstname lastname hospitalnumber if length(hospitalnumber)==1
-replace flag5=hospitalnumber if length(hospitalnumber)==1 //1 change
+count if hospitalnumber=="NYR" //2
+replace flag5=hospitalnumber if length(hospitalnumber)==1|hospitalnumber=="NYR" //2 changes
 
 
 ** STEP #19
 ** Correct Hosp# errors using below method as these won't lead to de-identifying the dofile
-replace hospitalnumber="99" if length(hospitalnumber)==1 //1 change
+replace hospitalnumber="99" if length(hospitalnumber)==1|hospitalnumber=="NYR" //1 change
 
 
 ** STEP #20
 ** Identify corrected Hosp#s in prep for export to excel ERRORS list
-replace flag10=hospitalnumber if flag5!="" //1 change
+replace flag10=hospitalnumber if flag5!="" //2 changes
 
 
 ** STEP #21
@@ -273,7 +296,7 @@ restore
 ** Remove variables not needed for excel lists
 drop stdataabstractor stsourcedate nftype sourcename doctor doctoraddress recordstatus
 
-count //10,400
+count //10,627
 
 
 ** STEP #24
