@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-MAY-2022
-    // 	date last modified      18-MAY-2022
+    // 	date last modified      19-MAY-2022
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASMRs
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2017 death data for inclusion in 2016-2018 cancer report.
@@ -98,6 +98,7 @@ rename count number
 	replace number=670 in 11
 	replace percentage=100 in 11
 
+STOP //JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
 label define cancer_site_lab 1 "all" 2 "prostate" 3 "breast" 4 "colon" 5 "pancreas" 6 "rectum" 7 "lung" 8 "multiple myeloma" 9 "corpus uteri" 10 "cervix uteri" 11 "stomach" ,modify
 label values cancer_site cancer_site_lab
 label define year_lab 1 "2017" 2 "2015" 3 "2014" 4 "2013" 5 "2008",modify
@@ -128,7 +129,7 @@ restore
 ********************************************************************
 ** Using WHO World Standard pop_wppulation
 //tab siteiarc ,m
-
+STOP //JC 19may2022: use age5 population and groupings for distrate per IH's + NS' recommendation
 merge m:m sex age_10 using "`datapath'\version04\2-working\pop_wpp_2017-10"
 /*
     Result                      Number of obs
@@ -150,28 +151,28 @@ gen pfu=1 // for % year if not whole year collected; not done for cancer
 
 ** SF requested by email & WhatsApp on 07-Jan-2020 age and sex specific rates for top 10 cancers
 /*
-What is age-specific incidence rate? 
-Age-specific rates provide information on the incidence of a particular event in an age group relative to the total number of people at risk of that event in the same age group.
+What is age-specific mortality rate? 
+Age-specific rates provide information on the mortality of a particular event in an age group relative to the total number of people at risk of that event in the same age group.
 
-What is age-standardised incidence rate?
-The age-standardized incidence rate is the summary rate that would have been observed, given the schedule of age-specific rates, in a population with the age composition of some reference population, often called the standard population.
+What is age-standardised mortality rate?
+The age-standardized mortality rate is the summary rate that would have been observed, given the schedule of age-specific rates, in a population with the age composition of some reference population, often called the standard population.
 */
 ** AGE + SEX
 preserve
 collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex siteiarc)
-gen incirate=case/pop_wpp*100000
+gen mortrate=case/pop_wpp*100000
 drop if siteiarc!=39 & siteiarc!=29 & siteiarc!=13 & siteiarc!=21 ///
 		& siteiarc!=18 & siteiarc!=11 & siteiarc!=14 ///
 		& siteiarc!=33 & siteiarc!=55 & siteiarc!=32
-//by sex,sort: tab age_10 incirate ,m
+//by sex,sort: tab age_10 mortrate ,m
 sort siteiarc age_10 sex
-//list incirate age_10 sex
-//list incirate age_10 sex if siteiarc==13
+//list mortrate age_10 sex
+//list mortrate age_10 sex if siteiarc==13
 
-format incirate %04.2f
+format mortrate %04.2f
 gen year=2017
 rename siteiarc cancer_site
-rename incirate age_specific_rate
+rename mortrate age_specific_rate
 drop pfu case pop_wpp
 order year cancer_site sex age_10 age_specific_rate
 save "`datapath'\version04\2-working\2017_top10mort_age+sex_rates" ,replace
@@ -180,25 +181,25 @@ restore
 ** AGE
 preserve
 collapse (sum) case (mean) pop_wpp, by(pfu age_10 siteiarc)
-gen incirate=case/pop_wpp*100000
+gen mortrate=case/pop_wpp*100000
 drop if siteiarc!=39 & siteiarc!=29 & siteiarc!=13 & siteiarc!=21 ///
 		& siteiarc!=18 & siteiarc!=11 & siteiarc!=14 ///
 		& siteiarc!=33 & siteiarc!=55 & siteiarc!=32
-//by sex,sort: tab age_10 incirate ,m
+//by sex,sort: tab age_10 mortrate ,m
 sort siteiarc age_10
-//list incirate age_10 sex
-//list incirate age_10 sex if siteiarc==13
+//list mortrate age_10 sex
+//list mortrate age_10 sex if siteiarc==13
 
-format incirate %04.2f
+format mortrate %04.2f
 gen year=2017
 rename siteiarc cancer_site
-rename incirate age_specific_rate
+rename mortrate age_specific_rate
 drop pfu case pop_wpp
 order year cancer_site age_10 age_specific_rate
 save "`datapath'\version04\2-working\2017_top10mort_age_rates" ,replace
 restore
 
-** Check for missing age as these would need to be added to the median group for that site when assessing ASIRs to prevent creating an outlier
+** Check for missing age as these would need to be added to the median group for that site when assessing ASMRs to prevent creating an outlier
 count if age==.|age==999 //1
 
 list siteiarc age if age==.|age==999 //this is missing age_10: 25-34 so no change needed
@@ -361,6 +362,8 @@ tab pop_wpp age_10 if siteiarc==29 & sex==1 //female
 tab pop_wpp age_10 if siteiarc==29 & sex==2 //male
 
 preserve
+STOP //JC 19may2022: remove male breast cancers so rate calculated only based on female pop
+	drop if sex==2
 	drop if age_10==.
 	keep if siteiarc==29 // breast only
 	
