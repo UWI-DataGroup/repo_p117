@@ -11,7 +11,7 @@
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
 
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off
@@ -45,6 +45,9 @@ and removed from 2014_cancer_nonsurvival.dta
 ** Load the dataset (2014)
 use "`datapath'\version02\1-input\2014_cancer_sites_da", replace
 count //927
+
+** JC 07feb2022: Correct basis for PID 20130187 from 9 to 3 - picked up while doing NAACCR 2022 abstract
+basis=3 if pid=="20130187" & cr5id=="T1S1"
 
 ** Updates to DCOs after checked by KWG 12jun2019 (see excel sheet: ...\Sync\Cancer\CanReg5\DCOs).
 replace basis=2 if pid=="20130175"

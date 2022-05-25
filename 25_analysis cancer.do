@@ -13,7 +13,7 @@ cls
     //  methods                 See 30_report cancer.do for detailed methods of each statistic
 
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off
@@ -190,6 +190,10 @@ Lab test (biochem/imm |         5          5          3 |        13
 ----------------------+---------------------------------+----------
                 Total |       849        847      1,012 |     2,708 
 */
+
+
+** Analysis point to look for raised at cancer mtg on 25jan2022
+CHECK FOR BOD=CLINICAL AND TIME BETWEEN DOT AND DOD as KWG noticed alot of cases where pts sought medical attention late and seemed like an increase from previous yrs.
 
 //This section assesses DCO % in relation to tumour, patient and behaviour totals
 **********
