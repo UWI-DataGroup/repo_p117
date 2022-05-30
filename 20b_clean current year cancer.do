@@ -3,8 +3,8 @@
     //  algorithm name          20b_clean current year cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      25-MAY-2022
-    // 	date last modified      25-MAY-2022
+    //  date first created      30-MAY-2022
+    // 	date last modified      30-MAY-2022
     //  algorithm task          Cleaning 2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for inclusion in 2018 cancer report.
@@ -31,7 +31,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\20a_prep current year cancer.smcl", replace
+    log using "`logpath'\20b_clean current year cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
 *************************************************
@@ -46,13 +46,15 @@ Note: Checks not always in sequential order due
 
 use "`datapath'\version04\2-working\2018_prepped cancer", clear
 
+count //2223
+
 ********************** 
 ** Unique PatientID **
 **********************
 count if pid=="" //0
 
 ** Person Search
-count if persearch==0 //1744 - person serach not done; can ignore as will check duplicates in this dofile
+count if persearch==0 //2214 - person serach not done; can ignore as will check duplicates in this dofile
 count if persearch==3 //0
 count if persearch==4 //0
 
@@ -79,7 +81,7 @@ count if ptda>14 & ptda<22 //0
 **********************
 ** Check 4 - missing/ptdoa!=stdoa
 count if ptdoa==. //0
-count if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) & (tumourtot<2 & sourcetot<2) //62 - no correction necessary
+count if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) //& (tumourtot<2 & sourcetot<2) //1097 - no correction necessary
 //list pid eid sid ptdoa stdoa dxyr cr5id if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) & (tumourtot<2 & sourcetot<2)
 
 ** Check 5 - invalid (future date)
@@ -90,6 +92,9 @@ drop currentd
 format currentdatept %dD_m_CY
 label var currentdate "Current date PT"
 count if ptdoa!=. & ptdoa>currentdatept //0
+
+/*
+JC 30may2022: Case Status was removed from CR5db since Record Status was expanded this field no longer served any purpose.
 
 *****************
 ** Case Status **
@@ -115,17 +120,23 @@ replace cstatus=1 if cstatus==3 & recstatus<3 //12 changes
 ** Check 11 - invalid (record status for all tumours in a patient record=duplicate)
 count if cstatus==1 & recstatus==4 //108 - no review needed as already done
 //list pid cstatus dxyr cr5id if cstatus==1 & recstatus==4
+*/
 
 ****************
 ** Notes Seen **
 ****************
 ** Added after these checks were sequentially written
 ** Additional check for PT variable
-** Check 174 - Notes Seen (check for missed 2015 cases that were abstracted in this dofile) 
-count if notesseen==0 & dxyr==2015 //49
-//list pid cr5id if notesseen==0 & dxyr==2015
+** Check 174 - Notes Seen (check for missed 2018 cases that were abstracted in this dofile) 
+count if notesseen==0 & dxyr==2018 //25
+//list pid cr5id recstatus notesseen sourcename if notesseen==0 & dxyr==2018
 ** Check main CR5db then correct
-replace notesseen=2 if notesseen==0 & dxyr==2015 //49 changes
+destring flag84 ,replace
+destring flag179 ,replace
+replace flag84=notesseen if notesseen==0 & dxyr==2018
+replace notesseen=5 if notesseen==0 & dxyr==2018 & recstatus==1 //2 changes
+replace notesseen=3 if notesseen==0 & dxyr==2018 & recstatus==3 //23 changes
+replace flag179=notesseen if flag84!=.
 
 ** Check 175 - Notes Seen=pending retrieval; dxyr>2013 (for 2018 data collection this check will be revised)
 count if notesseen==0 & dxyr>2013 //0
@@ -133,10 +144,13 @@ count if notesseen==0 & dxyr>2013 //0
 ** Check main CRdb or add to above code: (regexm(comments, "Notes seen")|comments, "Notes seen"))
 //replace notesseen=4 if notesseen==0 & dxyr>2013 //0 changes
 
-** Check 176 - Notes Seen=Yes but NS date=blank; dxyr=2015
-count if notesseen==1 & nsdate==. & dxyr==2015 //0 - unnecessary to check each case for data cleaning but will flag in data review code
-//list pid comments cr5id if notesseen==1 & nsdate==. & dxyr==2015
-//replace nsdate=d(01jan2000) if notesseen==1 & nsdate==. & dxyr==2015 //81 changes
+** Check 176 - Notes Seen=Yes but NS date=blank; dxyr=2018
+count if notesseen==1 & nsdate==. & dxyr==2018 //3 - unnecessary to check each case for data cleaning but will flag in data review code
+//list pid comments cr5id if notesseen==1 & nsdate==. & dxyr==2018
+//replace nsdate=d(01jan2000) if notesseen==1 & nsdate==. & dxyr==2018 //81 changes
+replace flag84=notesseen if notesseen==1 & nsdate==. & dxyr==2018
+replace notesseen=3 if notesseen==1 & nsdate==. & dxyr==2018 //3 changes
+replace flag179=notesseen if pid=="20182229"
 /*
 ** Check 177 - Notes Seen=No; recstatus!=dup; dxyr==2013
 count if notesseen==3 & recstatus!=4 & dxyr==2013 //25
@@ -178,8 +192,8 @@ count if dob==. & natregno!="" & natregno!="9999999999" & natregno!="999999-9999
 
 ** Check 28 - invalid (dob has future year)
 gen dob_yr = year(dob)
-count if dob!=. & dob_yr>2014 //0
-//list pid dob dob_yr if dob!=. & dob_yr>2014
+count if dob!=. & dob_yr>2018 //0
+//list pid age dob dob_yr if dob!=. & dob_yr>2018
 
 ** Check 29 - invalid (dob does not match natregno)
 gen dob_year = year(dob) if natregno!="" & natregno!="9999999999" & natregno!="999999-9999" & nrnday!="99" & length(natregno)==11
@@ -201,43 +215,53 @@ destring nrnyr, replace
 sort nrn
 gen dobchk=mdy(month, day, nrnyr)
 format dobchk %dD_m_CY
-count if dob!=dobchk & dobchk!=. //13
-list pid age natregno dob dobchk dob_year dot if dob!=dobchk & dobchk!=.
+count if dob!=dobchk & dobchk!=. //16
+list pid fname lname age natregno dob dobchk dob_year dot if dob!=dobchk & dobchk!=. //checked against electoral list
 drop day month year nrnyr yr yr1 nrn
 ** Correct dob, where applicable
-replace natregno=subinstr(natregno,"45","49",.) if pid=="20151250" //3 changes
-replace natregno=subinstr(natregno,"48","49",.) if pid=="20150521" //2 changes
-replace natregno=subinstr(natregno,"61","91",.) if pid=="20150294" //2 changes
-replace dob=dobchk if dob!=dobchk & dobchk!=. & pid!="20151250" & pid!="20150521" & pid!="20150294" //6 changes
+destring flag72 ,replace
+destring flag167 ,replace
+replace flag72=dob if dob!=dobchk & dobchk!=. //16 changes
+replace dob=dobchk if dob!=dobchk & dobchk!=. //16 changes
+replace flag167=dob if flag72!=. //16 changes
+//replace natregno=subinstr(natregno,"61","91",.) if pid=="20150294" //2 changes
+//replace dob=dobchk if dob!=dobchk & dobchk!=. & pid!="20151250" & pid!="20150521" & pid!="20150294" //6 changes
 
 ***********************
 ** National Reg. No. **
 ***********************
 sort pid
 ** Check 30 - missing 
-count if natregno=="" & dob!=. //1
+count if natregno=="" & dob!=. //0
 //list pid cr5id dob natregno cstatus recstatus dxyr if natregno=="" & dob!=.
 
 ** Check 31 - invalid length
-count if length(natregno)<11 & natregno!="" //3
+count if length(natregno)<11 & natregno!="" //0
 //list pid natregno if length(natregno)<11 & natregno!=""
 
 *********
 ** Sex **
 *********
 ** Check 32 - missing
-count if sex==. | sex==9 //7
+count if sex==. | sex==9 //1
 //list pid sex fname primarysite top if sex==.|sex==9
-replace sex=2 if sex==.|sex==9 //7 changes
+destring flag73 ,replace
+destring flag168 ,replace
+replace flag73=sex if sex==. | sex==9 //1 change
+replace sex=2 if sex==.|sex==9 //1 change
+replace flag168=sex if flag73!=. //1 change
+
 
 ** Check 33 - possibly invalid (first name, NRN and sex check: MALES)
 gen nrnid=substr(natregno, -4,4)
-count if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //5
+count if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //3
 //list pid fname lname sex natregno primarysite top cr5id if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]")
-replace sex=1 if pid=="20151061"|pid=="20151378" //5 changes
+replace flag73=sex if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //1 change
+replace sex=1 if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //1 change
+replace flag168=sex if pid=="20180248"|pid=="20180611" //3 changes
 
 ** Check 34 - possibly invalid (sex=M; site=breast)
-count if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50")) //2 - no changes; all correct
+count if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50")) //4 - no changes; all correct
 //list pid fname lname natregno sex top cr5cod cr5id if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50"))
 
 ** Check 35 - invalid (sex=M; site=FGS)
@@ -247,9 +271,11 @@ count if sex==1 & topcat>43 & topcat<52	& (regexm(cr5cod, "VULVA") | regexm(cr5c
 //								| regexm(cr5cod, "CERVIX") | regexm(cr5cod, "CERVICAL") | regexm(cr5cod, "UTER") | regexm(cr5cod, "OVAR") | regexm(cr5cod, "PLACENTA"))
 								
 ** Check 36 - possibly invalid (first name, NRN and sex check: FEMALES)
-count if sex==1 & nrnid!="9999" & regex(substr(natregno,-2,1), "[0,2,4,6,8]") //7
+count if sex==1 & nrnid!="9999" & regex(substr(natregno,-2,1), "[0,2,4,6,8]") //2 - 1 correct; 1 error
 //list pid fname lname sex natregno primarysite top cr5id if sex==1 & nrnid!="9999" & regex(substr(natregno,-2,1), "[0,2,4,6,8]")
-replace sex=2 if pid=="20150537" //3 changes
+replace flag73=sex if pid=="20180009" //1 change
+replace sex=2 if pid=="20180009" //1 change
+replace flag168=sex if pid=="20180009" //1 change
 
 ** Check 37 - invalid (sex=F; site=MGS)
 count if sex==2 & topcat>51 & topcat<56 & (regexm(cr5cod, "PENIS")|regexm(cr5cod, "PROSTAT")|regexm(cr5cod, "TESTIS")|regexm(cr5cod, "TESTIC")) //0
@@ -267,57 +293,78 @@ count if hospnum=="" & retsource<8 //0
 ** Resident Status **
 *********************
 ** Check 39 - missing
-count if resident==. //41 - all recstatus=ineligible
+count if resident==. //0
 //list pid resident recstatus cr5id if resident==.
 
 *************************
 ** Status Last Contact **
 *************************
 ** Check 40 - missing
-count if slc==. & recstatus<3 //1
-//list pid slc recstatus cr5id if slc==. & recstatus<3
+count if slc==. & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
+
+//list pid slc recstatus cr5id if slc==. & recstatus!=2 & recstatus!=3 & recstatus!=5
 tab slc recstatus,m
-replace notesseen=3 if pid=="20151084"
-replace slc=1 if pid=="20151084"
-replace dlc=d(10feb2015) if pid=="20151084"
-replace parish=99 if pid=="20151084"
-replace addr="99" if pid=="20151084"
 
 ** Check 41 - invalid (slc=died;dlc=blank)
 count if slc==2 & dlc==. //0
 //list pid slc dlc cr5id if slc==2 & dlc==.
 
 ** Check 42 - invalid (slc=alive;dlc=blank)
-count if slc==1 & dlc==. //1
+count if slc==1 & dlc==. //0
 //list pid slc dlc recstatus cr5id if slc==1 & dlc==.
-replace dlc=d(13aug2015) if pid=="20151310"
 
 ** Check 43 - invalid (slc=alive;nftype=death info)
 count if slc==1 & (nftype==8 | nftype==9) //4
 //list pid slc nftype cr5id if slc==1 & (nftype==8 | nftype==9)
-replace slc=2 if pid=="20150420"|pid=="20150435"|pid=="20151229"|pid=="20151249" //10 changes
+destring flag77 ,replace
+destring flag172 ,replace
+replace flag77=slc if slc==1 & (nftype==8 | nftype==9) //4 changes
+replace slc=2 if slc==1 & (nftype==8 | nftype==9) //4 changes
+replace flag172=slc if flag77!=.
+
+destring flag79 ,replace
+destring flag174 ,replace
+replace flag79=dod if flag77!=. //4 changes
+replace dod=d(12jul2019) if pid=="20180188"
+replace dod=d(01jan2022) if pid=="20180419"
+replace dod=d(13feb2019) if pid=="20180493"
+replace dod=d(07jan2020) if pid=="20180529"
+replace flag174=dod if flag77!=. //4 changes
+
 
 ***********************
 ** Date Last Contact **
 ***********************
 ** Check 44 - missing
-count if dlc==. & cstatus==1 & slc!=9 //0
-//list pid slc dlc cr5id if dlc==. & cstatus==1 & slc!=9
+count if dlc==. & slc!=9 & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
+//list pid recstatus slc dlc cr5id if dlc==. & slc!=9 & recstatus!=2 & recstatus!=3 & recstatus!=5
 
 ** Check 45 - invalid (future date)
 ** Use already created variable called 'currentdatept';
 ** to be used when cleaning dates
 count if dlc!=. & dlc>currentdatept //0
 
+*******************
+** Date Of Death **
+*******************
+** Check 44 - missing
+count if dod==. & slc==2 & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
+//list pid slc dlc cr5id if dod==. & slc==2
+
+** Check 45 - invalid (future date)
+** Use already created variable called 'currentdatept';
+** to be used when cleaning dates
+count if dod!=. & dod>currentdatept //0
+
 **************
 ** Comments **
 **************
 ** Check 46 - missing
-count if comments=="" & cstatus==1 //7
-//list pid cstatus comments cr5id if comments=="" & cstatus==1
-replace comments="99" if comments=="" & cstatus==1 //7 changes
+count if comments=="" //4 - no update needed
+//list pid recstatus comments cr5id if comments==""
+//replace comments="99" if comments=="" //4 changes
 
-
+STOP
 **********************************************************
 /*
 BLANK & INCONSISTENCY CHECKS - TUMOUR TABLE
