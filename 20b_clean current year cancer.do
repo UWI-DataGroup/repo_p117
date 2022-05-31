@@ -1,3 +1,4 @@
+cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
     //  algorithm name          20b_clean current year cancer.do
@@ -47,6 +48,218 @@ Note: Checks not always in sequential order due
 use "`datapath'\version04\2-working\2018_prepped cancer", clear
 
 count //2223
+
+/*
+	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
+	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.
+	Using the cancer duplicates process for flagging errors and corrections,
+	
+	(1)	Create flags for errors within found in all the variables
+	(2)	Create flags for corrections performed on all the erroneous data by variable
+	(3)	Create list with these error and correction flags that is exported to an excel workbook for SDA to correct in CR5db
+	
+	Note: JC 31may2022 - remove previous flags from '20a_prep current year cancer.do' as that list will be separate from 
+		  this one so rather than duplicate work for the SDA, re-create these flags.
+*/
+drop flag*
+
+forvalues j=1/94 {
+	gen flag`j'=""
+}
+
+label var flag1 "Error: STDataAbstractor"
+label var flag2 "Error: STSourceDate"
+label var flag3 "Error: NFType"
+label var flag4 "Error: SourceName"
+label var flag5 "Error: Doctor"
+label var flag6 "Error: DoctorAddress"
+label var flag7 "Error: RecordNumber"
+label var flag8 "Error: CFDiagnosis"
+label var flag9 "Error: LabNumber"
+label var flag10 "Error: SurgicalNumber"
+label var flag11 "Error: Specimen"
+label var flag12 "Error: SampleTakenDate"
+label var flag13 "Error: ReceivedDate"
+label var flag14 "Error: ReportDate"
+label var flag15 "Error: ClinicalDetails"
+label var flag16 "Error: CytologicalFindings"
+label var flag17 "Error: MicroscopicDescription"
+label var flag18 "Error: ConsultationReport"
+label var flag19 "Error: SurgicalFindings"
+label var flag20 "Error: SurgicalFindingsDate"
+label var flag21 "Error: PhysicalExam"
+label var flag22 "Error: PhysicalExamDate"
+label var flag23 "Error: ImagingResults"
+label var flag24 "Error: ImagingResultsDate"
+label var flag25 "Error: CausesOfDeath"
+label var flag26 "Error: DurationOfIllness"
+label var flag27 "Error: OnsetDeathInterval"
+label var flag28 "Error: Certifier"
+label var flag29 "Error: AdmissionDate"
+label var flag30 "Error: DateFirstConsultation"
+label var flag31 "Error: RTRegDate"
+label var flag32 "Error: Recordstatus"
+label var flag33 "Error: TTDataAbstractor"
+label var flag34 "Error: TTAbstractionDate"
+label var flag35 "Error: DuplicateCheck"
+label var flag36 "Error: Parish"
+label var flag37 "Error: Address"
+label var flag38 "Error: Age"
+label var flag39 "Error: PrimarySite"
+label var flag40 "Error: Topography"
+label var flag41 "Error: Histology"
+label var flag42 "Error: Morphology"
+label var flag43 "Error: Laterality"
+label var flag44 "Error: Behaviour"
+label var flag45 "Error: Grade"
+label var flag46 "Error: BasisOfDiagnosis"
+label var flag47 "Error: TNMCatStage"
+label var flag48 "Error: TNMAntStage"
+label var flag49 "Error: EssTNMCatStage"
+label var flag50 "Error: EssTNMAntStage"
+label var flag51 "Error: SummaryStaging"
+label var flag52 "Error: IncidenceDate"
+label var flag53 "Error: DiagnosisYear"
+label var flag54 "Error: Consultant"
+label var flag55 "Error: Treatment1"
+label var flag56 "Error: Treatment1Date"
+label var flag57 "Error: Treatment2"
+label var flag58 "Error: Treatment2Date"
+label var flag59 "Error: Treatment3"
+label var flag60 "Error: Treatment3Date"
+label var flag61 "Error: Treatment4"
+label var flag62 "Error: Treatment4Date"
+label var flag63 "Error: Treatment5"
+label var flag64 "Error: Treatment5Date"
+label var flag65 "Error: OtherTreatment1"
+label var flag66 "Error: OtherTreatment2"
+label var flag67 "Error: NoTreatment1"
+label var flag68 "Error: NoTreatment2"
+label var flag69 "Error: LastName"
+label var flag70 "Error: FirstName"
+label var flag71 "Error: MiddleInitials"
+label var flag72 "Error: BirthDate"
+label var flag73 "Error: Sex"
+label var flag74 "Error: NRN"
+label var flag75 "Error: HospitalNumber"
+label var flag76 "Error: ResidentStatus"
+label var flag77 "Error: StatusLastContact"
+label var flag78 "Error: DateLastContact"
+label var flag79 "Error: DateOfDeath"
+label var flag80 "Error: Comments"
+label var flag81 "Error: PTDataAbstractor"
+label var flag82 "Error: PTCasefindingDate"
+label var flag83 "Error: RetrievalSource"
+label var flag84 "Error: NotesSeen"
+label var flag85 "Error: NotesSeenDate"
+label var flag86 "Error: FurtherRetrievalSource"
+label var flag87 "Error: RFAlcohol"
+label var flag88 "Error: AlcoholAmount"
+label var flag89 "Error: AlcoholFreq"
+label var flag90 "Error: RFSmoking"
+label var flag91 "Error: SmokingAmount"
+label var flag92 "Error: SmokingFreq"
+label var flag93 "Error: SmokingDuration"
+label var flag94 "Error: SmokingDurationFreq"
+
+forvalues j=95/189 {
+	gen flag`j'=""
+}
+label var flag95 "Correction: STDataAbstractor"
+label var flag96 "Correction: STSourceDate"
+label var flag97 "Correction: NFType"
+label var flag98 "Correction: SourceName"
+label var flag99 "Correction: Doctor"
+label var flag100 "Correction: Doctor"
+label var flag101 "Correction: DoctorAddress"
+label var flag102 "Correction: RecordNumber"
+label var flag103 "Correction: CFDiagnosis"
+label var flag104 "Correction: LabNumber"
+label var flag105 "Correction: SurgicalNumber"
+label var flag106 "Correction: Specimen"
+label var flag107 "Correction: SampleTakenDate"
+label var flag108 "Correction: ReceivedDate"
+label var flag109 "Correction: ReportDate"
+label var flag110 "Correction: ClinicalDetails"
+label var flag111 "Correction: CytologicalFindings"
+label var flag112 "Correction: MicroscopicDescription"
+label var flag113 "Correction: ConsultationReport"
+label var flag114 "Correction: SurgicalFindings"
+label var flag115 "Correction: SurgicalFindingsDate"
+label var flag116 "Correction: PhysicalExam"
+label var flag117 "Correction: PhysicalExamDate"
+label var flag118 "Correction: ImagingResults"
+label var flag119 "Correction: ImagingResultsDate"
+label var flag120 "Correction: CausesOfDeath"
+label var flag121 "Correction: DurationOfIllness"
+label var flag122 "Correction: OnsetDeathInterval"
+label var flag123 "Correction: Certifier"
+label var flag124 "Correction: AdmissionDate"
+label var flag125 "Correction: DateFirstConsultation"
+label var flag126 "Correction: RTRegDate"
+label var flag127 "Correction: Recordstatus"
+label var flag128 "Correction: TTDataAbstractor"
+label var flag129 "Correction: TTAbstractionDate"
+label var flag130 "Correction: DuplicateCheck"
+label var flag131 "Correction: Parish"
+label var flag132 "Correction: Address"
+label var flag133 "Correction: Age"
+label var flag134 "Correction: PrimarySite"
+label var flag135 "Correction: Topography"
+label var flag136 "Correction: Histology"
+label var flag137 "Correction: Morphology"
+label var flag138 "Correction: Laterality"
+label var flag139 "Correction: Behaviour"
+label var flag140 "Correction: Grade"
+label var flag141 "Correction: BasisOfDiagnosis"
+label var flag142 "Correction: TNMCatStage"
+label var flag143 "Correction: TNMAntStage"
+label var flag144 "Correction: EssTNMCatStage"
+label var flag145 "Correction: EssTNMAntStage"
+label var flag146 "Correction: SummaryStaging"
+label var flag147 "Correction: IncidenceDate"
+label var flag148 "Correction: DiagnosisYear"
+label var flag149 "Correction: Consultant"
+label var flag150 "Correction: Treatment1"
+label var flag151 "Correction: Treatment1Date"
+label var flag152 "Correction: Treatment2"
+label var flag153 "Correction: Treatment2Date"
+label var flag154 "Correction: Treatment3"
+label var flag155 "Correction: Treatment3Date"
+label var flag156 "Correction: Treatment4"
+label var flag157 "Correction: Treatment4Date"
+label var flag158 "Correction: Treatment5"
+label var flag159 "Correction: Treatment5Date"
+label var flag160 "Correction: OtherTreatment1"
+label var flag161 "Correction: OtherTreatment2"
+label var flag162 "Correction: NoTreatment1"
+label var flag163 "Correction: NoTreatment2"
+label var flag164 "Correction: LastName"
+label var flag165 "Correction: FirstName"
+label var flag166 "Correction: MiddleInitials"
+label var flag167 "Correction: BirthDate"
+label var flag168 "Correction: Sex"
+label var flag169 "Correction: NRN"
+label var flag170 "Correction: HospitalNumber"
+label var flag171 "Correction: ResidentStatus"
+label var flag172 "Correction: StatusLastContact"
+label var flag173 "Correction: DateLastContact"
+label var flag174 "Correction: DateOfDeath"
+label var flag175 "Correction: Comments"
+label var flag176 "Correction: PTDataAbstractor"
+label var flag177 "Correction: PTCasefindingDate"
+label var flag178 "Correction: RetrievalSource"
+label var flag179 "Correction: NotesSeen"
+label var flag180 "Correction: NotesSeenDate"
+label var flag181 "Correction: FurtherRetrievalSource"
+label var flag182 "Correction: RFAlcohol"
+label var flag183 "Correction: AlcoholAmount"
+label var flag184 "Correction: AlcoholFreq"
+label var flag185 "Correction: RFSmoking"
+label var flag186 "Correction: SmokingAmount"
+label var flag187 "Correction: SmokingFreq"
+label var flag188 "Correction: SmokingDuration"
+label var flag189 "Correction: SmokingDurationFreq"
 
 ********************** 
 ** Unique PatientID **
@@ -364,7 +577,7 @@ count if comments=="" //4 - no update needed
 //list pid recstatus comments cr5id if comments==""
 //replace comments="99" if comments=="" //4 changes
 
-STOP
+
 **********************************************************
 /*
 BLANK & INCONSISTENCY CHECKS - TUMOUR TABLE
@@ -387,12 +600,14 @@ count if eid=="" //0
 ** there will never be any records with missing recstatus
 
 ** Check 47 - invalid (recstatus=pending)
-count if recstatus==0 & dxyr!=. //3
+count if recstatus==0 & dxyr!=. //1
 //list pid dxyr cr5id resident age if recstatus==0 & dxyr!=.
-replace recstatus=1 if recstatus==0 & dxyr!=. //3 changes
+drop if pid=="20180879" //KWG updated dxyr=2017 after this data was exported from CR5db
+//replace recstatus=1 if recstatus==0 & dxyr!=. //3 changes
 
+** JC 31may2022: this check no longer applicable as Case Status has been removed from CR5db.
 ** Check 48 - invalid(cstatus=CF;recstatus<>Pending)
-count if recstatus!=0 & cstatus==0 & ttdoa!=. //6 - no changes needed
+//count if recstatus!=0 & cstatus==0 & ttdoa!=. //6 - no changes needed
 //list pid cstatus recstatus dxyr ttdoa pid2 cr5id if recstatus!=0 & cstatus==0 & ttdoa!=.
 
 ** Check 49a - possibly invalid (tumour record listed as deleted)
@@ -400,12 +615,12 @@ count if recstatus==2 //0
 
 ** REVIEW ALL dxyr>2013 CASES FLAGGED AS INELIGIBLE SINCE SOME DISCOVERED IN 2014 AS INELIGIBLE WHICH ARE ELIGIBLE FOR REGISTRATION
 ** Points to note: (1) reason for ineligibility should be recorded by DA in Comments field; (2) dxyr should be updated with correct year.
-count if recstatus==3 //118 - already reviewed
+count if recstatus==3 //137 - already reviewed
 //list pid cr5id dxyr ttda recstatus if recstatus==3
 
 ** Check 49b - review all cases flagged as ineligible to check for missed 2013 cases
 ** JC 30oct18: In later checks I incidentally discovered missed 2013 cases so added in this new check
-count if recstatus==3 & cr5id=="T1S1" //86 - already reviewed
+count if recstatus==3 & cr5id=="T1S1" //108 - already reviewed
 
 *********************
 ** TT Check Status **
@@ -418,7 +633,7 @@ count if checkstatus==0 & recstatus<2 & primarysite!="" //0
 //list pid dxyr checkstatus recstatus cr5id if checkstatus==0 & recstatus<2 & primarysite!=""
 
 ** Check 51 - invalid (checkstatus=invalid;recstatus=pend/confirm;primarysite<>blank)
-count if checkstatus==3 & recstatus<2 & primarysite!="" //3 - no age/DOB and not in death data so cannot confirm
+count if checkstatus==3 & recstatus<2 & primarysite!="" //0
 //list pid dxyr checkstatus recstatus cr5id if checkstatus==3 & recstatus<2 & primarysite!=""
 
 ** MP Sequence
@@ -470,19 +685,51 @@ count if parish==. & addr!="" //0
 ** Address **
 *************
 ** Check 57 - missing
-count if addr=="" & parish!=. & cstatus!=0 & cr5id=="T1S1" //7
-//list pid parish addr sourcename recstatus cr5id if addr=="" & parish!=. & cstatus!=0 & cr5id=="T1S1"
-replace addr="99" if addr=="" & parish!=. & cstatus!=0 & cr5id=="T1S1" //7 changes - all ineligibles
+count if addr=="" & parish!=. & cr5id=="T1S1" //3
+//list pid parish addr sourcename recstatus cr5id if addr=="" & parish!=. & cr5id=="T1S1"
+
+replace flag37=addr if addr=="" & parish!=. & cr5id=="T1S1" //3 changes
+replace addr="99" if pid=="20180260"|pid=="20180616"
+replace flag132=addr if pid=="20180260"|pid=="20180616"
+//replace addr="99" if addr=="" & parish!=. & cr5id=="T1S1" //7 changes - all ineligibles
 * addr=="" & parish!=. & cstatus!=0 & cr5id=="T1S1" & recstatus==3 //7 changes
+
+preserve
+clear
+import excel using "`datapath'\version04\2-working\MissingAddr_20220531.xlsx" , firstrow case(lower)
+tostring pid, replace
+save "`datapath'\version04\2-working\missing_addr" ,replace
+restore
+
+merge 1:1 pid cr5id using "`datapath'\version04\2-working\missing_addr" ,force
+/*
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         2,221
+        from master                     2,221  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                                 1  (_merge==3)
+    -----------------------------------------
+*/
+replace addr=meddata_addr if _merge==3 //1 change
+drop meddata_* _merge
+erase "`datapath'\version04\2-working\missing_addr.dta"
+replace flag132=addr if pid=="20182046"
 
 **********	
 **	Age **
 **********
 ** Check 58 - missing
-count if (age==-1 | age==.) & dot!=. //2-no age/DOB and not in death data so cannot confirm (20141167, 20141510, 20145025)
+count if (age==-1 | age==.) & dot!=. //0
 //list pid cr5id if (age==-1 | age==.) & dot!=.
-count if age==-1 //18
-replace age=999 if age==-1 //18 changes
+count if age==-1 //2
+//list pid cr5id age recstatus if age==-1
+destring flag38 ,replace
+destring flag133 ,replace
+replace flag38=age if age==-1 //2 changes
+replace age=999 if age==-1 //2 changes
+replace flag133=age if flag38!=. //2 changes
 
 ** Check 59 - invalid (age<>incidencedate-dob); checked no errors
 ** Age (at INCIDENCE - to nearest year)
@@ -490,27 +737,49 @@ gen ageyrs = (dot - dob)/365.25 //
 gen checkage=int(ageyrs)
 drop ageyrs
 label var checkage "Age in years at INCIDENCE"
-count if dob!=. & dot!=. & age!=checkage //1 - these correct according to CR5 as same day & month for dob & dot
+count if dob!=. & dot!=. & age!=checkage //8 - 4 are correct according to CR5 as same day & month for dob & dot
 //list pid dot dob dotday dobday dotmonth dobmonth age checkage cr5id if dob!=. & dot!=. & age!=checkage
-count if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage //0
+count if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage //4
 //list pid dotday dobday dotmonth dobmonth if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage
-
+replace flag38=age if pid=="20180305"|pid=="20181211" //4 changes
+replace age=checkage if pid=="20180305"|pid=="20181211" //4 changes
+replace flag133=age if pid=="20180305"|pid=="20181211" //4 changes
 
 ******************
 ** Primary Site **
 ******************
 ** Check 61 - missing
-count if primarysite=="" & topography!=. //2 - ineligibles
+count if primarysite=="" & topography!=. //0
 //list pid primarysite topography recstatus cr5id if primarysite=="" & topography!=.
 
 ** Check 63 - invalid(primarysite<>top)
 sort topography pid
-count if topcheckcat!=. //64 - all correct
+count if topcheckcat!=. //44
 //list pid primarysite topography topcat cr5id if topcheckcat!=.
+
+replace flag39=primarysite if topcheckcat!=. & pid!="20180031" & pid!="20180276" & pid!="20180897" & pid!="20180232" ///
+							  & pid!="20190609" & pid!="20180067" & pid!="20180582" //27 changes
+replace primarysite="PANCREAS-OVERLAP. HEAD NECK" if pid=="20180861" & regexm(cr5id, "T1")
+replace primarysite="PANCREAS-OVERLAP. HEAD NECK BODY" if pid=="20181163" & regexm(cr5id, "T1")
+replace primarysite="BONE MARROW" if pid=="20180004" & regexm(cr5id, "T1")
+replace primarysite="BONE MARROW" if pid=="20180015" & regexm(cr5id, "T1")
+replace primarysite="SKIN-EYELID UPPER" if pid=="20181154" & regexm(cr5id, "T1")
+replace primarysite="SKIN-NOS" if pid=="20180934" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER HALF" if pid=="20180237" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER" if pid=="20180458" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INNER" if pid=="20182230" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INNER QUADRANT" if pid=="20182255" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20182318" & regexm(cr5id, "T1")
+replace primarysite="RENAL PELVIS" if pid=="20155215" & regexm(cr5id, "T2")
+replace primarysite="RENAL PELVIS" if pid=="20180050" & regexm(cr5id, "T2")
+replace primarysite="RENAL PELVIS" if pid=="20182250" & regexm(cr5id, "T1")
+replace flag134=primarysite if topcheckcat!=. & pid!="20180031" & pid!="20180276" & pid!="20180897" & pid!="20180232" ///
+							  & pid!="20190609" & pid!="20180067" & pid!="20180582" //27 changes
 
 /* 
 Below cases are incorrect data that have been cleaned in Stata or MPs that were missed by cancer team at abstraction and should have been abstracted.
 JC 25sep2018 corrected below as NS instructed for 2014 data cleaning I will clean data but for the future SDA to clean data:
+JC 31may2022: cases flagged below have already been corrected above.
 */
 ** List #1
 /*
@@ -573,6 +842,7 @@ list pid primarysite topography cr5id if ///
 
 ** List #2
 sort topography pid
+** JC 31may2022: cases flagged below have already been corrected above.
 /*
 list pid primarysite topography cr5id if ///
 		(regexm(primarysite, "HEART")|regexm(primarysite, "CARD")|regexm(primarysite, "STINUM")|regexm(primarysite, "PLEURA")) & !(strmatch(strupper(primarysite), "*GASTR*")|strmatch(strupper(primarysite), "*STOMACH*")) & (topography<380|topography>384) ///
@@ -635,6 +905,7 @@ list pid primarysite topography cr5id if ///
 ** All correct
 
 ** List #3
+** JC 31may2022: cases flagged below have already been corrected above.
 /*
 list pid ttda primarysite topography cr5id if ///
 		(regexm(primarysite, "PARATHYROID")|regexm(primarysite, "PITUITARY")|regexm(primarysite, "CRANIOPHARYNGEAL")|regexm(primarysite, "CAROTID")|regexm(primarysite, "ENDOCRINE")) & (topography<750|topography>759) ///
@@ -678,7 +949,7 @@ count if (morph==.|morph==99|morph==9999) & hx!="" //0
 gen morphology=morph
 tostring morphology, replace
 ** Need to change all morphology=="." to morphology==""
-replace morphology="" if morphology=="." //778 changes
+replace morphology="" if morphology=="." //247 changes
 count if morphology!="" & length(morphology)!=4 //0
 //list pid morphology morph cr5id if morphology!="" & length(morphology)!=4
 
@@ -692,7 +963,7 @@ count if (beh==2|beh==3) & !(strmatch(strupper(hx), "*MALIG*")|strmatch(strupper
 		 |strmatch(strupper(hx), "*WILMS*")|strmatch(strupper(hx), "*MULLERIAN*")|strmatch(strupper(hx), "*YOLK*")|strmatch(strupper(hx), "*REFRACTORY*") ///
 		 |strmatch(strupper(hx), "*ACUTE MYELOID*")|strmatch(strupper(hx), "*PAGET*")|strmatch(strupper(hx), "*PLASMA CELL*") ///
 		 |strmatch(strupper(hx), "*PIN III*")|strmatch(strupper(hx), "*NEUROENDOCRINE*")|strmatch(strupper(hx), "*TERATOID/RHABOID*") ///
-		 |strmatch(strupper(hx), "*INTRA-EPITHELIAL NEOPLASIA*")) & hx!="CLL" & hx!="PIN" & hx!="HGCGIN /  AIS" //16
+		 |strmatch(strupper(hx), "*INTRA-EPITHELIAL NEOPLASIA*")) & hx!="CLL" & hx!="PIN" & hx!="HGCGIN /  AIS" //9
 /*
 list pid hx beh cr5id if (beh==2|beh==3) & !(strmatch(strupper(hx), "*MALIG*")|strmatch(strupper(hx), "*CANCER*")|strmatch(strupper(hx), "*OMA*") ///
 						 |strmatch(strupper(hx), "*SUSPICIOUS*")|strmatch(strupper(hx), "*CIN*")|strmatch(strupper(hx), "*LEU*")|strmatch(strupper(hx), "*META*") ///
@@ -707,15 +978,40 @@ list pid hx beh cr5id if (beh==2|beh==3) & !(strmatch(strupper(hx), "*MALIG*")|s
 */
 						 **All correct
 
+replace flag41=hx if pid=="20180068" //3 changes
+replace hx="CRIBIFORM CARCINOMA WITH MUCINOUS FEATURES" if pid=="20180068" & regexm(cr5id, "T1")
+replace hx="MUCINOUS CARCINOMA" if pid=="20180068" & regexm(cr5id, "T2")
+replace flag136=hx if pid=="20180068" //3 changes
+
+destring flag42 ,replace
+destring flag137 ,replace
+replace flag42=morph if pid=="20180068"|pid=="" //3 changes
+replace morph=8201 if pid=="20180068" & regexm(cr5id, "T1")
+replace morph=8480 if pid=="20180068" & regexm(cr5id, "T2")
+replace flag137=morph if pid=="20180068"|pid=="" //3 changes
+replace morphcat=6 if pid=="20180068" & regexm(cr5id,"T1")
+replace morphcat=9 if pid=="20180068" & regexm(cr5id,"T2")
+
+replace flag80=comments if pid=="20180068"|pid=="20182346" //4 changes
+replace comments="JC 31MAY2022: Please verify T1 MORPH with Prof Prussia, as the ICD-O-3 rules state code to higher morph if 2 terms used don't have a single code but since this says '...with mucinous features' I'm unsure if to apply this rule."+" "+comments if pid=="20180068"
+replace comments="JC 31MAY2022: Please verify T1 BEHAVIOUR with Prof Prussia, as the path and IHC don't specify malignancy and this type of tumour can be begnin."+" "+comments if pid=="20182346"
+replace flag175=comments if pid=="20180068"|pid=="20182346" //4 changes
+
+destring flag32 ,replace
+destring flag127 ,replace
+replace flag32=recstatus if pid=="20180068" & regexm(cr5id, "T1")|pid=="20182346" & regexm(cr5id, "T1") //3 changes
+replace recstatus=6 if pid=="20180068" & regexm(cr5id, "T1")|pid=="20182346" & regexm(cr5id, "T1")
+replace flag127=recstatus if pid=="20180068" & regexm(cr5id, "T1")|pid=="20182346" & regexm(cr5id, "T1") //3 changes
+	  
 ** Check 72 - invalid (morph vs basis)
-count if morph==8000 & (basis==6|basis==7|basis==8) //11 - all correct
+count if morph==8000 & (basis==6|basis==7|basis==8) //6 - all correct
 //list pid hx basis cr5id if morph==8000 & (basis==6|basis==7|basis==8)
 
 ** Check 74 - invalid(hx<>morph)
 sort pid
 
 ** morphcheckcat 1: Hx=Undifferentiated Ca & Morph!=8020
-count if morphcheckcat==1 //3 - all correct
+count if morphcheckcat==1 //0
 //list pid hx morph basis cfdx cr5id if morphcheckcat==1, string(100)
 
 ** morphcheckcat 2: Hx!=Undifferentiated Ca & Morph==8020
@@ -723,620 +1019,657 @@ count if morphcheckcat==2 //0
 //list pid hx morph basis cfdx cr5id if morphcheckcat==2
 
 ** morphcheckcat 3: Hx=Papillary ca & Morph!=8050
-count if morphcheckcat==3 //15 - all correct
-//list pid hx morph top basis beh cr5id if morphcheckcat==3
+count if morphcheckcat==3 //7 - all correct
+//list pid hx morphology top basis beh cr5id if morphcheckcat==3
+replace flag42=morph if pid=="20180247"
+replace morph=8504 if pid=="20180247" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180247"
+
+replace flag80=comments if pid=="20180447"
+replace comments="JC 31MAY2022: Please verify T1 MORPH with Prof Prussia, path rpt dx and MD differ slightly and I'm unsure M8503 is the correct code or if M8500 should be used as 'micropapillary' seems to be a specific coding term so best if Prof confirms."+" "+comments if pid=="20180447"
+replace flag175=comments if pid=="20180447"
+
+replace flag32=recstatus if pid=="20180447" & regexm(cr5id, "T1")
+replace recstatus=6 if pid=="20180447" & regexm(cr5id, "T1")
+replace flag127=recstatus if pid=="20180447" & regexm(cr5id, "T1")
 
 ** morphcheckcat 4: Hx=Papillary serous adenoca & Morph!=8460 & Top!=ovary/peritoneum
 count if morphcheckcat==4 //0 (thyroid/renal=M8260 & ovary/peritoneum=M8461 & endometrium=M8460)
-//list pid top hx morph top basis beh cr5id if morphcheckcat==4
+//list pid top hx morph morphology top basis beh cr5id if morphcheckcat==4
+replace flag42=morph if pid=="20180515"
+replace morph=8460 if pid=="20180515" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180515"
 
 ** morphcheckcat 5: Hx=Papillary & intraduct/intracyst & Morph!=8503
-count if morphcheckcat==5 //2
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==5
+count if morphcheckcat==5 //2 - all correct
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==5
 
 ** morphcheckcat 6: Hx=Keratoacanthoma & Morph!=8070
 count if morphcheckcat==6 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==6
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==6
 
 ** morphcheckcat 7: Hx=Squamous & microinvasive & Morph!=8076
 count if morphcheckcat==7 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==7
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==7
 
 ** morphcheckcat 8: Hx=Bowen excluding clinical & basis==6/7/8 & morph!=8081 (want to check skin SCCs that have bowen disease is coded to M8081) 
 count if morphcheckcat==8 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==8
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==8
 
 ** morphcheckcat 9: Hx=adenoid BCC & morph!=8098
 count if morphcheckcat==9 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==9
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==9
 
 ** morphcheckcat 10: Hx=infiltrating BCC excluding nodular & morph!=8092
 count if morphcheckcat==10 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==10
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==10
 
 ** morphcheckcat 11: Hx=superficial BCC excluding nodular & basis=6/7/8 & morph!=8091
 count if morphcheckcat==11 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==11
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==11
 
 ** morphcheckcat 12: Hx=sclerotic/sclerosing BCC excluding nodular & morph!=8091
 count if morphcheckcat==12 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==12
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==12
 
 ** morphcheckcat 13: Hx=nodular BCC excluding clinical & morph!=8097
 count if morphcheckcat==13 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==13
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==13
 
 ** morphcheckcat 14: Hx!=nodular BCC excluding clinical & morph==8097
 count if morphcheckcat==14 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==14
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==14
 
 ** morphcheckcat 15: Hx=BCC & SCC excluding basaloid & morph!=8094
 count if morphcheckcat==15 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==15
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==15
 
 ** morphcheckcat 16: Hx!=BCC & SCC & morph==8094
 count if morphcheckcat==16 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==16
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==16
 
 ** morphcheckcat 17: Hx!=transitional/urothelial & morph==8120
-count if morphcheckcat==17 //1
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==17
+count if morphcheckcat==17 //0
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==17
 
 ** morphcheckcat 18: Hx=transitional/urothelial excluding papillary & morph!=8120
 count if morphcheckcat==18 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==18
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==18
 
 ** morphcheckcat 19: Hx=transitional/urothelial & papillary & morph!=8130
-count if morphcheckcat==19 //0
-//list pid primarysite hx morph basis beh  cr5id if morphcheckcat==19
+count if morphcheckcat==19 //2 - 1 correct
+//list pid primarysite hx morph morphology basis beh  cr5id if morphcheckcat==19
+replace flag42=morph if pid=="20181184"
+replace morph=8130 if pid=="20181184" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20181184"
 
 ** morphcheckcat 20: Hx=villous & adenoma excluding tubulo & morph!=8261
 count if morphcheckcat==20 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==20
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==20
 
 ** morphcheckcat 21: Hx=intestinal excl. stromal (GISTs) & morph!=8144
 count if morphcheckcat==21 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==21
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==21
 
 ** morphcheckcat 22: Hx=villoglandular & morph!=8263
 count if morphcheckcat==22 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==22
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==22
 
 ** morphcheckcat 23: Hx!=clear cell & morph==8310
 count if morphcheckcat==23 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==23
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==23
 
 ** morphcheckcat 24: Hx==clear cell & morph!=8310
 count if morphcheckcat==24 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==24
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==24
 
 ** morphcheckcat 25: Hx==cyst & renal & morph!=8316
 count if morphcheckcat==25 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==25
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==25
 
 ** morphcheckcat 26: Hx==chromophobe & renal & morph!=8317
 count if morphcheckcat==26 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==26
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==26
 
 ** morphcheckcat 27: Hx==sarcomatoid & renal & morph!=8318
 count if morphcheckcat==27 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==27
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==27
 
 ** morphcheckcat 28: Hx==follicular excl.minimally invasive & morph!=8330
-count if morphcheckcat==28 //6 - all correct
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==28
+count if morphcheckcat==28 //2 - all correct
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==28
 
 ** morphcheckcat 29: Hx==follicular & minimally invasive & morph!=8335
 count if morphcheckcat==29 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==29
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==29
 
 ** morphcheckcat 30: Hx==microcarcinoma & morph!=8341
-count if morphcheckcat==30 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==30
+count if morphcheckcat==30 //2
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==30
+replace flag42=morph if pid=="20180283"
+replace morph=8341 if pid=="20180283" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180283"
+
+replace flag80=comments if pid=="20180283"
+replace comments="JC 31MAY2022: Please verify T1 MORPH with Prof Prussia, 'microcarcinoma' M8341 is a specific term that has higher code than M8340 so best to confirm with Prof."+" "+comments if pid=="20180283"
+replace flag175=comments if pid=="20180283"
+
+replace flag32=recstatus if pid=="20180283" & regexm(cr5id, "T1")
+replace recstatus=6 if pid=="20180283" & regexm(cr5id, "T1")
+replace flag127=recstatus if pid=="20180283" & regexm(cr5id, "T1")
 
 ** morphcheckcat 31: Hx!=endometrioid & morph==8380
-count if morphcheckcat==31 //1 - 20140739 alredy corrected in Check 11 above.
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==31
+count if morphcheckcat==31 //0
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==31
 
 ** morphcheckcat 32: Hx==poroma & morph!=8409 & mptot<2
 count if morphcheckcat==32 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==32
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==32
 
 ** morphcheckcat 33: Hx==serous excl. papillary & morph!=8441
 count if morphcheckcat==33 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==33
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==33
 
 ** morphcheckcat 34: Hx==mucinous excl. endocervical,producing,secreting,infiltrating duct & morph!=8480
-count if morphcheckcat==34 //4 - all correct
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==34
+count if morphcheckcat==34 //2
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==34
+replace flag42=morph if pid=="20182014"
+replace morph=8480 if pid=="20182014" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20182014"
+replace morphcat=9 if pid=="20182014" & regexm(cr5id,"T1")
 
 ** morphcheckcat 35: Hx!=mucinous/pseudomyxoma peritonei & morph==8480
 count if morphcheckcat==35 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==35
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==35
 
 ** morphcheckcat 36: Hx==acinar & duct & morph!=8552
 count if morphcheckcat==36 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==36
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==36
 
 ** morphcheckcat 37: Hx==intraduct & micropapillary or intraduct & clinging & morph!=8507
 count if morphcheckcat==37 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==37
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==37
 
 ** morphcheckcat 38: Hx!=intraduct & micropapillary or intraduct & clinging & morph==8507
 count if morphcheckcat==38 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==38
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==38
 
 ** morphcheckcat 39: Hx!=ductular & morph==8521
 count if morphcheckcat==39 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==39
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==39
 
 ** morphcheckcat 40: Hx!=duct & Hx==lobular & morph!=8520
-count if morphcheckcat==40 //4 - all correct
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==40
+count if morphcheckcat==40 //0
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==40
 
 ** morphcheckcat 41: Hx==duct & lobular & morph!=8522
 count if morphcheckcat==41 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==41
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==41
 
 ** morphcheckcat 42: Hx!=acinar & morph==8550
-count if morphcheckcat==42 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==42
+count if morphcheckcat==42 //1
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==42
+replace flag42=morph if pid=="20182177"
+replace morph=8500 if pid=="20182177" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20182177"
+replace morphcat=10 if pid=="20182177" & regexm(cr5id,"T1")
 
 ** morphcheckcat 43: Hx!=adenosquamous & morph==8560
 count if morphcheckcat==43 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==43
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==43
 
 ** morphcheckcat 44: Hx!=thecoma & morph==8600
 count if morphcheckcat==44 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==44
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==44
 
 ** morphcheckcat 45: Hx!=sarcoma & morph==8800
 count if morphcheckcat==45 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==45
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==45
 
 ** morphcheckcat 46: Hx=spindle & sarcoma & morph!=8801
 count if morphcheckcat==46 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==46
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==46
 
 ** morphcheckcat 47: Hx=undifferentiated & sarcoma & morph!=8805
 count if morphcheckcat==47 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==47
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==47
 
 ** morphcheckcat 48: Hx=fibrosarcoma & Hx!=myxo/dermato/mesothelioma & morph!=8810
 count if morphcheckcat==48 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==48
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==48
 
 ** morphcheckcat 49: Hx=fibrosarcoma & Hx=myxo & morph!=8811
-count if morphcheckcat==49 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==49
+count if morphcheckcat==49 //2
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==49
+replace flag42=morph if pid=="20180344"
+replace morph=8811 if pid=="20180344" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180344"
+replace morphcat=18 if pid=="20180344" & regexm(cr5id,"T1")
 
 ** morphcheckcat 50: Hx=fibro & histiocytoma & morph!=8830 (see morphcheckcat=92 also!)
 count if morphcheckcat==50 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==50
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==50
 
 ** morphcheckcat 51: Hx!=dermatofibrosarcoma & morph==8832
 count if morphcheckcat==51 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==51
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==51
 
 ** morphcheckcat 52: Hx==stromal sarcoma high grade & morph!=8930
 count if morphcheckcat==52 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==52
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==52
 
 ** morphcheckcat 53: Hx==stromal sarcoma low grade & morph!=8931
 count if morphcheckcat==53 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==53
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==53
 
 ** morphcheckcat 54: Hx==gastrointestinal stromal tumour & morph!=8936
 count if morphcheckcat==54 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==54
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==54
 
 ** morphcheckcat 55: Hx==mixed mullerian tumour & Hx!=mesodermal & morph!=8950
 count if morphcheckcat==55 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==55
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==55
 
 ** morphcheckcat 56: Hx==mesodermal mixed & morph!=8951
 count if morphcheckcat==56 //0 20mar18; 0 04jul18
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==56
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==56
 
 ** morphcheckcat 57: Hx==wilms or nephro & morph!=8960
 count if morphcheckcat==57 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==57
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==57
 
 ** morphcheckcat 58: Hx==mesothelioma & Hx!=fibrous or sarcoma or epithelioid/papillary or cystic & morph!=9050
-count if morphcheckcat==58 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==58
+count if morphcheckcat==58 //2
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==58
+replace flag39=primarysite if pid=="20180469"
+replace primarysite="UNKNOWN" if pid=="20180469" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20180469"
 
+destring flag40 ,replace
+destring flag135 ,replace
+replace flag40=topography if pid=="20180469"
+replace topography=809 if pid=="20180469" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20180469"
+replace topcat=70 if pid=="20180469" & regexm(cr5id,"T1")
+
+replace flag42=morph if pid=="20180469"
+replace morph=9050 if pid=="20180469" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180469"
+
+replace flag80=comments if pid=="20180469"
+replace comments="JC 31MAY2022: Please verify T1 TOPOGRAPHY with Prof Prussia + NS, the path rpt indicates mass in lung/pleura was metastatic - maybe using too much interpretation/inference here instead of performing surveillance."+" "+comments if pid=="20180469"
+replace flag175=comments if pid=="20180469"
+
+replace flag32=recstatus if pid=="20180469" & regexm(cr5id, "T1")
+replace recstatus=6 if pid=="20180469" & regexm(cr5id, "T1")
+replace flag127=recstatus if pid=="20180469" & regexm(cr5id, "T1")
+			  
 ** morphcheckcat 59: Hx==fibrous or sarcomatoid mesothelioma & Hx!=epithelioid/papillary or cystic & morph!=9051
 count if morphcheckcat==59 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==59
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==59
 
 ** morphcheckcat 60: Hx==epitheliaoid or papillary mesothelioma & Hx!=fibrous or sarcomatoid or cystic & morph!=9052
 count if morphcheckcat==60 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==60
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==60
 
 ** morphcheckcat 61: Hx==biphasic mesothelioma & morph!=9053
 count if morphcheckcat==61 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==61
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==61
 
 ** morphcheckcat 62: Hx==adenomatoid tumour & morph!=9054
 count if morphcheckcat==62 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==62
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==62
 
 ** morphcheckcat 63: Hx==cystic mesothelioma & morph!=9055
 count if morphcheckcat==63 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==63
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==63
 
 ** morphcheckcat 64: Hx==yolk & morph!=9071
 count if morphcheckcat==64 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==64
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==64
 
 ** morphcheckcat 65: Hx==teratoma & morph!=9080
 count if morphcheckcat==65 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==65
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==65
 
 ** morphcheckcat 66: Hx==teratoma & Hx!=metastatic or malignant or embryonal or teratoblastoma or immature & morph==9080
 count if morphcheckcat==66 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==66
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==66
 
 ** morphcheckcat 67: Hx==complete hydatidiform mole & Hx!=choriocarcinoma & beh==3 & morph==9100
 count if morphcheckcat==67 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==67
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==67
 
 ** morphcheckcat 68: Hx==choriocarcinoma & morph!=9100
 count if morphcheckcat==68 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==68
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==68
 
 ** morphcheckcat 69: Hx==epithelioid hemangioendothelioma & Hx!=malignant & morph==9133
 count if morphcheckcat==69 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==69
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==69
 
 ** morphcheckcat 70: Hx==osteosarcoma & morph!=9180
 count if morphcheckcat==70 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==70
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==70
 
 ** morphcheckcat 71: Hx==chondrosarcoma & morph!=9220
 count if morphcheckcat==71 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==71
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==71
 
 ** morphcheckcat 72: Hx=myxoid and Hx!=chondrosarcoma & morph==9231
 count if morphcheckcat==72 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==72
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==72
 
 ** morphcheckcat 73: Hx=retinoblastoma and poorly or undifferentiated & morph==9511
 count if morphcheckcat==73 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==73
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==73
 
 ** morphcheckcat 74: Hx=meningioma & Hx!=meningothelial/endotheliomatous/syncytial & morph==9531
 count if morphcheckcat==74 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==74
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==74
 
 ** morphcheckcat 75: Hx=mantle cell lymphoma & morph!=9673
 count if morphcheckcat==75 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==75
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==75
 
 ** morphcheckcat 76: Hx=T-cell lymphoma & Hx!=leukemia & morph!=9702
 count if morphcheckcat==76 //1
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==76
-replace hx="ADULT T-CELL LEUKAEMIA/LYMPHOMA HTLV-1 ASSOCIATED" if pid=="20155178" //1 change
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==76
+replace flag41=hx if pid=="20180932" //3 changes
+replace hx="ADULT T-CELL LYMPHOMA LEUKEMIA" if pid=="20180932" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20180932" //3 changes
 
 ** morphcheckcat 77: Hx=non-hodgkin lymphoma & Hx!=cell (to excl. mantle, large, cleaved, small, etc) & morph!=9591
 count if morphcheckcat==77 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==77
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==77
 
 ** morphcheckcat 78: Hx=precursor t-cell acute lymphoblastic leukemia & morph!=9837
 ** note: ICD-O-3 has another matching code (M9729) but WHO Classification notes that M9837 more accurate
 count if morphcheckcat==78 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==78
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==78
 
 ** morphcheckcat 79: Hx=CML (chronic myeloid/myelogenous leukemia) & Hx!=genetic studies & morph==9863
 ** note: HemeDb under CML, NOS notes 'Presumably myelogenous leukemia without genetic studies done would be coded to M9863.'
 count if morphcheckcat==79 //2
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==79
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==79
+replace flag42=morph if pid=="20180006"
+replace morph=9863 if pid=="20180006" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180006"
 
 ** morphcheckcat 80: Hx=CML (chronic myeloid/myelogenous leukemia) & Hx!=BCR/ABL1 & morph==9875
 ** note: HemeDb under CML, NOS notes 'Presumably myelogenous leukemia without genetic studies done would be coded to M9863.'
-count if morphcheckcat==80 //2 - correct
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==80
+count if morphcheckcat==80 //0
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==80
 
 ** morphcheckcat 81: Hx=acute myeloid leukemia & Hx!=myelodysplastic/down syndrome & basis==cyto/heme/histology... & morph!=9861
-count if morphcheckcat==81 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==81
+count if morphcheckcat==81 //3 - all correct
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==81
 
 ** morphcheckcat 82: Hx=acute myeloid leukemia & down syndrome & morph!=9898
 count if morphcheckcat==82 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==82
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==82
 
 ** morphcheckcat 83: Hx=secondary myelofibrosis & recstatus!=3 & morph==9931 or 9961
 count if morphcheckcat==83 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==83
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==83
 
 ** morphcheckcat 84: Hx=polycythemia & Hx!=vera/proliferative/primary & morph==9950
 count if morphcheckcat==84 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==84
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==84
 
 ** morphcheckcat 85: Hx=myeloproliferative & Hx!=essential & dxyr<2010 & morph==9975
 count if morphcheckcat==85 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==85
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==85
 
 ** morphcheckcat 86: Hx=myeloproliferative & Hx!=essential & dxyr>2009 & morph==9960
 count if morphcheckcat==86 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==86
-replace morph=9950 if pid=="20155085" & cr5id=="T1S1" //2 changes
-replace hx="MYELOPROLIFERATIVE DISEASE LIKELY POLYCYTHEMIA RUBRA VERA" if pid=="20155085" & cr5id=="T1S1" //2 changes
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==86
 
 ** morphcheckcat 87: Hx=refractory anemia & Hx!=sideroblast or blast & morph!=9980
 count if morphcheckcat==87 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==87
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==87
 
 ** morphcheckcat 88: Hx=refractory anemia & sideroblast & Hx!=excess blasts & morph!=9982
 count if morphcheckcat==88 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==88
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==88
 
 ** morphcheckcat 89: Hx=refractory anemia & excess blasts &  Hx!=sidero & morph!=9983
 count if morphcheckcat==89 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==89
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==89
 
 ** morphcheckcat 90: Hx=myelodysplasia & Hx!=syndrome & recstatus!=inelig. & morph==9989
 count if morphcheckcat==90 //0
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==90
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==90
 
 ** morphcheckcat 91: Hx=acinar & top!=619 & morph!=8550
 count if morphcheckcat==91 //35 - on 22oct18 JC added in top!=619 to this code so now count=0
-//list pid primarysite hx morph cr5id if morphcheckcat==91
+//list pid primarysite hx morph morphology cr5id if morphcheckcat==91
 
 ** morphcheckcat 92: Hx!=fibro & histiocytoma & morph=8830 (see morphcheckcat=50 also!)
 count if morphcheckcat==92 //1
-//list pid primarysite hx morph basis beh cr5id if morphcheckcat==92
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==92
 
 ** morphcheckcat 93: Hx=acinar & top=619 & morph!=8140
 /*
 This check added on 22oct18 after update re morphcheckcat 91 above.  
 */
 count if morphcheckcat==93 //1
-//list pid primarysite hx morph cr5id if morphcheckcat==93
+//list pid primarysite hx morph morphology cr5id if morphcheckcat==93
 replace morph=8140 if morphcheckcat==93 //1 change
 
 ** morphcheckcat 94: Hx=hodgkin & morph=non-hodgkin
 count if morphcheckcat==94 //3 - corrected in Check 76 subcheck 1 below
-//list pid hx morph cr5id if morphcheckcat==94
+//list pid hx morph morphology cr5id if morphcheckcat==94
 
 ** morphcheckcat 95: Hx=leukaemia & morph=9729
 count if morphcheckcat==95 //0
-//list pid hx morph cr5id if morphcheckcat==95
+//list pid hx morph morphology cr5id if morphcheckcat==95
 
 ** morphcheckcat 96: Hx=lymphoma & morph=9837
 count if morphcheckcat==96 //0
-//list pid hx morph cr5id if morphcheckcat==96
+//list pid hx morph morphology cr5id if morphcheckcat==96
 
 ** Check 76 - invalid(primarysite vs hx)
 ** hxcheckcat 1: PrimSite=Blood/Bone Marrow & Hx=Lymphoma 
-count if hxcheckcat==1 //5
-//list pid top hx morph cr5id if hxcheckcat==1
-** Correct data for above list
-replace primarysite="LYMPH NODE-UNKNOWN" if pid=="20150556" & regexm(cr5id,"T1") //1 change
-replace topography=779 if pid=="20150556" & regexm(cr5id,"T1") //1 change
-replace top="779" if pid=="20150556" & regexm(cr5id,"T1") //1 change
-replace topcat=69 if pid=="20150556" & regexm(cr5id,"T1") //1 change
+count if hxcheckcat==1 //3
+//list pid top hx morph morphology cr5id if hxcheckcat==1
+replace flag39=primarysite if pid=="20180019"
+replace primarysite="LYMPH NODE-NECK" if pid=="20180019" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20180019"
 
-replace primarysite="LYMPH NODE-UNKNOWN" if pid=="20155197" & regexm(cr5id,"T1") //1 change
-replace topography=779 if pid=="20155197" & regexm(cr5id,"T1") //1 change
-replace top="779" if pid=="20155197" & regexm(cr5id,"T1") //1 change
-replace topcat=69 if pid=="20155197" & regexm(cr5id,"T1") //1 change
-
-replace primarysite="LYMPH NODE-UNKNOWN" if pid=="20155205" & regexm(cr5id,"T1") //1 change
-replace topography=779 if pid=="20155205" & regexm(cr5id,"T1") //1 change
-replace top="779" if pid=="20155205" & regexm(cr5id,"T1") //1 change
-replace topcat=69 if pid=="20155205" & regexm(cr5id,"T1") //1 change
-
-replace primarysite="LYMPH NODE-UNKNOWN" if pid=="20160018" & regexm(cr5id,"T1") //2 changes
-replace topography=779 if pid=="20160018" & regexm(cr5id,"T1") //2 changes
-replace top="779" if pid=="20160018" & regexm(cr5id,"T1") //2 changes
-replace topcat=69 if pid=="20160018" & regexm(cr5id,"T1") //2 changes
+replace flag40=topography if pid=="20180019"
+replace topography=770 if pid=="20180019" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20180019"
+replace topcat=69 if pid=="20180019" & regexm(cr5id,"T1")
 
 ** hxcheckcat 2: PrimSite=Thymus & MorphCat!=13 (Thymic epithe. neo.) & Hx!=carcinoma
 count if hxcheckcat==2 //0
-//list pid primarysite top hx morph cr5id if hxcheckcat==2
+//list pid primarysite top hx morph morphology cr5id if hxcheckcat==2
 
 ** hxcheckcat 3: PrimSite!=Bone Marrow & MorphCat==56 (Myelodysplastic Syn.)
 count if hxcheckcat==3 //0
-//list pid primarysite top hx morph cr5id if hxcheckcat==3
+//list pid primarysite top hx morph morphology cr5id if hxcheckcat==3
 
 ** hxcheckcat 4: PrimSite!=thyroid & Hx=Renal & Hx=Papillary ca & Morph!=8260
 count if hxcheckcat==4 //0
-//list pid primarysite hx morph cr5id if hxcheckcat==4
+//list pid primarysite hx morph morphology cr5id if hxcheckcat==4
 
 ** hxcheckcat 5: PrimSite==thyroid & Hx!=Renal & Hx=Papillary ca & adenoca & Morph!=8260
 count if hxcheckcat==5 //0
-//list pid primarysite hx morph cr5id if hxcheckcat==5
+//list pid primarysite hx morph morphology cr5id if hxcheckcat==5
 
 ** hxcheckcat 6: PrimSite==ovary or peritoneum & Hx=Papillary & Serous & Morph!=8461
 count if hxcheckcat==6 //0
-//list pid hx morph cr5id if hxcheckcat==6
+//list pid hx morph morphology cr5id if hxcheckcat==6
 
 ** hxcheckcat 7: PrimSite==endometrium & Hx=Papillary & Serous & Morph!=8460
-count if hxcheckcat==7 //0
-//list pid primarysite hx morph cr5id if hxcheckcat==7
+count if hxcheckcat==7 //2 - corrected in morphcheckcat==4
+//list pid primarysite hx morph morphology cr5id if hxcheckcat==7
 
 ** hxcheckcat 8: PrimSite!=bone; Hx=plasmacytoma & Morph==9731(bone)
 count if hxcheckcat==8 //0
-//list pid primarysite hx morph cr5id if hxcheckcat==8
+//list pid primarysite hx morph morphology cr5id if hxcheckcat==8
 
 ** hxcheckcat 9: PrimSite==bone; Hx=plasmacytoma & Morph==9734(not bone)
 count if hxcheckcat==9 //0
-//list pid primarysite hx morph cr5id if hxcheckcat==9
+//list pid primarysite hx morph morphology cr5id if hxcheckcat==9
 
 ** hxcheckcat 10: PrimSite!=meninges; Hx=meningioma
-count if hxcheckcat==10 //5
-//list pid primarysite top hx morph cr5id if hxcheckcat==10
-replace primarysite="BRAIN-MENINGES PARIETAL LOBE" if pid=="20151058" //1 change
-replace topography=700 if pid=="20151058" //1 change
-replace top="700" if pid=="20151058" //1 change
-replace topcat=62 if pid=="20151058" //1 change
-
-replace primarysite="BRAIN-MENINGES TEMPORAL LOBE" if pid=="20151086" //1 change
-replace topography=700 if pid=="20151086" //1 change
-replace top="700" if pid=="20151086" //1 change
-replace topcat=62 if pid=="20151086" //1 change
-
-replace primarysite="BRAIN-MENINGES TEMPORAL LOBE" if pid=="20151090" //1 change
-replace topography=700 if pid=="20151090" //1 change
-replace top="700" if pid=="20151090" //1 change
-replace topcat=62 if pid=="20151090" //1 change
-
-replace primarysite="SPINE-MENINGES CERVICAL CORD" if pid=="20151167" //1 change
-replace topography=701 if pid=="20151167" //1 change
-replace top="701" if pid=="20151167" //1 change
-replace topcat=62 if pid=="20151167" //1 change
-
-replace primarysite="BRAIN-MENINGES CEREBELLOPONTINE ANGLE" if pid=="20151270" //1 change
-replace topography=700 if pid=="20151270" //1 change
-replace top="700" if pid=="20151270" //1 change
-replace topcat=62 if pid=="20151270" //1 change
+count if hxcheckcat==10 //0
+//list pid primarysite top hx morph morphology cr5id if hxcheckcat==10
 
 ** hxcheckcat 11: PrimSite=Blood/Bone Marrow & Hx=HTLV+T-cell Lymphoma 
-count if hxcheckcat==11 //1 - correct
-//list pid top hx morph cr5id if hxcheckcat==11
+count if hxcheckcat==11 //3
+//list pid top hx morph morphology cr5id if hxcheckcat==11
+replace flag39=primarysite if pid=="20180028"|pid=="20180932"
+replace primarysite="LYMPH NODE-NOS" if pid=="20180028" & regexm(cr5id, "T1")|pid=="20180932" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20180028"|pid=="20180932"
+
+replace flag40=topography if pid=="20180028"|pid=="20180932"
+replace topography=779 if pid=="20180028" & regexm(cr5id, "T1")|pid=="20180932" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20180028"|pid=="20180932"
+replace topcat=69 if pid=="20180028" & regexm(cr5id,"T1")|pid=="20180932" & regexm(cr5id, "T1")
 
 ** Check 78 - invalid(age/site/histology)
 ** agecheckcat 1: Age<3 & Hx=Hodgkin Lymphoma
 count if agecheckcat==1 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==1
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==1
 
 ** agecheckcat 2: Age 10-14 & Hx=Neuroblastoma
 count if agecheckcat==2 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==2
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==2
 
 ** agecheckcat 3: Age 6-14 & Hx=Retinoblastoma
 count if agecheckcat==3 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==3
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==3
 
 ** agecheckcat 4: Age 9-14 & Hx=Wilm's Tumour
 count if agecheckcat==4 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==4
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==4
 
 ** agecheckcat 5: Age 0-8 & Hx=Renal carcinoma
 count if agecheckcat==5 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==5
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==5
 
 ** agecheckcat 6: Age 6-14 & Hx=Hepatoblastoma
 count if agecheckcat==6 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==6
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==6
 
 ** agecheckcat 7: Age 0-8 & Hx=Hepatic carcinoma
 count if agecheckcat==7 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==7
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==7
 
 ** agecheckcat 8: Age 0-5 & Hx=Osteosarcoma
 count if agecheckcat==8 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==8
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==8
 
 ** agecheckcat 9: Age 0-5 & Hx=Chondrosarcoma
 count if agecheckcat==9 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==9
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==9
 
 ** agecheckcat 10: Age 0-3 & Hx=Ewing sarcoma
 count if agecheckcat==10 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==10
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==10
 
 ** agecheckcat 11: Age 8-14 & Hx=Non-gonadal germ cell
-count if agecheckcat==11 //3 - no corrections needed
-//list pid cr5id age hx morph dxyr if agecheckcat==11
+count if agecheckcat==11 //0
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==11
 
 ** agecheckcat 12: Age 0-4 & Hx=Gonadal carcinoma
 count if agecheckcat==12 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==12
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==12
 
 ** agecheckcat 13: Age 0-5 & Hx=Thyroid carcinoma
 count if agecheckcat==13 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==13
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==13
 
 ** agecheckcat 14: Age 0-5 & Hx=Nasopharyngeal carcinoma
 count if agecheckcat==14 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==14
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==14
 
 ** agecheckcat 15: Age 0-4 & Hx=Skin carcinoma
 count if agecheckcat==15 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==15
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==15
 
 ** agecheckcat 16: Age 0-4 & Hx=Carcinoma, NOS
 count if agecheckcat==16 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==16
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==16
 
 ** agecheckcat 17: Age 0-14 & Hx=Mesothelial neoplasms
 count if agecheckcat==17 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==17
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==17
 
 ** agecheckcat 18: Age <40 & Hx=814_ & Top=61_
-count if agecheckcat==18 //3 - all correct
-//list pid cr5id age hx morph dxyr if agecheckcat==18
+count if agecheckcat==18 //0
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==18
 
 ** agecheckcat 19: Age <20 & Top=15._,19._,20._,21._,23._,24._,38.4,50._53._,54._,55._
-count if agecheckcat==19 //1 - 20145025 missing dob: no correction needed
-//list pid cr5id age primarysite top hx morph dxyr if agecheckcat==19
+count if agecheckcat==19 //0
+//list pid cr5id age primarysite top hx morph morphology dxyr if agecheckcat==19
 
 ** agecheckcat 20: Age <20 & Top=17._ & Morph<9590(ie.not lymphoma)
 count if agecheckcat==20 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==20
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==20
 
 ** agecheckcat 21: Age <20 & Top=33._ or 34._ or 18._ & Morph!=824_(ie.not carcinoid)
 count if agecheckcat==21 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==21
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==21
 
 ** agecheckcat 22: Age >45 & Top=58._ & Morph==9100(chorioca.)
 count if agecheckcat==22 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==22
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==22
 
 ** agecheckcat 23: Age <26 & Morph==9732(myeloma) or 9823(BCLL)
 count if agecheckcat==23 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==23
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==23
 
 ** agecheckcat 24: Age >15 & Morph==8910/8960/8970/8981/8991/9072/9470/9490/9500/951_/9687
 count if agecheckcat==24 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==24
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==24
 
 ** agecheckcat 25: Age <15 & Morph==9724
 count if agecheckcat==25 //0
-//list pid cr5id age hx morph dxyr if agecheckcat==25
+//list pid cr5id age hx morph morphology dxyr if agecheckcat==25
 
 
 ** Check 80 - invalid(sex/histology)
 ** sexcheckcat 1: Sex=male & Hx family=23,24,25,26,27
 count if sexcheckcat==1 //0
-//list pid cr5id age hx morph hxfamcat dxyr if sexcheckcat==1
+//list pid cr5id age hx morph morphology hxfamcat dxyr if sexcheckcat==1
 
 ** sexcheckcat 2: Sex=female & Hx family=28 or 29
 count if sexcheckcat==2 //0
-//list pid cr5id age hx morph hxfamcat dxyr if sexcheckcat==2
+//list pid cr5id age hx morph morphology hxfamcat dxyr if sexcheckcat==2
 
 
 ** Check 82 - invalid(site/histology)
 ** sitecheckcat 1: NOT haem. tumours
 count if sitecheckcat==1 //0
-//list pid cr5id age hx morph dxyr if sitecheckcat==1
+//list pid cr5id age hx morph morphology dxyr if sitecheckcat==1
 
 ** sitecheckcat 2: NOT site-specific carcinomas
-count if sitecheckcat==2 //3 - 20145112 no corrections needed
-//list pid cr5id age hx morph dxyr if sitecheckcat==2
+count if sitecheckcat==2 //0
+//list pid cr5id age hx morph morphology dxyr if sitecheckcat==2
 
 ** sitecheckcat 3: NOT site-specific sarcomas
 count if sitecheckcat==3 //0
-//list pid cr5id age hx morph dxyr if sitecheckcat==3
+//list pid cr5id age hx morph morphology dxyr if sitecheckcat==3
 
 ** sitecheckcat 4: Top=Bone; Hx=Giant cell sarc. except bone
 count if sitecheckcat==4 //0
-//list pid cr5id age hx morph dxyr if sitecheckcat==4
+//list pid cr5id age hx morph morphology dxyr if sitecheckcat==4
 
 ** sitecheckcat 5: NOT sarcomas affecting CNS
 count if sitecheckcat==5 //0
-//list pid cr5id age hx morph dxyr if sitecheckcat==5
+//list pid cr5id age hx morph morphology dxyr if sitecheckcat==5
 
 ** sitecheckcat 6: NOT sites for Kaposi sarcoma
 count if sitecheckcat==6 //0
-//list pid cr5id age hx morph dxyr if sitecheckcat==6
+//list pid cr5id age hx morph morphology dxyr if sitecheckcat==6
 
 ** sitecheckcat 7: Top=Bone; Hx=extramedullary plasmacytoma
 count if sitecheckcat==7 //0
-//list pid cr5id age hx morph dxyr if sitecheckcat==7
+//list pid cr5id age hx morph morphology dxyr if sitecheckcat==7
 
 
 ****************
@@ -1347,11 +1680,16 @@ count if lat==. & primarysite!="" //0
 //list pid lat primarysite cr5id if lat==. & primarysite!=""
 count if latcat==. & lat!=. //0 - some latcats may change due to corrections in clean dofile being run after prep dofile
 //list pid lat primarysite cr5id if latcat==. & lat!=.
-count if lat==8 //40 - lat should=0(not paired site) if latcat=0 or blank
+count if lat==8 //25 - lat should=0(not paired site) if latcat=0 or blank
 //list pid lat primarysite latcat cr5id if lat==8
-count if lat==8 & (latcat==0|latcat==.) //40
+count if lat==8 & (latcat==0|latcat==.) //25
 //list pid lat top latcat cr5id if lat==8 & (latcat==0|latcat==.)
-replace lat=0 if lat==8 & (latcat==0|latcat==.) //40 changes
+
+destring flag43 ,replace
+destring flag138 ,replace
+replace flag43=lat if lat==8 & (latcat==0|latcat==.) //25 changes
+replace lat=0 if lat==8 & (latcat==0|latcat==.)
+replace flag138=lat if flag43!=. //25 changes
 
 ** Check 84 - Laterality length
 ** Need to create string variable for laterality
@@ -1367,7 +1705,7 @@ count if laterality!="" & length(laterality)!=1 //0
 sort pid
 
 ** latcheckcat 1: COD='left'; COD=cancer (codcat!=1); latcat>0; lat!=left
-count if latcheckcat==1 //1 - this is not an error as 'left' refers to non-cancer COD
+count if latcheckcat==1 //1 - this is not an error as 'left' is incorrect on COD but correct in other source records
 //list pid cr5id primarysite lat cr5cod dxyr if latcheckcat==1
 
 ** latcheckcat 2: COD='right'; COD=cancer (codcat!=1); latcat>0; lat!=right
@@ -1375,31 +1713,90 @@ count if latcheckcat==2 //0
 //list pid cr5id primarysite lat cr5cod dxyr if latcheckcat==2
 
 ** latcheckcat 3: CFdx='left'; latcat>0; lat!=left
-count if latcheckcat==3 //4 - all correct
+count if latcheckcat==3 //8 - 7 correct
 //list pid cr5id primarysite lat cfdx dxyr if latcheckcat==3 ,string(100)
+replace flag43=lat if pid=="20182193" & regexm(cr5id, "T1")
+replace lat=2 if pid=="20182193" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20182193" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20182253" & regexm(cr5id, "T1")
+replace primarysite="LUNG-LOWER LOBE" if pid=="20182253" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20182253" & regexm(cr5id, "T1")
+
+replace flag40=topography if pid=="20182253" & regexm(cr5id, "T1")
+replace topography=343 if pid=="20182253" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20182253" & regexm(cr5id, "T1")
+
+replace flag43=lat if pid=="20182253" & regexm(cr5id, "T1")
+replace lat=2 if pid=="20182253" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20182253" & regexm(cr5id, "T1")
+
+** JC 31may2022: missed MP 20182253 (lat=4 does not apply if diffuse lung tumours were not present at time of dx)
+expand=2 if pid=="20182253" & cr5id=="T1S1", gen (dupobs1)
+replace cr5id="T2S1" if dupobs1==1
+
+replace flag39=primarysite if pid=="20182253" & regexm(cr5id, "T2")
+replace primarysite="LUNG-UPPER LOBE" if pid=="20182253" & regexm(cr5id, "T2")
+replace flag134=primarysite if pid=="20182253" & regexm(cr5id, "T2")
+
+replace flag40=topography if pid=="20182253" & regexm(cr5id, "T2")
+replace topography=341 if pid=="20182253" & regexm(cr5id, "T2")
+replace flag135=topography if pid=="20182253" & regexm(cr5id, "T2")
+
+replace flag43=lat if pid=="20182253" & regexm(cr5id, "T2")
+replace lat=1 if pid=="20182253" & regexm(cr5id, "T2")
+replace flag138=lat if pid=="20182253" & regexm(cr5id, "T2")
+
+destring flag45 ,replace
+destring flag140 ,replace
+replace flag45=grade if pid=="20182253" & regexm(cr5id, "T2")
+replace grade=9 if pid=="20182253" & regexm(cr5id, "T2")
+replace flag140=grade if pid=="20182253" & regexm(cr5id, "T2")
+
+destring flag52 ,replace
+destring flag147 ,replace
+format flag52 flag147 %dD_m_CY
+replace flag52=dot if pid=="20182253" & regexm(cr5id, "T2")
+replace dot=d(05dec2018) if pid=="20182253" & regexm(cr5id, "T2")
+replace flag147=dot if pid=="20182253" & regexm(cr5id, "T2")
+
+replace flag80=comments if pid=="20182253" & cr5id=="T2S1"
+replace comments="JC 31MAY2022: missed Lung MP, right - please abstract (Note: laterality=4 does not apply if diffuse lung tumours were not present at time of dx."+" "+comments if pid=="20182253" & cr5id=="T2S1"
+replace flag175=comments if pid=="20182253" & cr5id=="T2S1"
 
 ** latcheckcat 4: CFdx='right'; latcat>0; lat!=right
-count if latcheckcat==4 //6 - all correct
+count if latcheckcat==4 //5 - all correct
 //list pid cr5id primarysite lat cfdx dxyr if latcheckcat==4 ,string(100)
 
 ** latcheckcat 5: topog==809 & lat!=0-paired site (in accord with SEER Prog. Coding manual 2016 pg 82 #1.a.)
-count if latcheckcat==5 //6
+count if latcheckcat==5 //38
 //list pid cr5id primarysite topography lat dxyr if latcheckcat==5
-replace lat=0 if latcheckcat==5 & topography==809 //6 changes
-count if lat!=0 & topography==809 //0
+count if lat!=0 & topography==809 //40
 //list pid cr5id primarysite topography lat dxyr if lat!=0 & topography==809
+replace flag39=primarysite if pid=="20181081" & regexm(cr5id, "T1")
+replace primarysite="SKIN-NOS" if pid=="20181081" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20181081" & regexm(cr5id, "T1")
+
+replace flag40=topography if pid=="20181081" & regexm(cr5id, "T1")
+replace topography=449 if pid=="20181081" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20181081" & regexm(cr5id, "T1")
+replace topcat=39 if pid=="20181081" & regexm(cr5id,"T1")
+
+replace flag43=lat if pid=="20181081" & regexm(cr5id, "T1")
+replace lat=0 if pid=="20181081" & regexm(cr5id, "T1")|latcheckcat==5|lat!=0 & topography==809 //40 changes
+replace flag138=lat if pid=="20181081" & regexm(cr5id, "T1")
 
 ** latcheckcat 6: latcat>0 & lat==0 or 8 (in accord with SEER Prog. Coding manual 2016 pg 82 #2)
-count if latcheckcat==6 //7
+count if latcheckcat==6 //8
 //list pid cr5id topography lat latcat dxyr if latcheckcat==6
-replace lat=2 if pid=="20150400" //1 change
-replace lat=1 if pid=="20151086" //1 change
-replace lat=2 if pid=="20151090" //1 change
-replace lat=1 if pid=="20151124" //3 changes
-replace lat=2 if pid=="20151140" //1 change
+replace flag43=lat if pid=="20140849" & regexm(cr5id, "T3")|pid=="20180031" & regexm(cr5id, "T1")|pid=="20180634" & regexm(cr5id, "T1")|pid=="20181211" & regexm(cr5id, "T1")|pid=="20182138" & regexm(cr5id, "T1")
+replace lat=2 if pid=="20181211" & regexm(cr5id, "T1")
+replace lat=5 if pid=="20140849" & regexm(cr5id, "T3")|pid=="20180031" & regexm(cr5id, "T1")|pid=="20180634" & regexm(cr5id, "T1")
+replace lat=9 if pid=="20182138" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20140849" & regexm(cr5id, "T3")|pid=="20180031" & regexm(cr5id, "T1")|pid=="20180634" & regexm(cr5id, "T1")|pid=="20181211" & regexm(cr5id, "T1")|pid=="20182138" & regexm(cr5id, "T1")
 
 ** latcheckcat 7: latcat!=ovary,lung,eye,kidney & lat==4 (in accord with SEER Prog. Coding manual 2016 pg 82 #4 & IARC MP recommendations for recording #1)
-count if latcheckcat==7 //2 - 20140555 already corrected above in check 11
+count if latcheckcat==7 //0
 //list pid cr5id primarysite topography lat latcat dxyr if latcheckcat==7
 
 ** latcheckcat 8: latcat=meninges/brain/CNS/skin-face,trunk & dxyr>2009 & lat!=5 & lat=NA (in accord with SEER Prog. Coding manual 2016 pg 83 #5) (lat 5-midline only for 2010 onwards dx)
@@ -1419,36 +1816,94 @@ count if latcheckcat==11 //0
 //list pid cr5id primarysite topography lat latcat dxyr if latcheckcat==11
 
 ** latcheckcat 12: latcat=no lat cat (i.e. laterality n/a); topog!=809; lat!=N/A; latcheckcat==. (this can capture any that have not already been corrected in above latcheckcats)
-count if latcheckcat==12 //11
-list pid cr5id topography lat latcat dxyr if latcheckcat==12
-replace lat=0 if latcheckcat==12 //11 changes
+count if latcheckcat==12 //13
+//list pid cr5id topography lat latcat dxyr if latcheckcat==12
+replace flag43=lat if latcheckcat==12
+replace lat=0 if latcheckcat==12 //13 changes
+replace flag138=lat if latcheckcat==12
 
 ** latcheckcat 13: lat=N/A & dxyr>2013 (cases dx>2013 should use code '0-not paired site')
-count if latcheckcat==13 //37 - all correct
+count if latcheckcat==13 //25 - all corrected above
 //list pid cr5id topography lat latcat if latcheckcat==13
 count if lat==8 & dxyr>2013 //0 - flagged and corrected in below latcheckcat 14
 //list pid cr5id topography lat latcat if lat==8 & dxyr>2013
 
 ** latcheckcat 14: lat=N/A & latcat!=0
-count if latcheckcat==14 //19 - 5 already corrected in above checks
+count if latcheckcat==14 //0
 //list pid cr5id topography lat latcat if latcheckcat==14
 
 ** latcheckcat 15: lat=unk for a paired site
-count if latcheckcat==15 //33
-//list pid cr5id topography lat latcat cfdx if latcheckcat==15, string(100)
-replace lat=3 if pid=="20150320"|pid=="20155191"|pid=="20155237"|pid=="20155265" ///
-				 |pid=="20160436" //12 changes
-replace lat=1 if pid=="20151308"|pid=="20151309"|pid=="20151319"|pid=="20151322" //8 changes
-replace lat=2 if pid=="20151323" //2 changes
-replace primarysite="LUNG-UPPER LOBE" if pid=="20151323" //2 changes
-replace top="341" if pid=="20151323" //2 changes
-replace topography=341 if pid=="20151323" //2 changes
+count if latcheckcat==15 //41
+//list pid cr5id topography lat latcat cfdx if latcheckcat==15, string(50)
+replace latcat=0 if pid=="20180469" & regexm(cr5id, "T1")
+
+replace flag41=hx if pid=="20180639" //3 changes
+replace hx="POORLY DIFFERENTIATED MAMMARY CARCINOMA, LOBULAR SUBTYPE" if pid=="20180639" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20180639" //3 changes
+
+replace flag42=morph if pid=="20180639"
+replace morph=8522 if pid=="20180639" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180639"
+
+replace flag43=lat if pid=="20180639"
+replace lat=1 if pid=="20180639" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20180639"
+
+replace flag39=primarysite if pid=="20180920" & regexm(cr5id, "T1")
+replace primarysite="UNKNOWN" if pid=="20180920" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20180920" & regexm(cr5id, "T1")
+
+replace flag40=topography if pid=="20180920" & regexm(cr5id, "T1")
+replace topography=809 if pid=="20180920" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20180920" & regexm(cr5id, "T1")
+replace topcat=70 if pid=="20180920" & regexm(cr5id,"T1")
+
+replace flag43=lat if pid=="20180920" & regexm(cr5id, "T1")
+replace lat=0 if pid=="20180920" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20180920" & regexm(cr5id, "T1")
+replace latcat=0 if pid=="20180920" & regexm(cr5id,"T1")
+
+destring flag46 ,replace
+destring flag141 ,replace
+replace flag46=basis if pid=="20181079"|pid=="20181161"|pid=="20182303"
+replace basis=6 if pid=="20181079" & regexm(cr5id, "T1")|pid=="20181161" & regexm(cr5id, "T1")|pid=="20182303" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20181079"|pid=="20181161"|pid=="20182303"
 
 ** latcheckcat 16: lat=9 & top=ovary
-count if latcheckcat==16 //11
+count if latcheckcat==16 //20
 //list pid cr5id topography lat latcat cfdx if latcheckcat==16, string(100)
-replace lat=4 if pid=="20151355" //1 change
+replace flag46=basis if pid=="20180350"|pid==""|pid==""
+replace basis=6 if pid=="20180350" & regexm(cr5id, "T1")|pid=="" & regexm(cr5id, "T1")|pid=="" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20180350"|pid==""|pid==""
 
+replace flag43=lat if pid=="20180405" & regexm(cr5id, "T1")
+replace lat=1 if pid=="20180405" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20180405" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20180493" & regexm(cr5id, "T1")
+replace primarysite="ENDOMETRIUM" if pid=="20180493" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20180493" & regexm(cr5id, "T1")
+
+replace flag40=topography if pid=="20180493" & regexm(cr5id, "T1")
+replace topography=541 if pid=="20180493" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20180493" & regexm(cr5id, "T1")
+replace topcat=47 if pid=="20180493" & regexm(cr5id,"T1")
+
+replace flag41=hx if pid=="20180493" //3 changes
+replace hx="SEROUS PAPILLARY CARCINOMA" if pid=="20180493" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20180493" //3 changes
+
+replace flag42=morph if pid=="20180493"
+replace morph=8460 if pid=="20180493" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180493"
+replace morphcat=9 if pid=="20180493" & regexm(cr5id,"T1")
+
+replace flag43=lat if pid=="20180493" & regexm(cr5id, "T1")
+replace lat=0 if pid=="20180493" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20180493" & regexm(cr5id, "T1")
+replace latcat=0 if pid=="20180493" & regexm(cr5id,"T1")
+
+STOP
 ***************
 ** Behaviour **
 ***************
@@ -1468,35 +1923,35 @@ count if behaviour!="" & length(behaviour)!=1 //0
 ** Check 90 - invalid(behaviour)
 ** behcheckcat 1: Beh!=2 & Morph==8503
 count if behcheckcat==5 //0
-//list pid hx morph basis beh cr5id if behcheckcat==5
+//list pid hx morph morphology basis beh cr5id if behcheckcat==5
 
 ** behcheckcat 2: Beh!=2 & Morph==8077
 count if behcheckcat==2 //16 - 20140690 already corrected in check 11.
-//list pid primarysite hx morph basis beh cr5id if behcheckcat==2
+//list pid primarysite hx morph morphology basis beh cr5id if behcheckcat==2
 
 ** behcheckcat 3: Hx=Squamous & microinvasive & Beh=2 & Morph!=8076
 count if behcheckcat==3 //0
-//list pid primarysite hx morph basis beh cr5id if behcheckcat==3
+//list pid primarysite hx morph morphology basis beh cr5id if behcheckcat==3
 
 ** behcheckcat 4: Hx=Bowen & Beh!=2 (want to check skin SCCs that have bowen disease is coded to beh=in-situ)
 count if behcheckcat==4 //0
-//list pid primarysite hx morph basis beh cr5id if behcheckcat==4
+//list pid primarysite hx morph morphology basis beh cr5id if behcheckcat==4
 
 ** behcheckcat 5: PrimSite==appendix & Morph==8240 & Beh!=1
 count if behcheckcat==5 //0
-//list pid primarysite hx morph basis beh cr5id if behcheckcat==5
+//list pid primarysite hx morph morphology basis beh cr5id if behcheckcat==5
 
 ** behcheckcat 6: Hx=adenoma excl. adenocarcinoma & invasion & Morph==8263 & Beh!=2
 count if behcheckcat==6 //0
-//list pid hx morph beh cr5id if behcheckcat==6
+//list pid hx morph morphology beh cr5id if behcheckcat==6
 
 ** behcheckcat 7: Morph not listed in ICD-O-3 (IARCcrgTools Check pg 8)
 count if behcheckcat==7 //0
-//list pid hx morph beh cr5id if behcheckcat==7
+//list pid hx morph morphology beh cr5id if behcheckcat==7
 
 ** behcheckcat 8: Hx=tumour & beh>1
 count if behcheckcat==8 //0
-//list pid hx morph beh recstatus cr5id if behcheckcat==8
+//list pid hx morph morphology beh recstatus cr5id if behcheckcat==8
 
 ** Below checks taken from IARCcrgTools pg 8.
 ** behsitecheckcat 1: Beh==2 & Top==C40._(bone)
@@ -1554,52 +2009,52 @@ count if str_grade!="" & length(str_grade)!=1 //0
 ** Taken from IACRcrgTools pg 9
 ** gradecheckcat 1: Beh<3 & Grade<9 & DxYr>2013
 count if gradecheckcat==1 //0
-//list pid grade beh morph cr5id if gradecheckcat==1
+//list pid grade beh morph morphology cr5id if gradecheckcat==1
 
 ** gradecheckcat 2: Grade>=5 & <=8 & Hx<9590 & DxYr>2013
 count if gradecheckcat==2 //0
-//list pid grade beh morph cr5id if gradecheckcat==2
+//list pid grade beh morph morphology cr5id if gradecheckcat==2
 
 ** gradecheckcat 3: Grade>=1 & <=4 & Hx>=9590 & DxYr>2013
 count if gradecheckcat==3 //3 - all correct
-//list pid hx morph grade beh morph cr5id if gradecheckcat==3 ,string(100)
+//list pid hx morph grade beh morph morphology cr5id if gradecheckcat==3 ,string(100)
 
 ** gradecheckcat 4: Grade!=5 & Hx=9702-9709,9716-9726(!=9719),9729,9827,9834,9837 & DxYr>2013
 count if gradecheckcat==4 //10
-//list pid grade beh morph cr5id if gradecheckcat==4
+//list pid grade beh morph morphology cr5id if gradecheckcat==4
 
 ** gradecheckcat 5: Grade!=5 or 7 & Hx=9714 & DxYr>2013
 count if gradecheckcat==5 //0
-//list pid grade beh morph cr5id if gradecheckcat==5
+//list pid grade beh morph morphology cr5id if gradecheckcat==5
 
 ** gradecheckcat 6: Grade!=5 or 8 & Hx=9700/9701/9719/9831 & DxYr>2013
 count if gradecheckcat==6 //0
-//list pid grade beh morph cr5id if gradecheckcat==6
+//list pid grade beh morph morphology cr5id if gradecheckcat==6
 
 ** gradecheckcat 7: Grade!=6 & Hx=>=9670,<=9699,9712,9728,9737,9738,>=9811,<=9818,9823,9826,9833,9836 & DxYr>2013
 count if gradecheckcat==7 //10
-//list pid hx grade beh morph cr5id if gradecheckcat==7 ,string(100)
+//list pid hx grade beh morph morphology cr5id if gradecheckcat==7 ,string(100)
 replace grade=6 if gradecheckcat==7 //10 changes
 
 ** gradecheckcat 8: Grade!=8 & Hx=9948 & DxYr>2013
 count if gradecheckcat==8 //0
-//list pid grade beh morph cr5id if gradecheckcat==8
+//list pid grade beh morph morphology cr5id if gradecheckcat==8
 
 ** gradecheckcat 9: Grade!=1 & Hx=8331/8851/9187/9511 & DxYr>2013
 count if gradecheckcat==9 //0
-//list pid grade beh morph cr5id if gradecheckcat==9
+//list pid grade beh morph morphology cr5id if gradecheckcat==9
 
 ** gradecheckcat 10: Grade!=2 & Hx=8249/8332/8858/9083/9243/9372 & DxYr>2013
 count if gradecheckcat==10 //0
-//list pid grade beh morph cr5id if gradecheckcat==10
+//list pid grade beh morph morphology cr5id if gradecheckcat==10
 
 ** gradecheckcat 11: Grade!=3 & HX=8631/8634 & DxYr>2013
 count if gradecheckcat==11 //0
-//list pid grade beh morph cr5id if gradecheckcat==11
+//list pid grade beh morph morphology cr5id if gradecheckcat==11
 
 ** gradecheckcat 12: Grade!=4 & Hx=8020/8021/8805/9062/9082/9392/9401/9451/9505/9512 & DxYr>2013
 count if gradecheckcat==12 //0
-//list pid grade beh morph cr5id if gradecheckcat==12
+//list pid grade beh morph morphology cr5id if gradecheckcat==12
 
 ** gradecheckcat 13: Grade=9 & cfdx/md/consrpt=Gleason & DxYr>2013
 count if gradecheckcat==13 //0
@@ -1616,7 +2071,7 @@ count if gradecheckcat==15 //0
 
 ** gradecheckcat 16: Grade!=6 & Hx=9732 & DxYr>2013 (see MM in HemeDb for grade)
 count if gradecheckcat==16 //42 - leave as is
-//list pid grade beh morph cr5id if gradecheckcat==16
+//list pid grade beh morph morphology cr5id if gradecheckcat==16
 
 ** gradecheckcat 17: Grade!=9/blank & DxYr<2014
 count if (grade!=9 & grade!=.) & dxyr<2014 //7
@@ -1651,11 +2106,11 @@ count if bascheckcat==2 //0
 
 ** bascheckcat 3: Basis not missing & basis!=cyto/heme/histology... & Hx!=...see BOD/Hx Control pg 47,48 of IARCcrgTools Check Program
 count if bascheckcat==3 //0
-//list pid primarysite hx morph basis cr5id if bascheckcat==3
+//list pid primarysite hx morph morphology basis cr5id if bascheckcat==3
 
 ** bascheckcat 4: Hx=mass; Basis=DCO; Morph==8000 - If topog=CNS then terms such as neoplasm & tumour eligible criteria (see Eligibility SOP)
 count if bascheckcat==4 //0
-//list pid cr5id primarysite hx morph basis dxyr if bascheckcat==4
+//list pid cr5id primarysite hx morph morphology basis dxyr if bascheckcat==4
 
 ** bascheckcat 5: Basis=DCO; Comments='Notes seen'
 count if bascheckcat==5 //108
@@ -1728,6 +2183,15 @@ count if stagecheckcat==8 //
 
 ** stagecheckcat 9: TNM, Essential TNM and Summary Staging are all missing & dxyr=2018
 count if stagecheckcat==9 //
+
+** stagecheckcat 10: Summary Staging!=8(NA) & Site!=Prostate/Breast/Colorectal & dxyr=2018
+count if stagecheckcat==10 //
+
+** stagecheckcat 11: TNM, Essential TNM and Summary Staging are all missing for prostate, breast, colorectal & dxyr=2018
+count if stagecheckcat==11 //
+
+** stagecheckcat 12: TNM, Essential TNM and Summary Staging are NOT missing for non-prostate/breast/colorectal & dxyr=2018
+count if stagecheckcat==12 //
 
 ********************
 ** Incidence Date **
@@ -2427,6 +2891,100 @@ replace cr5id="T1S2" if pid=="20150385" & cr5id=="T2S2"
 replace cr5id="T1S3" if pid=="20150385" & cr5id=="T2S3"
 replace cr5id="T1S4" if pid=="20150385" & cr5id=="T2S4"
 
+** Check if morph and morphology do not match (added this check on 31may2022)
+gen morph2=morph
+tostring morph2 ,replace
+count if morph2!=morphology //
+replace morphology=morph2
+drop morph2
+
+** Check if morph and morphology do not match (added this check on 31may2022)
+gen topography2=topography
+tostring topography2 ,replace
+count if topography2!=top //
+replace top=topography2
+drop topography2
+
+** Check for matches by natregno and pt names
+sort natregno lname fname pid
+quietly by natregno :  gen dupnrn = cond(_N==1,0,_n)
+sort natregno
+count if dupnrn>0 //11211
+sort lname fname pid record_id
+order pid record_id fname lname sex age natregno dds2natregno
+count if dupnrn>0 & natregno!="" & natregno!="9999999999" & natregno!=dds2natregno & _merge!=3 //770 - no matches (used data editor and filtered)
+//list pid record_id fname lname age dds2age natregno dds2natregno addr dds2address slc if dupnrn>0 & natregno!="" & natregno!="9999999999" & _merge!=3, string(38)
+
+drop duppt
+sort lname fname record_id pid
+quietly by lname fname :  gen duppt = cond(_N==1,0,_n)
+sort lname fname
+count if duppt>0 //2198
+sort lname fname pid record_id
+count if duppt>0 & _merge!=3 //1313 - no matches (used data editor and filtered)
+
+
+** Export corrections before dropping duplicate tumours/sources since errors maybe in dup source records
+/*
+** Prepare this dataset for export to excel (prior to removing non-2018 cases)
+preserve
+sort pid
+
+drop if  flag1=="" & flag2=="" & flag3=="" & flag4=="" & flag5=="" & flag6=="" & flag7=="" & flag8=="" & flag9=="" & flag10=="" ///
+		 & flag11=="" & flag12=="" & flag13=="" & flag14=="" & flag15=="" & flag16=="" & flag17=="" & flag18=="" & flag19=="" & flag20=="" ///
+		 & flag21=="" & flag22=="" & flag23=="" & flag24=="" & flag25=="" & flag26=="" & flag27=="" & flag28=="" & flag29=="" & flag30=="" ///
+		 & flag31=="" & flag32==. & flag33=="" & flag34=="" & flag35=="" & flag36=="" & flag37=="" & flag38=="" & flag39=="" & flag40=="" ///
+		 & flag41=="" & flag42=="" & flag43=="" & flag44=="" & flag45=="" & flag46=="" & flag47=="" & flag48=="" & flag49=="" & flag50=="" ///
+		 & flag51=="" & flag52==. & flag53==. & flag54=="" & flag55=="" & flag56=="" & flag57=="" & flag58=="" & flag59=="" & flag60=="" ///
+		 & flag61=="" & flag62=="" & flag63=="" & flag64=="" & flag65=="" & flag66=="" & flag67=="" & flag68=="" & flag69=="" & flag70=="" ///
+		 & flag71=="" & flag72=="" & flag73=="" & flag74=="" & flag75=="" & flag76==. & flag77=="" & flag78=="" & flag79=="" & flag80=="" ///
+		 & flag81=="" & flag82=="" & flag83=="" & flag84=="" & flag85=="" & flag86=="" & flag87=="" & flag88=="" & flag89=="" & flag90=="" ///
+		 & flag91=="" & flag92=="" & flag93=="" & flag94=="" & flag95=="" & flag96=="" & flag97=="" & flag98=="" & flag99=="" & flag100=="" ///
+		 & flag101=="" & flag102=="" & flag103=="" & flag104=="" & flag105=="" & flag106=="" & flag107=="" & flag108=="" & flag109=="" & flag110=="" ///
+		 & flag111=="" & flag112=="" & flag113=="" & flag114=="" & flag115=="" & flag116=="" & flag117=="" & flag118=="" & flag119=="" & flag120=="" ///
+		 & flag121=="" & flag122=="" & flag123=="" & flag124=="" & flag125=="" & flag126=="" & flag127==. & flag128=="" & flag129=="" & flag130=="" ///
+		 & flag131=="" & flag132=="" & flag133=="" & flag134=="" & flag135=="" & flag136=="" & flag137=="" & flag138=="" & flag139=="" & flag140=="" ///
+		 & flag141=="" & flag142=="" & flag143=="" & flag144=="" & flag145=="" & flag146=="" & flag147==. & flag148==. & flag149=="" & flag150=="" ///
+		 & flag151=="" & flag152=="" & flag153=="" & flag154=="" & flag155=="" & flag156=="" & flag157=="" & flag158=="" & flag159=="" & flag160=="" ///
+		 & flag161=="" & flag162=="" & flag163=="" & flag164=="" & flag165=="" & flag166=="" & flag167=="" & flag168=="" & flag169=="" & flag170=="" ///
+		 & flag171==. & flag172=="" & flag173=="" & flag174=="" & flag175=="" & flag176=="" & flag177=="" & flag178=="" & flag179=="" & flag180=="" ///
+		 & flag181=="" & flag182=="" & flag183=="" & flag184=="" & flag185=="" & flag186=="" & flag187=="" & flag188=="" & flag189==""
+// deleted
+
+gen str_no= _n
+label var str_no "No."
+
+** Create excel errors list before deleting incorrect records
+** Use below code to automate file names using current date
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+capture export_excel str_no pid flag1-flag94 if ///
+		flag1!="" | flag2!="" | flag3!="" | flag4!="" | flag5!="" | flag6!="" | flag7!="" | flag8!="" | flag9!="" | flag10!="" ///
+		|flag11!="" | flag12!="" | flag13!="" | flag14!="" | flag15!="" | flag16!="" | flag17!="" | flag18!="" | flag19!="" | flag20!="" ///
+		|flag21!="" | flag22!="" | flag23!="" | flag24!="" | flag25!="" | flag26!="" | flag27!="" | flag28!="" | flag29!="" | flag30!="" ///
+		|flag31!="" | flag32!=. | flag33!="" | flag34!="" | flag35!="" | flag36!="" | flag37!="" | flag38!="" | flag39!="" | flag40!="" ///
+		|flag41!="" | flag42!="" | flag43!="" | flag44!="" | flag45!="" | flag46!="" | flag47!="" | flag48!="" | flag49!="" | flag50!="" ///
+		|flag51!="" | flag52!=. | flag53!=. | flag54!="" | flag55!="" | flag56!="" | flag57!="" | flag58!="" | flag59!="" | flag60!="" ///
+		|flag61!="" | flag62!="" | flag63!="" | flag64!="" | flag65!="" | flag66!="" | flag67!="" | flag68!="" | flag69!="" | flag70!="" ///
+		|flag71!="" | flag72!="" | flag73!="" | flag74!="" | flag75!="" | flag76!=. | flag77!="" | flag78!="" | flag79!="" | flag80!="" ///
+		|flag81!="" | flag82!="" | flag83!="" | flag84!="" | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
+		|flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
+using "`datapath'\version04\3-output\CancerCleaningALL`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+capture export_excel str_no pid flag95-flag189 if ///
+		 flag95!="" | flag96!="" | flag97!="" | flag98!="" | flag99!="" | flag100!="" ///
+		 |flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!="" | flag108!="" | flag109!="" | flag110!="" ///
+		 |flag111!="" | flag112!="" | flag113!="" | flag114!="" | flag115!="" | flag116!="" | flag117!="" | flag118!="" | flag119!="" | flag120!="" ///
+		 |flag121!="" | flag122!="" | flag123!="" | flag124!="" | flag125!="" | flag126!="" | flag127!=. | flag128!="" | flag129!="" | flag130!="" ///
+		 |flag131!="" | flag132!="" | flag133!="" | flag134!="" | flag135!="" | flag136!="" | flag137!="" | flag138!="" | flag139!="" | flag140!="" ///
+		 |flag141!="" | flag142!="" | flag143!="" | flag144!="" | flag145!="" | flag146!="" | flag147!=. | flag148!=. | flag149!="" | flag150!="" ///
+		 |flag151!="" | flag152!="" | flag153!="" | flag154!="" | flag155!="" | flag156!="" | flag157!="" | flag158!="" | flag159!="" | flag160!="" ///
+		 |flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!="" | flag168!="" | flag169!="" | flag170!="" ///
+		 |flag171!=. | flag172!="" | flag173!="" | flag174!="" | flag175!="" | flag176!="" | flag177!="" | flag178!="" | flag179!="" | flag180!="" ///
+		 |flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
+using "`datapath'\version04\3-output\CancerCleaningALL`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+restore
+*/
+
+
 ** Identify duplicate pids to assist with death matching
 duplicates tag pid, gen(dup_pid)
 count if dup_pid>0 //1627
@@ -2444,6 +3002,672 @@ notes _dta :These data prepared from CanReg5 CLEAN (2015BNR-C) database
 save "`datapath'\version04\2-working\2015_cancer_dups_prematch" ,replace
 note: TS This dataset can be used for matching 2015-2018 deaths with incidence data
 note: TS This dataset can be used for assessing number of sources per record
+
+
+*****************************
+** Identifying & Labelling **
+** 		  Duplicate		   **
+**	 Tumours and Sources   **
+*****************************
+
+sort pid cr5id lname fname
+quietly by pid :  gen dupst = cond(_N==1,0,_n)
+sort pid cr5id
+count if dupst>0 //260
+sort pid cr5id lname fname
+//list pid cr5id dupst ,sepby(pid)
+//list pid cr5id dupst checkstatus recstatus top if dupst>0
+
+/* 
+Each multiple sources from CR5 dataset is imported into Stata as 
+a separate observation and some tumour records are multiple sources for the abstracted tumour
+so need to differentiate between 
+multiple (duplicate) sources (MSs) for same pt vs multiple (primary) tumours (MPs) for same pt:
+(1) The MSs will assessed for data quality index then dropped before death merge;
+(2) The MPs will be kept throughout datasets.
+*/
+sort pid cr5id
+gen dupsource=0 //
+label var dupsource "Multiple Sources"
+label define dupsource_lab  1 "MS-Conf Tumour Rec" 2 "MS-Conf Source Rec" ///
+							3 "MS-Dup Tumour Rec" 4 "MS-Dup Tumour & Source Rec" ///
+							5 "MS-Ineligible Tumour 1 Rec" 6 "MS-Ineligible Tumour 2~ & Source Rec" , modify
+label values dupsource dupsource_lab
+
+replace dupsource=1 if recstatus==1 & regexm(cr5id,"S1") //141 confirmed - this is the # eligible non-duplicate tumours
+replace dupsource=2 if recstatus==1 & !strmatch(strupper(cr5id), "*S1") //150 - confirmed
+replace dupsource=3 if recstatus==4 & regexm(cr5id,"S1") //0 - duplicate
+replace dupsource=4 if recstatus==4 & !strmatch(strupper(cr5id), "*S1") //0 - duplicate
+replace dupsource=5 if recstatus==3 & cr5id=="T1S1" //0 - ineligible
+replace dupsource=6 if recstatus==3 & cr5id!="T1S1" //0 - duplicate
+
+
+sort pid
+drop obsid
+gen obsid = _n
+by pid: generate pidobsid=_n //gives sequence id for each pid that appears in dataset
+by pid: generate pidobstot=_N //give total count for each pid that is duplicated in dataset
+
+sort pid obsid
+** Now check list of only eligible non-duplicate tumours for 'true' and 'false' MPs by first & last names
+count if dupsource==1 //141
+//list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 0, 700), sepby(pid)
+//list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 701, 1400), sepby(pid)
+//list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 1401, 2035), sepby(pid)
+
+
+** Assign person search variable
+tab persearch ,m
+replace persearch=1 if dupsource==1 & (persearch==0|persearch==.) //141
+replace persearch=3 if (dupsource>1 & dupsource<5) & (persearch==0|persearch==.) //150
+count if recstatus==4 & persearch!=3 //0
+count if recstatus==3 //0
+count if recstatus==3 & (persearch==0|persearch==.) //0
+replace persearch=0 if recstatus==3 //0 changes
+
+** Based on above list, create variable to identify MPs
+gen eidmp=1 if persearch==1
+replace eidmp=2 if persearch==2
+label var eidmp "CR5 tumour events"
+label define eidmp_lab 1 "single tumour" 2 "multiple tumour" ,modify
+label values eidmp eidmp_lab
+tab eidmp ,m
+tab eidmp dxyr
+** Check if eidmp below match with MPs identified on hardcopy list
+count if dupsource==1 //141
+sort pid lname fname
+//list pid eidmp dupsource duppid cr5id fname lname if dupsource==1 
+**no corrections needed
+
+*****************************
+**   Final Clean and Prep  **
+*****************************
+use "`datapath'\version04\2-working\2015_cancer_nodups_matched" ,clear
+
+
+** Create variable called "deceased" - same as AR's 2008 dofile called '3_merge_cancer_deaths.do'
+tab slc ,m
+count if slc!=2 & dod!=. //0
+gen deceased=1 if slc==2 //627 changes
+label var deceased "whether patient is deceased"
+label define deceased_lab 1 "dead" 2 "alive at last contact" , modify
+label values deceased deceased_lab
+replace deceased=2 if slc==1 //493 changes
+
+tab slc deceased ,m
+
+** Create the "patient" variable - same as AR's 2008 dofile called '3_merge_cancer_deaths.do'
+gen patient=.  
+label var patient "cancer patient"
+label define pt_lab 1 "patient" 2 "separate event",modify
+label values patient pt_lab
+replace patient=1 if eidmp==1 //1108 changes
+replace patient=2 if eidmp==2 //12 changes
+tab patient ,m
+
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //870 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+	  
+** Ensure death date is correct IF PATIENT IS DEAD
+count if dlc!=dod & slc==2 //48
+replace dlc=dod if dlc!=dod & slc==2 //48 changes
+format dod %dD_m_CY
+
+count if dodyear==. & dod!=. //70
+replace dodyear=year(dod) if dodyear==. & dod!=. //70 changes
+count if dod==. & slc==2 //0
+//list pid cr5id fname lname nftype dlc if dod==. & slc==2
+/*
+gen cr5dodyear = year(dod)
+label var cr5dodyear "Year of CR5 death"
+*/
+count if slc==2 & recstatus==3 //0
+
+** Check for cases where cancer=2-not cancer but it has been abstracted
+count if cancer==2 & pid!="" //32
+sort pid deathid
+//list pid deathid fname lname top cr5cod cod if cancer==2 & pid!="", nolabel string(90)
+//list cr5cod if cancer==2 & pid!=""
+//list cod1a if cancer==2 & pid!=""
+** Corrections from above list
+replace cod=1 if pid=="20150063"|pid=="20150351"|pid=="20151023"|pid=="20151039"|pid=="20151050"| ///
+				 pid=="20151095"|pid=="20151113"|pid=="20151278 "|pid=="20155201" //8 changes
+replace cancer=1 if pid=="20150063"|pid=="20150351"|pid=="20151039"|pid=="20151095"|pid=="20151113"|pid=="20151278"|pid=="20155201" //7 changes
+//replace dcostatus=1 if pid=="20140047" //1 change
+preserve
+drop if basis!=0
+keep pid fname lname natregno dod cr5cod doctor docaddr certifier
+capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier ///
+		using "`datapath'\version04\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
+//JC remember to change V01 to V02 when running list a 2nd time!
+restore
+
+/*
+IARC crg Tools - see SOP for steps on how to perform below checks:
+
+(1) Perform file transfer using '2015_nonsuvival_iarccrgtools.txt'
+(2) Perform check using '2015_iarccrgtools_to check.prn'
+(3) Perform multiple primary check using ''
+
+Results of IARC Check Program:
+(Titles for each data column: pid sex top morph beh grade basis dot dob age)
+    973 records processed
+	0 errors
+        
+	32 warnings
+        - 19 unlikely hx/site
+		- 2 unlikely grade/hx
+        - 10 unlikely basis/hx
+		- 1 unlikely age/site/hx
+*/
+/*	
+Results of IARC MP Program:
+	21 excluded (non-malignant)
+	24 MPs (multiple tumours)
+	 0 Duplicate registration
+*/
+/*
+Convert ICD-O-3 DCOs (153) to ICD10, ICCCcode:
+
+*/
+** Below updates from warnings/errors report
+replace grade=9 if pid=="20151100"
+replace grade=9 if pid=="20155222"
+
+** Only report non-duplicate MPs (see IARC MP rules on recording and reporting)
+display `"{browse "http://www.iacr.com.fr/images/doc/MPrules_july2004.pdf":IARC-MP}"'
+tab persearch ,m
+//list pid cr5id if persearch==3 //3
+
+** Updates from multiple primary report (define which is the MP so can remove in survival dataset):
+//no updates needed as none to exclude
+
+** Updates from MP exclusion report (excludes in-situ/unreportable cancers)
+label drop persearch_lab
+label define persearch_lab 0 "Not done" 1 "Done: OK" 2 "Done: MP" 3 "Done: Duplicate" 4 "Done: Non-IARC MP" 5 "Done: IARCcrgTools Excluded", modify
+label values persearch persearch_lab
+tab beh ,m
+replace persearch=5 if beh<3 //21 changes
+
+tab persearch ,m
+//list pid cr5id if persearch==2
+replace persearch=1 if pid=="20151369" //1 change
+
+** Check DCOs
+tab basis ,m
+** Re-assign dcostatus for cases with updated death trace-back: still pending as of 19feb2020 TBD by NS
+tab dcostatus ,m
+replace dcostatus=1 if pid=="20150468" & dcostatus==. //1 change; 0 changes
+count if dcostatus==2 & basis!=0
+//list pid basis if dcostatus==2 & basis!=0 - autopsy w/ hx
+/*
+replace basis=1 if pid=="20140672" & cr5id=="T2S1"
+replace dcostatus=1 if pid=="20140672" & cr5id=="T2S1"
+replace nsdate=d(24jul2018) if pid=="20140672" & cr5id=="T2S1"
+*/
+
+** Rename cod in prep for death data matching
+rename cod codcancer
+
+** Remove non-residents (see IARC validity presentation)
+tab resident ,m //45 missing
+label drop resident_lab
+label define resident_lab 1 "Yes" 2 "No" 99 "Unknown", modify
+label values resident resident_lab
+replace resident=99 if resident==9 //45 changes
+//list pid natregno nrn addr dd_address if resident==99
+replace resident=1 if resident==99 & addr!="99" & addr!="" //29 changes
+replace resident=1 if resident==99 & dd_address!="99" & dd_address!="" //0
+//replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
+replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //1 change
+** Check electoral list and CR5db for those resident=99
+//list pid fname lname nrn natregno dob if resident==99
+//list pid fname lname addr if resident==99
+tab resident ,m //15 unknown
+
+** Check parish
+count if parish!=. & parish!=99 & addr=="" //0
+count if parish==. & addr!="" & addr!="99" //0
+//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
+//bysort pid (cr5id) : replace addr = addr[_n-1] if missing(addr) //1 change - 20140566/
+
+** Check missing sex
+tab sex ,m //none missing
+
+** Check for missing age & 100+
+tab age ,m //2 missing - none are 100+: f/u was done but age not found
+//list pid natregno dd_natregno if age==999
+
+** Check for missing follow-up
+label drop slc_lab
+label define slc_lab 1 "Alive" 2 "Deceased" 3 "Emigrated" 99 "Unknown", modify
+label values slc slc_lab
+replace slc=99 if slc==9 //0 changes
+tab slc ,m 
+** Check missing in CR5db
+//list pid if slc==99
+count if dlc==. //0
+//tab dlc ,m
+
+** Check for non-malignant
+tab beh ,m //3 benign; 18 in-situ
+replace recstatus=3 if pid=="20151095" & cr5id=="T1S1" //1 change
+replace recstatus=3 if pid=="20151221" & cr5id=="T1S1" //1 change
+replace recstatus=3 if pid=="20151270" & cr5id=="T1S1" //1 change
+tab morph if beh!=3 //18 CIN III
+
+** Check for ineligibles
+tab recstatus ,m
+drop if recstatus==3 //3 deleted
+
+** Check for duplicate tumours
+tab persearch ,m //18 excluded
+
+** Check dob
+count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //0
+//list pid natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*-9999*"))
+
+** Check age
+gen age2 = (dot - dob)/365.25
+gen checkage2=int(age2)
+drop age2
+count if dob!=. & dot!=. & age!=checkage2 //3; 13
+//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2
+replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //13 changes
+
+** Check no missing dxyr so this can be used in analysis
+tab dxyr ,m //0 missing
+
+** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
+//replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+
+count //1117
+
+** Updates to non-2015 dx
+** First check in 2008_2013_2014_cancer_nonsurvival_bnr_reportable.dta if to keep/remove them
+count if dxyr!=2015 //43
+//list pid cr5id fname lname primarysite morph dxyr slc dlc dot if dxyr!=2015
+drop if pid=="20080292"|pid=="20080563"|pid=="20140817"|pid=="20141288" & cr5id=="T1S1" //4 deleted
+
+** Create new site variable with CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
+display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
+
+rename ICCCcode iccc
+rename ICD10 icd10
+
+gen siteiarc=.
+label define siteiarc_lab ///
+1 "Lip (C00)" 2 "Tongue (C01-02)" 3 "Mouth (C03-06)" ///
+4 "Salivary gland (C07-08)" 5 "Tonsil (C09)" 6 "Other oropharynx (C10)" ///
+7 "Nasopharynx (C11)" 8 "Hypopharynx (C12-13)" 9 "Pharynx unspecified (C14)" ///
+10 "Oesophagus (C15)" 11 "Stomach (C16)" 12 "Small intestine (C17)" ///
+13 "Colon (C18)" 14 "Rectum (C19-20)" 15 "Anus (C21)" ///
+16 "Liver (C22)" 17 "Gallbladder etc. (C23-24)" 18 "Pancreas (C25)" ///
+19 "Nose, sinuses etc. (C30-31)" 20 "Larynx (C32)" ///
+21 "Lung (incl. trachea and bronchus) (C33-34)" 22 "Other thoracic organs (C37-38)" ///
+23 "Bone (C40-41)" 24 "Melanoma of skin (C43)" 25 "Other skin (C44)" ///
+26 "Mesothelioma (C45)" 27 "Kaposi sarcoma (C46)" 28 "Connective and soft tissue (C47+C49)" ///
+29 "Breast (C50)" 30 "Vulva (C51)" 31 "Vagina (C52)" 32 "Cervix uteri (C53)" ///
+33 "Corpus uteri (C54)" 34 "Uterus unspecified (C55)" 35 "Ovary (C56)" ///
+36 "Other female genital organs (C57)" 37 "Placenta (C58)" ///
+38 "Penis (C60)" 39 "Prostate (C61)" 40 "Testis (C62)" 41 "Other male genital organs (C63)" ///
+42 "Kidney (C64)" 43 "Renal pelvis (C65)" 44 "Ureter (C66)" 45 "Bladder (C67)" ///
+46 "Other urinary organs (C68)" 47 "Eye (C69)" 48 "Brain, nervous system (C70-72)" ///
+49 "Thyroid (C73)" 50 "Adrenal gland (C74)" 51 "Other endocrine (C75)" ///
+52 "Hodgkin lymphoma (C81)" 53 "Non-Hodgkin lymphoma (C82-86,C96)" ///
+54 "Immunoproliferative diseases (C88)" 55 "Multiple myeloma (C90)" ///
+56 "Lymphoid leukaemia (C91)" 57 "Myeloid leukaemia (C92-94)" 58 "Leukaemia unspecified (C95)" ///
+59 "Myeloproliferative disorders (MPD)" 60 "Myelodysplastic syndromes (MDS)" ///
+61 "Other and unspecified (O&U)" ///
+62 "All sites(ALL)" 63 "All sites but skin (ALLbC44)" ///
+64 "D069: CIN 3"
+label var siteiarc "IARC CI5-XI sites"
+label values siteiarc siteiarc_lab
+
+replace siteiarc=1 if regexm(icd10,"C00") //0 changes
+replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //7 changes
+replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //4 changes
+replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //2 changes
+replace siteiarc=5 if regexm(icd10,"C09") //4 changes
+replace siteiarc=6 if regexm(icd10,"C10") //2 changes
+replace siteiarc=7 if regexm(icd10,"C11") //5 changes
+replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //0 changes
+replace siteiarc=9 if regexm(icd10,"C14") //1 change
+replace siteiarc=10 if regexm(icd10,"C15") //12 changes
+replace siteiarc=11 if regexm(icd10,"C16") //37 changes
+replace siteiarc=12 if regexm(icd10,"C17") //8 changes
+replace siteiarc=13 if regexm(icd10,"C18") //117 changes
+replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //49 changes
+replace siteiarc=15 if regexm(icd10,"C21") //6 changes
+replace siteiarc=16 if regexm(icd10,"C22") //7 changes
+replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //12 changes
+replace siteiarc=18 if regexm(icd10,"C25") //27 changes
+replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //2 changes
+replace siteiarc=20 if regexm(icd10,"C32") //7 changes
+replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //32 changes
+replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //1 change
+replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
+replace siteiarc=24 if regexm(icd10,"C43") //10 changes
+replace siteiarc=25 if regexm(icd10,"C44") //0 changes
+replace siteiarc=26 if regexm(icd10,"C45") //0 changes
+replace siteiarc=27 if regexm(icd10,"C46") //0 changes
+replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //5 changes
+replace siteiarc=29 if regexm(icd10,"C50") //209 changes
+replace siteiarc=30 if regexm(icd10,"C51") //2 changes
+replace siteiarc=31 if regexm(icd10,"C52") //4 changes
+replace siteiarc=32 if regexm(icd10,"C53") //19 changes
+replace siteiarc=33 if regexm(icd10,"C54") //46 changes
+replace siteiarc=34 if regexm(icd10,"C55") //7 changes
+replace siteiarc=35 if regexm(icd10,"C56") //19 changes
+replace siteiarc=36 if regexm(icd10,"C57") //2 changes
+replace siteiarc=37 if regexm(icd10,"C58") //0 changes
+replace siteiarc=38 if regexm(icd10,"C60") //1 change
+replace siteiarc=39 if regexm(icd10,"C61") //228 changes
+replace siteiarc=40 if regexm(icd10,"C62") //2 changes
+replace siteiarc=41 if regexm(icd10,"C63") //0 changes
+replace siteiarc=42 if regexm(icd10,"C64") //17 changes
+replace siteiarc=43 if regexm(icd10,"C65") //0 changes
+replace siteiarc=44 if regexm(icd10,"C66") //1 change
+replace siteiarc=45 if regexm(icd10,"C67") //17 changes
+replace siteiarc=46 if regexm(icd10,"C68") //1 change
+replace siteiarc=47 if regexm(icd10,"C69") //2 changes
+replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
+replace siteiarc=49 if regexm(icd10,"C73") //12 changes
+replace siteiarc=50 if regexm(icd10,"C74") //0 changes
+replace siteiarc=51 if regexm(icd10,"C75") //0 changes
+replace siteiarc=52 if regexm(icd10,"C81") //6 changes
+replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //30 changes
+replace siteiarc=54 if regexm(icd10,"C88") //0 changes
+replace siteiarc=55 if regexm(icd10,"C90") //32 changes
+replace siteiarc=56 if regexm(icd10,"C91") //5 changes
+replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //6 changes
+replace siteiarc=58 if regexm(icd10,"C95") //4 changes
+replace siteiarc=59 if morphcat==54|morphcat==55 //6 changes
+replace siteiarc=60 if morphcat==56 //6 changes
+replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //40 changes
+**replace siteiarc=62 if siteiarc<62
+**replace siteiarc=63 if siteiarc<62 & siteiarc!=25
+replace siteiarc=64 if morph==8077 //18 changes
+
+tab siteiarc ,m //1 missing
+//list pid cr5id primarysite top hx morph icd10 if siteiarc==.
+replace iccc="11f" if pid=="20150298" & cr5id=="T1S1" //1 change
+replace icd10="C059" if pid=="20150298" & cr5id=="T1S1" //1 change
+replace siteiarc=3 if pid=="20150298" & cr5id=="T1S1" //1 change
+
+gen allsites=1 if siteiarc<62 //951 changes - 18 missing values=CIN 3
+label var allsites "All sites (ALL)"
+
+gen allsitesbC44=1 if siteiarc<62 & siteiarc!=25
+//951 changes - 18 missing values=CIN 3
+label var allsitesbC44 "All sites but skin (ALLbC44)"
+
+** Create site variable for lymphoid and haematopoietic diseases for conversion of these from ICD-O-3 1st edition (M9590-M9992)
+** (see chapter 3 Table 3.2 of CI5-XI)
+gen siteiarchaem=.
+label define siteiarchaem_lab ///
+1 "Malignant lymphomas,NOS or diffuse" ///
+2 "Hodgkin lymphoma" ///
+3 "Mature B-cell lymphomas" ///
+4 "Mature T- and NK-cell lymphomas" ///
+5 "Precursor cell lymphoblastic lymphoma" ///
+6 "Plasma cell tumours" ///
+7 "Mast cell tumours" ///
+8 "Neoplasms of histiocytes and accessory lymphoid cells" ///
+9 "Immunoproliferative diseases" ///
+10 "Leukemias, NOS" ///
+11 "Lymphoid leukemias" ///
+12 "Myeloid leukemias" ///
+13 "Other leukemias" ///
+14 "Chronic myeloproliferative disorders" ///
+15 "Other hematologic disorders" ///
+16 "Myelodysplastic syndromes"
+label var siteiarchaem "IARC CI5-XI lymphoid & haem diseases"
+label values siteiarchaem siteiarchaem_lab
+
+** Note that morphcat is based on ICD-O-3 edition 3.1. so e.g. morphcat54
+replace siteiarchaem=1 if morphcat==41 //7 changes
+replace siteiarchaem=2 if morphcat==42 //6 changes
+replace siteiarchaem=3 if morphcat==43 //16 changes
+replace siteiarchaem=4 if morphcat==44 //5 changes
+replace siteiarchaem=5 if morphcat==45 //1 change
+replace siteiarchaem=6 if morphcat==46 //32 changes
+replace siteiarchaem=7 if morphcat==47 //0 changes
+replace siteiarchaem=8 if morphcat==48 //0 changes
+replace siteiarchaem=9 if morphcat==49 //0 changes
+replace siteiarchaem=10 if morphcat==50 //4 changes
+replace siteiarchaem=11 if morphcat==51 //5 changes
+replace siteiarchaem=12 if morphcat==52 //6 changes
+replace siteiarchaem=13 if morphcat==53 //0 changes
+replace siteiarchaem=14 if morphcat==54 //5 changes
+replace siteiarchaem=15 if morphcat==55 //1 change
+replace siteiarchaem=16 if morphcat==56 //6 changes
+
+tab siteiarchaem ,m //882 missing - correct!
+count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //1
+//list pid cr5id primarysite top hx morph morphcat iccc icd10 if (siteiarc>51 & siteiarc<59) & siteiarchaem==.
+replace iccc="12b" if pid=="20159040" & cr5id=="T1S1" //0 changes
+replace icd10="C80" if pid=="20159040" & cr5id=="T1S1" //1 change
+replace siteiarchaem=15 if pid=="20159040" & cr5id=="T1S1" //1 change
+
+
+** Create ICD-10 groups according to analysis tables in CR5 db (added after analysis dofiles 4,6)
+gen sitecr5db=.
+label define sitecr5db_lab ///
+1 "Mouth & pharynx (C00-14)" ///
+2 "Oesophagus (C15)" ///
+3 "Stomach (C16)" ///
+4 "Colon, rectum, anus (C18-21)" ///
+5 "Liver (C22)" ///
+6 "Pancreas (C25)" ///
+7 "Larynx (C32)" ///
+8 "Lung, trachea, bronchus (C33-34)" ///
+9 "Melanoma of skin (C43)" ///
+10 "Breast (C50)" ///
+11 "Cervix (C53)" ///
+12 "Corpus & Uterus NOS (C54-55)" ///
+13 "Ovary & adnexa (C56)" ///
+14 "Prostate (C61)" ///
+15 "Testis (C62)" ///
+16 "Kidney & urinary NOS (C64-66,68)" ///
+17 "Bladder (C67)" ///
+18 "Brain, nervous system (C70-72)" ///
+19 "Thyroid (C73)" ///
+20 "O&U (C26,39,48,76,80)" ///
+21 "Lymphoma (C81-85,88,90,96)" ///
+22 "Leukaemia (C91-95)" ///
+23 "Other digestive (C17,23-24)" ///
+24 "Nose, sinuses (C30-31)" ///
+25 "Bone, cartilage, etc (C40-41,45,47,49)" ///
+26 "Other skin (C44)" ///
+27 "Other female organs (C51-52,57-58)" ///
+28 "Other male organs (C60,63)" ///
+29 "Other endocrine (C74-75)" ///
+30 "Myeloproliferative disorders (MPD)" ///
+31 "Myelodysplastic syndromes (MDS)" ///
+32 "D069: CIN 3" ///
+33 "Eye,Heart,etc (C69,C38)" ///
+34 "All sites but C44"
+label var sitecr5db "CR5db sites"
+label values sitecr5db sitecr5db_lab
+
+replace sitecr5db=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
+					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
+					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
+					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //26 changes
+replace sitecr5db=2 if regexm(icd10,"C15") //12 changes
+replace sitecr5db=3 if regexm(icd10,"C16") //37 changes
+replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //172 changes
+replace sitecr5db=5 if regexm(icd10,"C22") //7 changes
+replace sitecr5db=6 if regexm(icd10,"C25") //27 changes
+replace sitecr5db=7 if regexm(icd10,"C32") //7 changes
+replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //32 changes
+replace sitecr5db=9 if regexm(icd10,"C43") //10 changes
+replace sitecr5db=10 if regexm(icd10,"C50") //209 changes
+replace sitecr5db=11 if regexm(icd10,"C53") //19 changes
+replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //53 changes
+replace sitecr5db=13 if regexm(icd10,"C56") //19 changes
+replace sitecr5db=14 if regexm(icd10,"C61") //228 changes
+replace sitecr5db=15 if regexm(icd10,"C62") //2 changes
+replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //19 changes
+replace sitecr5db=17 if regexm(icd10,"C67") //17 changes
+replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
+replace sitecr5db=19 if regexm(icd10,"C73") //12 changes
+replace sitecr5db=20 if siteiarc==61 //40 changes
+replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //67 changes
+replace sitecr5db=22 if (regexm(icd10,"C91")|regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")) //15 changes
+replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //20 changes
+replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //2 changes
+replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //7 changes
+replace sitecr5db=26 if siteiarc==25 //0 changes
+replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //8 changes
+replace sitecr5db=28 if (regexm(icd10,"C60")|regexm(icd10,"C63")) //1 change
+replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //0 changes
+replace sitecr5db=30 if siteiarc==59 //6 changes
+replace sitecr5db=31 if siteiarc==60 //6 changes
+replace sitecr5db=32 if siteiarc==64 //18 changes
+replace sitecr5db=33 if (regexm(icd10,"C38")|regexm(icd10,"C69")) //3 changes
+
+tab sitecr5db ,m
+//list pid cr5id top morph icd10 if sitecr5db==.
+replace sitecr5db=21 if pid=="20159040" & cr5id=="T1S1" //1 change
+
+
+***********************
+** Create ICD10 site **
+***********************
+** Create variable based on ICD-10 2010 version to use in graphs (dofile 12) - may not use
+gen siteicd10=.
+label define siteicd10_lab ///
+1 "C00-C14: lip,oral cavity & pharynx" ///
+2 "C15-C26: digestive organs" ///
+3 "C30-C39: respiratory & intrathoracic organs" ///
+4 "C40-C41: bone & articular cartilage" ///
+5 "C43: melanoma" ///
+6 "C44: other skin" ///
+7 "C45-C49: mesothelial & soft tissue" ///
+8 "C50: breast" ///
+9 "C51-C58: female genital organs" ///
+10 "C61: prostate" ///
+11 "C60-C62,C63: male genital organs" ///
+12 "C64-C68: urinary tract" ///
+13 "C69-C72: eye,brain,other CNS" ///
+14 "C73-C75: thyroid & other endocrine glands" ///
+15 "C76-C79: ill-defined sites" ///
+16 "C80: primary site unknown" ///
+17 "C81-C96: lymphoid & haem"
+label var siteicd10 "ICD-10 site of tumour"
+label values siteicd10 siteicd10_lab
+
+
+replace siteicd10=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C02") ///
+					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
+					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
+					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //26 changes
+replace siteicd10=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
+					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
+					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
+					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) //280 changes
+replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //42 changes
+replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //2 changes
+replace siteicd10=5 if siteiarc==24 //10 changes
+replace siteicd10=6 if siteiarc==25 //0 changes
+replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //6 changes
+replace siteicd10=8 if regexm(icd10,"C50") //209 changes
+replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //99 changes
+replace siteicd10=10 if regexm(icd10,"C61") //228 changes
+replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //3 changes
+replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //36 changes
+replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //13 changes
+replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //12 changes
+replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //0 changess
+replace siteicd10=16 if regexm(icd10,"C80") //35 changes
+replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
+					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
+					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
+					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
+					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")|regexm(icd10,"C96")) //82 changes
+
+
+tab siteicd10 ,m // missing - CIN3, beh /0,/1,/2 and MPDs
+//list pid cr5id top morph icd10 if siteicd10==.
+
+** Check non-2015 dxyrs are reportable
+count if resident==2 & dxyr!=2015 //0
+count if resident==99 & dxyr!=2015 //0
+count if recstatus==3 & dxyr!=2015 //0
+count if sex==9 & dxyr!=2015 //0
+count if beh!=3 & dxyr!=2015 //0
+count if persearch>2 & dxyr!=2015 //0
+count if siteiarc==25 & dxyr!=2015 //0
+** Remove non-reportable-non-2015 dx
+//none to be removed
+
+tab dxyr ,m
+
+** Remove reportable-non-2015 dx
+drop if dxyr!=2015 //28; 39 deleted
+
+count //1074
+
+** Removing cases not included for international reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
+duplicates tag pid, gen(dup_id)
+//list pid cr5id if persearch==1 & (resident==2|resident==99|recstatus==3|sex==9|beh!=3|siteiarc==25), nolabel sepby(pid)
+** Remove further down in this dofile as NS checked MEDDATA for unk residents and data is updated further down (in final clean of 2013-2015 ds)
+/*
+drop if resident==2 //0 deleted - nonresident
+drop if resident==99 //15 deleted - resident unknown
+drop if recstatus==3 //0 deleted - ineligible case definition
+drop if sex==9 //0 deleted - sex unknown
+drop if beh!=3 //18 deleted - nonmalignant
+drop if persearch>2 //0 to be deleted; already deleted from above line
+drop if siteiarc==25 //0 deleted - nonreportable skin cancers
+*/
+
+** Remove cases before 2014 from 2014 dataset
+tab dxyr ,m //0 missing
+//list pid dot if dxyr==.
+//replace dxyr=2015 if dxyr==. //3 changes
+//drop if dxyr!=2015 //43 deleted
+
+tab eidmp ,m
+/*
+     CR5 tumour |
+         events |      Freq.     Percent        Cum.
+----------------+-----------------------------------
+  single tumour |      1,029       98.85       98.85
+multiple tumour |         12        1.15      100.00
+----------------+-----------------------------------
+          Total |      1,041      100.00
+*/
+tab persearch ,m
+/*
+              Person Search |      Freq.     Percent        Cum.
+----------------------------+-----------------------------------
+                   Done: OK |      1,029       98.85       98.85
+                   Done: MP |         12        1.15      100.00
+----------------------------+-----------------------------------
+                      Total |      1,041      100.00
+*/
+
+count //1041
+
+** For 2015 using internationally reportable standards, as decided by NS on 06-Oct-2020, email subject: BNR-C: 2015 cancer stats tables completed
+** Save this corrected dataset with reportable cases
+save "`datapath'\version04\2-working\2015_cancer_nonsurvival", replace
+label data "2015 BNR-Cancer analysed data - Non-survival Dataset"
+note: TS This dataset was NOT used for 2015 annual report
+note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
+
+remove ineligibles, non-reportables, etc.
+create anonymized ds for PAB 2018 ASIRs
 
 ********************
 ** Death Matching **
@@ -9922,6 +11146,8 @@ replace dd_dod=dod if dd_dodyear==. & slc==2 //6 changes
 
 ** Create dataset to use for 2015-2020 death matching (see dofile 50)
 save "`datapath'\version04\2-working\2008_2013_2014_2015_cancer ds_2015-2020 death matching", replace
+	• Fig 1.3a + 1.3b: age distribution for cases for 2018 (not for PAB) from IARC-Hub DQ assessment rpt
+	• Create anonymized dataset for analysis dofiles in cancer.
 
 /* 
 	STOP and perform death matching using dofile 50 before moving onto dofile 16 for final checks 
