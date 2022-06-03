@@ -219,7 +219,7 @@ label var flag95 "Correction: STDataAbstractor"
 label var flag96 "Correction: STSourceDate"
 label var flag97 "Correction: NFType"
 label var flag98 "Correction: SourceName"
-//label var flag99 "Correction: Doctor"
+label var flag99 "Correction: Doctor" //repeated below in error
 label var flag100 "Correction: Doctor"
 label var flag101 "Correction: DoctorAddress"
 label var flag102 "Correction: RecordNumber"
