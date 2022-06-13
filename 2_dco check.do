@@ -11,7 +11,7 @@
     //  methods                 Merging CR5 2018 dataset with the prepared 2018 death dataset from 10_prep mort.do
 
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off

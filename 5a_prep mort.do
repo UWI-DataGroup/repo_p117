@@ -12,7 +12,7 @@
 	//							(2) analysis/reporting mortality rates.
     
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off
