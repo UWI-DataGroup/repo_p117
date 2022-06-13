@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-MAY-2022
-    // 	date last modified      18-MAY-2022
+    // 	date last modified      13-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -1486,27 +1486,54 @@ drop dupobs* dup_id
 	 
 order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear cancer siteiarc siteiarchaem pod coddeath
 
-label data "BNR MORTALITY data 2016 + 2017"
+label data "BNR MORTALITY data 2016 + 2017: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2016+2017_prep mort" ,replace
+save "`datapath'\version04\3-output\2016+2017_prep mort_identifiable" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
+
+preserve
+** Create corrected dataset with reportable cases but de-identified data
+drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
+** Save this death dataset with de-identified data
+label data "BNR MORTALITY data 2016 + 2017: De-identified Dataset"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version04\3-output\2016+2017_prep mort_deidentified" ,replace
+note: TS This dataset is used for analysis of age-standardized mortality rates
+note: TS This dataset includes patients with multiple eligible cancer causes of death
+restore
 
 ** Save separate datasets for 2016 and 2017
 preserve
 drop if dodyear!=2016
-label data "BNR MORTALITY data 2016"
+label data "BNR MORTALITY data 2016: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2016_prep mort" ,replace
+save "`datapath'\version04\3-output\2016_prep mort_identifiable" ,replace
+note: TS This dataset is used for analysis of age-standardized mortality rates
+note: TS This dataset includes patients with multiple eligible cancer causes of death
+** Create corrected dataset with reportable cases but de-identified data
+drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
+** Save this death dataset with de-identified data
+label data "BNR MORTALITY data 2016: De-identified Dataset"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version04\3-output\2016_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 restore
 
 preserve
 drop if dodyear!=2017
-label data "BNR MORTALITY data 2017"
+label data "BNR MORTALITY data 2017: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2017_prep mort" ,replace
+save "`datapath'\version04\3-output\2017_prep mort_identifiable" ,replace
+note: TS This dataset is used for analysis of age-standardized mortality rates
+note: TS This dataset includes patients with multiple eligible cancer causes of death
+** Create corrected dataset with reportable cases but de-identified data
+drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
+** Save this death dataset with de-identified data
+label data "BNR MORTALITY data 2017: De-identified Dataset"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version04\3-output\2017_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 restore

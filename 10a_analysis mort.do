@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      10-MAY-2022
-    // 	date last modified      19-MAY-2022
+    // 	date last modified      13-JUN-2022
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASMRs
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2018 death data for inclusion in 2018 cancer report.
@@ -30,14 +30,15 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\10_analysis_mort.smcl", replace
+    log using "`logpath'\10a_analysis_mort.smcl", replace
 ** HEADER -----------------------------------------------------
 
 ** Load the dataset
-use "`datapath'\version04\3-output\2018_prep mort", replace
+use "`datapath'\version04\3-output\2018_prep mort_deidentified", replace
 
+** JC 13jun2022: SF emailed on 02jun2022 with correction to dod year from 2018 to 2019 so re-ran the prep and analysis dofiles for 2018 ASMRs
 
-count // 659 cancer deaths in 2018
+count // 659; 658 cancer deaths in 2018
 tab age_10 sex ,m
 //tab siteiarc ,m
 //labelbook siteiarc_lab
@@ -47,7 +48,6 @@ tab age_10 sex ,m
 //tab siteiarc , m
 //tab siteiarc if sex==2 ,m // female
 //tab siteiarc if sex==1 ,m // male
-
 
 ** For annual report - Section 4: Mortality - Table 7a
 ** Below top 10 code added by JC for 2014
@@ -77,8 +77,20 @@ Rectum (C19-20)								26		5.50
 Corpus uteri (C54)							22		4.65
 Multiple myeloma (C90)						20		4.23
 Ovary (C56)									15		3.17
+
+siteiarc									count	percentage
+Prostate (C61)								134		28.39
+Breast (C50)								102		21.61
+Colon (C18)									 61		12.92
+Lung (incl. trachea and bronchus) (C33-34)	 33		 6.99
+Pancreas (C25)								 32		 6.78
+Stomach (C16)								 27		 5.72
+Rectum (C19-20)								 26		 5.51
+Corpus uteri (C54)							 22		 4.66
+Multiple myeloma (C90)						 20		 4.24
+Ovary (C56)									 15		 3.18
 */
-total count //473
+total count //473; 472
 
 ** JC update: Save these results as a dataset for reporting
 replace siteiarc=2 if siteiarc==39
@@ -99,8 +111,9 @@ rename count number
 	replace number=659 in 11
 	replace percentage=100 in 11
 
-STOP //JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
-label define cancer_site_lab 1 "all" 2 "prostate" 3 "breast" 4 "colon" 5 "lung" 6 "pancreas" 7 "stomach" 8 "rectum" 9 "corpus uteri" 10 "multiple myeloma" 11 "ovary" ,modify
+//JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
+//JC 13jun2022: performed above correction
+label define cancer_site_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "lung" 6 "pancreas" 7 "stomach" 8 "rectum" 9 "corpus uteri" 10 "multiple myeloma" 11 "ovary" ,modify
 label values cancer_site cancer_site_lab
 label define year_lab 1 "2018" 2 "2015" 3 "2014" 4 "2013" 5 "2008",modify
 label values year year_lab
@@ -130,7 +143,8 @@ restore
 ********************************************************************
 ** Using WHO World Standard pop_wppulation
 //tab siteiarc ,m
-STOP //JC 19may2022: use age5 population and groupings for distrate per IH's + NS' recommendation
+//JC 19may2022: use age5 population and groupings for distrate per IH's + NS' recommendation
+//JC 13jun2022: Above correction not performed - will perform in a separate dofile when using IH's rate calculation method
 merge m:m sex age_10 using "`datapath'\version04\2-working\pop_wpp_2018-10"
 /*
     Result                           # of obs.
@@ -141,6 +155,15 @@ merge m:m sex age_10 using "`datapath'\version04\2-working\pop_wpp_2018-10"
         from using                          1  (_merge==2)
 
     Matched                               659  (_merge==3)
+    -----------------------------------------
+	
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             1
+        from master                         0  (_merge==1)
+        from using                          1  (_merge==2)
+
+    Matched                               658  (_merge==3)
     -----------------------------------------
 */
 **drop if _merge==2 //do not drop these age groups as it skews pop_wppulation 
@@ -237,6 +260,12 @@ distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///
   |-------------------------------------------------------------|
   |  659   286640   229.91    129.84   119.59   140.83     5.35 |
   +-------------------------------------------------------------+
+  
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  658   286640   229.56    129.64   119.39   140.62     5.34 |
+  +-------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
 matrix list r(NDeath)
@@ -258,7 +287,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -328,6 +357,12 @@ distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///
   |------------------------------------------------------------|
   |  135   138525   97.46     51.93    43.33    62.03     4.64 |
   +------------------------------------------------------------+
+  
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  134   138525   96.73     51.48    42.92    61.53     4.61 |
+  +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
 matrix list r(NDeath)
@@ -348,7 +383,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -369,7 +404,8 @@ tab pop_wpp age_10 if siteiarc==29 & sex==1 //female
 tab pop_wpp age_10 if siteiarc==29 & sex==2 //male
 
 preserve
-STOP //JC 19may2022: remove male breast cancers so rate calculated only based on female pop
+//JC 19may2022: remove male breast cancers so rate calculated only based on female pop
+//JC 13jun2022: above correction performed
 	drop if sex==2
 	drop if age_10==.
 	keep if siteiarc==29 // breast only
@@ -382,19 +418,19 @@ STOP //JC 19may2022: remove male breast cancers so rate calculated only based on
 	** M 0-14,15-24,25-34,35-44,55-64,65-74,85+
 	
 	expand 2 in 1
-	replace sex=1 in 10
-	replace age_10=1 in 10
-	replace case=0 in 10
-	replace pop_wpp=(24395) in 10
+	replace sex=1 in 8
+	replace age_10=1 in 8
+	replace case=0 in 8
+	replace pop_wpp=(24395) in 8
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=1 in 11
-	replace age_10=2 in 11
-	replace case=0 in 11
-	replace pop_wpp=(18623) in 11
+	replace sex=1 in 9
+	replace age_10=2 in 9
+	replace case=0 in 9
+	replace pop_wpp=(18623) in 9
 	sort age_10
-	
+/*
 	expand 2 in 1
 	replace sex=2 in 12
 	replace age_10=1 in 12
@@ -450,7 +486,7 @@ STOP //JC 19may2022: remove male breast cancers so rate calculated only based on
 	replace case=0 in 19
 	replace pop_wpp=(2624) in 19
 	sort age_10
-
+*/
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
@@ -459,13 +495,19 @@ total pop_wpp
 
 distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
-** THIS IS FOR BC (M&F) - STD TO WHO WORLD pop_wppN 
+** THIS IS FOR BC (F) - STD TO WHO WORLD pop_wppN 
 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
   |  102   292464   34.88     21.83    17.59    26.87     2.31 |
+  +------------------------------------------------------------+
+  
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  100   148115   67.52     41.12    33.06    50.73     4.39 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -487,13 +529,13 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
 replace cancer_site=3 if cancer_site==.
 replace year=1 if year==.
-gen asmr_id="breast" if rpt_id==.
+gen asmr_id="fem.breast" if rpt_id==.
 replace rpt_id=3 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
@@ -603,7 +645,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -718,7 +760,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -847,7 +889,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -963,7 +1005,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -1093,7 +1135,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -1192,7 +1234,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -1329,7 +1371,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"
@@ -1422,7 +1464,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/659*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'\version04\2-working\ASMRs_wpp"

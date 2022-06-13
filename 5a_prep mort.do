@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-MAY-2022
-    // 	date last modified      10-MAY-2022
+    // 	date last modified      13-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -312,6 +312,10 @@ replace dd_mname = lower(rtrim(ltrim(itrim(dd_mname)))) if fixpname==1 //34 chan
 replace dd_lname = lower(rtrim(ltrim(itrim(dd_lname)))) if fixpname==1 //137 changes
 drop ptname fixpname name1 name2 name3 name4 name5
 
+** JC 13jun2022: SF emailed on 02jun2022 with correction to dod year for below record
+replace dd_dod=d(04jan2019) if record_id==26742 //dod changed from 2018 to 2019
+replace dd_dodyear=2019 if record_id==26742
+
 ** Remove redcap variables
 drop rc_pname rc_nrnnd rc_nrn rc_dod rc_dodyear rc_natregno _merge
 erase "`datapath'\version04\2-working\2015-2020_deaths_redcap.dta"
@@ -320,7 +324,6 @@ label data "BNR MORTALITY data 2015-2020"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
 save "`datapath'\version04\3-output\2015-2020_deaths_for_matching" ,replace
 note: TS This dataset can be used for matching 2015-2020 deaths with incidence data
-
 
 *********************
 **     Preparing   **
@@ -357,16 +360,28 @@ tab dodyear ,m
        2020 |      2,603       16.89      100.00
 ------------+-----------------------------------
       Total |     15,416      100.00
+
+    dodyear |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2015 |      2,482       16.10       16.10
+       2016 |      2,488       16.14       32.24
+       2017 |      2,530       16.41       48.65
+       2018 |      2,527       16.39       65.04
+       2019 |      2,786       18.07       83.11
+       2020 |      2,603       16.89      100.00
+------------+-----------------------------------
+      Total |     15,416      100.00
+
 */
 gen dodyr=year(dod)
 count if dodyear!=dodyr //0
 drop dodyr
 
-drop if dodyear!=2018 //12,888 deleted
+drop if dodyear!=2018 //12,888; 12,889 deleted
 ** Remove Tracking Form info (already previously removed)
 //drop if event==2 //0 deleted
 
-count //2528
+count //2528; 2527
 
 ** NOTE: For accuracy, the above count of 2018 deaths was cross-checked against the current multi-year REDCapdb using the report called '2018 deaths' which has the below filters:
 //JC 09may2022
@@ -1590,9 +1605,19 @@ drop dupobs* dup_id
 	 
 order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear cancer siteiarc siteiarchaem pod coddeath
 
-
-label data "BNR MORTALITY data 2018"
+** Save this death dataset with identifiable data
+label data "BNR MORTALITY data 2018: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2018_prep mort" ,replace
+save "`datapath'\version04\3-output\2018_prep mort_identifiable" ,replace
+note: TS This dataset is used for analysis of age-standardized mortality rates
+note: TS This dataset includes patients with multiple eligible cancer causes of death
+
+** Create corrected dataset with reportable cases but de-identified data
+drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
+
+** Save this death dataset with de-identified data
+label data "BNR MORTALITY data 2018: De-identified Dataset"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version04\3-output\2018_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death

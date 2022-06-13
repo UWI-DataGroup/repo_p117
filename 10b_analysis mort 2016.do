@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-MAY-2022
-    // 	date last modified      19-MAY-2022
+    // 	date last modified      13-JUN-2022
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASMRs
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016 death data for inclusion in 2016-2018 cancer report.
@@ -34,7 +34,7 @@
 ** HEADER -----------------------------------------------------
 
 ** Load the dataset
-use "`datapath'\version04\3-output\2016_prep mort", replace
+use "`datapath'\version04\3-output\2016_prep mort_deidentified", replace
 
 count // 658 cancer deaths in 2016
 tab age_10 sex ,m
@@ -98,8 +98,9 @@ rename count number
 	replace number=658 in 11
 	replace percentage=100 in 11
 
-STOP //JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
-label define cancer_site_lab 1 "all" 2 "prostate" 3 "colon" 4 "breast" 5 "lung" 6 "stomach" 7 "multiple myeloma" 8 "pancreas" 9 "rectum" 10 "corpus uteri" 11 "liver" ,modify
+//JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
+//JC 13jun2022: performed above correction
+label define cancer_site_lab 1 "all" 2 "prostate" 3 "colon" 4 "female breast" 5 "lung" 6 "stomach" 7 "multiple myeloma" 8 "pancreas" 9 "rectum" 10 "corpus uteri" 11 "liver" ,modify
 label values cancer_site cancer_site_lab
 label define year_lab 1 "2016" 2 "2015" 3 "2014" 4 "2013" 5 "2008",modify
 label values year year_lab
@@ -129,7 +130,8 @@ restore
 ********************************************************************
 ** Using WHO World Standard pop_wppulation
 //tab siteiarc ,m
-STOP //JC 19may2022: use age5 population and groupings for distrate per IH's + NS' recommendation
+//JC 19may2022: use age5 population and groupings for distrate per IH's + NS' recommendation
+//JC 13jun2022: Above correction not performed - will perform in a separate dofile when using IH's rate calculation method
 merge m:m sex age_10 using "`datapath'\version04\2-working\pop_wpp_2016-10"
 /*
     Result                      Number of obs
@@ -489,7 +491,8 @@ tab pop_wpp age_10 if siteiarc==29 & sex==1 //female
 tab pop_wpp age_10 if siteiarc==29 & sex==2 //male
 
 preserve
-STOP //JC 19may2022: remove male breast cancers so rate calculated only based on female pop
+//JC 19may2022: remove male breast cancers so rate calculated only based on female pop
+//JC 13jun2022: above correction performed
 	drop if sex==2
 	drop if age_10==.
 	keep if siteiarc==29 // breast only
@@ -514,7 +517,7 @@ STOP //JC 19may2022: remove male breast cancers so rate calculated only based on
 	replace case=0 in 9
 	replace pop_wpp=(18745) in 9
 	sort age_10
-	
+/*	
 	expand 2 in 1
 	replace sex=2 in 10
 	replace age_10=1 in 10
@@ -577,7 +580,7 @@ STOP //JC 19may2022: remove male breast cancers so rate calculated only based on
 	replace case=0 in 18
 	replace pop_wpp=(2553) in 18
 	sort age_10
-
+*/
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
@@ -593,6 +596,12 @@ distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
   |   73   285798   25.54     16.67    12.87    21.31     2.09 |
+  +------------------------------------------------------------+
+  
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |   73   147896   49.36     31.04    23.87    39.84     3.96 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -620,7 +629,7 @@ replace percent=round(percent,0.01)
 append using "`datapath'\version04\2-working\ASMRs_wpp_2016"
 replace cancer_site=4 if cancer_site==.
 replace year=1 if year==.
-gen asmr_id="breast" if rpt_id==.
+gen asmr_id="fem.breast" if rpt_id==.
 replace rpt_id=4 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
