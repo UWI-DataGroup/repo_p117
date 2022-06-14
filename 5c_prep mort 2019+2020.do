@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      13-JUN-2022
-    // 	date last modified      13-JUN-2022
+    // 	date last modified      14-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -633,6 +633,7 @@ drop nrn2
 count if natregno=="" //231
 count if natregno=="" & age!=0 //231
 count if natregno=="" & age!=0 & !(strmatch(strupper(address), "*BRIDGETOWN PORT*")) & !(strmatch(strupper(pname), "*BABY*")) //204 - checked against 2021 electoral list + updated NRN in REDCapdb
+replace pod=11 if record_id==29351|record_id==28202
 STOP
 count if age==. //0
 
