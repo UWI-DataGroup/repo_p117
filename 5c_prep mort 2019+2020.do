@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      13-JUN-2022
-    // 	date last modified      14-JUN-2022
+    // 	date last modified      15-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -633,14 +633,14 @@ drop nrn2
 count if natregno=="" //231
 count if natregno=="" & age!=0 //231
 count if natregno=="" & age!=0 & !(strmatch(strupper(address), "*BRIDGETOWN PORT*")) & !(strmatch(strupper(pname), "*BABY*")) //204 - checked against 2021 electoral list + updated NRN in REDCapdb
-replace pod=11 if record_id==29351|record_id==28202
-STOP
+replace pod=11 if record_id==29351|record_id==28202|record_id==27410
+drop if record_id==29548 //duplicate of record_id 27369
 count if age==. //0
 
 ** Add missing NRNs flagged above with list of NRNs manually created using electoral list (this ensures dofile remains de-identified)
 preserve
 clear
-import excel using "`datapath'\version04\2-working\MissingNRNs_mort_20220512.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version04\2-working\MissingNRNs_mort_20220614.xlsx" , firstrow case(lower)
 format elec_nrn %15.0g
 replace elec_natregno=subinstr(elec_natregno,"-","",.)
 save "`datapath'\version04\2-working\electoral_missingnrn" ,replace
@@ -649,11 +649,11 @@ merge 1:1 record_id using "`datapath'\version04\2-working\electoral_missingnrn" 
 /*
     Result                      Number of obs
     -----------------------------------------
-    Not matched                         5,004
-        from master                     5,004  (_merge==1)
+    Not matched                         5,337
+        from master                     5,337  (_merge==1)
         from using                          0  (_merge==2)
 
-    Matched                                13  (_merge==3)
+    Matched                                50  (_merge==3)
     -----------------------------------------
 */
 replace nrn=elec_nrn if _merge==3 //3 changes
@@ -675,8 +675,7 @@ order record_id natregno nrn age yr yr1
 ** Check age and yr1 in Stata browse
 //list record_id natregno nrn age yr1 if yr1==20
 ** Initially need to run this code separately from entire dofile to determine which nrnyears should be '19' instead of '20' depending on age, e.g. for age 107 nrnyear=19
-replace yr1 = 19 if record_id==20866
-replace yr1 = 19 if record_id==21017
+replace yr1 = 19 if record_id==29610|record_id==30063
 
 gen nrndob = substr(natregno,1,6) 
 destring nrndob, replace
@@ -693,20 +692,22 @@ format nrn1 %dD_m_CY
 rename nrn1 dobcheck
 gen age2 = (dod - dobcheck)/365.25
 gen ageyrs=int(age2)
-count if tempvarn!=6 & age!=ageyrs //6
+count if tempvarn!=6 & age!=ageyrs //27
 sort record_id
 list record_id fname lname address age ageyrs nrn natregno dob dobcheck dod yr1 if tempvarn!=6 & age!=ageyrs, string(20) //check against electoral list
-count if dobcheck!=. & dob==. //4,791
-replace dob=dobcheck if dobcheck!=. & dob==. //4,791 changes
-replace age=ageyrs if tempvarn!=6 & age!=ageyrs & record_id!=24637 & record_id!=24537 //4 changes
+count if dobcheck!=. & dob==. //5,206
+replace dob=dobcheck if dobcheck!=. & dob==. //5,206 changes
+replace nrn=. if record_id==34112
+replace natregno="" if record_id==34112
+replace age=ageyrs if tempvarn!=6 & age!=ageyrs & ageyrs<100 //11 changes
 drop day month dyear nrnyr yr yr1 year2 nrndob age2 ageyrs tempvarn dobcheck
 
 ** Check age
 gen age2 = (dod - dob)/365.25
 gen checkage2=int(age2)
 drop age2
-count if dob!=. & dod!=. & age!=checkage2 //3
-list record_id fname lname dod dob age checkage2 if dob!=. & dod!=. & age!=checkage2 //2 correct
+count if dob!=. & dod!=. & age!=checkage2 //15
+list record_id fname lname dod dob age checkage2 if dob!=. & dod!=. & age!=checkage2 //all correct
 //replace age=checkage2 if dob!=. & dod!=. & age!=checkage2 //0 changes
 drop checkage2
 
@@ -717,11 +718,11 @@ count if dodyear!=year(dod) //0
 //list pid record_id dod dodyear if dodyear!=year(dod)
 replace dodyear=year(dod) if dodyear!=year(dod) //0 changes
 
-label data "BNR MORTALITY data 2016 + 2017"
+label data "BNR MORTALITY data 2019 + 2020"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2016_2017_prep mort_ALL" ,replace
+save "`datapath'\version04\3-output\2019_2020_prep mort_ALL" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
-note: TS This dataset includes all 2016 + 2017 CODs
+note: TS This dataset includes all 2019 + 2020 CODs
 
 *******************
 ** Check for MPs **
@@ -739,59 +740,74 @@ drop if cancer!=1 //3,724 deleted
 sort coddeath record_id
 order record_id coddeath //check Stata Browse window for MPs in CODs
 
-
 ** Create duplicate observations for MPs in CODs
-expand=2 if record_id==21507, gen (dupobs1)
-expand=2 if record_id==20093, gen (dupobs2)
-expand=2 if record_id==19971, gen (dupobs3)
-expand=2 if record_id==23215, gen (dupobs4)
-expand=2 if record_id==20230, gen (dupobs5)
-expand=3 if record_id==24170, gen (dupobs6) //COD with 3 cancers
-expand=2 if record_id==20755, gen (dupobs7)
-expand=2 if record_id==19914, gen (dupobs8)
-expand=2 if record_id==22445, gen (dupobs9)
-expand=2 if record_id==21899, gen (dupobs10)
-expand=2 if record_id==23183, gen (dupobs11)
-expand=2 if record_id==19709, gen (dupobs12)
-expand=2 if record_id==21921, gen (dupobs13)
-expand=2 if record_id==20532, gen (dupobs14)
-expand=2 if record_id==20638, gen (dupobs15)
-expand=2 if record_id==21407, gen (dupobs16)
-expand=3 if record_id==21266, gen (dupobs17) //ask SF, NS re if this is 3 cancers or 2 - 17may2022: checked CR5db + MedData - all 3 are primaries
-//expand=2 if record_id==23247, gen (dupobs20) //ask SF, NS re if this is 2 cancers - 17may2022: checked CR5db + MedData - lung ca is mets
-expand=2 if record_id==22472, gen (dupobs18)
-expand=2 if record_id==21631, gen (dupobs19)
-expand=2 if record_id==23599, gen (dupobs20)
-expand=2 if record_id==20087, gen (dupobs21)
-expand=2 if record_id==20184, gen (dupobs22)
-expand=2 if record_id==22218, gen (dupobs23)
-expand=2 if record_id==24121, gen (dupobs24)
-expand=2 if record_id==20880, gen (dupobs25)
-expand=2 if record_id==23574, gen (dupobs26)
-expand=2 if record_id==19584, gen (dupobs27)
-expand=2 if record_id==21871, gen (dupobs28)
-expand=2 if record_id==19891, gen (dupobs29)
-expand=2 if record_id==21968, gen (dupobs30)
-expand=2 if record_id==22022, gen (dupobs31) //ask SF, NS re if this is 2 cancers - 17may2022: checked CR5db + MedData - both are primaries
-expand=2 if record_id==23483, gen (dupobs32)
-expand=2 if record_id==22730, gen (dupobs33)
-expand=2 if record_id==21584, gen (dupobs34) //found in below ICD10 lists
-expand=2 if record_id==22760, gen (dupobs35) //found in below ICD10 lists
-expand=2 if record_id==22872, gen (dupobs36) //found in below ICD10 lists
+expand=2 if record_id==27809, gen (dupobs1)
+expand=2 if record_id==29720, gen (dupobs2)
+expand=2 if record_id==27922, gen (dupobs3)
+expand=2 if record_id==27043, gen (dupobs4)
+expand=2 if record_id==29768, gen (dupobs5)
+expand=2 if record_id==31999, gen (dupobs6)
+expand=2 if record_id==28921, gen (dupobs7)
+expand=2 if record_id==32399, gen (dupobs8)
+expand=2 if record_id==32957, gen (dupobs9)
+expand=2 if record_id==27947, gen (dupobs10) //checked MedData and the renal mass was listed as malignant; Emailed KWG with this update (15jun2022).
+expand=2 if record_id==32418, gen (dupobs11)
+expand=2 if record_id==27678, gen (dupobs12)
+expand=2 if record_id==26923, gen (dupobs13)
+expand=2 if record_id==32312, gen (dupobs14)
+expand=2 if record_id==27492, gen (dupobs15)
+expand=2 if record_id==33620, gen (dupobs16)
+expand=2 if record_id==33272, gen (dupobs17)
+expand=2 if record_id==31827, gen (dupobs18)
+expand=2 if record_id==33660, gen (dupobs19)
+expand=2 if record_id==33084, gen (dupobs20)
+expand=2 if record_id==28926, gen (dupobs21)
+expand=2 if record_id==27737, gen (dupobs22)
+expand=2 if record_id==32999, gen (dupobs23)
+expand=2 if record_id==33332, gen (dupobs24)
+expand=2 if record_id==29451, gen (dupobs25)
+expand=2 if record_id==33558, gen (dupobs26)
+expand=2 if record_id==31683, gen (dupobs27)
+expand=2 if record_id==32276, gen (dupobs28)
+expand=2 if record_id==33614, gen (dupobs29)
+/*
+expand=2 if record_id==, gen (dupobs30)
+expand=2 if record_id==, gen (dupobs31)
+expand=2 if record_id==, gen (dupobs32)
+expand=2 if record_id==, gen (dupobs33)
+expand=2 if record_id==, gen (dupobs34) //found in below ICD10 lists
+expand=2 if record_id==, gen (dupobs35) //found in below ICD10 lists
+expand=2 if record_id==, gen (dupobs36) //found in below ICD10 lists
+*/
+drop if record_id==33843 //myelodysplasia, NOS is considered benign - 1 deleted
+drop if record_id==27282 //tumour, uncertain/unk behaviour - 1 deleted
+drop if record_id==31961 //myelofibrosis, NOS is considered benign - 1 deleted
+drop if record_id==32786 //no cancer listed in CODs - 1 deleted
+drop if record_id==33515 //mass - 1 deleted
 
-drop if record_id==23381 //meningioma, NOS is considered benign - 1 deleted
-drop if record_id==24251 //tumour, uncertain/unk behaviour - 1 deleted (JC 17may2022: checked CR5 + MedData)
-
-//M9811(9) vs M9837(10) and M9875(8)
+** JC 15jun2022: below is an old note but kept in as maybe relevant in later years
 //pid 20130770 CML in 2013 that transformed to either T-ALL or B-ALL in 2015 COD states C-CELL!
 //M9811 (B-ALL) chosen as research shows "With few exceptions, Ph-positive ALL patients are diagnosed with B-ALL "
 //https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4896164/
 display `"{browse "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4896164/":Ph+ALL}"'
 
-replace coddeath=subinstr(coddeath,"VANCER","CANCER",.) if record_id==20525 //cancer spelt vancer when checking above list
+** JC 15jun2022: added the below corrections to excel list for KG to correct in REDCap multi-year deaht db: ...\Sync\BNR\Death Data Updates
+replace coddeath=subinstr(coddeath,"ENDORIETRIAL","ENDOMETRIAL",.) if record_id==27356 //cancer spelt vancer when checking above list
+replace coddeath=subinstr(coddeath,"ASPHYSCIATION","ASPHYXIATION",.) if record_id==32636
+replace coddeath=subinstr(coddeath,"BENIGH","BENIGN",.) if record_id==28183
+replace coddeath=subinstr(coddeath,"FALL","GALL",.) if record_id==29614
+replace coddeath=subinstr(coddeath,"METASTATIS","METASTASIS",.) if record_id==27482
+replace coddeath=subinstr(coddeath,"METASTAES","METASTASES",.) if record_id==29882
+replace coddeath=subinstr(coddeath,"GLIOBESTOMA","GLIOBLASTOMA",.) if record_id==32579
+replace coddeath=subinstr(coddeath,"MALGINANT","MALIGNANT",.) if record_id==31827
+replace coddeath=subinstr(coddeath,"MELONMA","MELANOMA",.) if record_id==33714
+replace coddeath=subinstr(coddeath,"OVERIAN","OVARIAN",.) if record_id==28392
+replace coddeath=subinstr(coddeath,"OUCT","DUCT",.) if record_id==28305
+replace coddeath=subinstr(coddeath,"AMPOLLA","AMPULLA",.) if record_id==29108
+replace coddeath=subinstr(coddeath,"OFVATER","OF VATER",.) if record_id==29108
+replace coddeath=subinstr(coddeath,"CELLED","CELL",.) if record_id==29149
 
-
-count //1329
+count //1357
 
 ** Create variables to identify patients vs tumours
 gen ptrectot=.
@@ -802,8 +818,9 @@ replace ptrectot=1 if dupobs1==0|dupobs2==0|dupobs3==0|dupobs4==0 ///
 					 |dupobs17==0|dupobs18==0|dupobs19==0|dupobs20==0 ///
 					 |dupobs21==0|dupobs22==0|dupobs23==0|dupobs24==0 ///
 					 |dupobs25==0|dupobs26==0|dupobs27==0|dupobs28==0 ///
-					 |dupobs29==0|dupobs30==0|dupobs31==0|dupobs32==0 ///
-					 |dupobs33==0|dupobs34==0|dupobs35==0|dupobs36==0 //1329 changes
+					 |dupobs29==0 
+					 //|dupobs30==0|dupobs31==0|dupobs32==0 ///
+					 //|dupobs33==0|dupobs34==0|dupobs35==0|dupobs36==0 //1329 changes
 replace ptrectot=2 if dupobs1>0|dupobs2>0|dupobs3>0|dupobs4>0 ///
 					 |dupobs5>0|dupobs6>0|dupobs7>0|dupobs8>0 ///
 					 |dupobs9>0|dupobs10>0|dupobs11>0|dupobs12>0 ///
@@ -811,8 +828,9 @@ replace ptrectot=2 if dupobs1>0|dupobs2>0|dupobs3>0|dupobs4>0 ///
 					 |dupobs17>0|dupobs18>0|dupobs19>0|dupobs20>0 ///
 					 |dupobs21>0|dupobs22>0|dupobs23>0|dupobs24>0 ///
 					 |dupobs25>0|dupobs26>0|dupobs27>0|dupobs28>0 ///
-					 |dupobs29>0|dupobs30>0|dupobs31>0|dupobs32>0 ///
-					 |dupobs33>0|dupobs34>0|dupobs35>0|dupobs36>0 //38 changes
+					 |dupobs29>0
+					 //|dupobs30>0|dupobs31>0|dupobs32>0 ///
+					 //|dupobs33>0|dupobs34>0|dupobs35>0|dupobs36>0 //38 changes
 label define ptrectot_lab 1 "COD with single event" 2 "COD with multiple events" , modify
 label values ptrectot ptrectot_lab
 
@@ -821,9 +839,9 @@ tab ptrectot ,m
 ** Now create id in this dataset so when merging icd10 for siteiarc variable at end of this dofile
 sort record_id
 gen did="T1" if ptrectot==1
-replace did="T2" if ptrectot==2 //37 changes
-replace did="T3" in 523
-replace did="T3" in 1296
+replace did="T2" if ptrectot==2 //29 changes
+//replace did="T3" in 523
+//replace did="T3" in 1296
 
 ***********************************
 ** 1.4 Number of cases by age-group
@@ -854,10 +872,10 @@ tab age_10 sex ,m
 ************************
 ** Creating IARC Site **
 ************************
-count //1329
-tab cancer ,m //1329 cancers
-tab cancer dodyear,m //659 cancers in 2016; 670 cancers in 2017
-
+count //1357
+tab cancer ,m //1357 cancers
+tab cancer dodyear,m //688 cancers in 2019; 669 cancers in 2020
+STOP
 ** Note: Although siteiarc doesn't need sub-site, the specific icd10 code was used, where applicable
 display `"{browse "https://icd.who.int/browse10/2015/en#/C09":ICD10,v2015}"'
 
@@ -1513,9 +1531,9 @@ drop dupobs* dup_id
 	 
 order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear cancer siteiarc siteiarchaem pod coddeath
 
-label data "BNR MORTALITY data 2016 + 2017: Identifiable Dataset"
+label data "BNR MORTALITY data 2019 + 2020: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2016+2017_prep mort_identifiable" ,replace
+save "`datapath'\version04\3-output\2019+2020_prep mort_identifiable" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 
@@ -1523,44 +1541,44 @@ preserve
 ** Create corrected dataset with reportable cases but de-identified data
 drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
 ** Save this death dataset with de-identified data
-label data "BNR MORTALITY data 2016 + 2017: De-identified Dataset"
+label data "BNR MORTALITY data 2019 + 2020: De-identified Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2016+2017_prep mort_deidentified" ,replace
+save "`datapath'\version04\3-output\2019+2020_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 restore
 
-** Save separate datasets for 2016 and 2017
+** Save separate datasets for 2019 and 2020
 preserve
-drop if dodyear!=2016
-label data "BNR MORTALITY data 2016: Identifiable Dataset"
+drop if dodyear!=2019
+label data "BNR MORTALITY data 2019: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2016_prep mort_identifiable" ,replace
+save "`datapath'\version04\3-output\2019_prep mort_identifiable" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 ** Create corrected dataset with reportable cases but de-identified data
 drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
 ** Save this death dataset with de-identified data
-label data "BNR MORTALITY data 2016: De-identified Dataset"
+label data "BNR MORTALITY data 2019: De-identified Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2016_prep mort_deidentified" ,replace
+save "`datapath'\version04\3-output\2019_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 restore
 
 preserve
-drop if dodyear!=2017
-label data "BNR MORTALITY data 2017: Identifiable Dataset"
+drop if dodyear!=2020
+label data "BNR MORTALITY data 2020: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2017_prep mort_identifiable" ,replace
+save "`datapath'\version04\3-output\2020_prep mort_identifiable" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 ** Create corrected dataset with reportable cases but de-identified data
 drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
 ** Save this death dataset with de-identified data
-label data "BNR MORTALITY data 2017: De-identified Dataset"
+label data "BNR MORTALITY data 2020: De-identified Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2017_prep mort_deidentified" ,replace
+save "`datapath'\version04\3-output\2020_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 restore
