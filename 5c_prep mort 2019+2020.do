@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      13-JUN-2022
-    // 	date last modified      16-JUN-2022
+    // 	date last modified      21-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -991,32 +991,32 @@ replace icd10="C220" if record_id==27150|record_id==30059|record_id==32280|recor
 						|record_id==32676|record_id==34051 //liver, specified/hepatocellular
 replace icd10="C259" if record_id==29021|record_id==32677|record_id==32866 //pancreas
 replace icd10="C249" if record_id==32210 //biliary tract
-STOP
-count if regexm(coddeath,"CHOLANGIO") & icd10=="" //12
-replace icd10="C221" if regexm(coddeath,"CHOLANGIO") & icd10=="" //12 changes
 
-count if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //8
-replace icd10="C23" if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //8 changes
+count if regexm(coddeath,"CHOLANGIO") & icd10=="" //5
+replace icd10="C221" if regexm(coddeath,"CHOLANGIO") & icd10=="" //5 changes
 
-count if regexm(coddeath,"BILIARY") & icd10=="" //2
-replace icd10="C249" if regexm(coddeath,"BILIARY") & icd10=="" //2 changes
+count if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //14
+replace icd10="C23" if (regexm(coddeath,"GALLBLAD")|regexm(coddeath,"GALL BLAD")) & icd10=="" //14 changes
 
-count if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //1
-replace icd10="C250" if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //1 change
+count if regexm(coddeath,"BILIARY") & icd10=="" //1
+//replace icd10="C249" if regexm(coddeath,"BILIARY") & icd10=="" //1 change
+replace icd10="C259" if record_id==27855
 
-count if regexm(coddeath,"PANCREA") & icd10=="" //51
-replace icd10="C259" if regexm(coddeath,"PANCREA") & icd10=="" //51 changes
-replace icd10="C61" if record_id==23574 & did=="T2" //prostate MP
+count if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //3
+replace icd10="C250" if (regexm(coddeath,"PANCREA") & regexm(coddeath,"HEAD")) & icd10=="" //3 changes
 
-count if (regexm(coddeath,"NASAL")|regexm(coddeath,"EAR")) & icd10=="" //23-no nasal/ear so no replace
+count if regexm(coddeath,"PANCREA") & icd10=="" //45
+replace icd10="C259" if regexm(coddeath,"PANCREA") & icd10=="" //45 changes
 
-count if regexm(coddeath,"SINUS") & icd10=="" //0
+count if (regexm(coddeath,"NASAL")|regexm(coddeath,"EAR")) & icd10=="" //33-no nasal/ear so no replace
 
-count if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //4
-replace icd10="C329" if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //4 changes
+count if regexm(coddeath,"SINUS") & icd10=="" //1-no sinus
+
+count if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //6
+replace icd10="C329" if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //6 changes
 
 count if regexm(coddeath,"TRACHEA") & icd10=="" //0
-
+STOP
 count if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //80
 replace icd10="C349" if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //80 changes
 replace icd10="C809" if record_id==19408|record_id==22374|record_id==24142 //PSU, NOS
