@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      13-JUN-2022
-    // 	date last modified      21-JUN-2022
+    // 	date last modified      23-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -1016,45 +1016,43 @@ count if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"G
 replace icd10="C329" if (regexm(coddeath,"LARYNX")|regexm(coddeath,"LARYNG")|regexm(coddeath,"GLOTTI")|regexm(coddeath,"VOCAL")) & icd10=="" //6 changes
 
 count if regexm(coddeath,"TRACHEA") & icd10=="" //0
-STOP
-count if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //80
-replace icd10="C349" if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //80 changes
-replace icd10="C809" if record_id==19408|record_id==22374|record_id==24142 //PSU, NOS
-replace icd10="C509" if record_id==19565|record_id==19755|record_id==21201|record_id==21325|record_id==21938 ///
-						|record_id==21949|record_id==21956|record_id==23093|record_id==23123 //breast
-replace icd10="C900" if record_id==19812 //MM
-replace icd10="C541" if record_id==21871 & did=="T2" //endometrium
-replace icd10="C61" if record_id==20002|record_id==21321|record_id==21735|record_id==23247|record_id==23709 //prostate
-replace icd10="C829" if record_id==22483 //follicular lymphoma
-replace icd10="C830" if record_id==22249 //small cell lymphoma
-replace icd10="C845" if record_id==20014 //t-cell lymphoma
-replace icd10="C56" if record_id==22668 //ovary
-replace icd10="C679" if record_id==21747 //bladder
-replace icd10="C07" if record_id==22729 //parotid gland
-replace icd10="C119" if record_id==24170 & did=="T2" //nasopharynx
-replace icd10="C61" if record_id==24170 & did=="T3" //prostate
+
+count if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //87
+replace icd10="C349" if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //87 changes
+replace icd10="C809" if record_id==26945 //PSU, NOS
+replace icd10="C800" if record_id==28126|record_id==32899 //PSU
+replace icd10="C509" if record_id==27554|record_id==28158|record_id==29333|record_id==29581|record_id==33696|record_id==33706 //breast
+replace icd10="C900" if record_id==29483 //MM
+replace icd10="C541" if record_id==28921 & did=="T1" //endometrium
+replace icd10="C61" if record_id==28157|record_id==28244|(record_id==31999 & did=="T2") //prostate
+replace icd10="C859" if record_id==29604 //lymphoma, NOS
+replace icd10="C539" if record_id==29975 //cervix
+replace icd10="C402" if record_id==30043 //bone, femur
+replace icd10="C609" if record_id==32663 //penis
+replace icd10="C711" if record_id==28017 //brain, frontal
 
 count if regexm(coddeath,"THYMUS") & icd10=="" //0
 
-count if (regexm(coddeath,"HEART")|regexm(coddeath,"MEDIASTIN")|regexm(coddeath,"PLEURA")) & icd10=="" //26-none found so no replace
-replace icd10="C383" if record_id==20575 //mediastinal
+count if (regexm(coddeath,"HEART")|regexm(coddeath,"MEDIASTIN")|regexm(coddeath,"PLEURA")) & icd10=="" //39-none found so no replace
+replace icd10="C37" if record_id==28746 //thymus
+replace icd10="C383" if record_id==33945 //mediastinal
 
-count if (regexm(coddeath,"BONE")|regexm(coddeath,"OSTEO")|regexm(coddeath,"CARTILAGE")) & icd10=="" //15-none found so no replace
-replace icd10="C410" if record_id==22371 //maxilla
-replace icd10="C413" if record_id==20378 //rib
-replace icd10="C419" if record_id==24205 //bone, NOS
+count if (regexm(coddeath,"BONE")|regexm(coddeath,"OSTEO")|regexm(coddeath,"CARTILAGE")) & icd10=="" //10-none found so no replace
+replace icd10="C241" if record_id==29108 //ampulla vater
+replace icd10="C419" if record_id==33638 //bone, NOS
+STOP
+count if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //18
+replace icd10="C439" if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //18 changes
 
-count if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //16
-replace icd10="C439" if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //12 changes
-replace icd10="C081" if record_id==19981 //SCC, left sublingual
-replace icd10="C436" if record_id==19951 //melanoma, upper limb
-replace icd10="C445" if record_id==20720 //SCC, BCC, trunk
-replace icd10="C031" if record_id==21068 //SCC, mandible
-replace icd10="C52" if record_id==21166 //SCC, vagina
-replace icd10="C449" if record_id==21263|record_id==21358|record_id==22976|record_id==24162 //SCC, BCC, NOS
-replace icd10="C434" if record_id==21371 //melanoma, scalp
-replace icd10="C139" if record_id==23652 //hypopharynx
-replace icd10="C443" if record_id==23192 //SCC, BCC, face
+replace icd10="C081" if record_id== //SCC, left sublingual
+replace icd10="C436" if record_id== //melanoma, upper limb
+replace icd10="C445" if record_id== //SCC, BCC, trunk
+replace icd10="C031" if record_id== //SCC, mandible
+replace icd10="C52" if record_id== //SCC, vagina
+replace icd10="C449" if record_id==|record_id==|record_id==|record_id== //SCC, BCC, NOS
+replace icd10="C434" if record_id== //melanoma, scalp
+replace icd10="C139" if record_id== //hypopharynx
+replace icd10="C443" if record_id== //SCC, BCC, face
 
 count if (regexm(coddeath,"MESOTHELIOMA")|regexm(coddeath,"KAPOSI")|regexm(coddeath,"NERVE")|regexm(coddeath,"PERITON")) & icd10=="" //8
 replace icd10="C541" if record_id==20424 //endometrium
