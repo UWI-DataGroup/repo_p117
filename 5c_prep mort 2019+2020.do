@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      13-JUN-2022
-    // 	date last modified      23-JUN-2022
+    // 	date last modified      27-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -1040,124 +1040,121 @@ replace icd10="C383" if record_id==33945 //mediastinal
 count if (regexm(coddeath,"BONE")|regexm(coddeath,"OSTEO")|regexm(coddeath,"CARTILAGE")) & icd10=="" //10-none found so no replace
 replace icd10="C241" if record_id==29108 //ampulla vater
 replace icd10="C419" if record_id==33638 //bone, NOS
-STOP
+
 count if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //18
 replace icd10="C439" if (regexm(coddeath,"SKIN")|regexm(coddeath,"MELANOMA")|regexm(coddeath,"SQUAMOUS")|regexm(coddeath,"BASAL")) & icd10=="" //18 changes
 
-replace icd10="C081" if record_id== //SCC, left sublingual
-replace icd10="C436" if record_id== //melanoma, upper limb
-replace icd10="C445" if record_id== //SCC, BCC, trunk
-replace icd10="C031" if record_id== //SCC, mandible
-replace icd10="C52" if record_id== //SCC, vagina
-replace icd10="C449" if record_id==|record_id==|record_id==|record_id== //SCC, BCC, NOS
-replace icd10="C434" if record_id== //melanoma, scalp
-replace icd10="C139" if record_id== //hypopharynx
-replace icd10="C443" if record_id== //SCC, BCC, face
+replace icd10="C449" if record_id==29451 & did=="T2"|record_id==31580 //SCC, BCC, NOS
+replace icd10="C439" if record_id==27602|record_id==32276 & did=="T2"|record_id==32312 & did=="T1"|record_id==33555|record_id==33714 //melanoma, NOS
+replace icd10="C443" if record_id==27411|record_id==27715|record_id==28769 //SCC, BCC, face
+replace icd10="C61" if record_id==27910|record_id==28863 //prostate
+replace icd10="C441" if record_id==27964 //SCC, BCC, eye
+replace icd10="C447" if record_id==28300 //SCC, BCC, lower limb
+replace icd10="C539" if record_id==29149 //cervix
+replace icd10="C679" if record_id==29451 & did=="T1"|record_id==32312 & did=="T2" //bladder
+replace icd10="C762" if record_id==32276 & did=="T1" //abdomen
 
-count if (regexm(coddeath,"MESOTHELIOMA")|regexm(coddeath,"KAPOSI")|regexm(coddeath,"NERVE")|regexm(coddeath,"PERITON")) & icd10=="" //8
-replace icd10="C541" if record_id==20424 //endometrium
-replace icd10="C482" if record_id==21485|record_id==23387 //peritoneum, NOS
-replace icd10="C459" if record_id==22137 //mesothelioma, NOS
-replace icd10="C480" if record_id==22159 //retroperitoneum
-replace icd10="C479" if record_id==23573 //nerve
-replace icd10="C468" if record_id==23849 //kaposi sarcoma
-replace icd10="C763" if record_id==24565 //pelvis, NOS
 
-count if regexm(coddeath,"BREAST") & icd10=="" //137
+count if (regexm(coddeath,"MESOTHELIOMA")|regexm(coddeath,"KAPOSI")|regexm(coddeath,"NERVE")|regexm(coddeath,"PERITON")) & icd10=="" //2
+replace icd10="C689" if record_id==33318 //urinary organ, NOS
+replace icd10="C459" if record_id==27556 //mesothelioma, NOS
+
+count if regexm(coddeath,"BREAST") & icd10=="" //159
 //list record_id coddeath if regexm(coddeath,"BREAST"),string(120)
 replace icd10="C509" if regexm(coddeath,"BREAST") & icd10=="" //137 changes
-replace icd10="C541" if record_id==20093 & did=="T2" //endometrium MP
-replace icd10="C73" if record_id==20230 & did=="T2" //thyroid MP
-replace icd10="C900" if (record_id==20755 & did=="T2")|(record_id==23215 & did=="T2") //MM MP
-replace icd10="C56" if record_id==21631 & did=="T1" //ovary MP
-replace icd10="C55" if record_id==23599 & did=="T1" //uterus MP
+replace icd10="C443" if record_id==26923 & did=="T2" //SCC, BCC, face
+replace icd10="C61" if record_id==27043 & did=="T2"|record_id==32957 & did=="T1" //prostate MP
+replace icd10="C539" if record_id==27809 & did=="T1" //cervix
+replace icd10="C541" if record_id==27922 & did=="T2" //endometrium MP
 
-count if regexm(coddeath,"VULVA") & icd10=="" //1
-replace icd10="C519" if regexm(coddeath,"VULVA") & icd10=="" //1 change
+count if regexm(coddeath,"VULVA") & icd10=="" //0
+replace icd10="C519" if regexm(coddeath,"VULVA") & icd10=="" //0 changes
 
-count if regexm(coddeath,"VAGINA") & icd10=="" //
-replace icd10="C52" if regexm(coddeath,"VAGINA") & icd10=="" //1 change
+count if regexm(coddeath,"VAGINA") & icd10=="" //4
+replace icd10="C52" if regexm(coddeath,"VAGINA") & icd10=="" //4 changes
+replace icd10="C55" if record_id==33614 & did=="T1" //uterus, NOS
 
-count if (regexm(coddeath,"CERVICAL")|regexm(coddeath,"CERVIX")) & icd10=="" //26
-replace icd10="C539" if (regexm(coddeath,"CERVICAL")|regexm(coddeath,"CERVIX")) & icd10=="" //26 changes
-replace icd10="C541" if record_id==20638 & did=="T1" //endometrium MP
-replace icd10="C73" if record_id==21921 & did=="T1" //thyroid MP
-replace icd10="C64" if record_id==22745 //kidney
+count if (regexm(coddeath,"CERVICAL")|regexm(coddeath,"CERVIX")) & icd10=="" //17
+replace icd10="C539" if (regexm(coddeath,"CERVICAL")|regexm(coddeath,"CERVIX")) & icd10=="" //17 changes
 
-count if (regexm(coddeath,"ENDOMETRI")|regexm(coddeath,"CORPUS")) & icd10=="" //36
-replace icd10="C541" if (regexm(coddeath,"ENDOMETRI")|regexm(coddeath,"CORPUS")) & icd10=="" //36 changes
-replace icd10="C859" if (record_id==19914 & did=="T2")|(record_id==22472 & did=="T1") //NHL/lymphoma NOS, MP
-replace icd10="C800" if record_id==24121 & did=="T1" //occult MP
 
-count if (regexm(coddeath,"UTERINE")|regexm(coddeath,"UTERUS")) & icd10=="" //11
-replace icd10="C55" if (regexm(coddeath,"UTERINE")|regexm(coddeath,"UTERUS")) & icd10=="" //11 changes
-replace icd10="C920" if record_id==19454 //AML
+count if (regexm(coddeath,"ENDOMETRI")|regexm(coddeath,"CORPUS")) & icd10=="" //52
+replace icd10="C541" if (regexm(coddeath,"ENDOMETRI")|regexm(coddeath,"CORPUS")) & icd10=="" //52 changes
+replace icd10="C64" if record_id==31827 & did=="T1" //urinary organ, NOS
 
-count if (regexm(coddeath,"OVARY")|regexm(coddeath,"OVARIAN")) & icd10=="" //22
-replace icd10="C56" if (regexm(coddeath,"OVARY")|regexm(coddeath,"OVARIAN")) & icd10=="" //22 changes
-replace icd10="C800" if record_id==22872 & did=="T1" //occult MP
+
+count if (regexm(coddeath,"UTERINE")|regexm(coddeath,"UTERUS")) & icd10=="" //17
+replace icd10="C55" if (regexm(coddeath,"UTERINE")|regexm(coddeath,"UTERUS")) & icd10=="" //17 changes
+
+
+count if (regexm(coddeath,"OVARY")|regexm(coddeath,"OVARIAN")) & icd10=="" //21
+replace icd10="C56" if (regexm(coddeath,"OVARY")|regexm(coddeath,"OVARIAN")) & icd10=="" //21 changes
+
 
 count if (regexm(coddeath,"FALLOPIAN")|regexm(coddeath,"FEMALE")) & icd10=="" //0
 
-count if (regexm(coddeath,"PENIS")|regexm(coddeath,"PENILE")) & icd10=="" //4
-replace icd10="C609" if (regexm(coddeath,"PENIS")|regexm(coddeath,"PENILE")) & icd10=="" //4 changes
-replace icd10="C920" if record_id==20045 //AML
-replace icd10="C61" if record_id==22445 & did=="T1" //prostate MP
+count if (regexm(coddeath,"PENIS")|regexm(coddeath,"PENILE")) & icd10=="" //1
+replace icd10="C609" if (regexm(coddeath,"PENIS")|regexm(coddeath,"PENILE")) & icd10=="" //1 changes
 
-count if regexm(coddeath,"PROSTATE") & icd10=="" //260
-replace icd10="C61" if regexm(coddeath,"PROSTATE") & icd10=="" //260 changes
-replace icd10="C900" if (record_id==20087 & did=="T1")|(record_id==22730 & did=="T1") //MM MP
+count if regexm(coddeath,"PROSTATE") & icd10=="" //291
+replace icd10="C61" if regexm(coddeath,"PROSTATE") & icd10=="" //291 changes
+replace icd10="C859" if record_id==31683 & did=="T2" //NHL, NOS
+replace icd10="C64" if record_id==31925 //urinary organ, NOS
+replace icd10="C900" if record_id==33332 & did=="T2" //MM MP
 
 count if (regexm(coddeath,"TESTIS")|regexm(coddeath,"TESTES")) & icd10=="" //0
 
 count if (regexm(coddeath,"SCROT")|regexm(coddeath,"MALE")) & icd10=="" //0
 
-count if (regexm(coddeath,"KIDNEY")|regexm(coddeath,"RENAL")) & icd10=="" //35
-replace icd10="C64" if (regexm(coddeath,"KIDNEY")|regexm(coddeath,"RENAL")) & icd10=="" //35 changes
-replace icd10="C946" if record_id==19568 //myelodysplastic
-replace icd10="C800" if record_id==19434|record_id==19963 //PSU
-replace icd10="C61" if record_id==19597 //prostate
-replace icd10="C900" if record_id==19766|record_id==21129|record_id==21172|record_id==21620|record_id==23920 //MM
-replace icd10="C911" if record_id==21688 //CLL
-replace icd10="C859" if record_id==23131 //lymphoma NOS
+count if (regexm(coddeath,"KIDNEY")|regexm(coddeath,"RENAL")) & icd10=="" //43
+replace icd10="C64" if (regexm(coddeath,"KIDNEY")|regexm(coddeath,"RENAL")) & icd10=="" //43 changes
+replace icd10="C74" if record_id==27104 //adrenal gland
+replace icd10="C73" if record_id==27947 & did=="T2" //thyroid
+replace icd10="C859" if record_id==28069 //NHL, NOS
+replace icd10="C800" if record_id==26929|record_id==31523|record_id==31924|record_id==32947 //PSU
+replace icd10="C809" if record_id==28565|record_id==31764|record_id==32209|record_id==33534 //PSU, NOS
+replace icd10="C61" if record_id==32423 //prostate
+replace icd10="C900" if record_id==27262|record_id==28127|record_id==28550|record_id==28911|record_id==29765|record_id==32240|record_id==32729|record_id==33256 //MM
+replace icd10="C931" if record_id==32810 //CML
+replace icd10="C910" if record_id==32207 //B-cell ALL
+replace icd10="C859" if record_id==28968 //lymphoma NOS
+replace icd10="C950" if record_id==32535 //acute leukaemia
 
-count if (regexm(coddeath,"BLADDER")|regexm(coddeath,"URIN")) & icd10=="" //19
-replace icd10="C679" if (regexm(coddeath,"BLADDER")|regexm(coddeath,"URIN")) & icd10=="" //19 changes
-replace icd10="C119" if record_id==19462 //nasopharynx
-replace icd10="C414" if record_id==20673 //bone, pelvis
-replace icd10="C763" if record_id==20888 //pelvis, NOS
-replace icd10="C61" if record_id==21335 //prostate
-replace icd10="C800" if record_id==23456 //PSU
+count if (regexm(coddeath,"BLADDER")|regexm(coddeath,"URIN")) & icd10=="" //21
+replace icd10="C679" if (regexm(coddeath,"BLADDER")|regexm(coddeath,"URIN")) & icd10=="" //21 changes
+replace icd10="C709" if record_id==33009 //meninges
+replace icd10="C809" if record_id==32449 //PSU, NOS
 
-count if (regexm(coddeath,"EYE")|regexm(coddeath,"RETINA")|regexm(coddeath,"NEURO")) & icd10=="" //2
+count if (regexm(coddeath,"EYE")|regexm(coddeath,"RETINA")|regexm(coddeath,"NEURO")) & icd10=="" //3
 //replace icd10="C699" if (regexm(coddeath,"EYE")|regexm(coddeath,"RETINA")|regexm(coddeath,"NEURO")) & icd10=="" //1 changes
-replace icd10="C809" if record_id==19424|record_id==24680 //PSU, NOS
+replace icd10="C809" if record_id==32540 //PSU, NOS
+replace icd10="C080" if record_id==32681 //submandibular
+replace icd10="C719" if record_id==34074 //brain, NOS
 
-count if (regexm(coddeath,"ASTROCY")|regexm(coddeath,"MULTIFORME")|regexm(coddeath,"BRAIN")) & icd10=="" //16
-replace icd10="C719" if (regexm(coddeath,"ASTROCY")|regexm(coddeath,"MULTIFORME")|regexm(coddeath,"BRAIN")) & icd10=="" //16 changes
-replace icd10="C711" if record_id==20306 //brain, frontal lobe
-replace icd10="C809" if record_id==20557|record_id==23633 //PSU, NOS
-replace icd10="C159" if record_id==22022 & did=="T2" //oesophagus MP
+count if (regexm(coddeath,"ASTROCY")|regexm(coddeath,"MULTIFORME")|regexm(coddeath,"BRAIN")) & icd10=="" //3
+replace icd10="C719" if (regexm(coddeath,"ASTROCY")|regexm(coddeath,"MULTIFORME")|regexm(coddeath,"BRAIN")) & icd10=="" //3 changes
+replace icd10="C711" if record_id==28346 //brain, frontal lobe
 
-count if (regexm(coddeath,"THYROID")|regexm(coddeath,"ADRENAL")|regexm(coddeath,"ENDOCRI")) & icd10=="" //0
-//replace icd10="C73" if (regexm(coddeath,"THYROID")|regexm(coddeath,"ADRENAL")|regexm(coddeath,"ENDOCRI")) & icd10=="" //2 changes
+count if (regexm(coddeath,"THYROID")|regexm(coddeath,"ADRENAL")|regexm(coddeath,"ENDOCRI")) & icd10=="" //4
+replace icd10="C73" if (regexm(coddeath,"THYROID")|regexm(coddeath,"ADRENAL")|regexm(coddeath,"ENDOCRI")) & icd10=="" //4 changes
+replace icd10="C809" if record_id==33475 //PSU, NOS
 
-count if (regexm(coddeath,"UNKNOWN")|regexm(coddeath,"CULT")) & icd10=="" //27
-replace icd10="C800" if (regexm(coddeath,"UNKNOWN")|regexm(coddeath,"CULT")) & icd10=="" //27 changes
-replace icd10="C269" if record_id==24600 //gastronintestinal malignancy
+count if (regexm(coddeath,"UNKNOWN")|regexm(coddeath,"CULT")) & icd10=="" //31
+replace icd10="C800" if (regexm(coddeath,"UNKNOWN")|regexm(coddeath,"CULT")) & icd10=="" //31 changes
+replace icd10="C859" if record_id==28830 //lymphoma NOS
 
-count if (regexm(coddeath,"HODGKIN") & regexm(coddeath,"NON")) & icd10=="" //8
-replace icd10="C859" if (regexm(coddeath,"HODGKIN") & regexm(coddeath,"NON")) & icd10=="" //8 changes
-replace icd10="C845" if record_id==19480|record_id==19508 //t-cell lymphoma
-replace icd10="C857" if record_id==21712 //NHL, anaplastic/large cell type
+count if (regexm(coddeath,"HODGKIN") & regexm(coddeath,"NON")) & icd10=="" //15
+replace icd10="C859" if (regexm(coddeath,"HODGKIN") & regexm(coddeath,"NON")) & icd10=="" //15 changes
 
 count if regexm(coddeath,"HODGKIN") & icd10=="" //3
 replace icd10="C819" if regexm(coddeath,"HODGKIN") & icd10=="" //3 changes
+replace icd10="C812" if record_id==27247 //mixed cellularity HL
 
-count if (regexm(coddeath,"FOLLICUL") & regexm(coddeath,"LYMPH")) & icd10=="" //0
+count if (regexm(coddeath,"FOLLICUL") & regexm(coddeath,"LYMPH")) & icd10=="" //1
+replace icd10="C829" if record_id==33900 //follicular lymphoma, NOS
 
-count if (regexm(coddeath,"MULTIPLE") & regexm(coddeath,"OMA")) & icd10=="" //39
-replace icd10="C900" if (regexm(coddeath,"MULTIPLE") & regexm(coddeath,"OMA")) & icd10=="" //39 changes
+count if (regexm(coddeath,"MULTIPLE") & regexm(coddeath,"OMA")) & icd10=="" //41
+replace icd10="C900" if (regexm(coddeath,"MULTIPLE") & regexm(coddeath,"OMA")) & icd10=="" //41 changes
 
 count if regexm(coddeath,"PLASMACYTOMA") & icd10=="" //0
 //replace icd10="C903" if regexm(coddeath,"PLASMACYTOMA") & icd10=="" //1 change
@@ -1165,71 +1162,85 @@ count if regexm(coddeath,"PLASMACYTOMA") & icd10=="" //0
 count if regexm(coddeath,"SEZARY") & icd10=="" //0
 //replace icd10="C841" if regexm(coddeath,"SEZARY") & icd10=="" //1 change
 
-count if (regexm(coddeath,"LYMPH")|regexm(coddeath,"EMIA")|regexm(coddeath,"PHOMA")) & icd10=="" //52
-replace icd10="C950" if record_id==20512|record_id==20538|record_id==21716|record_id==23125|record_id==24025 //acute leukaemia
-replace icd10="C959" if record_id==23629 //leukaemia, NOS
-replace icd10="C920" if record_id==19512|record_id==19962|record_id==20565|record_id==20652 ///
-						|record_id==20834|record_id==21416|record_id==21680|record_id==22258 ///
-						|record_id==23087|record_id==23368|record_id==23857 //AML
-replace icd10="C910" if record_id==19511|record_id==21598|record_id==22449 //ALL, NOS
-replace icd10="C833" if record_id==20718|record_id==23020 //diffuse large b-cell lymphoma
-replace icd10="C911" if record_id==20229|record_id==21140|record_id==21674|record_id==24114 //CLL
-replace icd10="C915" if record_id==19571|record_id==20249|record_id==20621|record_id==21063|record_id==22278 //ALL, T-cell
-replace icd10="C809" if record_id==19619|record_id==22559 //PSU, NOS
-replace icd10="C859" if record_id==19792|record_id==19847|record_id==19882|record_id==21480|record_id==23023|record_id==23676 //lymphoma NOS
-replace icd10="C61" if record_id==20194|record_id==20290|record_id==20704|(record_id==21968 & did=="T2") //prostate
-replace icd10="C169" if record_id==20543 //stomach
-replace icd10="C880" if record_id==21368 //lymphoplasmacytic lymphoma
-replace icd10="D464" if record_id==21968 & did=="T1" //refractory anaemia, NOS
-replace icd10="C849" if record_id==21988|record_id==23060 //t-cell lymphoma, NOS
-replace icd10="C059" if record_id==22002 //palate, NOS
-replace icd10="C912" if record_id==22377|record_id==23331 //CML
-replace icd10="C719" if record_id==23808 //brain, NOS
+count if (regexm(coddeath,"LYMPH")|regexm(coddeath,"EMIA")|regexm(coddeath,"PHOMA")) & icd10=="" //46
+replace icd10="C950" if record_id==30074|record_id==32593 //acute leukaemia
+replace icd10="C959" if record_id==27729 //leukaemia, NOS
+replace icd10="C920" if record_id==27151|record_id==28031|record_id==28282|record_id==28384 ///
+						|record_id==28386|record_id==28653|record_id==31859|record_id==31893 ///
+						|record_id==32062|record_id==33124|record_id==34028 //AML
+replace icd10="C910" if record_id==27284|record_id==33033 //ALL, NOS
+replace icd10="C849" if record_id==27405 //adult T-cell lymphoma
+replace icd10="C833" if record_id==29922 //diffuse large b-cell lymphoma
+replace icd10="C911" if record_id==29332|record_id==29906|record_id==31532|record_id==33852 //CLL
+replace icd10="C915" if record_id==27136 //ALL, T-cell
+replace icd10="C809" if record_id==29763|record_id==33792 //PSU, NOS
+replace icd10="C859" if record_id==27531|record_id==28660|record_id==28865|record_id==31524 ///
+						|record_id==33144|record_id==34025 //lymphoma NOS
+replace icd10="C61" if record_id==32504|record_id==33771 //prostate
+//replace icd10="C880" if record_id== //lymphoplasmacytic lymphoma
+//replace icd10="D464" if record_id== & did=="T1" //refractory anaemia, NOS
+replace icd10="C849" if record_id==33782 //t-cell lymphoma, NOS
+replace icd10="C269" if record_id==33178 //gastronintestinal, NOS
+replace icd10="C419" if record_id==27955 //bone, NOS
+replace icd10="C921" if record_id==27745|record_id==27864|record_id==27915|record_id==28716 ///
+						|record_id==33125|record_id==33268 //CML
+replace icd10="C900" if record_id==28900 //MM
+replace icd10="C349" if record_id==32724 //lung, NOS
+replace icd10="D469" if record_id==32364 //MDS
+replace icd10="C109" if record_id==33793 //oropharynx
 
-count if icd10=="" //106
-replace icd10="C61" if record_id==19334|record_id==19505|record_id==19738|record_id==20028|record_id==20831 ///
-					  |record_id==21232|record_id==21566|record_id==22269|record_id==22630|record_id==22794 ///
-					  |record_id==23074|record_id==23102|record_id==23967 //prostate
-replace icd10="C052" if record_id==19435 //uvula
-replace icd10="C763" if record_id==19670|record_id==21032|record_id==21374|record_id==21751|record_id==22488|record_id==22929 //pelvis, NOS
-replace icd10="C492" if record_id==19779|record_id==21856 //sarcoma, lower limb
-replace icd10="C762" if record_id==19852|record_id==21991|record_id==22380 //abdomen, NOS
-replace icd10="C56" if record_id==20170 //ovary
-replace icd10="C447" if record_id==20680 //carcinoma skin, lower limb
-replace icd10="C809" if record_id==19346|record_id==19702|record_id==19796|record_id==19907 ///
-						|record_id==20490|record_id==20629|record_id==20727|record_id==20890 ///
-						|record_id==20973|record_id==21133|record_id==21277|record_id==21299 ///
-						|record_id==21338|record_id==21497|record_id==21728|record_id==22016 ///
-						|record_id==22186|record_id==22243|record_id==22364|record_id==22540 ///
-						|record_id==22576|record_id==22762|record_id==22931|record_id==23227 ///
-						|record_id==23304|record_id==23410|record_id==23428|record_id==23665 ///
-						|record_id==23724|record_id==23896|record_id==24088|record_id==24101 ///
-						|record_id==24117|record_id==24284 //PSU, NOS
-replace icd10="C109" if record_id==20252|record_id==23103|record_id==23960 //oropharynx
-replace icd10="C139" if record_id==23502|record_id==23561 //hypopharynx
-replace icd10="C119" if record_id==19684|record_id==19698|record_id==20244|record_id==20744|record_id==22230|record_id==22542|record_id==23696 //nasopharynx
-replace icd10="C169" if record_id==20830|record_id==22103 //stomach
-replace icd10="C248" if record_id==21457|record_id==21616 //biliary tract, (not C22.0-C24.1)
-//replace icd10="C946" if  //myelodysplastic
-replace icd10="C900" if record_id==21550|record_id==21650|record_id==22632|record_id==23901 //MM
-replace icd10="C180" if record_id==21628|record_id==22591|record_id==23452 //colon, caecum
-replace icd10="C187" if record_id==21717 //colon, sigmoid
-replace icd10="C445" if record_id==21772 //carcinoma skin, chest wall
-replace icd10="C549" if record_id==22330 //corpus uteri, NOS/mixed mullerian tumour
-replace icd10="C492" if record_id==22334|record_id==24061 //sarcoma, upper limb
-replace icd10="C310" if record_id==22434 //maxillary sinus
-replace icd10="C700" if record_id==22448 //intracranial meningioma, malignant
-replace icd10="D473" if record_id==22610 //essential thrombocytosis
-replace icd10="C969" if record_id==22656|record_id==23035 //haem. malignancy
-replace icd10="C579" if record_id==22927 //genitourinary tract (F)
-replace icd10="C720" if record_id==22937 //spinal cord
-replace icd10="C840" if record_id==23277 //mycosis fungoides
-replace icd10="D469" if record_id==21175|record_id==23262|record_id==22535|record_id==22546 //MDS
-replace icd10="C051" if record_id==23326 //soft palate
-replace icd10="C479" if record_id==23481 //peripheral nerve
-replace icd10="C490" if record_id==23498 //ear
-replace icd10="C719" if record_id==24009 //brain, NOS
-drop if record_id==20473 //myeloproliferative disorder NOS is beh /1 - 1 deleted
+count if icd10=="" //78
+replace icd10="C61" if record_id==28203|record_id==28287|record_id==28453 ///
+					  |record_id==29507|record_id==29566|record_id==32253 //prostate
+//replace icd10="C052" if record_id== //uvula
+replace icd10="C763" if record_id==31822 //pelvis, NOS
+replace icd10="C402" if record_id==32865 //Ewing sarcoma, lower limb long bone (thigh)
+//replace icd10="C492" if record_id==|record_id== //sarcoma, lower limb bone
+replace icd10="C493" if record_id==29527|record_id==33049 //sarcoma, chest wall
+replace icd10="C762" if record_id==26909|record_id==27457 //abdomen, NOS
+replace icd10="C55" if record_id==33975 //uterus, NOS
+//replace icd10="C56" if record_id== //ovary
+replace icd10="C541" if record_id==28883 //endometrium
+//replace icd10="C447" if record_id== //carcinoma skin, lower limb
+replace icd10="C809" if record_id==27373|record_id==27527|record_id==27804|record_id==27835 ///
+						|record_id==27874|record_id==27999|record_id==28032|record_id==28074 ///
+						|record_id==28225|record_id==28243|record_id==28257|record_id==28390 ///
+						|record_id==28562|record_id==28701|record_id==28760|record_id==28780 ///
+						|record_id==28816|record_id==29054|record_id==29345|record_id==31501 ///
+						|record_id==31562|record_id==31627|record_id==31649|record_id==32188 ///
+						|record_id==32315|record_id==32834|record_id==33629|record_id==33844 //PSU, NOS
+replace icd10="C109" if record_id==32788 //oropharynx
+//replace icd10="C139" if record_id==|record_id== //hypopharynx
+replace icd10="C119" if record_id==28500|record_id==31590 //nasopharynx
+replace icd10="C169" if record_id==28176|record_id==28974|record_id==32514 //stomach
+//replace icd10="C248" if record_id==|record_id== //biliary tract, (not C22.0-C24.1)
+replace icd10="C180" if record_id==34029 //colon, caecum
+replace icd10="C187" if record_id==33180 //colon, sigmoid
+//replace icd10="C445" if record_id== //carcinoma skin, chest wall
+replace icd10="C449" if record_id==27485 //merkel
+//replace icd10="C549" if record_id== //corpus uteri, NOS/mixed mullerian tumour
+//replace icd10="C492" if record_id==|record_id== //sarcoma, upper limb
+//replace icd10="C310" if record_id== //maxillary sinus
+replace icd10="C410" if record_id==27167|record_id==28506 //bone, maxilla
+//replace icd10="C700" if record_id== //intracranial meningioma, malignant
+replace icd10="D473" if record_id==28850 //essential thrombocytosis
+replace icd10="C969" if record_id==32983 //haem. malignancy
+//replace icd10="C579" if record_id== //genitourinary tract (F)
+//replace icd10="C720" if record_id== //spinal cord
+//replace icd10="C840" if record_id== //mycosis fungoides
+replace icd10="D469" if record_id==28227|record_id==31686|record_id==33986|record_id==33998 //MDS
+replace icd10="C946" if record_id==27338|record_id==27514 //myelodysplastic/myeloproliferative
+replace icd10="C051" if record_id==27986 //soft palate
+//replace icd10="C479" if record_id== //peripheral nerve
+//replace icd10="C490" if record_id== //ear
+replace icd10="C719" if record_id==28731|record_id==29650|record_id==32579|record_id==32987 //brain, NOS
+replace icd10="C229" if record_id==28048|record_id==29625|record_id==32158 //liver, NOS
+replace icd10="C509" if record_id==27854 //breast, NOS
+replace icd10="C900" if record_id==27539|record_id==28113|record_id==32226|record_id==33524 //MM
+replace icd10="C269" if record_id==28253|record_id==31498 //gastronintestinal, NOS
+replace icd10="C411" if record_id==29881 //mandible
+replace icd10="C349" if record_id==33372 //lung
+//drop if record_id== //myeloproliferative disorder NOS is beh /1 - 1 deleted
 
 tab icd10 ,m
 
@@ -1272,66 +1283,66 @@ label var siteiarc "IARC CI5-XI sites"
 label values siteiarc siteiarc_lab
 
 replace siteiarc=1 if regexm(icd10,"C00") //0 changes
-replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //4 changes
-replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //4 changes
-replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //3 changes
-replace siteiarc=5 if regexm(icd10,"C09") //4 changes
-replace siteiarc=6 if regexm(icd10,"C10") //5 changes
-replace siteiarc=7 if regexm(icd10,"C11") //9 changes
-replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //3 changes
-replace siteiarc=9 if regexm(icd10,"C14") //1 change
-replace siteiarc=10 if regexm(icd10,"C15") //19 changes
-replace siteiarc=11 if regexm(icd10,"C16") //45 changes
-replace siteiarc=12 if regexm(icd10,"C17") //3 changes
-replace siteiarc=13 if regexm(icd10,"C18") //143 changes
-replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //47 changes
-replace siteiarc=15 if regexm(icd10,"C21") //4 changes
-replace siteiarc=16 if regexm(icd10,"C22") //29 changes
-replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //15 changes
-replace siteiarc=18 if regexm(icd10,"C25") //52 changes
-replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //1 change
-replace siteiarc=20 if regexm(icd10,"C32") //5 changes
-replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //56 changes
-replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //1 change
-replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //4 changes
+replace siteiarc=2 if (regexm(icd10,"C01")|regexm(icd10,"C02")) //5 changes
+replace siteiarc=3 if (regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05")|regexm(icd10,"C06")) //1 change
+replace siteiarc=4 if (regexm(icd10,"C07")|regexm(icd10,"C08")) //1 change
+replace siteiarc=5 if regexm(icd10,"C09") //0 changes
+replace siteiarc=6 if regexm(icd10,"C10") //6 changes
+replace siteiarc=7 if regexm(icd10,"C11") //3 changes
+replace siteiarc=8 if (regexm(icd10,"C12")|regexm(icd10,"C13")) //0 changes
+replace siteiarc=9 if regexm(icd10,"C14") //0 changes
+replace siteiarc=10 if regexm(icd10,"C15") //17 changes
+replace siteiarc=11 if regexm(icd10,"C16") //43 changes
+replace siteiarc=12 if regexm(icd10,"C17") //6 changes
+replace siteiarc=13 if regexm(icd10,"C18") //155 changes
+replace siteiarc=14 if (regexm(icd10,"C19")|regexm(icd10,"C20")) //31 changes
+replace siteiarc=15 if regexm(icd10,"C21") //3 changes
+replace siteiarc=16 if regexm(icd10,"C22") //14 changes
+replace siteiarc=17 if (regexm(icd10,"C23")|regexm(icd10,"C24")) //18 changes
+replace siteiarc=18 if regexm(icd10,"C25") //54 changes
+replace siteiarc=19 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //0 changes
+replace siteiarc=20 if regexm(icd10,"C32") //6 changes
+replace siteiarc=21 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //70 changes
+replace siteiarc=22 if (regexm(icd10,"C37")|regexm(icd10,"C38")) //2 changes
+replace siteiarc=23 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //7 changes
 replace siteiarc=24 if regexm(icd10,"C43") //6 changes
-replace siteiarc=25 if regexm(icd10,"C44") //8 changes
+replace siteiarc=25 if regexm(icd10,"C44") //9 changes
 replace siteiarc=26 if regexm(icd10,"C45") //1 change
-replace siteiarc=27 if regexm(icd10,"C46") //1 change
-replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //7 changes
-replace siteiarc=29 if regexm(icd10,"C50") //146 changes
-replace siteiarc=30 if regexm(icd10,"C51") //1 change
-replace siteiarc=31 if regexm(icd10,"C52") //2 changes
-replace siteiarc=32 if regexm(icd10,"C53") //23 changes
-replace siteiarc=33 if regexm(icd10,"C54") //39 changes
-replace siteiarc=34 if regexm(icd10,"C55") //11 changes
-replace siteiarc=35 if regexm(icd10,"C56") //26 change
-replace siteiarc=36 if regexm(icd10,"C57") //2 changes
+replace siteiarc=27 if regexm(icd10,"C46") //0 changes
+replace siteiarc=28 if (regexm(icd10,"C47")|regexm(icd10,"C49")) //2 changes
+replace siteiarc=29 if regexm(icd10,"C50") //170 changes
+replace siteiarc=30 if regexm(icd10,"C51") //0 changes
+replace siteiarc=31 if regexm(icd10,"C52") //3 changes
+replace siteiarc=32 if regexm(icd10,"C53") //20 changes
+replace siteiarc=33 if regexm(icd10,"C54") //55 changes
+replace siteiarc=34 if regexm(icd10,"C55") //19 changes
+replace siteiarc=35 if regexm(icd10,"C56") //21 change
+replace siteiarc=36 if regexm(icd10,"C57") //0 changes
 replace siteiarc=37 if regexm(icd10,"C58") //0 changes
 replace siteiarc=38 if regexm(icd10,"C60") //2 changes
-replace siteiarc=39 if regexm(icd10,"C61") //293 changes
+replace siteiarc=39 if regexm(icd10,"C61") //317 changes
 replace siteiarc=40 if regexm(icd10,"C62") //0 changes
 replace siteiarc=41 if regexm(icd10,"C63") //0 changes
-replace siteiarc=42 if regexm(icd10,"C64") //27 changes
+replace siteiarc=42 if regexm(icd10,"C64") //21 changes
 replace siteiarc=43 if regexm(icd10,"C65") //0 changes
-replace siteiarc=44 if regexm(icd10,"C66") //0 changes
-replace siteiarc=45 if regexm(icd10,"C67") //16 changes
-replace siteiarc=46 if regexm(icd10,"C68") //0 changes
+replace siteiarc=44 if regexm(icd10,"C66") //1 change
+replace siteiarc=45 if regexm(icd10,"C67") //24 changes
+replace siteiarc=46 if regexm(icd10,"C68") //1 change
 replace siteiarc=47 if regexm(icd10,"C69") //0 changes
-replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //17 changes
-replace siteiarc=49 if regexm(icd10,"C73") //2 changes
-replace siteiarc=50 if regexm(icd10,"C74") //0 changes
+replace siteiarc=48 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
+replace siteiarc=49 if regexm(icd10,"C73") //4 changes
+replace siteiarc=50 if regexm(icd10,"C74") //1 change
 replace siteiarc=51 if regexm(icd10,"C75") //0 changes
 replace siteiarc=52 if regexm(icd10,"C81") //3 changes
-replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //29 changes
-replace siteiarc=54 if regexm(icd10,"C88") //1 change
-replace siteiarc=55 if regexm(icd10,"C90") //53 changes
-replace siteiarc=56 if regexm(icd10,"C91") //15 changes
-replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //14 changes
-replace siteiarc=58 if regexm(icd10,"C95") //6 changes
+replace siteiarc=53 if (regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86")|regexm(icd10,"C96")) //34 changes
+replace siteiarc=54 if regexm(icd10,"C88") //0 changes
+replace siteiarc=55 if regexm(icd10,"C90") //57 changes
+replace siteiarc=56 if regexm(icd10,"C91") //8 changes
+replace siteiarc=57 if (regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")) //20 changes
+replace siteiarc=58 if regexm(icd10,"C95") //4 changes
 replace siteiarc=59 if regexm(icd10,"D47") //1 change
 replace siteiarc=60 if regexm(icd10,"D46") //5 changes
-replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //112 changes
+replace siteiarc=61 if (regexm(icd10,"C26")|regexm(icd10,"C39")|regexm(icd10,"C48")|regexm(icd10,"C76")|regexm(icd10,"C80")) //95 changes
 **replace siteiarc=62 if siteiarc<62
 **replace siteiarc=63 if siteiarc<62 & siteiarc!=25
 replace siteiarc=64 if regexm(icd10,"D06") //0 changes - no CIN 3 in death data
@@ -1368,24 +1379,24 @@ label var siteiarchaem "IARC CI5-XI lymphoid & haem diseases"
 label values siteiarchaem siteiarchaem_lab
 
 ** Note that morphcat is based on ICD-O-3 edition 3.1. so e.g. morphcat54
-replace siteiarchaem=1 if icd10=="C859"|icd10=="C851"|icd10=="C826"|icd10=="C969" //17 changes
+replace siteiarchaem=1 if icd10=="C859"|icd10=="C851"|icd10=="C826"|icd10=="C969" //30 changes
 replace siteiarchaem=2 if icd10=="C819"|icd10=="C814"|icd10=="C813"|icd10=="C812"|icd10=="C811"|icd10=="C810" //3 changes
-replace siteiarchaem=3 if icd10=="C830"|icd10=="C831"|icd10=="C833"|icd10=="C837"|icd10=="C838"|icd10=="C857"|icd10=="C859"|icd10=="C852"|icd10=="C829"|icd10=="C821"|icd10=="C820"|icd10=="C822"|icd10=="C420"|icd10=="C421"|icd10=="C424"|icd10=="C884"|regexm(icd10,"C77") //21 changes
-replace siteiarchaem=4 if icd10=="C840"|icd10=="C841"|icd10=="C844"|icd10=="C865"|icd10=="C863"|icd10=="C848"|icd10=="C838"|icd10=="C846"|icd10=="C861"|icd10=="C862"|icd10=="C866"|icd10=="C860"|icd10=="C849" //3 changes
-replace siteiarchaem=5 if icd10=="C845"|icd10=="C835" //3 changes
-replace siteiarchaem=6 if icd10=="C903"|icd10=="C900"|icd10=="C901"|icd10=="C902"|icd10=="C833" //56 changes
+replace siteiarchaem=3 if icd10=="C830"|icd10=="C831"|icd10=="C833"|icd10=="C837"|icd10=="C838"|icd10=="C857"|icd10=="C859"|icd10=="C852"|icd10=="C829"|icd10=="C821"|icd10=="C820"|icd10=="C822"|icd10=="C420"|icd10=="C421"|icd10=="C424"|icd10=="C884"|regexm(icd10,"C77") //31 changes
+replace siteiarchaem=4 if icd10=="C840"|icd10=="C841"|icd10=="C844"|icd10=="C865"|icd10=="C863"|icd10=="C848"|icd10=="C838"|icd10=="C846"|icd10=="C861"|icd10=="C862"|icd10=="C866"|icd10=="C860"|icd10=="C849" //2 changes
+replace siteiarchaem=5 if icd10=="C845"|icd10=="C835" //0 changes
+replace siteiarchaem=6 if icd10=="C903"|icd10=="C900"|icd10=="C901"|icd10=="C902"|icd10=="C833" //58 changes
 replace siteiarchaem=7 if icd10=="D470"|icd10=="C962"|icd10=="C943" //0 changes
 replace siteiarchaem=8 if icd10=="C968"|icd10=="C966"|icd10=="C964" //0 changes
-replace siteiarchaem=9 if icd10=="C889"|icd10=="C880"|icd10=="C882"|icd10=="C883"|icd10=="D472"|icd10=="C838"|icd10=="C865"|icd10=="D479"|icd10=="D477" //1 change
-replace siteiarchaem=10 if icd10=="C959"|icd10=="C950" //6 changes
-replace siteiarchaem=11 if icd10=="C910"|icd10=="C919"|icd10=="C911"|icd10=="C918"|icd10=="C915"|icd10=="C917"|icd10=="C913"|icd10=="C916" //13 changes
-replace siteiarchaem=12 if icd10=="C940"|icd10=="C929"|icd10=="C920"|icd10=="C921"|icd10=="C924"|icd10=="C925"|icd10=="C947"|icd10=="C922"|icd10=="C930"|icd10=="C928"|icd10=="C926"|icd10=="D471"|icd10=="C927"|icd10=="C942"|icd10=="C946"|icd10=="C923"|icd10=="C944"|icd10=="C914"|icd10=="C912" //16 changes
-replace siteiarchaem=13 if icd10=="C931"|icd10=="C933"|icd10=="C947" //0 changes
+replace siteiarchaem=9 if icd10=="C889"|icd10=="C880"|icd10=="C882"|icd10=="C883"|icd10=="D472"|icd10=="C838"|icd10=="C865"|icd10=="D479"|icd10=="D477" //0 changes
+replace siteiarchaem=10 if icd10=="C959"|icd10=="C950" //4 changes
+replace siteiarchaem=11 if icd10=="C910"|icd10=="C919"|icd10=="C911"|icd10=="C918"|icd10=="C915"|icd10=="C917"|icd10=="C913"|icd10=="C916" //8 changes
+replace siteiarchaem=12 if icd10=="C940"|icd10=="C929"|icd10=="C920"|icd10=="C921"|icd10=="C924"|icd10=="C925"|icd10=="C947"|icd10=="C922"|icd10=="C930"|icd10=="C928"|icd10=="C926"|icd10=="D471"|icd10=="C927"|icd10=="C942"|icd10=="C946"|icd10=="C923"|icd10=="C944"|icd10=="C914"|icd10=="C912" //19 changes
+replace siteiarchaem=13 if icd10=="C931"|icd10=="C933"|icd10=="C947" //1 change
 replace siteiarchaem=14 if icd10=="D45"|icd10=="D471"|icd10=="D474"|icd10=="D473"|icd10=="D475"|icd10=="C927"|icd10=="C967" //1 change
 replace siteiarchaem=15 if icd10=="D477"|icd10=="D471" //0 changes
-replace siteiarchaem=16 if icd10=="D465"|icd10=="D466"|icd10=="D467"|icd10=="D469" //4 changes
+replace siteiarchaem=16 if icd10=="D465"|icd10=="D466"|icd10=="D467"|icd10=="D469" //5 changes
 
-tab siteiarchaem ,m //1206 missing - correct!
+tab siteiarchaem ,m //1225 missing - correct!
 count if (siteiarc>51 & siteiarc<59) & siteiarchaem==. //0
 
 ** Create ICD-10 groups according to analysis tables in CR5 db (added after analysis dofiles 4,6)
@@ -1432,35 +1443,35 @@ replace sitecr5db=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C0
 					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
 					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
 					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //35 changes
-replace sitecr5db=2 if regexm(icd10,"C15") //19 changes
-replace sitecr5db=3 if regexm(icd10,"C16") //45 changes
-replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //194 changes
-replace sitecr5db=5 if regexm(icd10,"C22") //29 changes
-replace sitecr5db=6 if regexm(icd10,"C25") //52 changes
-replace sitecr5db=7 if regexm(icd10,"C32") //5 changes
-replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //56 changes
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //16 changes
+replace sitecr5db=2 if regexm(icd10,"C15") //17 changes
+replace sitecr5db=3 if regexm(icd10,"C16") //43 changes
+replace sitecr5db=4 if (regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20")|regexm(icd10,"C21")) //189 changes
+replace sitecr5db=5 if regexm(icd10,"C22") //14 changes
+replace sitecr5db=6 if regexm(icd10,"C25") //54 changes
+replace sitecr5db=7 if regexm(icd10,"C32") //6 changes
+replace sitecr5db=8 if (regexm(icd10,"C33")|regexm(icd10,"C34")) //70 changes
 replace sitecr5db=9 if regexm(icd10,"C43") //6 changes
-replace sitecr5db=10 if regexm(icd10,"C50") //146 changes
-replace sitecr5db=11 if regexm(icd10,"C53") //23 changes
-replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //50 changes
-replace sitecr5db=13 if regexm(icd10,"C56") //26 changes
-replace sitecr5db=14 if regexm(icd10,"C61") //293 changes
+replace sitecr5db=10 if regexm(icd10,"C50") //170 changes
+replace sitecr5db=11 if regexm(icd10,"C53") //20 changes
+replace sitecr5db=12 if (regexm(icd10,"C54")|regexm(icd10,"C55")) //74 changes
+replace sitecr5db=13 if regexm(icd10,"C56") //21 changes
+replace sitecr5db=14 if regexm(icd10,"C61") //317 changes
 replace sitecr5db=15 if regexm(icd10,"C62") //0 changes
-replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //27 changes
-replace sitecr5db=17 if regexm(icd10,"C67") //16 changes
-replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //17 changes
-replace sitecr5db=19 if regexm(icd10,"C73") //2 changes
-replace sitecr5db=20 if siteiarc==61 //112 changes
-replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //86 changes
-replace sitecr5db=22 if (regexm(icd10,"C91")|regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")) //35 changes
-replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //18 changes
-replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //1 change
-replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //12 changes
-replace sitecr5db=26 if siteiarc==25 //8 changes
-replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //5 changes
+replace sitecr5db=16 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C68")) //23 changes
+replace sitecr5db=17 if regexm(icd10,"C67") //24 changes
+replace sitecr5db=18 if (regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
+replace sitecr5db=19 if regexm(icd10,"C73") //4 changes
+replace sitecr5db=20 if siteiarc==61 //95 changes
+replace sitecr5db=21 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83")|regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C88")|regexm(icd10,"C90")|regexm(icd10,"C96")) //94 changes
+replace sitecr5db=22 if (regexm(icd10,"C91")|regexm(icd10,"C92")|regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95")) //32 changes
+replace sitecr5db=23 if (regexm(icd10,"C17")|regexm(icd10,"C23")|regexm(icd10,"C24")) //24 changes
+replace sitecr5db=24 if (regexm(icd10,"C30")|regexm(icd10,"C31")) //0 changes
+replace sitecr5db=25 if (regexm(icd10,"C40")|regexm(icd10,"C41")|regexm(icd10,"C45")|regexm(icd10,"C47")|regexm(icd10,"C49")) //10 changes
+replace sitecr5db=26 if siteiarc==25 //9 changes
+replace sitecr5db=27 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C57")|regexm(icd10,"C58")) //3 changes
 replace sitecr5db=28 if (regexm(icd10,"C60")|regexm(icd10,"C63")) //2 changes
-replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //0 changes
+replace sitecr5db=29 if (regexm(icd10,"C74")|regexm(icd10,"C75")) //1 change
 replace sitecr5db=30 if siteiarc==59 //1 change
 replace sitecr5db=31 if siteiarc==60 //5 changes
 replace sitecr5db=32 if siteiarc==64 //0 changes
@@ -1499,31 +1510,31 @@ replace siteicd10=1 if (regexm(icd10,"C00")|regexm(icd10,"C01")|regexm(icd10,"C0
 					 |regexm(icd10,"C03")|regexm(icd10,"C04")|regexm(icd10,"C05") ///
 					 |regexm(icd10,"C06")|regexm(icd10,"C07")|regexm(icd10,"C08") ///
 					 |regexm(icd10,"C09")|regexm(icd10,"C10")|regexm(icd10,"C11") ///
-					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //13 changes
+					 |regexm(icd10,"C12")|regexm(icd10,"C13")|regexm(icd10,"C14")) //16 changes
 replace siteicd10=2 if (regexm(icd10,"C15")|regexm(icd10,"C16")|regexm(icd10,"C17") ///
 					 |regexm(icd10,"C18")|regexm(icd10,"C19")|regexm(icd10,"C20") ///
 					 |regexm(icd10,"C21")|regexm(icd10,"C22")|regexm(icd10,"C23") ///
-					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) //176 changes
-replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //37 changes
-replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //1 change
-replace siteicd10=5 if siteiarc==24 //4 changes
-replace siteicd10=6 if siteiarc==25 //6 changes
-replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //4 changes
-replace siteicd10=8 if regexm(icd10,"C50") //102 changes
-replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //51 changes
-replace siteicd10=10 if regexm(icd10,"C61") //135 changes
-replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //1 change
-replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //23 changes
-replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //6 changes
-replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //4 changes
-replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //0 changes
-replace siteicd10=16 if regexm(icd10,"C80") //40 changes
+					 |regexm(icd10,"C24")|regexm(icd10,"C25")|regexm(icd10,"C26")) //347 changes
+replace siteicd10=3 if (regexm(icd10,"C30")|regexm(icd10,"C31")|regexm(icd10,"C32")|regexm(icd10,"C33")|regexm(icd10,"C34")|regexm(icd10,"C37")|regexm(icd10,"C38")|regexm(icd10,"C39")) //78 changes
+replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //7 changes
+replace siteicd10=5 if siteiarc==24 //6 changes
+replace siteicd10=6 if siteiarc==25 //9 changes
+replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //3 changes
+replace siteicd10=8 if regexm(icd10,"C50") //170 changes
+replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //118 changes
+replace siteicd10=10 if regexm(icd10,"C61") //317 changes
+replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //2 changes
+replace siteicd10=12 if (regexm(icd10,"C64")|regexm(icd10,"C65")|regexm(icd10,"C66")|regexm(icd10,"C67")|regexm(icd10,"C68")) //47 changes
+replace siteicd10=13 if (regexm(icd10,"C69")|regexm(icd10,"C70")|regexm(icd10,"C71")|regexm(icd10,"C72")) //11 changes
+replace siteicd10=14 if (regexm(icd10,"C73")|regexm(icd10,"C74")|regexm(icd10,"C75")) //5 changes
+replace siteicd10=15 if (regexm(icd10,"C76")|regexm(icd10,"C77")|regexm(icd10,"C78")|regexm(icd10,"C79")) //4 changes
+replace siteicd10=16 if regexm(icd10,"C80") //85 changes
 replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C83") ///
 					 |regexm(icd10,"C84")|regexm(icd10,"C85")|regexm(icd10,"C86") ///
 					 |regexm(icd10,"C87")|regexm(icd10,"C88")|regexm(icd10,"C89") ///
 					 |regexm(icd10,"C90")|regexm(icd10,"C91")|regexm(icd10,"C92") ///
 					 |regexm(icd10,"C93")|regexm(icd10,"C94")|regexm(icd10,"C95") ///
-					 |regexm(icd10,"C96")|regexm(icd10,"D46")|regexm(icd10,"D47")) //56 changes
+					 |regexm(icd10,"C96")|regexm(icd10,"D46")|regexm(icd10,"D47")) //132 changes
 
 
 tab siteicd10 ,m //0 missing
