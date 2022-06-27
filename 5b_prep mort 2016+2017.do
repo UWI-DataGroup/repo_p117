@@ -1137,7 +1137,7 @@ replace icd10="C880" if record_id==21368 //lymphoplasmacytic lymphoma
 replace icd10="D464" if record_id==21968 & did=="T1" //refractory anaemia, NOS
 replace icd10="C849" if record_id==21988|record_id==23060 //t-cell lymphoma, NOS
 replace icd10="C059" if record_id==22002 //palate, NOS
-replace icd10="C912" if record_id==22377|record_id==23331 //CML
+replace icd10="C921" if record_id==22377|record_id==23331 //CML
 replace icd10="C719" if record_id==23808 //brain, NOS
 
 count if icd10=="" //106
