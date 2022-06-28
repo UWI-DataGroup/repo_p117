@@ -700,8 +700,8 @@ sort record_id
 list record_id fname lname address age ageyrs nrn natregno dob dobcheck dod yr1 if tempvarn!=6 & age!=ageyrs, string(20) //check against electoral list
 count if dobcheck!=. & dob==. //5,206
 replace dob=dobcheck if dobcheck!=. & dob==. //5,206 changes
-replace nrn=. if record_id==34112
-replace natregno="" if record_id==34112
+//replace nrn=. if record_id==34112 - KG checked 24jun2022 and confirmed NRN and age are correct since pt's age = 18 months
+//replace natregno="" if record_id==34112
 replace age=ageyrs if tempvarn!=6 & age!=ageyrs & ageyrs<100 //11 changes
 drop day month dyear nrnyr yr yr1 year2 nrndob age2 ageyrs tempvarn dobcheck
 
@@ -811,6 +811,13 @@ replace coddeath=subinstr(coddeath,"OFVATER","OF VATER",.) if record_id==29108
 replace coddeath=subinstr(coddeath,"CELLED","CELL",.) if record_id==29149
 
 count //1357
+
+** Corrections from KG's checks on 24jun2022 (see L:\Sync\BNR\Death Data Updates\Updates for KG_20220614_KGedits.xlsx)
+replace coddeath=subinstr(coddeath,"MYOCARDIAL","MYELOID",.) if record_id==32593
+list record_id coddeath if regexm(coddeath, "PROSTAE") //JC emailed this correction to KG on 28jun2022
+list record_id coddeath if regexm(coddeath, "LNG CANCER") //JC emailed this correction to KG on 28jun2022
+replace coddeath=subinstr(coddeath,"PROSTAE","PROSTATE",.) if record_id==28287|record_id==32504
+replace coddeath=subinstr(coddeath,"LNG CANCER","LUNG CANCER",.) if record_id==33372
 
 ** Create variables to identify patients vs tumours
 gen ptrectot=.
@@ -1163,11 +1170,11 @@ count if regexm(coddeath,"SEZARY") & icd10=="" //0
 //replace icd10="C841" if regexm(coddeath,"SEZARY") & icd10=="" //1 change
 
 count if (regexm(coddeath,"LYMPH")|regexm(coddeath,"EMIA")|regexm(coddeath,"PHOMA")) & icd10=="" //46
-replace icd10="C950" if record_id==30074|record_id==32593 //acute leukaemia
+replace icd10="C950" if record_id==30074 //acute leukaemia
 replace icd10="C959" if record_id==27729 //leukaemia, NOS
 replace icd10="C920" if record_id==27151|record_id==28031|record_id==28282|record_id==28384 ///
 						|record_id==28386|record_id==28653|record_id==31859|record_id==31893 ///
-						|record_id==32062|record_id==33124|record_id==34028 //AML
+						|record_id==32062|record_id==33124|record_id==34028|record_id==32593 //AML
 replace icd10="C910" if record_id==27284|record_id==33033 //ALL, NOS
 replace icd10="C849" if record_id==27405 //adult T-cell lymphoma
 replace icd10="C833" if record_id==29922 //diffuse large b-cell lymphoma
@@ -1540,7 +1547,7 @@ replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C
 tab siteicd10 ,m //0 missing
 
 drop dupobs* dup_id
-	 
+
 order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear cancer siteiarc siteiarchaem pod coddeath
 
 label data "BNR MORTALITY data 2019 + 2020: Identifiable Dataset"
