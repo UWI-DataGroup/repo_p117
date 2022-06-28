@@ -144,7 +144,7 @@ merge m:m sex age_10 using "`datapath'\version04\2-working\pop_wpp_2016-10"
     -----------------------------------------
 
 */
-**drop if _merge==2 //do not drop these age groups as it skews pop_wppulation 
+**drop if _merge==2 //do not drop these age groups as it skews pop_wpp 
 ** There are 2 unmatched records (_merge==2) since 2016 data doesn't have any cases of males + females with age range 0-14
 
 tab age_10 ,m //none missing

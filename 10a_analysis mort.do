@@ -166,7 +166,7 @@ merge m:m sex age_10 using "`datapath'\version04\2-working\pop_wpp_2018-10"
     Matched                               658  (_merge==3)
     -----------------------------------------
 */
-**drop if _merge==2 //do not drop these age groups as it skews pop_wppulation 
+**drop if _merge==2 //do not drop these age groups as it skews pop_wpp 
 ** There is 1 unmatched records (_merge==2) since 2018 data doesn't have any cases of males with age range 25-34
 ** age_10	site  dup	sex	 pfu	pop_wpp	_merge
 ** 25-34	  .     .	male   .	18385	using only (2)

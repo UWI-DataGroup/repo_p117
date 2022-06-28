@@ -1,14 +1,14 @@
 cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          30b_report cancer 2016-2018.do
+    //  algorithm name          30_report cancer.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
+    //  analysts:               Jacqueline CAMPBELL/ Kern ROCKE
     //  date first created      10-MAY-2022
-    // 	date last modified      18-MAY-2022
-    //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
+    // 	date last modified      02-JUN-2022
+    //  algorithm task          Preparing 2013-2015,2018 cancer datasets for reporting
     //  status                  In progress
-    //  objective               To have one dataset with report outputs for 2013-2018 data for 2018 annual report.
+    //  objective               To have one dataset with report outputs for 2013-2015,2018 data for 2018 annual report.
     //  methods                 Use putdocx and Stata memory to produce tables and figures
 
     ** General algorithm set-up
@@ -32,7 +32,7 @@ cls
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\30b_report cancer 2016-2018.smcl", replace // error r(603)
+    log using "`logpath'\30_report cancer.smcl", replace // error r(603)
 ** HEADER -----------------------------------------------------
 
 /*
@@ -47,11 +47,7 @@ use "`datapath'\version04\3-output\2013_2014_2015_cancer_nonsurvival", clear // 
 gen poptot_2015=285327
 gen poptot_2014=284825
 gen poptot_2013=284294
-gen poptot_2016=285798
-gen poptot_2017=286229
 gen poptot_2018=286640
-gen poptot_2019=287021
-gen poptot_2020=287371
 
 ** TUMOURS
 egen tumourtot_2013=count(pid) if dxyr==2013
@@ -390,14 +386,14 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2018 Annual Report: Stata Results"), bold
 putdocx textblock begin
-Date Prepared: 10-MAY-2022. 
+Date Prepared: 10-MAY-2022(ASMRs) / 02-JUN-2022(ASIRs). 
 Prepared by: JC using Stata 
-CanReg5 (incidence) data release date: 21-May-2021.
+CanReg5 (incidence) data release date: 24-May-2022.
 REDCap (death) data release date: 06-May-2022.
 Generated using Dofile: 30_report cancer.do
 putdocx textblock end
 putdocx paragraph, halign(center)
-putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2018 (Population=286,640), 2016 (Population=285,798), 2017 (Population=286,229), 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294))"), bold font(Helvetica,10,"blue")
+putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2018 (Population=286,640), 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294))"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 putdocx text ("Standards"), bold
 putdocx paragraph, halign(center)
@@ -408,19 +404,19 @@ putdocx textblock begin
 (1) No.(tumours): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version04\3-output\2013_2014_2015_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(2) % of population: WPP population for 2013, 2014, 2015, 2016, 2017 and 2018 (see p_117\2018AnnualReportV02 branch\0_population.do)
+(2) % of population: WPP population for 2013, 2014, 2015 and 2018 (see p_117\2018AnnualReportV02 branch\0_population.do)
 putdocx textblock end
 putdocx textblock begin
 (3) No.(patients): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version04\3-output\2013_2014_2015_cancer_nonsurvival")
 putdocx textblock end
 putdocx textblock begin
-(4) ASIR: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; stata command distrate used with pop_wpp_2015-10, pop_wpp_2014-10, pop_wpp_2013-10 for 2015,2014,2013 cancer incidence, respectively, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version04\2-working\pop_wpp_2015-10;pop_wpp_2014-10;pop_wpp_2013-10"; cancer dataset used: "`datapath'\version04\2-working\2013_2014_2015_cancer_numbers")
+(4) ASIR: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; stata command distrate used with pop_wpp_2015-10, pop_wpp_2014-10, pop_wpp_2013-10 for 2015,2014,2013 cancer incidence, respectively, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version04\2-working\pop_wpp_2018-10;pop_wpp_2015-10;pop_wpp_2014-10;pop_wpp_2013-10"; cancer dataset used for PAB: "`datapath'\version04\3-output\2018_cancer_nonsurvival_deidentified"; cancer dataset used: "`datapath'\version04\2-working\2013_2014_2015_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
 (5) Site Order: These tables show where the order of 2015 top 10 sites in 2015,2014,2013, respectively; site order datasets used: "`datapath'\version04\2-working\siteorder_2015; siteorder_2014; siteorder_2013")
 putdocx textblock end
 putdocx textblock begin
-(6) ASIR by sex: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; unk/missing ages were included in the median age group; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version04\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version04\2-working\2013_2014_2015_cancer_numbers")
+(6) ASIR by sex: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; unk/missing ages were included in the median age group; stata command distrate used with pop_wpp_2018-10 for 2018 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version04\2-working\pop_wpp_2018-10"; cancer dataset used for PAB: "`datapath'\version04\3-output\2018_cancer_nonsurvival_deidentified"; cancer dataset used: "`datapath'\version04\2-working\2013_2014_2015_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
 (7) Population text files (WPP): saved in: "`datapath'\version04\2-working\WPP_population by sex_yyyy"
@@ -466,14 +462,14 @@ putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 */
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", replace
+putdocx save "`datapath'\version04\3-output\Cancer_2018AnnualReportStatsV02_`listdate'.docx", replace
 putdocx clear
 
 //save "`datapath'\version04\3-output\2013-2015_2018summstats" ,replace
 restore
 
 clear
-/*
+
 ** Output for above ASIRs
 preserve
 use "`datapath'\version04\2-working\ASIRs", clear
@@ -507,12 +503,12 @@ putdocx table tbl1(1,8), bold shading(lightgray)
 putdocx table tbl1(1,9), bold shading(lightgray)
 putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
-putdocx save "`datapath'\version04\3-output\2021-08-12_annual_report_stats.docx", append
+putdocx save "`datapath'\version04\3-output\Cancer_2018AnnualReportStatsV02_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
-
+/*
 ** Output for above Site Order tables
 preserve
 use "`datapath'\version04\2-working\siteorder_2015", clear
@@ -638,7 +634,39 @@ putdocx clear
 restore
 
 clear
+*/
+** Output for top10 by sex
+preserve
+use "`datapath'\version04\2-working\2018_top10_sex", clear
 
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *    Top 10 by SEX: 2018   *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Number of cases for 2018 Top 10 cancers by Sex: 2018"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2018"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx save "`datapath'\version04\3-output\Cancer_2018AnnualReportStatsV02_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+/*
 ** Output for top10 by sex
 preserve
 use "`datapath'\version04\2-working\2015_top10_sex", clear
@@ -732,6 +760,7 @@ restore
 
 clear
 
+
 ** Output for above ASIRs by sex
 preserve
 use "`datapath'\version04\2-working\ASIRs_female", clear
@@ -804,7 +833,45 @@ putdocx clear
 restore
 
 clear
+*/
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version04\2-working\2018_top10_age+sex_rates", clear
 
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*       by sex: 2018       *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2018"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2018"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version04\2-working\2018_top10_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx save "`datapath'\version04\3-output\Cancer_2018AnnualReportStatsV02_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+/*
 ** Output for top10 age-specific rates by sex
 preserve
 use "`datapath'\version04\2-working\2015_top10_age+sex_rates", clear
@@ -981,266 +1048,6 @@ restore
 				****************************
 
 ** Output for above ASMRs
-use "`datapath'\version04\2-working\ASMRs_wpp_2020", clear
-//format asmr %04.2f
-//format percentage %04.1f
-sort cancer_site year asmr
-
-preserve
-putdocx clear
-putdocx begin, footer(foot1)
-putdocx pagebreak
-putdocx paragraph, tofooter(foot1)
-putdocx text ("Page ")
-putdocx pagenumber
-putdocx paragraph, style(Title)
-putdocx text ("CANCER 2020 Annual Report: ASMRs - WPP"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2020 (Population=287,371)"), bold font(Helvetica,10,"blue")
-putdocx textblock begin
-Date Prepared: 28-Jun-2022.
-Prepared by: JC using Stata 
-REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10e_analysis mort 2020.do
-putdocx textblock end
-putdocx paragraph
-putdocx text ("Methods"), bold
-putdocx textblock begin
-(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version04\3-output\2020_prep mort")
-putdocx textblock end
-putdocx textblock begin
-(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2020-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version04\3-output\2020_prep mort")
-putdocx textblock end
-//putdocx pagebreak
-putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx table tbl1(1,7), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-** Output for top10 age-specific rates
-preserve
-use "`datapath'\version04\2-working\2020_top10mort_age_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				*      MORTALITY: 2020     *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers: 2020"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2020"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2020_top10mort_age_rates")
-putdocx textblock end
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-clear
-
-** Output for top10 age-specific rates by sex
-preserve
-use "`datapath'\version04\2-working\2020_top10mort_age+sex_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				* by sex - MORTALITY: 2020 *
-				****************************
-
-putdocx clear
-putdocx begin
-//putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers by Sex: 2020"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2020"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2020_top10mort_age+sex_rates")
-putdocx textblock end
-//putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *       ASMRs - WPP        *
-				****************************
-
-** Output for above ASMRs
-use "`datapath'\version04\2-working\ASMRs_wpp_2019", clear
-//format asmr %04.2f
-//format percentage %04.1f
-sort cancer_site year asmr
-
-preserve
-putdocx clear
-putdocx begin, footer(foot1)
-//putdocx pagebreak
-putdocx paragraph, tofooter(foot1)
-putdocx text ("Page ")
-putdocx pagenumber
-putdocx paragraph, style(Title)
-putdocx text ("CANCER 2019 Annual Report: ASMRs - WPP"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2019 (Population=287,021)"), bold font(Helvetica,10,"blue")
-putdocx textblock begin
-Date Prepared: 28-Jun-2022.
-Prepared by: JC using Stata 
-REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10d_analysis mort 2019.do
-putdocx textblock end
-putdocx paragraph
-putdocx text ("Methods"), bold
-putdocx textblock begin
-(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version04\3-output\2019_prep mort")
-putdocx textblock end
-putdocx textblock begin
-(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2019-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version04\3-output\2019_prep mort")
-putdocx textblock end
-//putdocx pagebreak
-putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx table tbl1(1,7), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-** Output for top10 age-specific rates
-preserve
-use "`datapath'\version04\2-working\2019_top10mort_age_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				*      MORTALITY: 2019     *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers: 2019"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2019"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2019_top10mort_age_rates")
-putdocx textblock end
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-clear
-
-** Output for top10 age-specific rates by sex
-preserve
-use "`datapath'\version04\2-working\2019_top10mort_age+sex_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				* by sex - MORTALITY: 2019 *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers by Sex: 2019"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2019"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2019_top10mort_age+sex_rates")
-putdocx textblock end
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *       ASMRs - WPP        *
-				****************************
-
-** Output for above ASMRs
 use "`datapath'\version04\2-working\ASMRs_wpp", clear
 //format asmr %04.2f
 //format percentage %04.1f
@@ -1282,7 +1089,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
+putdocx save "`datapath'\version04\3-output\Cancer_2018AnnualReportStatsV02_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1309,7 +1116,7 @@ putdocx text ("Mortality Top 10 - 2018"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2018_top10mort_age_rates")
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version04\2-working\2018_top10mort_age_rates")
 putdocx textblock end
 putdocx paragraph
 putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
@@ -1319,7 +1126,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
+putdocx save "`datapath'\version04\3-output\Cancer_2018AnnualReportStatsV02_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1348,7 +1155,7 @@ putdocx text ("Mortality Top 10 - 2018"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2018_top10mort_age+sex_rates")
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version04\2-working\2018_top10mort_age+sex_rates")
 putdocx textblock end
 putdocx paragraph
 putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
@@ -1359,272 +1166,9 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
+putdocx save "`datapath'\version04\3-output\Cancer_2018AnnualReportStatsV02_`listdate'.docx", append
 putdocx clear
 restore
-
-
-** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *       ASMRs - WPP        *
-				****************************
-
-** Output for above ASMRs
-use "`datapath'\version04\2-working\ASMRs_wpp_2017", clear
-//format asmr %04.2f
-//format percentage %04.1f
-sort cancer_site year asmr
-
-preserve
-putdocx clear
-putdocx begin, footer(foot1)
-putdocx pagebreak
-putdocx paragraph, tofooter(foot1)
-putdocx text ("Page ")
-putdocx pagenumber
-putdocx paragraph, style(Title)
-putdocx text ("CANCER 2017 Annual Report: ASMRs - WPP"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2017 (Population=286,229)"), bold font(Helvetica,10,"blue")
-putdocx textblock begin
-Date Prepared: 18-May-2022.
-Prepared by: JC using Stata 
-REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10b_analysis mort 2016.do
-putdocx textblock end
-putdocx paragraph
-putdocx text ("Methods"), bold
-putdocx textblock begin
-(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version04\3-output\2017_prep mort")
-putdocx textblock end
-putdocx textblock begin
-(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2017-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version04\3-output\2017_prep mort")
-putdocx textblock end
-//putdocx pagebreak
-putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx table tbl1(1,7), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-** Output for top10 age-specific rates
-preserve
-use "`datapath'\version04\2-working\2017_top10mort_age_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				*      MORTALITY: 2017     *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers: 2017"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2017"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2017_top10mort_age_rates")
-putdocx textblock end
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-clear
-
-** Output for top10 age-specific rates by sex
-preserve
-use "`datapath'\version04\2-working\2017_top10mort_age+sex_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				* by sex - MORTALITY: 2017 *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers by Sex: 2017"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2017"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2017_top10mort_age+sex_rates")
-putdocx textblock end
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-
-** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *       ASMRs - WPP        *
-				****************************
-
-** Output for above ASMRs
-use "`datapath'\version04\2-working\ASMRs_wpp_2016", clear
-//format asmr %04.2f
-//format percentage %04.1f
-sort cancer_site year asmr
-
-preserve
-putdocx clear
-putdocx begin, footer(foot1)
-putdocx pagebreak
-putdocx paragraph, tofooter(foot1)
-putdocx text ("Page ")
-putdocx pagenumber
-putdocx paragraph, style(Title)
-putdocx text ("CANCER 2016 Annual Report: ASMRs - WPP"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2016 (Population=285,798)"), bold font(Helvetica,10,"blue")
-putdocx textblock begin
-Date Prepared: 18-May-2022.
-Prepared by: JC using Stata 
-REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10b_analysis mort 2016.do
-putdocx textblock end
-putdocx paragraph
-putdocx text ("Methods"), bold
-putdocx textblock begin
-(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version04\3-output\2016_prep mort")
-putdocx textblock end
-putdocx textblock begin
-(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2016-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version04\3-output\2016_prep mort")
-putdocx textblock end
-//putdocx pagebreak
-putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx table tbl1(1,7), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-** Output for top10 age-specific rates
-preserve
-use "`datapath'\version04\2-working\2016_top10mort_age_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				*      MORTALITY: 2016     *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers: 2016"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2016"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2016_top10mort_age_rates")
-putdocx textblock end
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
-clear
-
-** Output for top10 age-specific rates by sex
-preserve
-use "`datapath'\version04\2-working\2016_top10mort_age+sex_rates", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                * Top 10 age-specific rate *
-				* by sex - MORTALITY: 2016 *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific mortality rates for Top 10 cancers by Sex: 2016"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Mortality Top 10 - 2016"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx text ("Note"), bold
-putdocx textblock begin
-Excludes age groups and sex with no deaths (dataset used: "`datapath'\version04\2-working\2016_top10mort_age+sex_rates")
-putdocx textblock end
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version04\3-output\Cancer_2016-2018AnnualReportStatsV04_`listdate'.docx", append
-putdocx clear
-restore
-
 stop
 /*
 ** Output for cases by PARISH
