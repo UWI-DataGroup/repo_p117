@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      13-JUN-2022
-    // 	date last modified      27-JUN-2022
+    // 	date last modified      29-JUN-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -1027,7 +1027,7 @@ count if regexm(coddeath,"TRACHEA") & icd10=="" //0
 count if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //87
 replace icd10="C349" if (regexm(coddeath,"LUNG")|regexm(coddeath,"BRONCH")) & icd10=="" //87 changes
 replace icd10="C809" if record_id==26945 //PSU, NOS
-replace icd10="C800" if record_id==28126|record_id==32899 //PSU
+replace icd10="C800" if record_id==28126|record_id==32899|record_id==33372 //PSU
 replace icd10="C509" if record_id==27554|record_id==28158|record_id==29333|record_id==29581|record_id==33696|record_id==33706 //breast
 replace icd10="C900" if record_id==29483 //MM
 replace icd10="C541" if record_id==28921 & did=="T1" //endometrium
@@ -1246,7 +1246,7 @@ replace icd10="C509" if record_id==27854 //breast, NOS
 replace icd10="C900" if record_id==27539|record_id==28113|record_id==32226|record_id==33524 //MM
 replace icd10="C269" if record_id==28253|record_id==31498 //gastronintestinal, NOS
 replace icd10="C411" if record_id==29881 //mandible
-replace icd10="C349" if record_id==33372 //lung
+//replace icd10="C349" if record_id==33372 //lung
 //drop if record_id== //myeloproliferative disorder NOS is beh /1 - 1 deleted
 
 tab icd10 ,m

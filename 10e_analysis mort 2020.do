@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      28-JUN-2022
-    // 	date last modified      28-JUN-2022
+    // 	date last modified      29-JUN-2022
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASMRs
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2020 death data for inclusion in 2016-2018 cancer report/for Globocan comparison.
@@ -633,57 +633,63 @@ preserve
 	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
 	sort age sex
 	** now we have to add in the cases and pops for the missings: 
-	** M&F 0-14,15-24,25-34
-	** F   35-44
+	** M&F 0-14,15-24,25-34,35-44
 	** M   45-54
 	
 	expand 2 in 1
-	replace sex=1 in 11
+	replace sex=1 in 10
+	replace age_10=1 in 10
+	replace case=0 in 10
+	replace pop_wpp=(23681) in 10
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=2 in 11
 	replace age_10=1 in 11
 	replace case=0 in 11
-	replace pop_wpp=(23681) in 11
+	replace pop_wpp=(24484) in 11
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=2 in 12
-	replace age_10=1 in 12
+	replace sex=1 in 12
+	replace age_10=2 in 12
 	replace case=0 in 12
-	replace pop_wpp=(24484) in 12
+	replace pop_wpp=(18448) in 12
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=1 in 13
+	replace sex=2 in 13
 	replace age_10=2 in 13
 	replace case=0 in 13
-	replace pop_wpp=(18448) in 13
+	replace pop_wpp=(19286) in 13
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=2 in 14
-	replace age_10=2 in 14
+	replace sex=1 in 14
+	replace age_10=3 in 14
 	replace case=0 in 14
-	replace pop_wpp=(19286) in 14
+	replace pop_wpp=(18488) in 14
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=1 in 15
+	replace sex=2 in 15
 	replace age_10=3 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18488) in 15
+	replace pop_wpp=(18422) in 15
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=2 in 16
-	replace age_10=3 in 16
+	replace sex=1 in 16
+	replace age_10=4 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18422) in 16
+	replace pop_wpp=(19333) in 16
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=1 in 17
+	replace sex=2 in 17
 	replace age_10=4 in 17
 	replace case=0 in 17
-	replace pop_wpp=(19333) in 17
+	replace pop_wpp=(18494) in 17
 	sort age_10
 	
 	expand 2 in 1
@@ -707,7 +713,7 @@ distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   33   287371   11.48      5.93     4.00     8.64     1.13 |
+  |   32   287371   11.14      5.56     3.75     8.15     1.07 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
