@@ -3,8 +3,8 @@
     //  algorithm name          20a_prep current year cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      25-MAY-2022
-    // 	date last modified      26-MAY-2022
+    //  date first created      06-JULY-2022
+    // 	date last modified      06-JULY-2022
     //  algorithm task          Formatting and cleaning 2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for inclusion in 2018 cancer report.
@@ -2405,6 +2405,7 @@ replace topcheckcat=113 if !(strmatch(strupper(primarysite), "*OVERLAP*")) & top
 replace topcheckcat=114 if regexm(primarysite, "NODE") & (topography<770|topography>779)
 replace topcheckcat=115 if !(strmatch(strupper(primarysite), "*OVERLAP*")) & topography==778
 replace topcheckcat=116 if regexm(primarysite, "UNKNOWN") & topography!=809
+replace topcheckcat=117 if (topography>439 & topography<450 & morph!=8720)|morph==8832
 label var topcheckcat "PrimSite<>Top Check Category"
 label define topcheckcat_lab 	1 "Check 1: Lip" 2 "Check 2: Lip-Overlap" 3 "Check 3: Tongue" 4 "Check 4: Tongue-Overlap" 5 "Check 5: Gum" 6 "Check 6: Mouth" ///
 								7 "Check 7: Mouth-Overlap" 8 "Check 8: Palate-Overlap" 9 "Check 9: Mouth Other-Overlap" 10 "Check 10: Glands" 11 "Check 11: Glands-Overlap" ///
@@ -2435,7 +2436,7 @@ label define topcheckcat_lab 	1 "Check 1: Lip" 2 "Check 2: Lip-Overlap" 3 "Check
 							   106 "Check 106: Spinal Cord/CNS" 107 "Check 107: Brain/CNS-Overlap" 108 "Check 108: Thyroid" ///
 							   109 "Check 109: Adrenal Gland" 110 "Check 110: Endocrine-Other" 111 "Check 111: Endocrine-Overalp" ///
 							   112 "Check 112: Other/Ill defined" 113 "Check 113: Ill-defined-Overlap" 114 "Check 114: LNs" ///
-							   115 "Check 115: LNs-Overlap" 116 "Check 116: PSU" ,modify
+							   115 "Check 115: LNs-Overlap" 116 "Check 116: PSU" 117 "Check 117: NMSCs" ,modify
 label values topcheckcat topcheckcat_lab
 
 ** Create category for morphology according to groupings in ICD-O-3 book
@@ -3305,7 +3306,15 @@ label define datescheckcat_lab 1 "Check 1: Admission Date missing" 2 "Check 2: D
 							 ,modify
 label values datescheckcat datescheckcat_lab
 
+
+** Create category for Resident Status check
+gen residentcheckcat=.
+replace residentcheckcat=1 if resident!=1 & recstatus!=3 & recstatus!=5
+label var residentcheckcat "Residency Check Category"
+label define residentcheckcat_lab 1 "Check 1: Residency and Record Status mismatch"	 ,modify
+label values residentcheckcat residentcheckcat_lab
 	
+
 ** Put variables in order they are to appear	  
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx

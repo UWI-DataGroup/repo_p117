@@ -4,8 +4,8 @@ cls
     //  algorithm name          20b_clean current year cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      30-MAY-2022
-    // 	date last modified      02-JUN-2022
+    //  date first created      06-JULY-2022
+    // 	date last modified      06-JULY-2022
     //  algorithm task          Cleaning 2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for PAB 07-Jun-2022.
@@ -509,6 +509,10 @@ count if hospnum=="" & retsource<8 //0
 count if resident==. //0
 //list pid resident recstatus cr5id if resident==.
 
+** residentcheckcat 1: Residency and Record Status mismatch - resident!=1 & recstatus!=3 & recstatus!=5
+count if residentcheckcat==1 //0
+//list pid resident record status cr5id if residentcheckcat==1, string(100)
+
 *************************
 ** Status Last Contact **
 *************************
@@ -930,6 +934,11 @@ count if topography==. & primarysite!=""  //0
 replace top="" if top=="." //0 changes
 count if top!="" & length(top)!=3 //0
 //list pid top topography cr5id if top!="" & length(top)!=3
+
+JC 06jul2022: check for other topcheckcat flags using Stata Browse window (topcheckcat 1 - 116)
+** topcheckcat 117: Non-melanoma skin cancers - (topography>439 & topography<450 & morph!=8720)|morph==8832
+count if topcheckcat==117 //0
+//list pid primarysite top hx morph basis cfdx cr5id if topcheckcat==117, string(100)
 
 ** No other checks needed as covered in primarysite checks 62 & 63
 
