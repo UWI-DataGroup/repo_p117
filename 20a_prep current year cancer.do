@@ -3,11 +3,11 @@
     //  algorithm name          20a_prep current year cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      06-JULY-2022
-    // 	date last modified      06-JULY-2022
-    //  algorithm task          Formatting and cleaning 2018 cancer dataset
+    //  date first created      07-JULY-2022
+    // 	date last modified      07-JULY-2022
+    //  algorithm task          Formatting and cleaning 2016-2018 cancer dataset
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for inclusion in 2018 cancer report.
+    //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for inclusion in 2016-2018 cancer report.
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
 
     ** General algorithm set-up
@@ -76,7 +76,7 @@
 	(9) Under 'File format'section, select 'Tab Separated Values'
 	(10) Click 'Export'
 	(11) Save export with date and initials from CanReg5 XML backup onto:
-		 e.g. `datapath'\version04\1-input\yyyy-mm-dd_MAIN Source+Tumour+Patient_KWG.txt
+		 e.g. `datapath'\version09\1-input\yyyy-mm-dd_MAIN Source+Tumour+Patient_KWG.txt
 */
 /*
  To prepare cancer dataset for import:
@@ -100,9 +100,9 @@
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-import excel using "`datapath'\version04\1-input\2022-05-24_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
+import excel using "`datapath'\version09\1-input\2022-07-07_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
 
-count //19,174
+count //20,995
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
 	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.
@@ -311,17 +311,6 @@ label var flag187 "Correction: SmokingFreq"
 label var flag188 "Correction: SmokingDuration"
 label var flag189 "Correction: SmokingDurationFreq"
 
-** Cleaning from IARCcrgTools checks above (JC 25may2022: one-time corrections so disable after SDA corrects and new CR5 export is imported into Stata)
-destring flag52 ,replace
-destring flag147 ,replace
-replace flag52=IncidenceDate if RegistryNumber=="20181167"
-replace IncidenceDate=20180215 if RegistryNumber=="20181167"
-replace flag147=IncidenceDate if RegistryNumber=="20181167"
-
-replace flag40=Topography if RegistryNumber=="20180934"
-replace Topography="449" if RegistryNumber=="20180934"
-replace flag135=Topography if RegistryNumber=="20180934"
-
 ** Format incidence date to create tumour year
 nsplit IncidenceDate, digits(4 2 2) gen(dotyear dotmonth dotday)
 gen dot=mdy(dotmonth, dotday, dotyear)
@@ -331,7 +320,7 @@ label var dot "Incidence Date"
 label var dotyear "Incidence Year"
 //drop IncidenceDate
 
-count //
+count //20,995
 
 ** Renaming CanReg5 variables
 rename Personsearch persearch
@@ -425,6 +414,8 @@ rename TumourIDSourceTable tumouridsourcetable
 	2) the first 8 digits in tumourid remains the same as the defunct (i.e. no longer used) pid while the new pid will be the pid into which 
 	   that tumour was merged e.g. 20130303 has 2 tumours with different tumourids - 201303030102 and 201407170101.
 */
+** Sort by RegistryNumber and SourceRecordID to create cr5id that matches tumour and source sequence in CR5db
+sort pid sid2
 
 gen str_sourcerecordid=sid2
 gen sourcetotal = substr(str_sourcerecordid,-1,1)
@@ -543,166 +534,50 @@ list pid if cr5id==""
 
 
 ** Check if dxyr and incidence year do not match and review these before dropping the ineligible years
-count if dxyr!=. & dotyear!=. & dxyr!=dotyear //47
+count if dxyr!=. & dotyear!=. & dxyr!=dotyear //5
 list pid eid sid dxyr dotyear dot cr5id if dxyr!=. & dotyear!=. & dxyr!=dotyear //reviewed these in CR5db
 
 ** Corrections for the above CR5db review
-replace flag52=IncidenceDate if pid=="20080563" & cr5id=="T2S1"
-replace IncidenceDate=20080529 if pid=="20080563" & cr5id=="T2S1"
-replace flag147=IncidenceDate if pid=="20080563" & cr5id=="T2S1"
-
 destring flag53 ,replace
 destring flag148 ,replace
-replace flag53=dxyr if pid=="20130650" & cr5id=="T1S1"
-replace dxyr=2011 if pid=="20130650" & cr5id=="T1S1"
-replace flag148=dxyr if pid=="20130650" & cr5id=="T1S1"
+replace flag53=dxyr if pid=="20170830" & regexm(cr5id,"T1")
+replace dxyr=2016 if pid=="20170830" & regexm(cr5id,"T1")
+replace flag148=dxyr if pid=="20170830" & regexm(cr5id,"T1")
 
-replace flag52=IncidenceDate if pid=="20140083" & cr5id=="T1S1"
-replace IncidenceDate=20120630 if pid=="20140083" & cr5id=="T1S1"
-replace flag147=IncidenceDate if pid=="20140083" & cr5id=="T1S1"
+replace flag53=dxyr if pid=="20180662" & regexm(cr5id,"T1")
+replace dxyr=2016 if pid=="20180662" & regexm(cr5id,"T1")
+replace flag148=dxyr if pid=="20180662" & regexm(cr5id,"T1")
 
-replace flag52=IncidenceDate if pid=="20140094" & regexm(cr5id,"T1")
-replace IncidenceDate=20120630 if pid=="20140094" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20140094" & regexm(cr5id,"T1")
+replace flag53=dxyr if pid=="20180872" & regexm(cr5id,"T1")
+replace dxyr=2016 if pid=="20180872" & regexm(cr5id,"T1")
+replace flag148=dxyr if pid=="20180872" & regexm(cr5id,"T1")
 
-replace flag52=IncidenceDate if pid=="20140117" & regexm(cr5id,"T1")
-replace IncidenceDate=20100630 if pid=="20140117" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20140117" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20140129" & regexm(cr5id,"T1")
-replace IncidenceDate=20111001 if pid=="20140129" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20140129" & regexm(cr5id,"T1")
-replace flag53=dxyr if pid=="20140129" & regexm(cr5id,"T1")
-replace dxyr=2011 if pid=="20140129" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20140129" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20140286" & regexm(cr5id,"T1")
-replace IncidenceDate=20131230 if pid=="20140286" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20140286" & regexm(cr5id,"T1")
-replace flag175="please enter path rpt from MasterDb: frmCF_2009 #3404" if pid=="20140286" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20140353" & regexm(cr5id,"T1")
-replace IncidenceDate=20080611 if pid=="20140353" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20140353" & regexm(cr5id,"T1")
-destring flag32 ,replace
-destring flag127 ,replace
-replace flag32=recstatus if pid=="20140353" & regexm(cr5id,"T1")
-replace recstatus=1 if pid=="20140353" & regexm(cr5id,"T1")
-replace flag127=recstatus if pid=="20140353" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20140455" & regexm(cr5id,"T1")
-replace IncidenceDate=20131210 if pid=="20140455" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20140455" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20140537" & regexm(cr5id,"T1")
-replace dxyr=2001 if pid=="20140537" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20140537" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20141434" & regexm(cr5id,"T2")
-replace IncidenceDate=20140724 if pid=="20141434" & regexm(cr5id,"T2")
-replace flag147=IncidenceDate if pid=="20141434" & regexm(cr5id,"T2")
-
-replace flag52=IncidenceDate if pid=="20141523" & regexm(cr5id,"T1")
-replace IncidenceDate=20120630 if pid=="20141523" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20141523" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20150536" & regexm(cr5id,"T1")
-replace dxyr=2015 if pid=="20150536" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20150536" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20160351" & regexm(cr5id,"T1")
-replace dxyr=2015 if pid=="20160351" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20160351" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20160847" & regexm(cr5id,"T1")
-replace dxyr=2015 if pid=="20160847" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20160847" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20170011" & regexm(cr5id,"T2")
-replace dxyr=2018 if pid=="20170011" & regexm(cr5id,"T2")
-replace flag148=dxyr if pid=="20170011" & regexm(cr5id,"T2")
-
-replace flag52=IncidenceDate if pid=="20170027" & regexm(cr5id,"T1")
-replace IncidenceDate=20160715 if pid=="20170027" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20170027" & regexm(cr5id,"T1")
-replace flag53=dxyr if pid=="20170027" & regexm(cr5id,"T1")
-replace dxyr=2016 if pid=="20170027" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20170027" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20170641" & regexm(cr5id,"T1")
-replace dxyr=2016 if pid=="20170641" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20170641" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20170715" & regexm(cr5id,"T1")
-replace dxyr=2016 if pid=="20170715" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20170715" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20180117" & regexm(cr5id,"T1")
-replace IncidenceDate=20171108 if pid=="20180117" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20180117" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20180399" & regexm(cr5id,"T1")
-replace dxyr=2018 if pid=="20180399" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20180399" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20180879" & regexm(cr5id,"T1")
-replace dxyr=2018 if pid=="20180879" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20180879" & regexm(cr5id,"T1")
-
-replace flag53=dxyr if pid=="20181159" & regexm(cr5id,"T1")
-replace dxyr=2018 if pid=="20181159" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20181159" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20182055" & regexm(cr5id,"T1")
-replace IncidenceDate=20010630 if pid=="20182055" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20182055" & regexm(cr5id,"T1")
-
-
-** Corrections from manual CR5db review of 2018 unconfirmed cases on 24may2022
-replace flag53=dxyr if pid=="20180033" & regexm(cr5id,"T1")
-replace dxyr=1996 if pid=="20180033" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20180033" & regexm(cr5id,"T1")
-
-replace flag52=IncidenceDate if pid=="20180540" & regexm(cr5id,"T1")
-replace IncidenceDate=20100821 if pid=="20180540" & regexm(cr5id,"T1")
-replace flag147=IncidenceDate if pid=="20180540" & regexm(cr5id,"T1")
-replace flag53=dxyr if pid=="20180540" & regexm(cr5id,"T1")
-replace dxyr=2010 if pid=="20180540" & regexm(cr5id,"T1")
-replace flag148=dxyr if pid=="20180540" & regexm(cr5id,"T1")
-
-destring flag76 ,replace
-destring flag171 ,replace
-replace flag76=resident if pid=="20180624" & regexm(cr5id,"T1")
-replace resident=2 if pid=="20180624" & regexm(cr5id,"T1")
-replace flag171=resident if pid=="20180624" & regexm(cr5id,"T1")
-
-replace flag76=resident if pid=="20180723" & regexm(cr5id,"T1")
-replace resident=2 if pid=="20180723" & regexm(cr5id,"T1")
-replace flag171=resident if pid=="20180723" & regexm(cr5id,"T1")
-
+replace flag53=99 if dxyr==. //14
+replace dxyr=99 if dxyr==99
+replace flag148=dxyr if dxyr==99
 /*
-** Prepare this dataset for export to excel (prior to removing non-2018 cases)
+** Prepare this dataset for export to excel (prior to removing non-2016,2017,2018 cases)
 preserve
 sort pid
 
 drop if  flag1=="" & flag2=="" & flag3=="" & flag4=="" & flag5=="" & flag6=="" & flag7=="" & flag8=="" & flag9=="" & flag10=="" ///
 		 & flag11=="" & flag12=="" & flag13=="" & flag14=="" & flag15=="" & flag16=="" & flag17=="" & flag18=="" & flag19=="" & flag20=="" ///
 		 & flag21=="" & flag22=="" & flag23=="" & flag24=="" & flag25=="" & flag26=="" & flag27=="" & flag28=="" & flag29=="" & flag30=="" ///
-		 & flag31=="" & flag32==. & flag33=="" & flag34=="" & flag35=="" & flag36=="" & flag37=="" & flag38=="" & flag39=="" & flag40=="" ///
+		 & flag31=="" & flag32=="" & flag33=="" & flag34=="" & flag35=="" & flag36=="" & flag37=="" & flag38=="" & flag39=="" & flag40=="" ///
 		 & flag41=="" & flag42=="" & flag43=="" & flag44=="" & flag45=="" & flag46=="" & flag47=="" & flag48=="" & flag49=="" & flag50=="" ///
-		 & flag51=="" & flag52==. & flag53==. & flag54=="" & flag55=="" & flag56=="" & flag57=="" & flag58=="" & flag59=="" & flag60=="" ///
+		 & flag51=="" & flag52=="" & flag53==. & flag54=="" & flag55=="" & flag56=="" & flag57=="" & flag58=="" & flag59=="" & flag60=="" ///
 		 & flag61=="" & flag62=="" & flag63=="" & flag64=="" & flag65=="" & flag66=="" & flag67=="" & flag68=="" & flag69=="" & flag70=="" ///
-		 & flag71=="" & flag72=="" & flag73=="" & flag74=="" & flag75=="" & flag76==. & flag77=="" & flag78=="" & flag79=="" & flag80=="" ///
+		 & flag71=="" & flag72=="" & flag73=="" & flag74=="" & flag75=="" & flag76=="" & flag77=="" & flag78=="" & flag79=="" & flag80=="" ///
 		 & flag81=="" & flag82=="" & flag83=="" & flag84=="" & flag85=="" & flag86=="" & flag87=="" & flag88=="" & flag89=="" & flag90=="" ///
 		 & flag91=="" & flag92=="" & flag93=="" & flag94=="" & flag95=="" & flag96=="" & flag97=="" & flag98=="" & flag99=="" & flag100=="" ///
 		 & flag101=="" & flag102=="" & flag103=="" & flag104=="" & flag105=="" & flag106=="" & flag107=="" & flag108=="" & flag109=="" & flag110=="" ///
 		 & flag111=="" & flag112=="" & flag113=="" & flag114=="" & flag115=="" & flag116=="" & flag117=="" & flag118=="" & flag119=="" & flag120=="" ///
-		 & flag121=="" & flag122=="" & flag123=="" & flag124=="" & flag125=="" & flag126=="" & flag127==. & flag128=="" & flag129=="" & flag130=="" ///
+		 & flag121=="" & flag122=="" & flag123=="" & flag124=="" & flag125=="" & flag126=="" & flag127=="" & flag128=="" & flag129=="" & flag130=="" ///
 		 & flag131=="" & flag132=="" & flag133=="" & flag134=="" & flag135=="" & flag136=="" & flag137=="" & flag138=="" & flag139=="" & flag140=="" ///
-		 & flag141=="" & flag142=="" & flag143=="" & flag144=="" & flag145=="" & flag146=="" & flag147==. & flag148==. & flag149=="" & flag150=="" ///
+		 & flag141=="" & flag142=="" & flag143=="" & flag144=="" & flag145=="" & flag146=="" & flag147=="" & flag148==. & flag149=="" & flag150=="" ///
 		 & flag151=="" & flag152=="" & flag153=="" & flag154=="" & flag155=="" & flag156=="" & flag157=="" & flag158=="" & flag159=="" & flag160=="" ///
 		 & flag161=="" & flag162=="" & flag163=="" & flag164=="" & flag165=="" & flag166=="" & flag167=="" & flag168=="" & flag169=="" & flag170=="" ///
-		 & flag171==. & flag172=="" & flag173=="" & flag174=="" & flag175=="" & flag176=="" & flag177=="" & flag178=="" & flag179=="" & flag180=="" ///
+		 & flag171=="" & flag172=="" & flag173=="" & flag174=="" & flag175=="" & flag176=="" & flag177=="" & flag178=="" & flag179=="" & flag180=="" ///
 		 & flag181=="" & flag182=="" & flag183=="" & flag184=="" & flag185=="" & flag186=="" & flag187=="" & flag188=="" & flag189==""
 // deleted
 
@@ -716,39 +591,36 @@ capture export_excel str_no pid flag1-flag94 if ///
 		flag1!="" | flag2!="" | flag3!="" | flag4!="" | flag5!="" | flag6!="" | flag7!="" | flag8!="" | flag9!="" | flag10!="" ///
 		|flag11!="" | flag12!="" | flag13!="" | flag14!="" | flag15!="" | flag16!="" | flag17!="" | flag18!="" | flag19!="" | flag20!="" ///
 		|flag21!="" | flag22!="" | flag23!="" | flag24!="" | flag25!="" | flag26!="" | flag27!="" | flag28!="" | flag29!="" | flag30!="" ///
-		|flag31!="" | flag32!=. | flag33!="" | flag34!="" | flag35!="" | flag36!="" | flag37!="" | flag38!="" | flag39!="" | flag40!="" ///
+		|flag31!="" | flag32!="" | flag33!="" | flag34!="" | flag35!="" | flag36!="" | flag37!="" | flag38!="" | flag39!="" | flag40!="" ///
 		|flag41!="" | flag42!="" | flag43!="" | flag44!="" | flag45!="" | flag46!="" | flag47!="" | flag48!="" | flag49!="" | flag50!="" ///
-		|flag51!="" | flag52!=. | flag53!=. | flag54!="" | flag55!="" | flag56!="" | flag57!="" | flag58!="" | flag59!="" | flag60!="" ///
+		|flag51!="" | flag52!="" | flag53!=. | flag54!="" | flag55!="" | flag56!="" | flag57!="" | flag58!="" | flag59!="" | flag60!="" ///
 		|flag61!="" | flag62!="" | flag63!="" | flag64!="" | flag65!="" | flag66!="" | flag67!="" | flag68!="" | flag69!="" | flag70!="" ///
-		|flag71!="" | flag72!="" | flag73!="" | flag74!="" | flag75!="" | flag76!=. | flag77!="" | flag78!="" | flag79!="" | flag80!="" ///
+		|flag71!="" | flag72!="" | flag73!="" | flag74!="" | flag75!="" | flag76!="" | flag77!="" | flag78!="" | flag79!="" | flag80!="" ///
 		|flag81!="" | flag82!="" | flag83!="" | flag84!="" | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
 		|flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
-using "`datapath'\version04\3-output\CancerCleaningALL`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+using "`datapath'\version09\3-output\CancerCleaningALL`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
 capture export_excel str_no pid flag95-flag189 if ///
 		 flag95!="" | flag96!="" | flag97!="" | flag98!="" | flag99!="" | flag100!="" ///
 		 |flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!="" | flag108!="" | flag109!="" | flag110!="" ///
 		 |flag111!="" | flag112!="" | flag113!="" | flag114!="" | flag115!="" | flag116!="" | flag117!="" | flag118!="" | flag119!="" | flag120!="" ///
-		 |flag121!="" | flag122!="" | flag123!="" | flag124!="" | flag125!="" | flag126!="" | flag127!=. | flag128!="" | flag129!="" | flag130!="" ///
+		 |flag121!="" | flag122!="" | flag123!="" | flag124!="" | flag125!="" | flag126!="" | flag127!="" | flag128!="" | flag129!="" | flag130!="" ///
 		 |flag131!="" | flag132!="" | flag133!="" | flag134!="" | flag135!="" | flag136!="" | flag137!="" | flag138!="" | flag139!="" | flag140!="" ///
-		 |flag141!="" | flag142!="" | flag143!="" | flag144!="" | flag145!="" | flag146!="" | flag147!=. | flag148!=. | flag149!="" | flag150!="" ///
+		 |flag141!="" | flag142!="" | flag143!="" | flag144!="" | flag145!="" | flag146!="" | flag147!="" | flag148!=. | flag149!="" | flag150!="" ///
 		 |flag151!="" | flag152!="" | flag153!="" | flag154!="" | flag155!="" | flag156!="" | flag157!="" | flag158!="" | flag159!="" | flag160!="" ///
 		 |flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!="" | flag168!="" | flag169!="" | flag170!="" ///
-		 |flag171!=. | flag172!="" | flag173!="" | flag174!="" | flag175!="" | flag176!="" | flag177!="" | flag178!="" | flag179!="" | flag180!="" ///
+		 |flag171!="" | flag172!="" | flag173!="" | flag174!="" | flag175!="" | flag176!="" | flag177!="" | flag178!="" | flag179!="" | flag180!="" ///
 		 |flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
-using "`datapath'\version04\3-output\CancerCleaningALL`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+using "`datapath'\version09\3-output\CancerCleaningALL`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
 restore
 */
 
 ** Remove cases NOT diagnosed in 2018
-tab dxyr ,m //3 missing dxyr
-list pid cr5id if dxyr==.
-replace dxyr=2018 if pid=="20181008" & cr5id=="T1S1"
-replace dxyr=2019 if pid=="20190321" & cr5id=="T1S1"
-replace dxyr=2019 if pid=="20190494" & cr5id=="T2S1"
+tab dxyr ,m //14 missing dxyr; 2016=2,494; 2017=2,141; 2018=2,227
+list pid cr5id if dxyr==. //not 2016/2017/2018 so leave for KWG to correct
 
-drop if dxyr!=2018 //16,951 deleted
+drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //16,951 deleted
 
-count //2223
+count //6862
 
 
 /*
@@ -2194,7 +2066,7 @@ label var streviewer "STReviewer"
 label define streviewer_lab 0 "Pending" 1 "JC" 2 "LM" 3 "PP" 4 "AR" 5 "AH" 6 "JK" 7 "TM" 8 "SAW" 9 "SAF" 99 "Unknown", modify
 label values streviewer streviewer_lab
 
-count //2223
+count //6862
 
 drop non_numeric*
 
@@ -3319,9 +3191,9 @@ label values residentcheckcat residentcheckcat_lab
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //2223
+count //6862
 
 
 ** Create dataset to use for 2018 cleaning
-save "`datapath'\version04\2-working\2018_prepped cancer", replace
+save "`datapath'\version09\2-working\2016-2018_prepped cancer", replace
 
