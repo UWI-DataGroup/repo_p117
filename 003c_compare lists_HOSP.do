@@ -3,8 +3,8 @@
     //  algorithm name          003c_compare lists_Hosp#.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      19-MAY-2022
-    // 	date last modified      19-MAY-2022
+    //  date first created      07-JULY-2022
+    // 	date last modified      07-JULY-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,627
+count //12,154
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
-count if dup>0 //10
+count if dup>0 //26
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 6,366 deleted
-count //10
+count //26
 
 
 ** STEP #6
@@ -92,7 +92,7 @@ count //10
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //16
+count //36
 
 
 ** STEP #7
@@ -137,6 +137,7 @@ label var str_no "No."
 
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action hosplist
 
+count //26
 
 ** STEP #10
 ** Save this dataset for export to excel (see dofile 004_export new lists)

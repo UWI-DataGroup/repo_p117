@@ -2,9 +2,9 @@
 **  DO-FILE METADATA
     //  algorithm name          001_flag errors.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL + Kirt GILL
-    //  date first created      19-MAY-2022
-    // 	date last modified      19-MAY-2022
+    //  analysts:               Jacqueline CAMPBELL
+    //  date first created      07-JULY-2022
+    // 	date last modified      07-JULY-2022
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -68,7 +68,7 @@
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version07\1-input\2022-05-19_MAIN Source+Tumour+Patient_JC.txt"
+insheet using "`datapath'\version07\1-input\2022-07-07_MAIN Source+Tumour+Patient_KWG.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -85,8 +85,9 @@ drop tumouridsourcetable recordnumber cfdiagnosis labnumber specimen sampletaken
 	 morphology laterality behaviour grade basisofdiagnosis tnmcatstage tnmantstage esstnmcatstage esstnmantstage summarystaging incidencedate consultant ///
 	 iccccode icd10 treatment1 treatment1date treatment2 treatment2date treatment3 treatment3date treatment4 treatment4date treatment5 treatment5date ///
 	 othertreatment1 othertreatment2 notreatment1 notreatment2 ttreviewer personsearch residentstatus statuslastcontact datelastcontact ///
-	 comments ptdataabstractor ptcasefindingdate casestatus obsoleteflagpatienttable patientrecordid patientupdatedby patientupdatedate patientrecordstatus ///
-	 patientcheckstatus retrievalsource notesseen notesseendate furtherretrievalsource ptreviewer 
+	 comments ptdataabstractor ptcasefindingdate obsoleteflagpatienttable patientrecordid patientupdatedby patientupdatedate patientrecordstatus ///
+	 patientcheckstatus retrievalsource notesseen notesseendate furtherretrievalsource ptreviewer rfalcohol alcoholamount alcoholfreq ///
+	 rfsmoking smokingamount smokingfreq smokingduration smokingdurationfreq
 
 ** STEP #6
 ** Create variables for the excel duplicate lists that the SDA will update and label already exisiting variables that will appear in list
@@ -156,7 +157,7 @@ replace flag7="delete blank record" if lastname==""
 
 ** STEP #11
 ** Check for invalid length NRN
-count if length(nrn)<11 & nrn!="" //0
+count if length(nrn)<11 & nrn!="" //20
 list registrynumber firstname lastname nrn birthdate if length(nrn)<11 & nrn!=""
 replace flag3=nrn if length(nrn)<11 & nrn!="" //0 changes
 
@@ -175,7 +176,8 @@ drop nrn2
 replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //0 changes
 
 replace nrn="" if length(nrn)==1
-
+replace nrn="" if registrynumber==20210143
+/*
 preserve
 clear
 import excel using "`datapath'\version07\2-working\NRNelectoral_dups.xlsx" , firstrow case(lower)
@@ -196,7 +198,7 @@ merge 1:1 registrynumber using "`datapath'\version07\2-working\electoral_nrn_dup
 replace nrn=elec_nrn if _merge==3 //2 changes
 drop elec_* _merge
 erase "`datapath'\version07\2-working\electoral_nrn_dups.dta"
-
+*/
 ** STEP #13
 ** Identify corrected NRNs in prep for export to excel ERRORS list
 replace flag8=nrn if flag3!="" //0 changes
@@ -207,9 +209,9 @@ replace flag8=nrn if flag3!="" //0 changes
 gen str8 dob = string(birthdate,"%08.0f")
 rename birthdate birthdate2
 rename dob birthdate
-count if length(birthdate)<8|length(birthdate)>8 //0 - check against electoral list using 'Contains' filter in the Names fields on electoral list
+count if length(birthdate)<8|length(birthdate)>8 //22 - check against electoral list using 'Contains' filter in the Names fields on electoral list
 list registrynumber firstname lastname nrn birthdate if length(birthdate)<8|length(birthdate)>8
-replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //0 changes
+replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //22 changes
 replace flag4="missing" if birthdate=="" //0 changes
 
 
@@ -256,20 +258,20 @@ replace flag9="delete blank record" if registrynumber==20159999 //0 changes
 
 ** STEP #18
 ** Check for invalid length Hosp#
-count if length(hospitalnumber)==1 //1
+count if length(hospitalnumber)==1 //35
 list registrynumber firstname lastname hospitalnumber if length(hospitalnumber)==1
-count if hospitalnumber=="NYR" //2
+count if hospitalnumber=="NYR" //0
 replace flag5=hospitalnumber if length(hospitalnumber)==1|hospitalnumber=="NYR" //2 changes
 
 
 ** STEP #19
 ** Correct Hosp# errors using below method as these won't lead to de-identifying the dofile
-replace hospitalnumber="99" if length(hospitalnumber)==1|hospitalnumber=="NYR" //1 change
+replace hospitalnumber="99" if length(hospitalnumber)==1|hospitalnumber=="NYR" //35 changes
 
 
 ** STEP #20
 ** Identify corrected Hosp#s in prep for export to excel ERRORS list
-replace flag10=hospitalnumber if flag5!="" //2 changes
+replace flag10=hospitalnumber if flag5!="" //35 changes
 
 
 ** STEP #21
@@ -296,7 +298,7 @@ restore
 ** Remove variables not needed for excel lists
 drop stdataabstractor stsourcedate nftype sourcename doctor doctoraddress recordstatus
 
-count //10,627
+count //12,154
 
 
 ** STEP #24

@@ -3,8 +3,8 @@
     //  algorithm name          003d_compare lists_NAMES.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      19-MAY-2022
-    // 	date last modified      19-MAY-2022
+    //  date first created      07-JULY-2022
+    // 	date last modified      07-JULY-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,627
+count //12,154
 
 
 ** STEP #3
@@ -66,7 +66,7 @@ drop if lastname==""
 sort lastname firstname
 quietly by lastname firstname:  gen dup = cond(_N==1,0,_n)
 sort lastname firstname registrynumber
-count if dup>0 //606
+count if dup>0 //2,273
 
 
 ** STEP #4 
@@ -80,7 +80,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Names non-duplicates - 9,187 deleted
-count //606
+count //2,273
 
 ** STEP #6
 /* 
@@ -90,35 +90,35 @@ count //606
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevNAMES_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //2,038
+count //3,716
 
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //1,946
+count if duppid>0 //1,996
 order registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked
 //list registrynumber lastname firstname str_no str_da str_dadate str_action duppid checked if duppid>0 , string(50)
 
-count if checked==2 & duppid>0 //548 - so all have a corresponding pid that's from previously-checked list so can no new dups found in this list
-count if checked==1 & duppid==0 //34 - check these in Stata Browse/Edit window: previously-checked and merged cases
-count if duppid>0 //1,946 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records; those with 4 records are previously-checked ones
+count if checked==2 & duppid>0 //603 - so all have a corresponding pid that's from previously-checked list so can no new dups found in this list
+count if checked==1 & duppid==0 //50 - check these in Stata Browse/Edit window: previously-checked and merged cases
+count if duppid>0 //1,996 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records; those with 4 records are previously-checked ones
 
 ** Check the below lists in Stata Browse/Edit window to see if they were previously-checked (i.e. checked==1) and merged cases
 sort lastname firstname
-count if checked==1 & duppid==0 //34 - check these in Stata Browse/Edit window: previously-checked and merged cases
-count if duppid==0 //92 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records
+count if checked==1 & duppid==0 //50 - check these in Stata Browse/Edit window: previously-checked and merged cases
+count if duppid==0 //1720- check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records
 
 ** Remove previously-checked cases that didn't match with any newly-generated cases
-drop if checked==1 & duppid==0 //34 deleted
+drop if checked==1 & duppid==0 //50 deleted
 
 ** Check the below lists in Stata Browse/Edit window to see if they were previously-checked (i.e. checked==1) and merged cases
-count if duppid==0 //58 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records
+count if duppid==0 //1,670 - check these in Stata Browse/Edit window: previously-checked and merged cases + new duplicate cases for those with 2 records
 
 ** Remove all previously-checked cases
-drop if duppid!=0 //1,887 deleted
-count //58
+drop if duppid!=0 //1,996 deleted
+count //1,670
 
 ** STEP #9
 ** Prepare this dataset for export to excel
@@ -140,6 +140,7 @@ label var str_no "No."
 
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nameslist
 
+count //1,670
 
 ** STEP #10
 ** Save this dataset for export to excel (see dofile 004_export new lists)
