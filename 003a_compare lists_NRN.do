@@ -3,8 +3,8 @@
     //  algorithm name          003a_compare lists_NRN.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      07-JULY-2022
-    // 	date last modified      07-JULY-2022
+    //  date first created      11-JULY-2022
+    // 	date last modified      11-JULY-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //12,154
+count //10,851
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if nrn==""|nrn=="999999-9999"|regexm(nrn,"9999") //remove blank/missing NRN
 sort nrn 
 quietly by nrn : gen dup = cond(_N==1,0,_n)
 sort nrn registrynumber lastname firstname
-count if dup>0 //1,064
+count if dup>0 //24
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the NRN non-duplicates - 8,115 deleted
-count //1,064
+count //24
 
 ** STEP #6
 /* 
@@ -91,19 +91,20 @@ count //1,064
 //destring birthdate ,replace
 append using "`datapath'\version07\2-working\prevNRN_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //1,072
+count //32
 
 
 ** STEP #7
 ** Compare these newly-generated duplicates with the previously-checked NRN list by checking for duplicates PIDs/Reg #s
 sort registrynumber
 quietly by registrynumber:  gen duppid = cond(_N==1,0,_n)
-count if duppid>0 //2
+count if duppid>0 //0
 
 ** STEP #8
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //7 deleted
-drop if duppid>0 //2 deleted
+sort nrn
+drop if checked==1 & duppid==0 //8 deleted
+drop if duppid>0 //0 deleted
 //drop if duppid!=0 //4 deleted the cases pulled in from the last list
 
 ** STEP #9
@@ -126,7 +127,7 @@ label var str_no "No."
 
 capture order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action nrnlist
 
-count //1063
+count //24
 
 ** STEP #10
 ** Save this dataset for export to excel (see dofile 004_export new lists)

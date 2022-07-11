@@ -3,8 +3,8 @@
     //  algorithm name          001_flag errors.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      07-JULY-2022
-    // 	date last modified      07-JULY-2022
+    //  date first created      11-JULY-2022
+    // 	date last modified      11-JULY-2022
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -68,7 +68,7 @@
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version07\1-input\2022-07-07_MAIN Source+Tumour+Patient_KWG.txt"
+insheet using "`datapath'\version07\1-input\2022-07-08_MAIN Source+Tumour+Patient_KWG.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -164,16 +164,16 @@ replace flag3=nrn if length(nrn)<11 & nrn!="" //0 changes
 
 ** STEP #12
 ** Correct NRN errors flagged above for non-specific incorrect NRNs
-replace nrn="999999-9999" if nrn=="99" //0 changes
+replace nrn="999999-9999" if nrn=="99"|nrn=="99999" //4 changes
 replace nrn="999999-9999" if nrn=="9999-9999" //0 changes
 //replace nrn="999999-9999" if nrn=="999999"
 gen nrn2 = substr(nrn, 1,6) + "-" + substr(nrn, -4,4) if length(nrn)==10 & !(strmatch(strupper(nrn), "*-*"))
-replace nrn=nrn2 if nrn2!="" //0 changes
+replace nrn=nrn2 if nrn2!="" //6 changes
 drop nrn2
 gen nrn2 = nrn + "-9999" if length(nrn)==6
-replace nrn=nrn2 if nrn2!="" //0 changes
+replace nrn=nrn2 if nrn2!="" //6 changes
 drop nrn2
-replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //0 changes
+replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //1 changes
 
 replace nrn="" if length(nrn)==1
 replace nrn="" if registrynumber==20210143
@@ -209,10 +209,11 @@ replace flag8=nrn if flag3!="" //0 changes
 gen str8 dob = string(birthdate,"%08.0f")
 rename birthdate birthdate2
 rename dob birthdate
-count if length(birthdate)<8|length(birthdate)>8 //22 - check against electoral list using 'Contains' filter in the Names fields on electoral list
+count if length(birthdate)<8|length(birthdate)>8 //1 - check against electoral list using 'Contains' filter in the Names fields on electoral list
 list registrynumber firstname lastname nrn birthdate if length(birthdate)<8|length(birthdate)>8
-replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //22 changes
+replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //1 change
 replace flag4="missing" if birthdate=="" //0 changes
+replace flag4="missing" if registrynumber==20212132 //1 change
 
 
 ** STEP #15
@@ -252,26 +253,36 @@ drop elec_* _merge
 
 ** STEP #17
 ** Identify corrected DOBs in prep for export to excel ERRORS list 
+gen nrn2=substr(nrn, 1,6) if registrynumber==20212132
+replace nrn2="19"+nrn2 if registrynumber==20212132
+replace birthdate=nrn2 if registrynumber==20212132
+destring nrn2 ,replace
+replace birthdate2=nrn2 if registrynumber==20212132
+drop nrn2
+
 replace flag9=birthdate if flag4!="" //0 changes - this will store the corrected DOBs in this variable in prep for export to the error excel list
 replace flag9="delete blank record" if registrynumber==20159999 //0 changes
 
 
 ** STEP #18
 ** Check for invalid length Hosp#
-count if length(hospitalnumber)==1 //35
-list registrynumber firstname lastname hospitalnumber if length(hospitalnumber)==1
+generate byte non_numeric_hospnum= indexnot(hospitalnumber, "0123456789.-")
+count if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //83
+list registrynumber firstname lastname hospitalnumber birthdate nrn non_numeric_hospnum if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1
 count if hospitalnumber=="NYR" //0
-replace flag5=hospitalnumber if length(hospitalnumber)==1|hospitalnumber=="NYR" //2 changes
+replace flag5=hospitalnumber if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="NYR"|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //83 changes
 
+replace nrn=hospitalnumber if registrynumber==20212186 //1 change
+replace flag8=nrn if registrynumber==20212186 //1 change
 
 ** STEP #19
 ** Correct Hosp# errors using below method as these won't lead to de-identifying the dofile
-replace hospitalnumber="99" if length(hospitalnumber)==1|hospitalnumber=="NYR" //35 changes
+replace hospitalnumber="99" if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="NYR"|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //83 changes
 
 
 ** STEP #20
 ** Identify corrected Hosp#s in prep for export to excel ERRORS list
-replace flag10=hospitalnumber if flag5!="" //35 changes
+replace flag10=hospitalnumber if flag5!="" //70 changes
 
 
 ** STEP #21
@@ -298,7 +309,7 @@ restore
 ** Remove variables not needed for excel lists
 drop stdataabstractor stsourcedate nftype sourcename doctor doctoraddress recordstatus
 
-count //12,154
+count //10,851
 
 
 ** STEP #24

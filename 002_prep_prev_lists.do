@@ -3,8 +3,8 @@
     //  algorithm name          002_prep prev lists.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      07-JULY-2022
-    // 	date last modified      07-JULY-2022
+    //  date first created      11-JULY-2022
+    // 	date last modified      11-JULY-2022
     //  algorithm task          Flagging previously-checked duplicates from CanReg5 dataset in prep for comparison with newly-generated lists (see dofiles '003a-003d')
     //  status                  Completed
     //  objective               (1) To have a dataset with previously-checked duplicates to flag these and append the DA's comments to new duplicates list where applicable.
@@ -187,7 +187,7 @@ rename datotakeaction str_da
 rename datedatookaction str_dadate
 rename actiontaken str_action
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear str_da str_dadate str_action nameslist checked
-count //1,490
+count //1,443
 save "`datapath'\version07\2-working\prevNAMES_dups" ,replace
 clear
 
