@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      30-JUN-2022
-    //  date last modified      11-JUL-2022
+    // 	date last modified      11-JUL-2022
     //  algorithm task          Prep, format and combine 2021 death data with 2015-2020 death dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned 2015-2021 death data for matching with cancer incidence dataset.
@@ -540,6 +540,22 @@ replace cancer=1 if record_id==37188|record_id==36674|record_id==34999|record_id
 //8 changes
 
 replace cancer=2 if cancer==. //2399 changes
+
+** Spelling corrections from the above list reviews; Also emailed to KG on 11jul2022 to update in multi-year REDCap deathdb
+replace coddeath=subinstr(coddeath,"AVARIAN","OVARIAN",.) if record_id==35653
+replace coddeath=subinstr(coddeath,"SENOUS","SEROUS",.) if record_id==35576
+replace coddeath=subinstr(coddeath,"LEUFAEMIA","LEUKAEMIA",.) if record_id==37188
+replace coddeath=subinstr(coddeath,"CACINOMA","CARCINOMA",.) if record_id==36674
+replace coddeath=subinstr(coddeath,"HODKINS","HODGKINS",.) if record_id==34999
+replace coddeath=subinstr(coddeath,"COID","COVID",.) if record_id==37168
+replace coddeath=subinstr(coddeath,"MYOCARDIAL I","MYOCARDIAL INFARCTION",.) if record_id==36466
+replace coddeath=subinstr(coddeath,"CARCINOM","CARCINOMA",.) if record_id==36358
+replace coddeath=subinstr(coddeath,"ARTERY IS","ARTERY",.) if record_id==36834
+replace coddeath=subinstr(coddeath,";","P",.) if record_id==36283
+replace coddeath=subinstr(coddeath,"TRSCT","TRACT",.) if record_id==36283
+replace coddeath=subinstr(coddeath,"ANERAL","RENAL",.) if record_id==34932
+replace coddeath=subinstr(coddeath,"UBDURAL","SUBDURAL",.) if record_id==37137
+replace coddeath=subinstr(coddeath,"FOO","FOOT",.) if record_id==36975
 
 ** Create cod variable 
 gen cod=.
