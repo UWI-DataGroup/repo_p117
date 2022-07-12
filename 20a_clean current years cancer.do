@@ -1,15 +1,17 @@
 cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          20a_clean current year cancer.do
+    //  algorithm name          20a_clean current years cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      06-JULY-2022
-    // 	date last modified      06-JULY-2022
-    //  algorithm task          Cleaning 2018 cancer dataset
+    //  date first created      12-JULY-2022
+    // 	date last modified      12-JULY-2022
+    //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for PAB 07-Jun-2022.
-    //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
+    //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
+    //  methods                 Clean and update all years' data using checks from:
+	//							(1) IARCcrgTools Check and Multiple Primary
+	//							(2) Custom checks
 
     ** General algorithm set-up
     version 17.0
@@ -32,22 +34,19 @@ cls
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\20b_clean current year cancer.smcl", replace
+    log using "`logpath'\20a_clean current years cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
-*************************************************
-/*
-BLANK & INCONSISTENCY CHECKS - PATIENT TABLE
-CHECKS 1 - 46
-IDENTIFY, REVIEW & CORRECT ERRORS
-Note: Checks not always in sequential order due
-	  to previous review format
-*/
-*************************************************
+************************
+** Format Dataset for **
+** Cleaning 2016-2018 **
+************************
+use "`datapath'\version09\2-working\allyears_prepped cancer", clear
 
-use "`datapath'\version04\2-working\2018_prepped cancer", clear
+count //19,733
 
-count //2223
+drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //12,871 deleted
+count //6862
 
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
@@ -261,13 +260,22 @@ label var flag187 "Correction: SmokingFreq"
 label var flag188 "Correction: SmokingDuration"
 label var flag189 "Correction: SmokingDurationFreq"
 
+*************************************************
+/*
+BLANK & INCONSISTENCY CHECKS - PATIENT TABLE
+CHECKS 1 - 46
+IDENTIFY, REVIEW & CORRECT ERRORS
+Note: Checks not always in sequential order due
+	  to previous review format
+*/
+*************************************************
 ********************** 
 ** Unique PatientID **
 **********************
 count if pid=="" //0
 
 ** Person Search
-count if persearch==0 //2214 - person serach not done; can ignore as will check duplicates in this dofile
+count if persearch==0 //6750 - person serach not done; can ignore as will check duplicates in this dofile
 count if persearch==3 //0
 count if persearch==4 //0
 
@@ -294,7 +302,7 @@ count if ptda>14 & ptda<22 //0
 **********************
 ** Check 4 - missing/ptdoa!=stdoa
 count if ptdoa==. //0
-count if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) //& (tumourtot<2 & sourcetot<2) //1097 - no correction necessary
+count if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) //& (tumourtot<2 & sourcetot<2) //3569 - no correction necessary
 //list pid eid sid ptdoa stdoa dxyr cr5id if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) & (tumourtot<2 & sourcetot<2)
 
 ** Check 5 - invalid (future date)
@@ -304,11 +312,16 @@ gen double currentdatept=date(currentd, "DMY", 2017)
 drop currentd
 format currentdatept %dD_m_CY
 label var currentdate "Current date PT"
-count if ptdoa!=. & ptdoa>currentdatept //0
+count if ptdoa!=. & ptdoa>currentdatept //2
+//list pid cr5id ptdoa stdoa if ptdoa!=. & ptdoa>currentdatept
+destring flag82 ,replace
+destring flag177 ,replace
+replace flag82=ptdoa if pid=="20170133"|pid=="20170158"
+replace ptdoa=stdoa if pid=="20170133" & cr5id=="T1S1"|pid=="20170158" & cr5id=="T1S1"
+replace flag177=ptdoa if pid=="20170133"|pid=="20170158"
 
 /*
 JC 30may2022: Case Status was removed from CR5db since Record Status was expanded this field no longer served any purpose.
-
 *****************
 ** Case Status **
 *****************
@@ -341,14 +354,15 @@ count if cstatus==1 & recstatus==4 //108 - no review needed as already done
 ** Added after these checks were sequentially written
 ** Additional check for PT variable
 ** Check 174 - Notes Seen (check for missed 2018 cases that were abstracted in this dofile) 
-count if notesseen==0 & dxyr==2018 //25
-//list pid cr5id recstatus notesseen sourcename if notesseen==0 & dxyr==2018
+count if notesseen==0 & dxyr>2015 & dxyr<2019 //195
+//list pid cr5id recstatus notesseen dxyr comments if notesseen==0 & dxyr>2015 & dxyr<2019, string(50)
 ** Check main CR5db then correct
 destring flag84 ,replace
 destring flag179 ,replace
-replace flag84=notesseen if notesseen==0 & dxyr==2018
-replace notesseen=5 if notesseen==0 & dxyr==2018 & recstatus==1 //2 changes
-replace notesseen=3 if notesseen==0 & dxyr==2018 & recstatus==3 //23 changes
+replace flag84=notesseen if notesseen==0 & dxyr>2015 & dxyr<2019
+replace notesseen=5 if notesseen==0 & dxyr==2018 & recstatus==1 //0 changes
+replace notesseen=3 if notesseen==0 & dxyr==2018 & recstatus==3 //3 changes
+replace notesseen=4 if notesseen==0 & dxyr==2016|notesseen==0 & dxyr==2017 //192 changes
 replace flag179=notesseen if flag84!=.
 
 ** Check 175 - Notes Seen=pending retrieval; dxyr>2013 (for 2018 data collection this check will be revised)
@@ -358,12 +372,15 @@ count if notesseen==0 & dxyr>2013 //0
 //replace notesseen=4 if notesseen==0 & dxyr>2013 //0 changes
 
 ** Check 176 - Notes Seen=Yes but NS date=blank; dxyr=2018
-count if notesseen==1 & nsdate==. & dxyr==2018 //3 - unnecessary to check each case for data cleaning but will flag in data review code
-//list pid comments cr5id if notesseen==1 & nsdate==. & dxyr==2018
+count if notesseen==1 & nsdate==. //2 - unnecessary to check each case for data cleaning but will flag in data review code
+//list pid comments cr5id if notesseen==1 & nsdate==.
 //replace nsdate=d(01jan2000) if notesseen==1 & nsdate==. & dxyr==2018 //81 changes
-replace flag84=notesseen if notesseen==1 & nsdate==. & dxyr==2018
-replace notesseen=3 if notesseen==1 & nsdate==. & dxyr==2018 //3 changes
-replace flag179=notesseen if pid=="20182229"
+destring flag85 ,replace
+destring flag180 ,replace
+replace flag85=nsdate if notesseen==1 & nsdate==.
+replace nsdate=d(07nov2018) if pid=="20160638" //1 change
+replace nsdate=d(26feb2020) if pid=="20180896" //1 change
+replace flag180=notesseen if pid=="20160638"|pid=="20180896"
 /*
 ** Check 177 - Notes Seen=No; recstatus!=dup; dxyr==2013
 count if notesseen==3 & recstatus!=4 & dxyr==2013 //25
@@ -415,7 +432,7 @@ replace yr1 = 20 if dob_year>1999
 replace yr1 = 19 if dob_year<2000
 replace yr1 = 19 if dob_year==.
 replace yr1 = 99 if natregno=="99"
-list pid dob_year dob natregno yr yr1 if dob_year!=. & dob_year > 1999
+list pid age dob_year dob natregno yr yr1 if dob_year!=. & dob_year > 1999
 gen nrn = substr(natregno,1,6) if natregno!="" & natregno!="9999999999" & natregno!="999999-9999" & nrnday!="99" & length(natregno)==11
 destring nrn, replace
 format nrn %06.0f
@@ -428,15 +445,15 @@ destring nrnyr, replace
 sort nrn
 gen dobchk=mdy(month, day, nrnyr)
 format dobchk %dD_m_CY
-count if dob!=dobchk & dobchk!=. //16
+count if dob!=dobchk & dobchk!=. //18
 list pid fname lname age natregno dob dobchk dob_year dot if dob!=dobchk & dobchk!=. //checked against electoral list
 drop day month year nrnyr yr yr1 nrn
 ** Correct dob, where applicable
 destring flag72 ,replace
 destring flag167 ,replace
-replace flag72=dob if dob!=dobchk & dobchk!=. //16 changes
-replace dob=dobchk if dob!=dobchk & dobchk!=. //16 changes
-replace flag167=dob if flag72!=. //16 changes
+replace flag72=dob if dob!=dobchk & dobchk!=. //18 changes
+replace dob=dobchk if dob!=dobchk & dobchk!=. //18 changes
+replace flag167=dob if flag72!=. //18 changes
 //replace natregno=subinstr(natregno,"61","91",.) if pid=="20150294" //2 changes
 //replace dob=dobchk if dob!=dobchk & dobchk!=. & pid!="20151250" & pid!="20150521" & pid!="20150294" //6 changes
 
@@ -456,26 +473,34 @@ count if length(natregno)<11 & natregno!="" //0
 ** Sex **
 *********
 ** Check 32 - missing
-count if sex==. | sex==9 //1
-//list pid sex fname primarysite top if sex==.|sex==9
+count if sex==. | sex==9 //3
+//list pid cr5id sex fname natregno primarysite top if sex==.|sex==9
 destring flag73 ,replace
 destring flag168 ,replace
-replace flag73=sex if sex==. | sex==9 //1 change
-replace sex=2 if sex==.|sex==9 //1 change
-replace flag168=sex if flag73!=. //1 change
+replace flag73=sex if sex==. | sex==9 //3 changes
+replace sex=2 if pid=="20160028"|pid=="20160753" //2 changes
+replace sex=1 if pid=="20160157"
+replace flag168=sex if flag73!=. //3 changes
 
 
 ** Check 33 - possibly invalid (first name, NRN and sex check: MALES)
 gen nrnid=substr(natregno, -4,4)
-count if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //3
+count if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //12
 //list pid fname lname sex natregno primarysite top cr5id if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]")
-replace flag73=sex if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //1 change
-replace sex=1 if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") //1 change
-replace flag168=sex if pid=="20180248"|pid=="20180611" //3 changes
+replace flag73=sex if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") & pid!="20160062" & pid!="20160854" //7 changes
+replace sex=1 if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7,9]") & pid!="20160062" & pid!="20160854" //7 changes
+replace flag168=sex if pid=="20170707"|pid=="20170785"|pid=="20170874"|pid=="20171022"|pid=="20172026" //7 changes
+
+replace flag74=natregno if pid=="20160854"
+replace natregno=subinstr(natregno,"98","88",.) if pid=="20160854"
+replace flag169=natregno if pid=="20160854"
 
 ** Check 34 - possibly invalid (sex=M; site=breast)
-count if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50")) //4 - no changes; all correct
-//list pid fname lname natregno sex top cr5cod cr5id if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50"))
+count if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50")) //27 - 11 correct
+//list pid fname lname natregno sex cr5id if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50"))
+replace flag73=sex if pid=="20160318"|pid=="20160425"|pid=="20160496"|pid=="20170013"|pid=="20170108"|pid=="20182107" //16 changes
+replace sex=2 if pid=="20160318"|pid=="20160425"|pid=="20160496"|pid=="20170013"|pid=="20170108"|pid=="20182107"
+replace flag168=sex if pid=="20160318"|pid=="20160425"|pid=="20160496"|pid=="20170013"|pid=="20170108"|pid=="20182107"
 
 ** Check 35 - invalid (sex=M; site=FGS)
 count if sex==1 & topcat>43 & topcat<52	& (regexm(cr5cod, "VULVA") | regexm(cr5cod, "VAGINA") | regexm(cr5cod, "CERVIX") | regexm(cr5cod, "CERVICAL") ///
@@ -484,11 +509,11 @@ count if sex==1 & topcat>43 & topcat<52	& (regexm(cr5cod, "VULVA") | regexm(cr5c
 //								| regexm(cr5cod, "CERVIX") | regexm(cr5cod, "CERVICAL") | regexm(cr5cod, "UTER") | regexm(cr5cod, "OVAR") | regexm(cr5cod, "PLACENTA"))
 								
 ** Check 36 - possibly invalid (first name, NRN and sex check: FEMALES)
-count if sex==1 & nrnid!="9999" & regex(substr(natregno,-2,1), "[0,2,4,6,8]") //2 - 1 correct; 1 error
+count if sex==1 & nrnid!="9999" & regex(substr(natregno,-2,1), "[0,2,4,6,8]") //4 - 3 correct; 1 error
 //list pid fname lname sex natregno primarysite top cr5id if sex==1 & nrnid!="9999" & regex(substr(natregno,-2,1), "[0,2,4,6,8]")
-replace flag73=sex if pid=="20180009" //1 change
-replace sex=2 if pid=="20180009" //1 change
-replace flag168=sex if pid=="20180009" //1 change
+replace flag73=sex if pid=="20170941" //1 change
+replace sex=2 if pid=="20170941" //1 change
+replace flag168=sex if pid=="20170941" //1 change
 
 ** Check 37 - invalid (sex=F; site=MGS)
 count if sex==2 & topcat>51 & topcat<56 & (regexm(cr5cod, "PENIS")|regexm(cr5cod, "PROSTAT")|regexm(cr5cod, "TESTIS")|regexm(cr5cod, "TESTIC")) //0
@@ -510,51 +535,73 @@ count if resident==. //0
 //list pid resident recstatus cr5id if resident==.
 
 ** residentcheckcat 1: Residency and Record Status mismatch - resident!=1 & recstatus!=3 & recstatus!=5
-count if residentcheckcat==1 //0
-//list pid resident record status cr5id if residentcheckcat==1, string(100)
+count if residentcheckcat==1 //10
+//list pid resident recstatus dxyr cr5id if residentcheckcat==1, string(100)
+destring flag76 ,replace
+destring flag171 ,replace
+replace flag76=resident if pid=="20150116"|pid=="20160569"|pid=="20161130"|pid=="20170060"|pid=="20170853"|pid=="20170871" //10 changes
+replace resident=1 if pid=="20150116"|pid=="20160569"|pid=="20161130"|pid=="20170060"|pid=="20170853"|pid=="20170871" //10 changes
+replace flag171=resident if flag76!=. //10 changes
+
 
 *************************
 ** Status Last Contact **
 *************************
 ** Check 40 - missing
-count if slc==. & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
-
-//list pid slc recstatus cr5id if slc==. & recstatus!=2 & recstatus!=3 & recstatus!=5
-tab slc recstatus,m
-
-** Check 41 - invalid (slc=died;dlc=blank)
-count if slc==2 & dlc==. //0
-//list pid slc dlc cr5id if slc==2 & dlc==.
-
-** Check 42 - invalid (slc=alive;dlc=blank)
-count if slc==1 & dlc==. //0
-//list pid slc dlc recstatus cr5id if slc==1 & dlc==.
-
-** Check 43 - invalid (slc=alive;nftype=death info)
-count if slc==1 & (nftype==8 | nftype==9) //4
-//list pid slc nftype cr5id if slc==1 & (nftype==8 | nftype==9)
+count if slc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5 //8
+//list pid slc recstatus cr5id if slc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5
 destring flag77 ,replace
 destring flag172 ,replace
-replace flag77=slc if slc==1 & (nftype==8 | nftype==9) //4 changes
-replace slc=2 if slc==1 & (nftype==8 | nftype==9) //4 changes
-replace flag172=slc if flag77!=.
+replace flag77=9 if slc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5 //8 changes
+replace slc=1 if pid=="20170507"|pid=="20170864"|pid=="20181134" //8 changes
+replace flag172=slc if flag77!=. //8 changes
 
+tab slc recstatus,m
+replace slc=9 if slc==. & recstatus>1 & recstatus<6 //237 changes
+
+** Check 41 - invalid (slc=alive;dlc=blank)
+count if slc==1 & dlc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5 //2
+//list pid slc dlc dod recstatus cr5id if slc==1 & dlc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5
+destring flag78 ,replace
+destring flag173 ,replace
+replace flag78=dlc if slc==1 & dlc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5  //2 changes
+replace dlc=d(24feb2022) if pid=="20181134" //2 changes
+replace flag173=dlc if pid=="20181134" //2 changes
+
+** Check 42 - invalid (slc=died;dod=blank)
+count if slc==2 & dod==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5 //3
+//list pid slc dlc dod recstatus cr5id if slc==2 & dod==.
 destring flag79 ,replace
 destring flag174 ,replace
-replace flag79=dod if flag77!=. //4 changes
-replace dod=d(12jul2019) if pid=="20180188"
-replace dod=d(01jan2022) if pid=="20180419"
-replace dod=d(13feb2019) if pid=="20180493"
-replace dod=d(07jan2020) if pid=="20180529"
-replace flag174=dod if flag77!=. //4 changes
+replace flag79=dod if slc==2 & dod==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5 //3 changes
+replace dod=d(26may2021) if pid=="20161040" //3 changes
+replace flag174=dod if pid=="20161040" //3 changes
+
+
+** Check 43 - invalid (slc=alive;nftype=death info)
+count if slc==1 & (nftype==8 | nftype==9) //3
+//list pid slc nftype cr5id if slc==1 & (nftype==8 | nftype==9)
+replace flag77=slc if slc==1 & (nftype==8 | nftype==9) //3 changes
+replace slc=2 if slc==1 & (nftype==8 | nftype==9) //3 changes
+replace flag172=slc if pid=="20160044"|pid=="20160664"|pid=="20181102"
+
+replace flag79=dod if pid=="20160664"|pid=="20181102"
+replace dod=d(12jan2017) if pid=="20160664" //used date in MedData's patient details section as pt not in death data
+replace dod=d(16may2019) if pid=="20181102"
+replace flag174=dod if pid=="20160664"|pid=="20181102"
 
 
 ***********************
 ** Date Last Contact **
 ***********************
 ** Check 44 - missing
-count if dlc==. & slc!=9 & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
+count if dlc==. & slc==1 & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
 //list pid recstatus slc dlc cr5id if dlc==. & slc!=9 & recstatus!=2 & recstatus!=3 & recstatus!=5
+count if dlc==. & dod!=. //5
+//list pid recstatus slc dlc cr5id if dlc==. & dod!=.
+replace flag78=dlc if dlc==. & dod!=.  //5 changes
+replace dlc=dod if dlc==. & dod!=. //5 changes
+replace flag173=dlc if pid=="20161039"|pid=="20161040" //5 changes
 
 ** Check 45 - invalid (future date)
 ** Use already created variable called 'currentdatept';
@@ -573,13 +620,14 @@ count if dod==. & slc==2 & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
 ** to be used when cleaning dates
 count if dod!=. & dod>currentdatept //0
 
+
 **************
 ** Comments **
 **************
 ** Check 46 - missing
-count if comments=="" //4 - no update needed
+count if comments=="" //1390 - no update needed
 //list pid recstatus comments cr5id if comments==""
-//replace comments="99" if comments=="" //4 changes
+replace comments="99" if comments=="" //1390 changes
 
 
 **********************************************************
@@ -604,10 +652,14 @@ count if eid=="" //0
 ** there will never be any records with missing recstatus
 
 ** Check 47 - invalid (recstatus=pending)
-count if recstatus==0 & dxyr!=. //1
+count if recstatus==0 & dxyr!=. //2
 //list pid dxyr cr5id resident age if recstatus==0 & dxyr!=.
-drop if pid=="20180879" //KWG updated dxyr=2017 after this data was exported from CR5db
-//replace recstatus=1 if recstatus==0 & dxyr!=. //3 changes
+destring flag32 ,replace
+destring flag127 ,replace
+replace flag32=recstatus if recstatus==0 & dxyr!=. //2 changes
+replace recstatus=1 if recstatus==0 & dxyr!=.
+replace flag127=recstatus if pid=="20182090" & regexm(cr5id,"T1")
+
 
 ** JC 31may2022: this check no longer applicable as Case Status has been removed from CR5db.
 ** Check 48 - invalid(cstatus=CF;recstatus<>Pending)
@@ -619,12 +671,12 @@ count if recstatus==2 //0
 
 ** REVIEW ALL dxyr>2013 CASES FLAGGED AS INELIGIBLE SINCE SOME DISCOVERED IN 2014 AS INELIGIBLE WHICH ARE ELIGIBLE FOR REGISTRATION
 ** Points to note: (1) reason for ineligibility should be recorded by DA in Comments field; (2) dxyr should be updated with correct year.
-count if recstatus==3 //137 - already reviewed
+count if recstatus==3 //324 - already reviewed
 //list pid cr5id dxyr ttda recstatus if recstatus==3
 
 ** Check 49b - review all cases flagged as ineligible to check for missed 2013 cases
 ** JC 30oct18: In later checks I incidentally discovered missed 2013 cases so added in this new check
-count if recstatus==3 & cr5id=="T1S1" //108 - already reviewed
+count if recstatus==3 & cr5id=="T1S1" //242 - already reviewed
 
 *********************
 ** TT Check Status **
@@ -633,8 +685,9 @@ count if recstatus==3 & cr5id=="T1S1" //108 - already reviewed
 ** there will never be any records with missing recstatus
 
 ** Check 50 - invalid (checkstatus=notdone;recstatus=pend/confirm;primarysite<>blank)
-count if checkstatus==0 & recstatus<2 & primarysite!="" //0
+count if checkstatus==0 & recstatus<2 & primarysite!="" //2
 //list pid dxyr checkstatus recstatus cr5id if checkstatus==0 & recstatus<2 & primarysite!=""
+replace checkstatus=1 if pid=="20182090" & regexm(cr5id,"T1") //2 changes
 
 ** Check 51 - invalid (checkstatus=invalid;recstatus=pend/confirm;primarysite<>blank)
 count if checkstatus==3 & recstatus<2 & primarysite!="" //0
@@ -675,8 +728,14 @@ gen double currentdatett=date(currentd, "DMY", 2017)
 drop currentd
 format currentdatett %dD_m_CY
 label var currentdatett "Current date TT"
-count if ttdoa!=. & ttdoa>currentdatett //0
+count if ttdoa!=. & ttdoa>currentdatett //2
 //list pid eid ttdoa currentdatett cr5id if ttdoa!=. & ttdoa>currentdatett
+destring flag34 ,replace
+destring flag129 ,replace
+replace flag34=ttdoa if ttdoa!=. & ttdoa>currentdatett //2 changes
+replace ttdoa=d(09apr2022) if ttdoa!=. & ttdoa>currentdatett
+replace flag129=ttdoa if pid=="20182356" & regexm(cr5id,"T2")
+
 
 ************
 ** Parish **
@@ -689,37 +748,36 @@ count if parish==. & addr!="" //0
 ** Address **
 *************
 ** Check 57 - missing
-count if addr=="" & parish!=. & cr5id=="T1S1" //3
+count if addr=="" & parish!=. & cr5id=="T1S1" //20 - 1 error (the others recstatus=ineligible)
 //list pid parish addr sourcename recstatus cr5id if addr=="" & parish!=. & cr5id=="T1S1"
-
-replace flag37=addr if addr=="" & parish!=. & cr5id=="T1S1" //3 changes
-replace addr="99" if pid=="20180260"|pid=="20180616"
-replace flag132=addr if pid=="20180260"|pid=="20180616"
+replace flag37=addr if pid=="20180606" & regexm(cr5id,"T1") //2 changes
+replace addr="99" if pid=="20180606" & regexm(cr5id,"T1")
+replace flag132=addr if pid=="20180606" & regexm(cr5id,"T1")
 //replace addr="99" if addr=="" & parish!=. & cr5id=="T1S1" //7 changes - all ineligibles
 * addr=="" & parish!=. & cstatus!=0 & cr5id=="T1S1" & recstatus==3 //7 changes
 
 preserve
 clear
-import excel using "`datapath'\version04\2-working\MissingAddr_20220531.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version09\2-working\MissingAddr_20220712.xlsx" , firstrow case(lower)
 tostring pid, replace
-save "`datapath'\version04\2-working\missing_addr" ,replace
+save "`datapath'\version09\2-working\missing_addr" ,replace
 restore
 
-merge 1:1 pid cr5id using "`datapath'\version04\2-working\missing_addr" ,force
+merge 1:1 pid cr5id using "`datapath'\version09\2-working\missing_addr" ,force
 /*
     Result                      Number of obs
     -----------------------------------------
-    Not matched                         2,221
-        from master                     2,221  (_merge==1)
+    Not matched                         6,860
+        from master                     6,860  (_merge==1)
         from using                          0  (_merge==2)
 
-    Matched                                 1  (_merge==3)
+    Matched                                 2  (_merge==3)
     -----------------------------------------
 */
-replace addr=meddata_addr if _merge==3 //1 change
+replace addr=meddata_addr if _merge==3 //2 changes
 drop meddata_* _merge
-erase "`datapath'\version04\2-working\missing_addr.dta"
-replace flag132=addr if pid=="20182046"
+erase "`datapath'\version09\2-working\missing_addr.dta"
+replace flag132=addr if pid=="20180606" & regexm(cr5id,"T1")
 
 **********	
 **	Age **
@@ -727,13 +785,14 @@ replace flag132=addr if pid=="20182046"
 ** Check 58 - missing
 count if (age==-1 | age==.) & dot!=. //0
 //list pid cr5id if (age==-1 | age==.) & dot!=.
-count if age==-1 //2
+count if age==-1 //7
 //list pid cr5id age recstatus if age==-1
 destring flag38 ,replace
 destring flag133 ,replace
-replace flag38=age if age==-1 //2 changes
-replace age=999 if age==-1 //2 changes
-replace flag133=age if flag38!=. //2 changes
+replace flag38=age if pid=="20160028" & regexm(cr5id,"T1") //1 change
+replace age=999 if pid=="20160028" & regexm(cr5id,"T1")
+replace flag133=age if pid=="20160028" & regexm(cr5id,"T1")
+replace age=999 if age==-1 //6 changes
 
 ** Check 59 - invalid (age<>incidencedate-dob); checked no errors
 ** Age (at INCIDENCE - to nearest year)
@@ -741,13 +800,13 @@ gen ageyrs = (dot - dob)/365.25 //
 gen checkage=int(ageyrs)
 drop ageyrs
 label var checkage "Age in years at INCIDENCE"
-count if dob!=. & dot!=. & age!=checkage //8 - 4 are correct according to CR5 as same day & month for dob & dot
+count if dob!=. & dot!=. & age!=checkage //15 - 4 are correct according to CR5 as same day & month for dob & dot
 //list pid dot dob dotday dobday dotmonth dobmonth age checkage cr5id if dob!=. & dot!=. & age!=checkage
-count if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage //4
+count if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage //5
 //list pid dotday dobday dotmonth dobmonth if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage
-replace flag38=age if pid=="20180305"|pid=="20181211" //4 changes
-replace age=checkage if pid=="20180305"|pid=="20181211" //4 changes
-replace flag133=age if pid=="20180305"|pid=="20181211" //4 changes
+replace flag38=age if dob!=. & dot!=. & age!=checkage //15 changes
+replace age=checkage if dob!=. & dot!=. & age!=checkage //15 changes
+replace flag133=age if flag38!=. //15 changes
 
 ******************
 ** Primary Site **
@@ -758,11 +817,12 @@ count if primarysite=="" & topography!=. //0
 
 ** Check 63 - invalid(primarysite<>top)
 sort topography pid
-count if topcheckcat!=. //44
-//list pid primarysite topography topcat cr5id if topcheckcat!=.
-
+count if topcheckcat!=. //142
+//list pid cr5id dxyr primarysite topography topcat topcheckcat if topcheckcat!=. ,string(20)
+STOP
 replace flag39=primarysite if topcheckcat!=. & pid!="20180031" & pid!="20180276" & pid!="20180897" & pid!="20180232" ///
 							  & pid!="20190609" & pid!="20180067" & pid!="20180582" //27 changes
+replace primarysite="OVERLAP.ORO+HYPO+PHARYNX" if pid=="20181109" & regexm(cr5id,"T1")
 replace primarysite="PANCREAS-OVERLAP. HEAD NECK" if pid=="20180861" & regexm(cr5id, "T1")
 replace primarysite="PANCREAS-OVERLAP. HEAD NECK BODY" if pid=="20181163" & regexm(cr5id, "T1")
 replace primarysite="BONE MARROW" if pid=="20180004" & regexm(cr5id, "T1")
@@ -780,6 +840,11 @@ replace primarysite="RENAL PELVIS" if pid=="20182250" & regexm(cr5id, "T1")
 replace flag134=primarysite if topcheckcat!=. & pid!="20180031" & pid!="20180276" & pid!="20180897" & pid!="20180232" ///
 							  & pid!="20190609" & pid!="20180067" & pid!="20180582" //27 changes
 
+replace flag40=top if pid=="20181109" & regexm(cr5id,"T1")
+replace top="148" if pid=="20181109" & regexm(cr5id,"T1")
+replace topography=148 if pid=="20181109" & regexm(cr5id,"T1")
+replace topcat=15 if pid=="20181109" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20181109" & regexm(cr5id,"T1")
 /* 
 Below cases are incorrect data that have been cleaned in Stata or MPs that were missed by cancer team at abstraction and should have been abstracted.
 JC 25sep2018 corrected below as NS instructed for 2014 data cleaning I will clean data but for the future SDA to clean data:
@@ -3357,7 +3422,7 @@ drop if  flag1==. & flag2=="" & flag3==. & flag4==. & flag5=="" & flag6=="" & fl
 		 & flag51==. & flag52==. & flag53==. & flag54=="" & flag55=="" & flag56=="" & flag57=="" & flag58=="" & flag59=="" & flag60=="" ///
 		 & flag61=="" & flag62=="" & flag63=="" & flag64=="" & flag65=="" & flag66=="" & flag67=="" & flag68=="" & flag69=="" & flag70=="" ///
 		 & flag71=="" & flag72==. & flag73==. & flag74=="" & flag75=="" & flag76=="" & flag77==. & flag78==. & flag79==. & flag80=="" ///
-		 & flag81=="" & flag82=="" & flag83=="" & flag84==. & flag85=="" & flag86=="" & flag87=="" & flag88=="" & flag89=="" & flag90=="" ///
+		 & flag81=="" & flag82==. & flag83=="" & flag84==. & flag85=="" & flag86=="" & flag87=="" & flag88=="" & flag89=="" & flag90=="" ///
 		 & flag91=="" & flag92=="" & flag93=="" & flag94=="" & flag95==. & flag96=="" & flag97==. & flag98==. & flag99=="" & flag100=="" ///
 		 & flag101=="" & flag102=="" & flag103=="" & flag104=="" & flag105=="" & flag106=="" & flag107==. & flag108==. & flag109==. & flag110=="" ///
 		 & flag111=="" & flag112=="" & flag113=="" & flag114=="" & flag115=="" & flag116=="" & flag117=="" & flag118=="" & flag119==. & flag120=="" ///
@@ -3385,9 +3450,9 @@ capture export_excel str_no pid cr5id flag1-flag94 if ///
 		|flag51!=. | flag52!=. | flag53!=. | flag54!="" | flag55!="" | flag56!="" | flag57!="" | flag58!="" | flag59!="" | flag60!="" ///
 		|flag61!="" | flag62!="" | flag63!="" | flag64!="" | flag65!="" | flag66!="" | flag67!="" | flag68!="" | flag69!="" | flag70!="" ///
 		|flag71!="" | flag72!=. | flag73!=. | flag74!="" | flag75!="" | flag76!="" | flag77!=. | flag78!=. | flag79!=. | flag80!="" ///
-		|flag81!="" | flag82!="" | flag83!="" | flag84!=. | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
+		|flag81!="" | flag82!=. | flag83!="" | flag84!=. | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
 		|flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
-using "`datapath'\version04\3-output\CancerCleaning2018_`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+using "`datapath'\version09\3-output\CancerCleaning2016-2018_`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
 capture export_excel str_no pid cr5id flag95-flag189 if ///
 		 flag95!=. | flag96!="" | flag97!=. | flag98!=. | flag99!="" | flag100!="" ///
 		 |flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!=. | flag108!=. | flag109!=. | flag110!="" ///
@@ -3397,12 +3462,11 @@ capture export_excel str_no pid cr5id flag95-flag189 if ///
 		 |flag141!=. | flag142!="" | flag143!=. | flag144!="" | flag145!=. | flag146!=. | flag147!=. | flag148!=. | flag149!="" | flag150!="" ///
 		 |flag151!="" | flag152!="" | flag153!="" | flag154!="" | flag155!="" | flag156!="" | flag157!="" | flag158!="" | flag159!="" | flag160!="" ///
 		 |flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!=. | flag168!=. | flag169!="" | flag170!="" ///
-		 |flag171!="" | flag172!=. | flag173!=. | flag174!=. | flag175!="" | flag176!="" | flag177!="" | flag178!="" | flag179!=. | flag180!="" ///
+		 |flag171!="" | flag172!=. | flag173!=. | flag174!=. | flag175!="" | flag176!="" | flag177!=. | flag178!="" | flag179!=. | flag180!="" ///
 		 |flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
-using "`datapath'\version04\3-output\CancerCleaning2018_`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+using "`datapath'\version09\3-output\CancerCleaning2016-2018_`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
 restore
 */
-
 
 ************************
 **  Prep dataset for  **
@@ -3500,6 +3564,7 @@ count if dupsource==1 //986
 		19 MPs (multiple tumours)
 		 5 Duplicate registration
 */
+JC 12jul2022: SEE L:\Sync\Cancer\CanReg5\Backups\Data Cleaning\2022\2022-07-07_Thursday\2016-2018_IARC Checks_20220707.xlsx TO ASSIGN PERSEARCH
 
 ** Only report non-duplicate MPs (see IARC MP rules on recording and reporting)
 display `"{browse "http://www.iacr.com.fr/images/doc/MPrules_july2004.pdf":IARC-MP}"'
@@ -3592,6 +3657,155 @@ count if dupsource==1 //988
 sort pid lname fname
 //list pid eidmp dupsource duppid cr5id fname lname if dupsource==1 
 **no corrections needed
+
+
+** Create word doc for NS of duplicates for assessing completeness (sources per record) but want to retain this dataset
+preserve
+** % tumours - Duplicates
+drop if dxyr!=2015 //65; 75 deleted: removed 2008, 2013, 2014 records
+gen dupdqi=.
+replace dupdqi=1 if eidmp==. & dupsource>1 & dupsource<5 //906 changes
+replace dupdqi=1 if eidmp==. & dupsource==1 //4 changes
+replace dupdqi=2 if eidmp==1 & dupsource==1 //930; 1066 changes
+replace dupdqi=3 if dupsource==5|dupsource==6 //120 changes
+tab dupdqi ,m
+/*
+     dupdqi |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        910       46.19       46.19
+          2 |        930       47.21       93.40
+          3 |        120        6.09       99.49
+          . |         10        0.51      100.00
+------------+-----------------------------------
+      Total |      1,970      100.00
+	  
+     dupdqi |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        910       43.17       43.17
+          2 |      1,066       50.57       93.74
+          3 |        120        5.69       99.43
+          . |         12        0.57      100.00
+------------+-----------------------------------
+      Total |      2,108      100.00
+*/
+tab dxyr dupdqi ,m
+replace dupdqi=2 if dupdqi==. //10 changes
+label define dupdqi_lab 1 "duplicates" 2 "non-duplicates" 3 "ineligibles" , modify
+label values dupdqi dupdqi_lab
+tab eidmp ,m
+tab dupsource eidmp ,m
+tab dupsource eidmp if dxyr==2015 ,m
+tab dupdqi ,m
+/*
+        dupdqi |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+    duplicates |        910       46.19       46.19
+non-duplicates |        940       47.72       93.91
+   ineligibles |        120        6.09      100.00
+---------------+-----------------------------------
+         Total |      1,970      100.00
+
+        dupdqi |      Freq.     Percent        Cum.
+---------------+-----------------------------------
+    duplicates |        910       43.17       43.17
+non-duplicates |      1,078       51.14       94.31
+   ineligibles |        120        5.69      100.00
+---------------+-----------------------------------
+         Total |      2,108      100.00
+*/
+tab dupsource dupdqi ,m
+contract dupdqi, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin, footer(foot1)
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
+//stop - update totals after 163 DCO trace-back was completed
+// Create a paragraph
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2015 Annual Report: DQI"), bold
+putdocx textblock begin
+Date Prepared: 20-JAN-2021. 
+Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
+Generated using Dofiles: 15_clean cancer.do and 20_analysis cancer.do
+putdocx textblock end
+putdocx paragraph, style(Heading1)
+putdocx text ("Duplicates"), bold
+putdocx paragraph
+putdocx text ("# duplicates: "), bold font(Helvetica,10)
+putdocx text ("910"), shading("yellow") bold font(Helvetica,10)
+putdocx paragraph
+putdocx text ("# non-duplicates: "), bold font(Helvetica,10)
+putdocx text ("1,078"), shading("yellow") bold font(Helvetica,10)
+putdocx paragraph
+putdocx text ("# ineligibles: "), bold font(Helvetica,10)
+putdocx text ("120"), shading("yellow") bold font(Helvetica,10)
+putdocx paragraph, halign(center)
+putdocx text ("Duplicates (total records/n=2,108)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename dupdqi Total_Duplicates
+rename count Total_Records
+rename percentage Pct_Multiple_Duplicates
+putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Duplicates"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_dups(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", replace
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_dups.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Duplicates"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+
+restore
+
+** Create word doc for SAF of sources but want to retain this dataset
+** NB: some sources need updating from 7-BNRdb to 4-IPS and 1-QEH
+preserve
+drop if dxyr!=2015 //74 deleted: removed 2008, 2013, 2014 records
+count if sourcename==7 & length(labnum)<8 //0
+replace sourcename=4 if sourcename==7 & length(labnum)<8 //0 changes
+count if sourcename==7
+replace sourcename=1 if sourcename==7 //0 changes
+contract sourcename, freq(count) percent(percentage)
+gsort -count
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Sources"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Sources (total records/n=2,108)"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("2015 Completeness: Sources per Record = 1.98"), bold font(Helvetica,12,"red")
+//2108/1078=1.96: nonsurvival ds has 1062 tumours so 2108/1062=1.98 sources per record
+putdocx paragraph, halign(center)
+putdocx text ("2014 Completeness: Sources per Record = 2.75"), bold font(Helvetica,12,"lightpink")
+putdocx paragraph
+rename sourcename Source
+rename count Total_Records
+rename percentage Pct_Source
+putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_source(1,.), bold
+
+putdocx save "`datapath'\version02\3-output\2021-08-12_DQI.docx", append
+putdocx clear
+
+save "`datapath'\version02\2-working\2015_cancer_dqi_source.dta" ,replace
+label data "BNR-Cancer 2015 Data Quality Index - Sources"
+notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+
+restore
+
+** Save dataset with duplicates
+label data "BNR-Cancer data - Multiple Sources"
+notes _dta :These data prepared from CanReg5 CLEAN (2015BNR-C) database
+save "`datapath'\version02\2-working\2015_cancer_dups" ,replace
+note: TS This dataset can be used for quality parameter of completeness in assessing number of sources per record
 
 count //2223
 
@@ -3696,7 +3910,7 @@ preserve
 drop if basis!=0
 keep pid fname lname natregno dod cr5cod doctor docaddr certifier
 capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier ///
-		using "`datapath'\version04\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
+		using "`datapath'\version09\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 */
@@ -4141,7 +4355,7 @@ tab sex ,m
 count //949
 
 ** Save this corrected dataset with reportable cases and identifiable data
-save "`datapath'\version04\3-output\2018_cancer_nonsurvival_identifiable", replace
+save "`datapath'\version09\3-output\2018_cancer_nonsurvival_identifiable", replace
 label data "2018 BNR-Cancer identifiable data - Non-survival Identifiable Dataset"
 note: TS This dataset was NOT used for 2018 annual report; it was used for PAB 07-June-2022
 note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
@@ -4150,7 +4364,7 @@ note: TS Includes ineligible case definition, non-residents, unk sex, non-malign
 ** Create corrected dataset with reportable cases but de-identified data
 drop fname lname natregno init dob resident parish recnum cfdx labnum SurgicalNumber specimen clindets cytofinds md consrpt sxfinds physexam imaging duration onsetint certifier dfc streviewer addr birthdate hospnum comments dobyear dobmonth dobday dob_yr dob_year dobchk sname nrnday nrnid dupnrntag
 
-save "`datapath'\version04\3-output\2018_cancer_nonsurvival_deidentified", replace
+save "`datapath'\version09\3-output\2018_cancer_nonsurvival_deidentified", replace
 label data "2018 BNR-Cancer de-identified data - Non-survival De-identified Dataset"
 note: TS This dataset was NOT used for 2018 annual report; it was used for PAB 07-June-2022
 note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis

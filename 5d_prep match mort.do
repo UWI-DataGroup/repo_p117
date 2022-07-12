@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      30-JUN-2022
-    // 	date last modified      11-JUL-2022
+    //  date last modified      12-JUL-2022
     //  algorithm task          Prep, format and combine 2021 death data with 2015-2020 death dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned 2015-2021 death data for matching with cancer incidence dataset.
@@ -557,6 +557,7 @@ replace coddeath=subinstr(coddeath,"ANERAL","RENAL",.) if record_id==34932
 replace coddeath=subinstr(coddeath,"UBDURAL","SUBDURAL",.) if record_id==37137
 replace coddeath=subinstr(coddeath,"FOO","FOOT",.) if record_id==36975
 
+
 ** Create cod variable 
 gen cod=.
 label define cod_lab 1 "Dead of cancer" 2 "Dead of other cause" 3 "Not known" 4 "NA", modify
@@ -673,6 +674,15 @@ note: TS This dataset can be used for combining 2021 deaths with 2015-2020 death
 count //3,136
 append using "`datapath'\version04\3-output\2015-2020_deaths_for_matching"
 count //18,552
+
+** JC 12jul2022: correction found incidentally
+replace dd_natregno=subinstr(dd_natregno,"2","7",.) if record_id==22335
+replace dd_nrn=dd_nrn+500000000 if record_id==22335
+swapval dd_fname dd_lname if record_id==22335
+gen pname2=substr(dd_pname,1,7) if record_id==22335
+gen pname3=substr(dd_pname,-11,11) if record_id==22335
+replace dd_pname=pname3+" "+pname2 if record_id==22335
+drop pname2 pname3
 
 
 drop dd_dodyear

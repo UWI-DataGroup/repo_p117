@@ -3200,7 +3200,7 @@ label values datescheckcat datescheckcat_lab
 
 ** Create category for Resident Status check
 gen residentcheckcat=.
-replace residentcheckcat=1 if resident!=1 & recstatus!=3 & recstatus!=5
+replace residentcheckcat=1 if resident!=1 & recstatus!=3 & recstatus!=4 & recstatus!=5
 label var residentcheckcat "Residency Check Category"
 label define residentcheckcat_lab 1 "Check 1: Residency and Record Status mismatch"	 ,modify
 label values residentcheckcat residentcheckcat_lab
