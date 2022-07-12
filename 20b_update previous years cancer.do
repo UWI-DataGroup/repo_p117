@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          5_prep cancer.do
+    //  algorithm name          20b_update previous years cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      28-OCT-2019

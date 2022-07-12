@@ -1,7 +1,7 @@
 cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          20b_clean current year cancer.do
+    //  algorithm name          20a_clean current year cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-JULY-2022

@@ -1,15 +1,17 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          20a_prep current year cancer.do
+    //  algorithm name          15_prep all years cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      07-JULY-2022
-    // 	date last modified      07-JULY-2022
-    //  algorithm task          Formatting and cleaning 2016-2018 cancer dataset
+    //  date first created      12-JULY-2022
+    // 	date last modified      12-JULY-2022
+    //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for inclusion in 2016-2018 cancer report.
-    //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
-
+    //  objective               To have one dataset with formatted data for:
+	//							(1) cleaning 2016-2018 data and 
+	//							(2) updating 2008, 2013-2015 data for inclusion in the cancer 2016-2018 annual report.
+	// methods					Formatted exported data from CanReg5 database and saved dataset for use in later dofiles.
+	
     ** General algorithm set-up
     version 17.0
     clear all
@@ -31,7 +33,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\20a_prep current year cancer.smcl", replace
+    log using "`logpath'\15_prep all years cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 /*
     The below steps were performed prior to importing data into Stata:
@@ -42,24 +44,36 @@
 		
 		Method: 
 		Using IARCcrgTools guide from the IARC-Hub, use the below filter in CR5db:
-			• DiagnosisYear = '2018' AND RecS < '2' OR DiagnosisYear = '2018' AND RecS > '5'
+			• DiagnosisYear = '2016' AND RecS < '2' OR DiagnosisYear = '2016' AND RecS > '5' OR 
+			  DiagnosisYear = '2017' AND RecS < '2' OR DiagnosisYear = '2017' AND RecS > '5' OR 
+			  DiagnosisYear = '2018' AND RecS < '2' OR DiagnosisYear = '2018' AND RecS > '5'
 		
-		Results for 975 records checked:
-		8 errors (8 individual records):
-			• 1 invalid date of diagnosis
-			• 7 invalid birth date
+		Results for 3080 records checked:
+		13 errors (13 individual records):
+			• 13 invalid birth date
 
-		18 warnings (18 individual records):
-			• 6 unlikely histology/site combination
-			• 12 unlikely basis/histology combination
+		25 warnings (25 individual records):
+			• 24 unlikely histology/site combination
+			• 1 unlikely basis/histology combination
 
-		Results for 975 checked for MPs:		
-			• 24 excluded
-			• 24 multiple tumours
-			• 5 duplicate registrations		
+		Results for 3080 checked for MPs:		
+			• 57 excluded
+			• 121 multiple tumours
+			• 18 duplicate registrations		
 		
 		Outputs for this cleaning are saved in the path: 
-			• ...\Sync\Cancer\CanReg5\Backups\Data Cleaning\2022\2022-05-25_Wednesday
+			• ...\Sync\Cancer\CanReg5\Backups\Data Cleaning\2022\2022-07-07_Thursday\2016-2018_IARC Checks_20220707.xlsx
+			
+		CanReg5 database checks:
+			• Missing dxyr
+			• 2018 cases with recstatus NOT=confirmed
+				○ DiagnosisYear = '2018' AND RecS <> '1' AND RecS <> '4'
+				○ DiagnosisYear = '2016' AND RecS <> '1' AND RecS <> '4' AND RecS <'6' 
+					§ 115 [157 source] records to review
+				○ DiagnosisYear = '2017' AND RecS <> '1' AND RecS <> '4' AND RecS <'6' 
+					§ 95 [126 source] records to review
+			• Missing/unknown resident status
+			• Generate duplicates list and Perform merges as needed (SDA)
 */
 
 ** Import ENTIRE cancer incidence data from CR5db - current year data has been manually reviewed and cleaned using IARCcrgTools:
@@ -100,9 +114,9 @@
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-import excel using "`datapath'\version09\1-input\2022-07-07_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
+import excel using "`datapath'\version09\1-input\2022-07-12_MAIN Source+Tumour+Patient_KWG_annualrpt_excel.xlsx", firstrow
 
-count //20,995
+count //19,733
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
 	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.
@@ -320,7 +334,7 @@ label var dot "Incidence Date"
 label var dotyear "Incidence Year"
 //drop IncidenceDate
 
-count //20,995
+count //19,733
 
 ** Renaming CanReg5 variables
 rename Personsearch persearch
@@ -614,13 +628,15 @@ using "`datapath'\version09\3-output\CancerCleaningALL`listdate'.xlsx", sheet("C
 restore
 */
 
-** Remove cases NOT diagnosed in 2018
-tab dxyr ,m //14 missing dxyr; 2016=2,494; 2017=2,141; 2018=2,227
+** Check for and correct cases missing diagnosis year
+tab dxyr ,m //0 missing dxyr; 2016=2494; 2017=2142; 2018=2226
 list pid cr5id if dxyr==. //not 2016/2017/2018 so leave for KWG to correct
 
-drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //16,951 deleted
+** Remove cases NOT diagnosed in 2016-2018
+** JC 12JUL2022: DON'T DROP PREVIOUS YEARS AS WILL NEED FOR 20b_update previous years.do for the cross-check process DOFILE
+//drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //16,951 deleted
 
-count //6862
+count //19,733
 
 
 /*
@@ -660,8 +676,9 @@ label var ptupdate "Date PT updated"
 label var ptda "PT Data Abstractor"
 ** contains a nonnumeric character so field needs correcting!
 generate byte non_numeric_ptda = indexnot(ptda, "0123456789.-")
-count if non_numeric_ptda //0
+count if non_numeric_ptda //1
 //list pid ptda cr5id if non_numeric_ptda
+replace ptda="09" if pid=="20145017"
 destring ptda,replace
 count if ptda==. //0
 label define ptda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
@@ -673,6 +690,7 @@ label values ptda ptda_lab
 generate byte non_numeric_ptdoa = indexnot(PTCasefindingDate, "0123456789.-")
 count if non_numeric_ptdoa //0
 //list pid ptda PTCasefindingDate cr5id if non_numeric_ptdoa
+replace PTCasefindingDate="20220316" if pid=="20200856"
 destring PTCasefindingDate,replace
 replace PTCasefindingDate=20000101 if PTCasefindingDate==99999999
 nsplit PTCasefindingDate, digits(4 2 2) gen(year month day)
@@ -2052,6 +2070,7 @@ label var dfc "DateFirstConsultation"
 generate byte non_numeric_rtdoa = indexnot(RTRegDate, "0123456789.-")
 count if non_numeric_rtdoa //
 //list pid RTRegDate cr5id if non_numeric_rtdoa
+replace RTRegDate="" if RTRegDate=="2020/420" & pid=="20201055" & cr5id=="T1S2"
 destring RTRegDate ,replace
 replace RTRegDate=20000101 if RTRegDate==99999999
 nsplit RTRegDate, digits(4 2 2) gen(rtyear rtmonth rtday)
@@ -2066,7 +2085,7 @@ label var streviewer "STReviewer"
 label define streviewer_lab 0 "Pending" 1 "JC" 2 "LM" 3 "PP" 4 "AR" 5 "AH" 6 "JK" 7 "TM" 8 "SAW" 9 "SAF" 99 "Unknown", modify
 label values streviewer streviewer_lab
 
-count //6862
+count //19,733
 
 drop non_numeric*
 
@@ -3191,9 +3210,9 @@ label values residentcheckcat residentcheckcat_lab
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //6862
+count //19,733
 
 
 ** Create dataset to use for 2018 cleaning
-save "`datapath'\version09\2-working\2016-2018_prepped cancer", replace
+save "`datapath'\version09\2-working\allyears_prepped cancer", replace
 
