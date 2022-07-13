@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      12-JULY-2022
+    // 	date last modified      13-JULY-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -43,10 +43,10 @@ cls
 ************************
 use "`datapath'\version09\2-working\allyears_prepped cancer", clear
 
-count //19,733
+count //19,748
 
-drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //12,871 deleted
-count //6862
+drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //12,879 deleted
+count //6869
 
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
@@ -302,7 +302,7 @@ count if ptda>14 & ptda<22 //0
 **********************
 ** Check 4 - missing/ptdoa!=stdoa
 count if ptdoa==. //0
-count if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) //& (tumourtot<2 & sourcetot<2) //3569 - no correction necessary
+count if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) //& (tumourtot<2 & sourcetot<2) //3575 - no correction necessary
 //list pid eid sid ptdoa stdoa dxyr cr5id if ptdoa!=stdoa & ptdoa!=d(01jan2000) & stdoa!=d(01jan2000) & (tumourtot<2 & sourcetot<2)
 
 ** Check 5 - invalid (future date)
@@ -354,7 +354,7 @@ count if cstatus==1 & recstatus==4 //108 - no review needed as already done
 ** Added after these checks were sequentially written
 ** Additional check for PT variable
 ** Check 174 - Notes Seen (check for missed 2018 cases that were abstracted in this dofile) 
-count if notesseen==0 & dxyr>2015 & dxyr<2019 //195
+count if notesseen==0 & dxyr>2015 & dxyr<2019 //193
 //list pid cr5id recstatus notesseen dxyr comments if notesseen==0 & dxyr>2015 & dxyr<2019, string(50)
 ** Check main CR5db then correct
 destring flag84 ,replace
@@ -362,7 +362,7 @@ destring flag179 ,replace
 replace flag84=notesseen if notesseen==0 & dxyr>2015 & dxyr<2019
 replace notesseen=5 if notesseen==0 & dxyr==2018 & recstatus==1 //0 changes
 replace notesseen=3 if notesseen==0 & dxyr==2018 & recstatus==3 //3 changes
-replace notesseen=4 if notesseen==0 & dxyr==2016|notesseen==0 & dxyr==2017 //192 changes
+replace notesseen=4 if notesseen==0 & dxyr==2016|notesseen==0 & dxyr==2017 //190 changes
 replace flag179=notesseen if flag84!=.
 
 ** Check 175 - Notes Seen=pending retrieval; dxyr>2013 (for 2018 data collection this check will be revised)
@@ -800,7 +800,7 @@ gen ageyrs = (dot - dob)/365.25 //
 gen checkage=int(ageyrs)
 drop ageyrs
 label var checkage "Age in years at INCIDENCE"
-count if dob!=. & dot!=. & age!=checkage //15 - 4 are correct according to CR5 as same day & month for dob & dot
+count if dob!=. & dot!=. & age!=checkage //15 - 0 are correct according to CR5 as same day & month for dob & dot
 //list pid dot dob dotday dobday dotmonth dobmonth age checkage cr5id if dob!=. & dot!=. & age!=checkage
 count if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage //5
 //list pid dotday dobday dotmonth dobmonth if (dobday!=dotday & dobmonth!=dotmonth) & dob!=. & dot!=. & age!=checkage
@@ -817,34 +817,148 @@ count if primarysite=="" & topography!=. //0
 
 ** Check 63 - invalid(primarysite<>top)
 sort topography pid
-count if topcheckcat!=. //142
-//list pid cr5id dxyr primarysite topography topcat topcheckcat if topcheckcat!=. ,string(20)
-STOP
-replace flag39=primarysite if topcheckcat!=. & pid!="20180031" & pid!="20180276" & pid!="20180897" & pid!="20180232" ///
-							  & pid!="20190609" & pid!="20180067" & pid!="20180582" //27 changes
+count if topcheckcat!=. //142 - ones below already corrected in CR5db have been disabled
+//list pid cr5id dxyr morph primarysite topography topcat topcheckcat if topcheckcat!=. ,nolabel string(20)
+
+replace flag39=primarysite if topcheckcat!=. & pid!="20170274" & pid!="20180927" & pid!="20180843" ///
+		& pid!="20170661" & pid!="20170750" & pid!="20170975" & pid!="20181154" & pid!="20160968" ///
+		& pid!="20080295" & pid!="20160732" & pid!="20161016" & pid!="20170201" & pid!="20180634" ///
+		& pid!="20160499" & pid!="20172010" & pid!="20130244" & pid!="20160805" & pid!="20160093" ///
+		& pid!="20160096" & pid!="20170079" & pid!="20172105" & pid!="20160416" & pid!="20180228" ///
+		& pid!="20162040" & pid!="20172090" & pid!="20190609" & pid!="20180067" & pid!="20170669" ///
+		& pid!="20172026" & pid!="20180932" & pid!="20180031" & pid!="20180276" & pid!="20180897" ///
+		& pid!="20180232" & pid!="20190609" & pid!="20180067" & pid!="20180582" //74 changes
 replace primarysite="OVERLAP.ORO+HYPO+PHARYNX" if pid=="20181109" & regexm(cr5id,"T1")
-replace primarysite="PANCREAS-OVERLAP. HEAD NECK" if pid=="20180861" & regexm(cr5id, "T1")
-replace primarysite="PANCREAS-OVERLAP. HEAD NECK BODY" if pid=="20181163" & regexm(cr5id, "T1")
-replace primarysite="BONE MARROW" if pid=="20180004" & regexm(cr5id, "T1")
-replace primarysite="BONE MARROW" if pid=="20180015" & regexm(cr5id, "T1")
-replace primarysite="SKIN-EYELID UPPER" if pid=="20181154" & regexm(cr5id, "T1")
-replace primarysite="SKIN-NOS" if pid=="20180934" & regexm(cr5id, "T1")
-replace primarysite="BREAST-OVERLAP. UPPER HALF" if pid=="20180237" & regexm(cr5id, "T1")
-replace primarysite="BREAST-OVERLAP. UPPER" if pid=="20180458" & regexm(cr5id, "T1")
-replace primarysite="BREAST-OVERLAP. INNER" if pid=="20182230" & regexm(cr5id, "T1")
-replace primarysite="BREAST-OVERLAP. INNER QUADRANT" if pid=="20182255" & regexm(cr5id, "T1")
-replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20182318" & regexm(cr5id, "T1")
-replace primarysite="RENAL PELVIS" if pid=="20155215" & regexm(cr5id, "T2")
-replace primarysite="RENAL PELVIS" if pid=="20180050" & regexm(cr5id, "T2")
-replace primarysite="RENAL PELVIS" if pid=="20182250" & regexm(cr5id, "T1")
-replace flag134=primarysite if topcheckcat!=. & pid!="20180031" & pid!="20180276" & pid!="20180897" & pid!="20180232" ///
-							  & pid!="20190609" & pid!="20180067" & pid!="20180582" //27 changes
+replace primarysite="GALLBLADDER" if pid=="20181041" & regexm(cr5id,"T1")
+//replace primarysite="PANCREAS-OVERLAP. HEAD NECK" if pid=="20180861" & regexm(cr5id, "T1")
+//replace primarysite="PANCREAS-OVERLAP. HEAD NECK BODY" if pid=="20181163" & regexm(cr5id, "T1")
+//replace primarysite="BONE MARROW" if pid=="20180004" & regexm(cr5id, "T1")
+//replace primarysite="BONE MARROW" if pid=="20180015" & regexm(cr5id, "T1")
+//replace primarysite="SKIN-EYELID UPPER" if pid=="20181154" & regexm(cr5id, "T1")
+replace primarysite="SKIN-NECK" if pid=="20180559" & regexm(cr5id, "T1")
+//replace primarysite="SKIN-NOS" if pid=="20180934" & regexm(cr5id, "T1")
+replace primarysite="SOFT TISSUE-THIGH/LOWER LIMB" if pid=="20170709" & regexm(cr5id, "T1")
+replace primarysite="SOFT TISSUE-SHOULDER/UPPER LIMB" if pid=="20170920" & regexm(cr5id, "T1")
+replace primarysite="SOFT TISSUE-STOMACH" if pid=="20181054" & regexm(cr5id, "T1")
+//replace primarysite="BREAST-OVERLAP. UPPER HALF" if pid=="20180237" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER HALF" if pid=="20160678" & regexm(cr5id, "T1")
+//replace primarysite="BREAST-OVERLAP. UPPER" if pid=="20180458" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER" if pid=="20170006" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER" if pid=="20170584" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER QUADRANT" if pid=="20170010" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER QUADRANT" if pid=="20170591" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. UPPER CENTRAL" if pid=="20170133" & regexm(cr5id, "T1")
+//replace primarysite="BREAST-OVERLAP. UPPER CENTRAL" if pid=="20180820" & regexm(cr5id, "T1")
+//replace primarysite="BREAST-OVERLAP. INNER" if pid=="20182230" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INNER" if pid=="20160095" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INNER" if pid=="20160365" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INNER" if pid=="20170329" & regexm(cr5id, "T1")
+//replace primarysite="BREAST-OVERLAP. INNER QUADRANT" if pid=="20182255" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INNER QUADRANT" if pid=="20160440" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INNER QUADRANT" if pid=="20170163" & regexm(cr5id, "T1")
+//replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20182318" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20160154" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20160789" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20170357" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20170649" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. LOWER" if pid=="20160064" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. LOWER" if pid=="20170100" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. LOWER" if pid=="20172084" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. LOWER LATERAL" if pid=="20160763" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. LATERAL" if pid=="20162023" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. LATERAL" if pid=="20170598" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. LOWER QUADRANT" if pid=="20170134" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. INFERIOR" if pid=="20172025" & regexm(cr5id, "T1")
+replace primarysite="LYMPH NODE-OVERLAP. MULTIPLE REGIONS" if pid=="20160078" & regexm(cr5id, "T1")
+//replace primarysite="RENAL PELVIS" if pid=="20155215" & regexm(cr5id, "T2")
+//replace primarysite="RENAL PELVIS" if pid=="20180050" & regexm(cr5id, "T2")
+//replace primarysite="RENAL PELVIS" if pid=="20182250" & regexm(cr5id, "T1")
+replace flag134=primarysite if topcheckcat!=. & pid!="20170274" & pid!="20180927" & pid!="20180843" ///
+		& pid!="20170661" & pid!="20170750" & pid!="20170975" & pid!="20181154" & pid!="20160968" ///
+		& pid!="20080295" & pid!="20160732" & pid!="20161016" & pid!="20170201" & pid!="20180634" ///
+		& pid!="20160499" & pid!="20172010" & pid!="20130244" & pid!="20160805" & pid!="20160093" ///
+		& pid!="20160096" & pid!="20172105" & pid!="20170079" & pid!="20160416" & pid!="20180228" ///
+		& pid!="20162040" & pid!="20172090" & pid!="20190609" & pid!="20180067" & pid!="20170669" ///
+		& pid!="20172026" & pid!="20180932" & pid!="20180031" & pid!="20180276" & pid!="20180897" ///
+		& pid!="20180232" & pid!="20190609" & pid!="20180067" & pid!="20180582" //74 changes
 
 replace flag40=top if pid=="20181109" & regexm(cr5id,"T1")
 replace top="148" if pid=="20181109" & regexm(cr5id,"T1")
 replace topography=148 if pid=="20181109" & regexm(cr5id,"T1")
 replace topcat=15 if pid=="20181109" & regexm(cr5id,"T1")
 replace flag135=top if pid=="20181109" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20170853" & regexm(cr5id,"T1")
+replace top="209" if pid=="20170853" & regexm(cr5id,"T1")
+replace topography=209 if pid=="20170853" & regexm(cr5id,"T1")
+replace topcat=21 if pid=="20170853" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20170853" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20181041" & regexm(cr5id,"T1")
+replace top="239" if pid=="20181041" & regexm(cr5id,"T1")
+replace topography=239 if pid=="20181041" & regexm(cr5id,"T1")
+replace topcat=24 if pid=="20181041" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20181041" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20170709" & regexm(cr5id,"T1")
+replace top="492" if pid=="20170709" & regexm(cr5id,"T1")
+replace topography=492 if pid=="20170709" & regexm(cr5id,"T1")
+replace topcat=42 if pid=="20170709" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20170709" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20170920" & regexm(cr5id,"T1")
+replace top="491" if pid=="20170920" & regexm(cr5id,"T1")
+replace topography=491 if pid=="20170920" & regexm(cr5id,"T1")
+replace topcat=42 if pid=="20170920" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20170920" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20181054" & regexm(cr5id,"T1")
+replace top="494" if pid=="20181054" & regexm(cr5id,"T1")
+replace topography=494 if pid=="20181054" & regexm(cr5id,"T1")
+//replace topcat=42 if pid=="20181054" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20181054" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20160093" & regexm(cr5id,"T1")
+replace top="501" if pid=="20160093" & regexm(cr5id,"T1")
+replace topography=501 if pid=="20160093" & regexm(cr5id,"T1")
+//replace topcat=43 if pid=="20160093" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20160093" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20160096" & regexm(cr5id,"T1")
+replace top="501" if pid=="20160096" & regexm(cr5id,"T1")
+replace topography=501 if pid=="20160096" & regexm(cr5id,"T1")
+//replace topcat=43 if pid=="20160096" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20160096" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20160862" & regexm(cr5id,"T1")
+replace top="659" if pid=="20160862" & regexm(cr5id,"T1")
+replace topography=659 if pid=="20160862" & regexm(cr5id,"T1")
+replace topcat=57 if pid=="20160862" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20160862" & regexm(cr5id,"T1")
+
+destring flag46 ,replace
+destring flag141 ,replace
+replace flag46=basis if pid=="20180843"
+replace basis=1 if pid=="20180843" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20180843"
+
+destring flag43 ,replace
+destring flag138 ,replace
+replace flag43=lat if pid=="20170920" & regexm(cr5id,"T1")
+replace lat=2 if pid=="20170920" & regexm(cr5id,"T1")
+replace flag138=lat if pid=="20170920" & regexm(cr5id,"T1")
+
+destring flag42 ,replace
+destring flag137 ,replace
+replace flag42=morph if pid=="20170951" & regexm(cr5id, "T1")|pid=="20170079" & regexm(cr5id, "T1") //3 changes
+replace morph=9700 if pid=="20170951" & regexm(cr5id, "T1")
+replace morph=8522 if pid=="20170079" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170951" & regexm(cr5id, "T1")|pid=="20170079" & regexm(cr5id, "T1")
+replace morphcat=44 if pid=="20170951" & regexm(cr5id, "T1")
+
+replace flag41=hx if pid=="20170079" & regexm(cr5id, "T1")
+replace hx="INVASIVE MAMMARY CARCINOMA WITH DUCTAL+LOBULAR FEATURES" if pid=="20170079" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20170079" & regexm(cr5id, "T1")
 /* 
 Below cases are incorrect data that have been cleaned in Stata or MPs that were missed by cancer team at abstraction and should have been abstracted.
 JC 25sep2018 corrected below as NS instructed for 2014 data cleaning I will clean data but for the future SDA to clean data:
@@ -1000,9 +1114,8 @@ replace top="" if top=="." //0 changes
 count if top!="" & length(top)!=3 //0
 //list pid top topography cr5id if top!="" & length(top)!=3
 
-JC 06jul2022: check for other topcheckcat flags using Stata Browse window (topcheckcat 1 - 116)
 ** topcheckcat 117: Non-melanoma skin cancers - (topography>439 & topography<450 & morph!=8720)|morph==8832
-count if topcheckcat==117 //0
+//count if topcheckcat==117 //0 - already captured above in Primary Site Check 63 - invalid(primarysite<>top)
 //list pid primarysite top hx morph basis cfdx cr5id if topcheckcat==117, string(100)
 
 ** No other checks needed as covered in primarysite checks 62 & 63
@@ -1037,7 +1150,7 @@ count if (beh==2|beh==3) & !(strmatch(strupper(hx), "*MALIG*")|strmatch(strupper
 		 |strmatch(strupper(hx), "*WILMS*")|strmatch(strupper(hx), "*MULLERIAN*")|strmatch(strupper(hx), "*YOLK*")|strmatch(strupper(hx), "*REFRACTORY*") ///
 		 |strmatch(strupper(hx), "*ACUTE MYELOID*")|strmatch(strupper(hx), "*PAGET*")|strmatch(strupper(hx), "*PLASMA CELL*") ///
 		 |strmatch(strupper(hx), "*PIN III*")|strmatch(strupper(hx), "*NEUROENDOCRINE*")|strmatch(strupper(hx), "*TERATOID/RHABOID*") ///
-		 |strmatch(strupper(hx), "*INTRA-EPITHELIAL NEOPLASIA*")) & hx!="CLL" & hx!="PIN" & hx!="HGCGIN /  AIS" //9
+		 |strmatch(strupper(hx), "*INTRA-EPITHELIAL NEOPLASIA*")) & hx!="CLL" & hx!="PIN" & hx!="HGCGIN /  AIS" //28
 /*
 list pid hx beh cr5id if (beh==2|beh==3) & !(strmatch(strupper(hx), "*MALIG*")|strmatch(strupper(hx), "*CANCER*")|strmatch(strupper(hx), "*OMA*") ///
 						 |strmatch(strupper(hx), "*SUSPICIOUS*")|strmatch(strupper(hx), "*CIN*")|strmatch(strupper(hx), "*LEU*")|strmatch(strupper(hx), "*META*") ///
@@ -1052,20 +1165,24 @@ list pid hx beh cr5id if (beh==2|beh==3) & !(strmatch(strupper(hx), "*MALIG*")|s
 */
 						 **All correct
 
-replace flag41=hx if pid=="20180068" //3 changes
-replace hx="CRIBIFORM CARCINOMA WITH MUCINOUS FEATURES" if pid=="20180068" & regexm(cr5id, "T1")
-replace hx="MUCINOUS CARCINOMA" if pid=="20180068" & regexm(cr5id, "T2")
-replace flag136=hx if pid=="20180068" //3 changes
+replace flag41=hx if pid=="20161148" & regexm(cr5id, "T1")|pid=="20170661" & regexm(cr5id, "T1")|pid=="20180872" & regexm(cr5id, "T1") // changes
+replace hx="PANCREATIC CANCER" if pid=="20161148" & regexm(cr5id, "T1")
+replace hx="MALIGNANCY" if pid=="20170661" & regexm(cr5id, "T1")|pid=="20170750" & regexm(cr5id, "T1")|pid=="20180872" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20161148" & regexm(cr5id, "T1")|pid=="20170661" & regexm(cr5id, "T1")|pid=="20180872" & regexm(cr5id, "T1")
 
-destring flag42 ,replace
-destring flag137 ,replace
-replace flag42=morph if pid=="20180068"|pid=="" //3 changes
-replace morph=8201 if pid=="20180068" & regexm(cr5id, "T1")
+replace flag41=hx if pid=="20180068" & regexm(cr5id, "T2")
+//replace hx="CRIBIFORM CARCINOMA WITH MUCINOUS FEATURES" if pid=="20180068" & regexm(cr5id, "T1")
+replace hx="MUCINOUS CARCINOMA" if pid=="20180068" & regexm(cr5id, "T2")
+replace flag136=hx if pid=="20180068" & regexm(cr5id, "T2")
+
+replace flag42=morph if pid=="20180068" & regexm(cr5id, "T2")
+//replace morph=8201 if pid=="20180068" & regexm(cr5id, "T1")
 replace morph=8480 if pid=="20180068" & regexm(cr5id, "T2")
-replace flag137=morph if pid=="20180068"|pid=="" //3 changes
-replace morphcat=6 if pid=="20180068" & regexm(cr5id,"T1")
+replace flag137=morph if pid=="20180068" & regexm(cr5id, "T2")
+//replace morphcat=6 if pid=="20180068" & regexm(cr5id,"T1")
 replace morphcat=9 if pid=="20180068" & regexm(cr5id,"T2")
 
+/* JC 13jul2022: disabled code that was corrected already
 replace flag80=comments if pid=="20180068"|pid=="20182346" //4 changes
 replace comments="JC 31MAY2022: Please verify T1 MORPH with Prof Prussia, as the ICD-O-3 rules state code to higher morph if 2 terms used don't have a single code but since this says '...with mucinous features' I'm unsure if to apply this rule."+" "+comments if pid=="20180068"
 replace comments="JC 31MAY2022: Please verify T1 BEHAVIOUR with Prof Prussia, as the path and IHC don't specify malignancy and this type of tumour can be begnin."+" "+comments if pid=="20182346"
@@ -1076,14 +1193,73 @@ destring flag127 ,replace
 replace flag32=recstatus if pid=="20180068" & regexm(cr5id, "T1")|pid=="20182346" & regexm(cr5id, "T1") //3 changes
 replace recstatus=6 if pid=="20180068" & regexm(cr5id, "T1")|pid=="20182346" & regexm(cr5id, "T1")
 replace flag127=recstatus if pid=="20180068" & regexm(cr5id, "T1")|pid=="20182346" & regexm(cr5id, "T1") //3 changes
-	  
+*/
+  
 ** Check 72 - invalid (morph vs basis)
-count if morph==8000 & (basis==6|basis==7|basis==8) //6 - all correct
+count if morph==8000 & (basis==6|basis==7|basis==8) //23 - all correct
 //list pid hx basis cr5id if morph==8000 & (basis==6|basis==7|basis==8)
+
+replace flag41=hx if pid=="20170805" & regexm(cr5id, "T1")
+replace hx="CARCINOMA" if pid=="20170805" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20170805" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20170805" & regexm(cr5id, "T1")
+replace morph=8010 if pid=="20170805" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170805" & regexm(cr5id, "T1")
+replace morphcat=2 if pid=="20170805" & regexm(cr5id,"T1")
+
+destring flag45 ,replace
+destring flag140 ,replace
+replace flag45=grade if pid=="20170805" & regexm(cr5id,"T1")
+replace grade=3 if pid=="20170805" & regexm(cr5id,"T1")
+replace flag140=grade if pid=="20170805" & regexm(cr5id,"T1")
+
+replace flag32=recstatus if pid=="20170853" & regexm(cr5id,"T1")
+replace recstatus=3 if pid=="20170853" & regexm(cr5id,"T1")
+replace flag127=recstatus if pid=="20170853" & regexm(cr5id,"T1")
+
+replace flag46=basis if pid=="20170863" & regexm(cr5id,"T1")|pid=="20170868" & regexm(cr5id,"T1")|pid=="20170987" & regexm(cr5id,"T1")|pid=="20171039" & regexm(cr5id,"T1")
+replace basis=1 if pid=="20170863" & regexm(cr5id, "T1")|pid=="20170868" & regexm(cr5id,"T1")|pid=="20170987" & regexm(cr5id,"T1")|pid=="20171039" & regexm(cr5id,"T1")
+replace flag141=basis if pid=="20170863" & regexm(cr5id,"T1")|pid=="20170868" & regexm(cr5id,"T1")|pid=="20170987" & regexm(cr5id,"T1")|pid=="20171039" & regexm(cr5id,"T1")
+
+replace flag39=primarysite if pid=="20172046" & regexm(cr5id,"T1")
+replace primarysite="LUNG" if pid=="20172046" & regexm(cr5id,"T1")
+replace flag134=primarysite if pid=="20172046" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20172046" & regexm(cr5id,"T1")
+replace top="349" if pid=="20172046" & regexm(cr5id,"T1")
+replace topography=349 if pid=="20172046" & regexm(cr5id,"T1")
+replace topcat=32 if pid=="20172046" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20172046" & regexm(cr5id,"T1")
+
+destring flag43 ,replace
+destring flag138 ,replace
+replace flag43=lat if pid=="20172046" & regexm(cr5id,"T1")
+replace lat=9 if pid=="20172046" & regexm(cr5id,"T1")
+replace flag138=lat if pid=="20172046" & regexm(cr5id,"T1")
+
+replace flag42=morph if pid=="20172046" & regexm(cr5id, "T1")
+replace morph=8140 if pid=="20172046" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20172046" & regexm(cr5id, "T1")
+replace morphcat=6 if pid=="20172046" & regexm(cr5id, "T1")
+
+replace flag41=hx if pid=="20172046" & regexm(cr5id, "T1")
+replace hx="SUSPICIOUS FOR METASTATIC ADENOCARCINOMA" if pid=="20172046" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20172046" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20180666" & regexm(cr5id,"T1")
+replace primarysite="CONNECTIVE,SOFT TISSUE-NOS" if pid=="20180666" & regexm(cr5id,"T1")
+replace flag134=primarysite if pid=="20180666" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20180666" & regexm(cr5id,"T1")
+replace top="499" if pid=="20180666" & regexm(cr5id,"T1")
+replace topography=499 if pid=="20180666" & regexm(cr5id,"T1")
+replace topcat=42 if pid=="20180666" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20180666" & regexm(cr5id,"T1")
 
 ** Check 74 - invalid(hx<>morph)
 sort pid
-
+STOP
 ** morphcheckcat 1: Hx=Undifferentiated Ca & Morph!=8020
 count if morphcheckcat==1 //0
 //list pid hx morph basis cfdx cr5id if morphcheckcat==1, string(100)

@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      12-JULY-2022
+    // 	date last modified      13-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -114,9 +114,9 @@
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-import excel using "`datapath'\version09\1-input\2022-07-12_MAIN Source+Tumour+Patient_KWG_annualrpt_excel.xlsx", firstrow
+import excel using "`datapath'\version09\1-input\2022-07-12_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
 
-count //19,733
+count //19,748
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
 	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.
@@ -548,10 +548,12 @@ list pid if cr5id==""
 
 
 ** Check if dxyr and incidence year do not match and review these before dropping the ineligible years
-count if dxyr!=. & dotyear!=. & dxyr!=dotyear //5
+count if dxyr!=. & dotyear!=. & dxyr!=dotyear //0
 list pid eid sid dxyr dotyear dot cr5id if dxyr!=. & dotyear!=. & dxyr!=dotyear //reviewed these in CR5db
 
 ** Corrections for the above CR5db review
+** JC 13jul2022: flagged in earlier version of CR5db export_excel
+/*
 destring flag53 ,replace
 destring flag148 ,replace
 replace flag53=dxyr if pid=="20170830" & regexm(cr5id,"T1")
@@ -569,6 +571,7 @@ replace flag148=dxyr if pid=="20180872" & regexm(cr5id,"T1")
 replace flag53=99 if dxyr==. //14
 replace dxyr=99 if dxyr==99
 replace flag148=dxyr if dxyr==99
+*/
 /*
 ** Prepare this dataset for export to excel (prior to removing non-2016,2017,2018 cases)
 preserve
@@ -629,14 +632,14 @@ restore
 */
 
 ** Check for and correct cases missing diagnosis year
-tab dxyr ,m //0 missing dxyr; 2016=2494; 2017=2142; 2018=2226
+tab dxyr ,m //0 missing dxyr; 2016=2494; 2017=2142; 2018=2233
 list pid cr5id if dxyr==. //not 2016/2017/2018 so leave for KWG to correct
 
 ** Remove cases NOT diagnosed in 2016-2018
 ** JC 12JUL2022: DON'T DROP PREVIOUS YEARS AS WILL NEED FOR 20b_update previous years.do for the cross-check process DOFILE
 //drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //16,951 deleted
 
-count //19,733
+count //19,748
 
 
 /*
@@ -687,10 +690,10 @@ label values ptda ptda_lab
 
 ** Casefinding Date
 ** contains a nonnumeric character so field needs correcting!
-generate byte non_numeric_ptdoa = indexnot(PTCasefindingDate, "0123456789.-")
-count if non_numeric_ptdoa //0
+//generate byte non_numeric_ptdoa = indexnot(PTCasefindingDate, "0123456789.-")
+//count if non_numeric_ptdoa //0
 //list pid ptda PTCasefindingDate cr5id if non_numeric_ptdoa
-replace PTCasefindingDate="20220316" if pid=="20200856"
+//replace PTCasefindingDate="20220316" if pid=="20200856" - corrected by KWG 12jul2022 so no longer needed
 destring PTCasefindingDate,replace
 replace PTCasefindingDate=20000101 if PTCasefindingDate==99999999
 nsplit PTCasefindingDate, digits(4 2 2) gen(year month day)
@@ -3210,7 +3213,7 @@ label values residentcheckcat residentcheckcat_lab
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //19,733
+count //19,748
 
 
 ** Create dataset to use for 2018 cleaning
