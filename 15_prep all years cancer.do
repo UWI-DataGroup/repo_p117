@@ -1,10 +1,11 @@
+cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
     //  algorithm name          15_prep all years cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      13-JULY-2022
+    // 	date last modified      14-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -114,9 +115,10 @@
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-import excel using "`datapath'\version09\1-input\2022-07-12_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
+** JC 14jul2022: KWG abstracted a 2015 (pid 20160419) and 2 2018 (pids 20190010 + 20190015) cases today but since already cleaned up to Laterality in 20a_clean current years cancer.do, I reviewed them manually so no need to re-clean those.
+import excel using "`datapath'\version09\1-input\2022-07-14_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
 
-count //19,748
+count //19,797
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
 	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.
@@ -334,7 +336,7 @@ label var dot "Incidence Date"
 label var dotyear "Incidence Year"
 //drop IncidenceDate
 
-count //19,733
+count //19,797
 
 ** Renaming CanReg5 variables
 rename Personsearch persearch
@@ -632,14 +634,14 @@ restore
 */
 
 ** Check for and correct cases missing diagnosis year
-tab dxyr ,m //0 missing dxyr; 2016=2494; 2017=2142; 2018=2233
+tab dxyr ,m //0 missing dxyr; 2016=2493; 2017=2142; 2018=2242
 list pid cr5id if dxyr==. //not 2016/2017/2018 so leave for KWG to correct
 
 ** Remove cases NOT diagnosed in 2016-2018
 ** JC 12JUL2022: DON'T DROP PREVIOUS YEARS AS WILL NEED FOR 20b_update previous years.do for the cross-check process DOFILE
 //drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //16,951 deleted
 
-count //19,748
+count //19,797
 
 
 /*
@@ -3213,7 +3215,7 @@ label values residentcheckcat residentcheckcat_lab
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //19,748
+count //19,797
 
 
 ** Create dataset to use for 2018 cleaning

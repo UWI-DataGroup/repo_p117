@@ -52,6 +52,8 @@ replace morph=8140 if pid=="20130299" & regexm(cr5id, "T1")
 replace flag137=morph if pid=="20130299" & regexm(cr5id, "T1")
 replace morphcat=6 if pid=="20130299" & regexm(cr5id, "T1")
 
+JC 14jul2022: KWG emailed to say he abstracted this pid today as a 2015 case: 20160419
+JC manually reviewed T1 of above case (dxyr=2015) on 14jul2022 and no errors found.
 
 *******************************
 ** 2014 Non-survival Dataset **

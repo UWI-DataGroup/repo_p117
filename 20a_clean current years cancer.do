@@ -37,16 +37,18 @@ cls
     log using "`logpath'\20a_clean current years cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
+** JC 14jul2022: KWG abstracted a 2015 (pid 20160419) and 2 2018 (pids 20190010 + 20190015) cases today but since already cleaned up to Laterality in 20a_clean current years cancer.do, I reviewed them manually so no need to re-clean those. Also checked the various check categories for these specific cases to see if any errors were flagged from dofile 15_prep all years cancer.do - no errors were flagged.
+
 ************************
 ** Format Dataset for **
 ** Cleaning 2016-2018 **
 ************************
 use "`datapath'\version09\2-working\allyears_prepped cancer", clear
 
-count //19,748
+count //19,797
 
-drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //12,879 deleted
-count //6869
+drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //12,920 deleted
+count //6877
 
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
@@ -1749,7 +1751,7 @@ replace morphcat=44 if pid=="20160018" & regexm(cr5id, "T1")
 replace flag46=basis if pid=="20160884" & regexm(cr5id,"T1")
 replace basis=7 if pid=="20160884" & regexm(cr5id, "T1")
 replace flag141=basis if pid=="20160884" & regexm(cr5id,"T1")
-STOP
+
 //replace flag41=hx if pid=="20180932" //3 changes
 //replace hx="ADULT T-CELL LYMPHOMA LEUKEMIA" if pid=="20180932" & regexm(cr5id, "T1")
 //replace flag136=hx if pid=="20180932" //3 changes
