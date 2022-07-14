@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      13-JULY-2022
+    // 	date last modified      14-JULY-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -938,9 +938,9 @@ replace flag135=top if pid=="20160862" & regexm(cr5id,"T1")
 
 destring flag46 ,replace
 destring flag141 ,replace
-replace flag46=basis if pid=="20180843"
+replace flag46=basis if pid=="20180843" & regexm(cr5id, "T1")
 replace basis=1 if pid=="20180843" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20180843"
+replace flag141=basis if pid=="20180843" & regexm(cr5id, "T1")
 
 destring flag43 ,replace
 destring flag138 ,replace
@@ -1257,9 +1257,19 @@ replace topography=499 if pid=="20180666" & regexm(cr5id,"T1")
 replace topcat=42 if pid=="20180666" & regexm(cr5id,"T1")
 replace flag135=top if pid=="20180666" & regexm(cr5id,"T1")
 
+** JC 14jul2022: WhatsApp conversation with SF revealed corrections to below records - she'll correct in CR5db so no need to export corrections
+replace primarysite="COLON-SPLENIC FLEXURE" if pid=="20160265" & regexm(cr5id,"T1")
+replace top="185" if pid=="20160265" & regexm(cr5id,"T1")
+replace topography=185 if pid=="20160265" & regexm(cr5id,"T1")
+
+replace primarysite="SKIN-EYE" if pid=="20170594" & regexm(cr5id,"T1")
+replace top="441" if pid=="20170594" & regexm(cr5id,"T1")
+replace topography=441 if pid=="20170594" & regexm(cr5id,"T1")
+replace topcat=39 if pid=="20170594" & regexm(cr5id,"T1")
+
 ** Check 74 - invalid(hx<>morph)
 sort pid
-STOP
+
 ** morphcheckcat 1: Hx=Undifferentiated Ca & Morph!=8020
 count if morphcheckcat==1 //0
 //list pid hx morph basis cfdx cr5id if morphcheckcat==1, string(100)
@@ -1269,8 +1279,61 @@ count if morphcheckcat==2 //0
 //list pid hx morph basis cfdx cr5id if morphcheckcat==2
 
 ** morphcheckcat 3: Hx=Papillary ca & Morph!=8050
-count if morphcheckcat==3 //7 - all correct
+count if morphcheckcat==3 //48 - all correct
 //list pid hx morphology top basis beh cr5id if morphcheckcat==3
+replace flag42=morph if pid=="20160365" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20160365" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20160365" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20160428" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20160428" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20160428" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20160650" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20160650" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20160650" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20160771" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20160771" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20160771" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20170133" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20170133" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170133" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20170138" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20170138" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170138" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20170215" & regexm(cr5id, "T1")
+replace morph=8504 if pid=="20170215" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170215" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20170329" & regexm(cr5id, "T1")
+replace morph=8500 if pid=="20170329" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170329" & regexm(cr5id, "T1")
+
+replace flag41=hx if pid=="20170329" & regexm(cr5id, "T1")
+replace hx="INVASIVE DUCTAL CARCINOMA" if pid=="20170329" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20170329" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20172106" & regexm(cr5id, "T1")
+replace morph=8070 if pid=="20172106" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20172106" & regexm(cr5id, "T1")
+
+replace flag41=hx if pid=="20172106" & regexm(cr5id, "T1")
+replace hx="SQUAMOUS CELL CARCINOMA" if pid=="20172106" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20172106" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20180108" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20180108" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180108" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20180152" & regexm(cr5id, "T1")
+replace morph=8523 if pid=="20180152" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180152" & regexm(cr5id, "T1")
+
+/* JC 14jul2022: below previously corrected.
 replace flag42=morph if pid=="20180247"
 replace morph=8504 if pid=="20180247" & regexm(cr5id, "T1")
 replace flag137=morph if pid=="20180247"
@@ -1286,16 +1349,17 @@ replace flag175=comments if pid=="20180447"
 replace flag32=recstatus if pid=="20180447" & regexm(cr5id, "T1")
 replace recstatus=6 if pid=="20180447" & regexm(cr5id, "T1")
 replace flag127=recstatus if pid=="20180447" & regexm(cr5id, "T1")
+*/
 
 ** morphcheckcat 4: Hx=Papillary serous adenoca & Morph!=8460 & Top!=ovary/peritoneum
 count if morphcheckcat==4 //0 (thyroid/renal=M8260 & ovary/peritoneum=M8461 & endometrium=M8460)
 //list pid top hx morph morphology top basis beh cr5id if morphcheckcat==4
-replace flag42=morph if pid=="20180515"
-replace morph=8460 if pid=="20180515" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20180515"
+//replace flag42=morph if pid=="20180515"
+//replace morph=8460 if pid=="20180515" & regexm(cr5id, "T1")
+//replace flag137=morph if pid=="20180515"
 
 ** morphcheckcat 5: Hx=Papillary & intraduct/intracyst & Morph!=8503
-count if morphcheckcat==5 //2 - all correct
+count if morphcheckcat==5 //4 - all correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==5
 
 ** morphcheckcat 6: Hx=Keratoacanthoma & Morph!=8070
@@ -1347,22 +1411,22 @@ count if morphcheckcat==17 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==17
 
 ** morphcheckcat 18: Hx=transitional/urothelial excluding papillary & morph!=8120
-count if morphcheckcat==18 //0
+count if morphcheckcat==18 //2 - correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==18
 
 ** morphcheckcat 19: Hx=transitional/urothelial & papillary & morph!=8130
-count if morphcheckcat==19 //2 - 1 correct
+count if morphcheckcat==19 //1 - correct
 //list pid primarysite hx morph morphology basis beh  cr5id if morphcheckcat==19
-replace flag42=morph if pid=="20181184"
-replace morph=8130 if pid=="20181184" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20181184"
+//replace flag42=morph if pid=="20181184"
+//replace morph=8130 if pid=="20181184" & regexm(cr5id, "T1")
+//replace flag137=morph if pid=="20181184"
 
 ** morphcheckcat 20: Hx=villous & adenoma excluding tubulo & morph!=8261
 count if morphcheckcat==20 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==20
 
 ** morphcheckcat 21: Hx=intestinal excl. stromal (GISTs) & morph!=8144
-count if morphcheckcat==21 //0
+count if morphcheckcat==21 //2 - correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==21
 
 ** morphcheckcat 22: Hx=villoglandular & morph!=8263
@@ -1390,16 +1454,20 @@ count if morphcheckcat==27 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==27
 
 ** morphcheckcat 28: Hx==follicular excl.minimally invasive & morph!=8330
-count if morphcheckcat==28 //2 - all correct
+count if morphcheckcat==28 //9 - all correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==28
+replace flag41=hx if pid=="20180726" & regexm(cr5id, "T1")
+replace hx="WELL DIFFERENTIATED FOLLICULAR CARCINOMA" if pid=="20180726" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20180726" & regexm(cr5id, "T1")
 
 ** morphcheckcat 29: Hx==follicular & minimally invasive & morph!=8335
 count if morphcheckcat==29 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==29
 
 ** morphcheckcat 30: Hx==microcarcinoma & morph!=8341
-count if morphcheckcat==30 //2
+count if morphcheckcat==30 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==30
+/*
 replace flag42=morph if pid=="20180283"
 replace morph=8341 if pid=="20180283" & regexm(cr5id, "T1")
 replace flag137=morph if pid=="20180283"
@@ -1411,31 +1479,69 @@ replace flag175=comments if pid=="20180283"
 replace flag32=recstatus if pid=="20180283" & regexm(cr5id, "T1")
 replace recstatus=6 if pid=="20180283" & regexm(cr5id, "T1")
 replace flag127=recstatus if pid=="20180283" & regexm(cr5id, "T1")
+*/
 
 ** morphcheckcat 31: Hx!=endometrioid & morph==8380
-count if morphcheckcat==31 //0
+count if morphcheckcat==31 //4
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==31
+replace flag39=primarysite if pid=="20180091" & regexm(cr5id,"T1")
+replace primarysite="UTERUS-UTERINE BODY" if pid=="20180091" & regexm(cr5id,"T1")
+replace flag134=primarysite if pid=="20180091" & regexm(cr5id,"T1")
+
+replace flag41=hx if pid=="20180091" & regexm(cr5id, "T1")
+replace hx="ENDOMETRIOID ADENOCARCINOMA (VILLOGLANDULAR)" if pid=="20180091" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20180091" & regexm(cr5id, "T1")
 
 ** morphcheckcat 32: Hx==poroma & morph!=8409 & mptot<2
 count if morphcheckcat==32 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==32
 
 ** morphcheckcat 33: Hx==serous excl. papillary & morph!=8441
-count if morphcheckcat==33 //0
+count if morphcheckcat==33 //6
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==33
+replace flag42=morph if pid=="20170081" & regexm(cr5id, "T1")
+replace morph=8441 if pid=="20170081" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170081" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20180710" & regexm(cr5id,"T1")
+replace primarysite="FUNDUS UTERI" if pid=="20180710" & regexm(cr5id,"T1")
+replace flag134=primarysite if pid=="20180710" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20180710" & regexm(cr5id,"T1")
+replace top="543" if pid=="20180710" & regexm(cr5id,"T1")
+replace topography=543 if pid=="20180710" & regexm(cr5id,"T1")
+replace topcat=47 if pid=="20180710" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20180710" & regexm(cr5id,"T1")
+
+replace flag42=morph if pid=="20180710" & regexm(cr5id, "T1")
+replace morph=8441 if pid=="20180710" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180710" & regexm(cr5id, "T1")
 
 ** morphcheckcat 34: Hx==mucinous excl. endocervical,producing,secreting,infiltrating duct & morph!=8480
-count if morphcheckcat==34 //2
-//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==34
-replace flag42=morph if pid=="20182014"
-replace morph=8480 if pid=="20182014" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20182014"
-replace morphcat=9 if pid=="20182014" & regexm(cr5id,"T1")
+count if morphcheckcat==34 //12 - 10 correct
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==34 ,string(30)
+replace flag41=hx if pid=="20170531" & regexm(cr5id, "T1")
+replace hx="PRIMARY INTESTINAL TYPE ADENOCARCINOMA OF OVARY" if pid=="20170531" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20170531" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20170531" & regexm(cr5id, "T1")
+replace morph=8144 if pid=="20170531" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170531" & regexm(cr5id, "T1")
+replace morphcat=6 if pid=="20170531" & regexm(cr5id, "T1")
+
+//replace flag42=morph if pid=="20182014"
+//replace morph=8480 if pid=="20182014" & regexm(cr5id, "T1")
+//replace flag137=morph if pid=="20182014"
+//replace morphcat=9 if pid=="20182014" & regexm(cr5id,"T1")
 
 ** morphcheckcat 35: Hx!=mucinous/pseudomyxoma peritonei & morph==8480
-count if morphcheckcat==35 //0
-//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==35
-
+count if morphcheckcat==35 //4
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==35 ,string(30)
+replace flag42=morph if pid=="20180163" & regexm(cr5id, "T1")
+replace morph=8140 if pid=="20180163" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180163" & regexm(cr5id, "T1")
+replace morphcat=6 if pid=="20180163" & regexm(cr5id, "T1")
+STOP
 ** morphcheckcat 36: Hx==acinar & duct & morph!=8552
 count if morphcheckcat==36 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==36

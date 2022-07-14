@@ -37,6 +37,22 @@ use "`datapath'\version09\1-input\2008_2013_2014_2015_iarchub_nonsurvival_nonrep
 cross-check with below ds
 use "`datapath'\version09\2-working\allyears_prepped cancer", clear
 
+JC 14jul2022: picked up when cleaning 2016-2018 as filtered cases in CR5db with 'intramucosal' in hx
+replace flag42=morph if pid=="20150271" & regexm(cr5id, "T1")
+replace morph=8140 if pid=="20150271" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20150271" & regexm(cr5id, "T1")
+replace morphcat=6 if pid=="20150271" & regexm(cr5id, "T1")
+
+replace flag41=hx if pid=="20130299" & regexm(cr5id, "T1")
+replace hx="ADENOCARCINOMA" if pid=="20130299" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20130299" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20130299" & regexm(cr5id, "T1")
+replace morph=8140 if pid=="20130299" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20130299" & regexm(cr5id, "T1")
+replace morphcat=6 if pid=="20130299" & regexm(cr5id, "T1")
+
+
 *******************************
 ** 2014 Non-survival Dataset **
 *******************************
