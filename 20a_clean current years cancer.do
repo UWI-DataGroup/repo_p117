@@ -1541,7 +1541,7 @@ replace flag42=morph if pid=="20180163" & regexm(cr5id, "T1")
 replace morph=8140 if pid=="20180163" & regexm(cr5id, "T1")
 replace flag137=morph if pid=="20180163" & regexm(cr5id, "T1")
 replace morphcat=6 if pid=="20180163" & regexm(cr5id, "T1")
-STOP
+
 ** morphcheckcat 36: Hx==acinar & duct & morph!=8552
 count if morphcheckcat==36 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==36
@@ -1559,20 +1559,23 @@ count if morphcheckcat==39 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==39
 
 ** morphcheckcat 40: Hx!=duct & Hx==lobular & morph!=8520
-count if morphcheckcat==40 //0
-//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==40
+count if morphcheckcat==40 //12
+//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==40 ,string(20)
+replace flag42=morph if pid=="20170139" & regexm(cr5id, "T1")
+replace morph=8520 if pid=="20170139" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170139" & regexm(cr5id, "T1")
 
 ** morphcheckcat 41: Hx==duct & lobular & morph!=8522
 count if morphcheckcat==41 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==41
 
 ** morphcheckcat 42: Hx!=acinar & morph==8550
-count if morphcheckcat==42 //1
+count if morphcheckcat==42 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==42
-replace flag42=morph if pid=="20182177"
-replace morph=8500 if pid=="20182177" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20182177"
-replace morphcat=10 if pid=="20182177" & regexm(cr5id,"T1")
+//replace flag42=morph if pid=="20182177"
+//replace morph=8500 if pid=="20182177" & regexm(cr5id, "T1")
+//replace flag137=morph if pid=="20182177"
+//replace morphcat=10 if pid=="20182177" & regexm(cr5id,"T1")
 
 ** morphcheckcat 43: Hx!=adenosquamous & morph==8560
 count if morphcheckcat==43 //0
@@ -1599,12 +1602,12 @@ count if morphcheckcat==48 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==48
 
 ** morphcheckcat 49: Hx=fibrosarcoma & Hx=myxo & morph!=8811
-count if morphcheckcat==49 //2
+count if morphcheckcat==49 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==49
-replace flag42=morph if pid=="20180344"
-replace morph=8811 if pid=="20180344" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20180344"
-replace morphcat=18 if pid=="20180344" & regexm(cr5id,"T1")
+//replace flag42=morph if pid=="20180344"
+//replace morph=8811 if pid=="20180344" & regexm(cr5id, "T1")
+//replace flag137=morph if pid=="20180344"
+//replace morphcat=18 if pid=="20180344" & regexm(cr5id,"T1")
 
 ** morphcheckcat 50: Hx=fibro & histiocytoma & morph!=8830 (see morphcheckcat=92 also!)
 count if morphcheckcat==50 //0
@@ -1627,7 +1630,7 @@ count if morphcheckcat==54 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==54
 
 ** morphcheckcat 55: Hx==mixed mullerian tumour & Hx!=mesodermal & morph!=8950
-count if morphcheckcat==55 //0
+count if morphcheckcat==55 //2 - correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==55
 
 ** morphcheckcat 56: Hx==mesodermal mixed & morph!=8951
@@ -1639,8 +1642,9 @@ count if morphcheckcat==57 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==57
 
 ** morphcheckcat 58: Hx==mesothelioma & Hx!=fibrous or sarcoma or epithelioid/papillary or cystic & morph!=9050
-count if morphcheckcat==58 //2
+count if morphcheckcat==58 //2 - correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==58
+/* JC 14jul2022: previously corrected cases
 replace flag39=primarysite if pid=="20180469"
 replace primarysite="UNKNOWN" if pid=="20180469" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20180469"
@@ -1663,7 +1667,8 @@ replace flag175=comments if pid=="20180469"
 replace flag32=recstatus if pid=="20180469" & regexm(cr5id, "T1")
 replace recstatus=6 if pid=="20180469" & regexm(cr5id, "T1")
 replace flag127=recstatus if pid=="20180469" & regexm(cr5id, "T1")
-			  
+*/
+
 ** morphcheckcat 59: Hx==fibrous or sarcomatoid mesothelioma & Hx!=epithelioid/papillary or cystic & morph!=9051
 count if morphcheckcat==59 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==59
@@ -1709,11 +1714,11 @@ count if morphcheckcat==69 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==69
 
 ** morphcheckcat 70: Hx==osteosarcoma & morph!=9180
-count if morphcheckcat==70 //0
+count if morphcheckcat==70 //3 - correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==70
 
 ** morphcheckcat 71: Hx==chondrosarcoma & morph!=9220
-count if morphcheckcat==71 //0
+count if morphcheckcat==71 //2 - correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==71
 
 ** morphcheckcat 72: Hx=myxoid and Hx!=chondrosarcoma & morph==9231
@@ -1733,15 +1738,28 @@ count if morphcheckcat==75 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==75
 
 ** morphcheckcat 76: Hx=T-cell lymphoma & Hx!=leukemia & morph!=9702
-count if morphcheckcat==76 //1
-//list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==76
-replace flag41=hx if pid=="20180932" //3 changes
-replace hx="ADULT T-CELL LYMPHOMA LEUKEMIA" if pid=="20180932" & regexm(cr5id, "T1")
-replace flag136=hx if pid=="20180932" //3 changes
+count if morphcheckcat==76 //11
+//list pid top hx morph morphology basis beh cr5id if morphcheckcat==76 ,string(30)
+replace flag42=morph if pid=="20160018" & regexm(cr5id, "T1")
+replace morph=9702 if pid=="20160018" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20160018" & regexm(cr5id, "T1")
+replace morphcat=44 if pid=="20160018" & regexm(cr5id, "T1")
+
+** JC 14jul2022: emailed SF, KWG to confirm if flow cytometry should be coded to BOD=hx of primary
+replace flag46=basis if pid=="20160884" & regexm(cr5id,"T1")
+replace basis=7 if pid=="20160884" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20160884" & regexm(cr5id,"T1")
+STOP
+//replace flag41=hx if pid=="20180932" //3 changes
+//replace hx="ADULT T-CELL LYMPHOMA LEUKEMIA" if pid=="20180932" & regexm(cr5id, "T1")
+//replace flag136=hx if pid=="20180932" //3 changes
 
 ** morphcheckcat 77: Hx=non-hodgkin lymphoma & Hx!=cell (to excl. mantle, large, cleaved, small, etc) & morph!=9591
-count if morphcheckcat==77 //0
+count if morphcheckcat==77 //6 - 2 correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==77
+replace flag46=basis if pid=="20160636" & regexm(cr5id,"T1")
+replace basis=7 if pid=="20160636" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20160636" & regexm(cr5id,"T1")
 
 ** morphcheckcat 78: Hx=precursor t-cell acute lymphoblastic leukemia & morph!=9837
 ** note: ICD-O-3 has another matching code (M9729) but WHO Classification notes that M9837 more accurate
@@ -1752,17 +1770,25 @@ count if morphcheckcat==78 //0
 ** note: HemeDb under CML, NOS notes 'Presumably myelogenous leukemia without genetic studies done would be coded to M9863.'
 count if morphcheckcat==79 //2
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==79
-replace flag42=morph if pid=="20180006"
-replace morph=9863 if pid=="20180006" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20180006"
+//replace flag42=morph if pid=="20180006"
+//replace morph=9863 if pid=="20180006" & regexm(cr5id, "T1")
+//replace flag137=morph if pid=="20180006"
+
+replace flag42=morph if pid=="20160073" & regexm(cr5id, "T1")
+replace morph=9863 if pid=="20160073" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20160073" & regexm(cr5id, "T1")
+
+replace flag80=comments if pid=="20160073"
+replace comments="JC 14JUL2022: SEER Haem coding online indicates: 'Chronic myeloid leukemia, NOS (M9863) is a generic disease description. DCO cases or path report only cases may stay in this classification'. So this code can be used for cases without hx confirmation."+" "+comments if pid=="20160073"
+replace flag175=comments if pid=="20160073"
 
 ** morphcheckcat 80: Hx=CML (chronic myeloid/myelogenous leukemia) & Hx!=BCR/ABL1 & morph==9875
 ** note: HemeDb under CML, NOS notes 'Presumably myelogenous leukemia without genetic studies done would be coded to M9863.'
-count if morphcheckcat==80 //0
+count if morphcheckcat==80 //2 -correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==80
 
 ** morphcheckcat 81: Hx=acute myeloid leukemia & Hx!=myelodysplastic/down syndrome & basis==cyto/heme/histology... & morph!=9861
-count if morphcheckcat==81 //3 - all correct
+count if morphcheckcat==81 //6 - all correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==81
 
 ** morphcheckcat 82: Hx=acute myeloid leukemia & down syndrome & morph!=9898
@@ -1802,23 +1828,23 @@ count if morphcheckcat==90 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==90
 
 ** morphcheckcat 91: Hx=acinar & top!=619 & morph!=8550
-count if morphcheckcat==91 //35 - on 22oct18 JC added in top!=619 to this code so now count=0
+count if morphcheckcat==91 //0
 //list pid primarysite hx morph morphology cr5id if morphcheckcat==91
 
 ** morphcheckcat 92: Hx!=fibro & histiocytoma & morph=8830 (see morphcheckcat=50 also!)
-count if morphcheckcat==92 //1
+count if morphcheckcat==92 //0
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==92
 
 ** morphcheckcat 93: Hx=acinar & top=619 & morph!=8140
 /*
 This check added on 22oct18 after update re morphcheckcat 91 above.  
 */
-count if morphcheckcat==93 //1
+count if morphcheckcat==93 //0
 //list pid primarysite hx morph morphology cr5id if morphcheckcat==93
-replace morph=8140 if morphcheckcat==93 //1 change
+replace morph=8140 if morphcheckcat==93 //0 changes
 
 ** morphcheckcat 94: Hx=hodgkin & morph=non-hodgkin
-count if morphcheckcat==94 //3 - corrected in Check 76 subcheck 1 below
+count if morphcheckcat==94 //0 - corrected in Check 76 subcheck 1 below
 //list pid hx morph morphology cr5id if morphcheckcat==94
 
 ** morphcheckcat 95: Hx=leukaemia & morph=9729
@@ -1828,7 +1854,7 @@ count if morphcheckcat==95 //0
 ** morphcheckcat 96: Hx=lymphoma & morph=9837
 count if morphcheckcat==96 //0
 //list pid hx morph morphology cr5id if morphcheckcat==96
-
+STOP
 ** Check 76 - invalid(primarysite vs hx)
 ** hxcheckcat 1: PrimSite=Blood/Bone Marrow & Hx=Lymphoma 
 count if hxcheckcat==1 //3
