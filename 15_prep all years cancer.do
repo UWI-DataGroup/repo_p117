@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      14-JULY-2022
+    // 	date last modified      18-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -115,10 +115,11 @@ cls
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-** JC 14jul2022: KWG abstracted a 2015 (pid 20160419) and 2 2018 (pids 20190010 + 20190015) cases today but since already cleaned up to Laterality in 20a_clean current years cancer.do, I reviewed them manually so no need to re-clean those.
-import excel using "`datapath'\version09\1-input\2022-07-14_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
+** JC 14jul2022: KWG abstracted a 2015 (pid 20160419) and 14 records for 2018 (pids 20190010, 20190015, 20190026, 20190027, 20190034, 20190042, 20190046, 20190049, 20190052, 20190053, 20190055, 20190057, 20190075 and 20190077) cases today but since already cleaned up to Laterality in 20a_clean current years cancer.do, I reviewed them manually so no need to re-clean those.
+import excel using "`datapath'\version09\1-input\2022-07-18_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
 
-count //19,797
+count //19,812
+
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
 	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.
@@ -336,7 +337,7 @@ label var dot "Incidence Date"
 label var dotyear "Incidence Year"
 //drop IncidenceDate
 
-count //19,797
+count //19,812
 
 ** Renaming CanReg5 variables
 rename Personsearch persearch
@@ -3209,13 +3210,156 @@ replace residentcheckcat=1 if resident!=1 & recstatus!=3 & recstatus!=4 & recsta
 label var residentcheckcat "Residency Check Category"
 label define residentcheckcat_lab 1 "Check 1: Residency and Record Status mismatch"	 ,modify
 label values residentcheckcat residentcheckcat_lab
-	
+
+
+** Check for cases wherein path report 'SampleDate' is before dxyr
+** New check added on 18jul2022
+count if year(sampledate) < dxyr & year(sampledate)!=2000 //27
+list pid cr5id dot sampledate dxyr if year(sampledate) < dxyr & year(sampledate)!=2000
+count if year(recvdate) < dxyr & year(recvdate)!=2000 //18
+list pid cr5id dot recvdate dxyr if year(recvdate) < dxyr & year(recvdate)!=2000
+count if year(rptdate) < dxyr & year(rptdate)!=2000 //32
+list pid cr5id dot rptdate dxyr if year(rptdate) < dxyr & year(rptdate)!=2000
+
+** Corrections from review of above lists
+destring flag53 ,replace
+destring flag148 ,replace
+replace flag53=dxyr if pid=="20210074" & regexm(cr5id,"T1")
+replace dxyr=2020 if pid=="20210074" & regexm(cr5id,"T1")
+replace flag148=dxyr if pid=="20210074" & regexm(cr5id,"T1")
+
+destring flag12 ,replace
+destring flag107 ,replace
+replace flag12=sampledate if pid=="20212052" & cr5id=="T1S1"
+replace sampledate=sampledate+365 if pid=="20212052" & cr5id=="T1S1"
+replace flag107=sampledate if pid=="20212052" & cr5id=="T1S1"
+
+replace flag53=dxyr if pid=="20212127 " & regexm(cr5id,"T1")
+replace dxyr=2021 if pid=="20212127 " & regexm(cr5id,"T1")
+replace flag148=dxyr if pid=="20212127 " & regexm(cr5id,"T1")
+
+destring flag14 ,replace
+destring flag109 ,replace
+replace flag14=rptdate if pid=="20170511" & cr5id=="T1S1"
+replace rptdate=rptdate+365 if pid=="20170511" & cr5id=="T1S1"
+replace flag109=rptdate if pid=="20170511" & cr5id=="T1S1"
+
+replace flag14=rptdate if pid=="20170104" & cr5id=="T1S1"
+replace rptdate=rptdate+1096 if pid=="20170104" & cr5id=="T1S1"
+replace flag109=rptdate if pid=="20170104" & cr5id=="T1S1"
+
+replace flag14=rptdate if pid=="20170078" & cr5id=="T1S1"
+replace rptdate=rptdate+731 if pid=="20170078" & cr5id=="T1S1"
+replace flag109=rptdate if pid=="20170078" & cr5id=="T1S1"
+
+replace flag14=rptdate if pid=="20160521" & cr5id=="T1S1"
+replace rptdate=rptdate+366 if pid=="20160521" & cr5id=="T1S1"
+replace flag109=rptdate if pid=="20160521" & cr5id=="T1S1"
+
+replace flag14=rptdate if pid=="20160287" & cr5id=="T1S1"
+replace rptdate=rptdate+366 if pid=="20160287" & cr5id=="T1S1"
+replace flag109=rptdate if pid=="20160287" & cr5id=="T1S1"
+
+** Check for path rpts with incorrect years based on path rpt lab #
+** New check added on 18jul2022
+gen labnum2=labnum
+list pid labnum2 if regexm(labnum2,"CY") & regexm(labnum2,"-")
+gen labyear=substr(labnum2,-4,4) if regexm(labnum2,"CY") & regexm(labnum2,"-")
+replace labnum2=subinstr(labnum2,"CR","",.) if labyear==""
+replace labnum2=subinstr(labnum2,"CY","",.) if labyear==""
+replace labnum2=subinstr(labnum2,"`","",.) if labyear==""
+replace labnum2=subinstr(labnum2,"-","",.) if labyear==""
+replace labyear=substr(labnum2,1,2) if labnum2!="" & labnum2!="99" & labyear==""
+replace labyear="20"+labyear if labnum2!="" & labnum2!="99" & length(labyear)<4
+** contains a nonnumeric character so field needs correcting!
+generate byte non_numeric_labyr = indexnot(labyear, "0123456789.-")
+count if non_numeric_labyr //29
+list pid labnum2 labyear cr5id if non_numeric_labyr
+replace labyear="" if non_numeric_labyr //29 changes
+drop non_numeric_labyr
+generate byte non_numeric_labyr = indexnot(labyear, "0123456789.-")
+count if non_numeric_labyr //0
+list pid labnum2 labyear cr5id if non_numeric_labyr
+count if length(labyear)!=4 & labyear!="" //0
+destring labyear ,replace
+//count if regexm(labyear,"-")
+count if labyear!=year(sampledate) & year(sampledate)!=2000 & year(sampledate)!=. & labyear<2022 & !strmatch((labnum), "*-*") //21
+list pid cr5id dxyr labnum labyear sampledate recvdate rptdate stda if labyear!=year(sampledate) & year(sampledate)!=2000 & year(sampledate)!=. & labyear<2022 & !strmatch((labnum), "*-*")
+count if labyear!=year(recvdate) & year(recvdate)!=2000 & year(recvdate)!=. & labyear<2022 & !strmatch((labnum), "*-*")
+count if labyear!=year(rptdate) & year(rptdate)!=2000 & year(rptdate)!=. & labyear<2022 & !strmatch((labnum), "*-*") //123
+list pid cr5id dxyr labnum labyear sampledate recvdate rptdate stda if labyear!=year(rptdate) & year(rptdate)!=2000 & year(rptdate)!=. & labyear<2022 & !strmatch((labnum), "*-*")
+drop non_numeric_labyr labnum2 labyear
+/*
+** Prepare this dataset for export to excel (prior to removing non-2016,2017,2018 cases)
+preserve
+sort pid
+
+drop if  flag1=="" & flag2=="" & flag3=="" & flag4=="" & flag5=="" & flag6=="" & flag7=="" & flag8=="" & flag9=="" & flag10=="" ///
+		 & flag11=="" & flag12==. & flag13=="" & flag14==. & flag15=="" & flag16=="" & flag17=="" & flag18=="" & flag19=="" & flag20=="" ///
+		 & flag21=="" & flag22=="" & flag23=="" & flag24=="" & flag25=="" & flag26=="" & flag27=="" & flag28=="" & flag29=="" & flag30=="" ///
+		 & flag31=="" & flag32=="" & flag33=="" & flag34=="" & flag35=="" & flag36=="" & flag37=="" & flag38=="" & flag39=="" & flag40=="" ///
+		 & flag41=="" & flag42=="" & flag43=="" & flag44=="" & flag45=="" & flag46=="" & flag47=="" & flag48=="" & flag49=="" & flag50=="" ///
+		 & flag51=="" & flag52=="" & flag53==. & flag54=="" & flag55=="" & flag56=="" & flag57=="" & flag58=="" & flag59=="" & flag60=="" ///
+		 & flag61=="" & flag62=="" & flag63=="" & flag64=="" & flag65=="" & flag66=="" & flag67=="" & flag68=="" & flag69=="" & flag70=="" ///
+		 & flag71=="" & flag72=="" & flag73=="" & flag74=="" & flag75=="" & flag76=="" & flag77=="" & flag78=="" & flag79=="" & flag80=="" ///
+		 & flag81=="" & flag82=="" & flag83=="" & flag84=="" & flag85=="" & flag86=="" & flag87=="" & flag88=="" & flag89=="" & flag90=="" ///
+		 & flag91=="" & flag92=="" & flag93=="" & flag94=="" & flag95=="" & flag96=="" & flag97=="" & flag98=="" & flag99=="" & flag100=="" ///
+		 & flag101=="" & flag102=="" & flag103=="" & flag104=="" & flag105=="" & flag106=="" & flag107==. & flag108=="" & flag109==. & flag110=="" ///
+		 & flag111=="" & flag112=="" & flag113=="" & flag114=="" & flag115=="" & flag116=="" & flag117=="" & flag118=="" & flag119=="" & flag120=="" ///
+		 & flag121=="" & flag122=="" & flag123=="" & flag124=="" & flag125=="" & flag126=="" & flag127=="" & flag128=="" & flag129=="" & flag130=="" ///
+		 & flag131=="" & flag132=="" & flag133=="" & flag134=="" & flag135=="" & flag136=="" & flag137=="" & flag138=="" & flag139=="" & flag140=="" ///
+		 & flag141=="" & flag142=="" & flag143=="" & flag144=="" & flag145=="" & flag146=="" & flag147=="" & flag148==. & flag149=="" & flag150=="" ///
+		 & flag151=="" & flag152=="" & flag153=="" & flag154=="" & flag155=="" & flag156=="" & flag157=="" & flag158=="" & flag159=="" & flag160=="" ///
+		 & flag161=="" & flag162=="" & flag163=="" & flag164=="" & flag165=="" & flag166=="" & flag167=="" & flag168=="" & flag169=="" & flag170=="" ///
+		 & flag171=="" & flag172=="" & flag173=="" & flag174=="" & flag175=="" & flag176=="" & flag177=="" & flag178=="" & flag179=="" & flag180=="" ///
+		 & flag181=="" & flag182=="" & flag183=="" & flag184=="" & flag185=="" & flag186=="" & flag187=="" & flag188=="" & flag189==""
+// deleted
+
+gen str_no= _n
+label var str_no "No."
+//generate sampled2 = string(sampledate, "%td") if flag12!=.
+//generate rptd2 = string(rptdate, "%td") if flag14!=.
+
+//generate sampled3 = string(sampledate, "%td") if flag107!=.
+//generate rptd3 = string(rptdate, "%td") if flag109!=.
+
+//replace flag12=sampled2 if flag12!=.
+
+** Create excel errors list before deleting incorrect records
+** Use below code to automate file names using current date
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+capture export_excel str_no pid cr5id flag1-flag94 if ///
+		flag1!="" | flag2!="" | flag3!="" | flag4!="" | flag5!="" | flag6!="" | flag7!="" | flag8!="" | flag9!="" | flag10!="" ///
+		|flag11!="" | flag12!=. | flag13!="" | flag14!=. | flag15!="" | flag16!="" | flag17!="" | flag18!="" | flag19!="" | flag20!="" ///
+		|flag21!="" | flag22!="" | flag23!="" | flag24!="" | flag25!="" | flag26!="" | flag27!="" | flag28!="" | flag29!="" | flag30!="" ///
+		|flag31!="" | flag32!="" | flag33!="" | flag34!="" | flag35!="" | flag36!="" | flag37!="" | flag38!="" | flag39!="" | flag40!="" ///
+		|flag41!="" | flag42!="" | flag43!="" | flag44!="" | flag45!="" | flag46!="" | flag47!="" | flag48!="" | flag49!="" | flag50!="" ///
+		|flag51!="" | flag52!="" | flag53!=. | flag54!="" | flag55!="" | flag56!="" | flag57!="" | flag58!="" | flag59!="" | flag60!="" ///
+		|flag61!="" | flag62!="" | flag63!="" | flag64!="" | flag65!="" | flag66!="" | flag67!="" | flag68!="" | flag69!="" | flag70!="" ///
+		|flag71!="" | flag72!="" | flag73!="" | flag74!="" | flag75!="" | flag76!="" | flag77!="" | flag78!="" | flag79!="" | flag80!="" ///
+		|flag81!="" | flag82!="" | flag83!="" | flag84!="" | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
+		|flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
+using "`datapath'\version09\3-output\CancerCleaningALL`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+capture export_excel str_no pid cr5id flag95-flag189 if ///
+		 flag95!="" | flag96!="" | flag97!="" | flag98!="" | flag99!="" | flag100!="" ///
+		 |flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!=. | flag108!="" | flag109!=. | flag110!="" ///
+		 |flag111!="" | flag112!="" | flag113!="" | flag114!="" | flag115!="" | flag116!="" | flag117!="" | flag118!="" | flag119!="" | flag120!="" ///
+		 |flag121!="" | flag122!="" | flag123!="" | flag124!="" | flag125!="" | flag126!="" | flag127!="" | flag128!="" | flag129!="" | flag130!="" ///
+		 |flag131!="" | flag132!="" | flag133!="" | flag134!="" | flag135!="" | flag136!="" | flag137!="" | flag138!="" | flag139!="" | flag140!="" ///
+		 |flag141!="" | flag142!="" | flag143!="" | flag144!="" | flag145!="" | flag146!="" | flag147!="" | flag148!=. | flag149!="" | flag150!="" ///
+		 |flag151!="" | flag152!="" | flag153!="" | flag154!="" | flag155!="" | flag156!="" | flag157!="" | flag158!="" | flag159!="" | flag160!="" ///
+		 |flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!="" | flag168!="" | flag169!="" | flag170!="" ///
+		 |flag171!="" | flag172!="" | flag173!="" | flag174!="" | flag175!="" | flag176!="" | flag177!="" | flag178!="" | flag179!="" | flag180!="" ///
+		 |flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
+using "`datapath'\version09\3-output\CancerCleaningALL`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+restore
+*/
 
 ** Put variables in order they are to appear	  
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //19,797
+count //19,812
 
 
 ** Create dataset to use for 2018 cleaning

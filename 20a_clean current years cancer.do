@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      14-JULY-2022
+    // 	date last modified      18-JULY-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -45,10 +45,10 @@ cls
 ************************
 use "`datapath'\version09\2-working\allyears_prepped cancer", clear
 
-count //19,797
+count //19,812
 
-drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //12,920 deleted
-count //6877
+drop if dxyr!=2016 & dxyr!=2017 & dxyr!=2018 //12,893 deleted
+count //6919
 
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
@@ -863,6 +863,7 @@ replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20160154" & regexm(cr5id, "
 replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20160789" & regexm(cr5id, "T1")
 replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20170357" & regexm(cr5id, "T1")
 replace primarysite="BREAST-OVERLAP. OUTER" if pid=="20170649" & regexm(cr5id, "T1")
+replace primarysite="BREAST-OVERLAP. OUTER QUADRANT" if pid=="20190046" & regexm(cr5id, "T1")
 replace primarysite="BREAST-OVERLAP. LOWER" if pid=="20160064" & regexm(cr5id, "T1")
 replace primarysite="BREAST-OVERLAP. LOWER" if pid=="20170100" & regexm(cr5id, "T1")
 replace primarysite="BREAST-OVERLAP. LOWER" if pid=="20172084" & regexm(cr5id, "T1")
@@ -1335,6 +1336,14 @@ replace flag42=morph if pid=="20180152" & regexm(cr5id, "T1")
 replace morph=8523 if pid=="20180152" & regexm(cr5id, "T1")
 replace flag137=morph if pid=="20180152" & regexm(cr5id, "T1")
 
+replace flag41=hx if pid=="20190042" & regexm(cr5id, "T1")
+replace hx="PAPILLARY THYROID CARCINOMA" if pid=="20190042" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20190042" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20190042" & regexm(cr5id, "T1")
+replace morph=8260 if pid=="20190042" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20190042" & regexm(cr5id, "T1")
+
 /* JC 14jul2022: below previously corrected.
 replace flag42=morph if pid=="20180247"
 replace morph=8504 if pid=="20180247" & regexm(cr5id, "T1")
@@ -1748,9 +1757,10 @@ replace flag137=morph if pid=="20160018" & regexm(cr5id, "T1")
 replace morphcat=44 if pid=="20160018" & regexm(cr5id, "T1")
 
 ** JC 14jul2022: emailed SF, KWG to confirm if flow cytometry should be coded to BOD=hx of primary
-replace flag46=basis if pid=="20160884" & regexm(cr5id,"T1")
-replace basis=7 if pid=="20160884" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20160884" & regexm(cr5id,"T1")
+** JC 18jul2022: BOD should not be assigned as Hx since the flow cytometry is separate from Hx in the SEER Coding manual (see SF's email on 15jul2022)
+//replace flag46=basis if pid=="20160884" & regexm(cr5id,"T1")
+//replace basis=7 if pid=="20160884" & regexm(cr5id, "T1")
+//replace flag141=basis if pid=="20160884" & regexm(cr5id,"T1")
 
 //replace flag41=hx if pid=="20180932" //3 changes
 //replace hx="ADULT T-CELL LYMPHOMA LEUKEMIA" if pid=="20180932" & regexm(cr5id, "T1")
