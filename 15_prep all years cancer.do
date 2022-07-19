@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      18-JULY-2022
+    // 	date last modified      19-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -115,7 +115,7 @@ cls
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-** JC 14jul2022: KWG abstracted a 2015 (pid 20160419) and 14 records for 2018 (pids 20190010, 20190015, 20190026, 20190027, 20190034, 20190042, 20190046, 20190049, 20190052, 20190053, 20190055, 20190057, 20190075 and 20190077) cases today but since already cleaned up to Laterality in 20a_clean current years cancer.do, I reviewed them manually so no need to re-clean those.
+** JC 14jul2022+18jul2022: KWG abstracted a 2015 (pid 20160419) and 14 records for 2018 (pids 20190010, 20190015, 20190026, 20190027, 20190034, 20190042, 20190046, 20190049, 20190052, 20190053, 20190055, 20190057, 20190075 and 20190077) cases today but since already cleaned up to Laterality in 20a_clean current years cancer.do, I reviewed them manually so no need to re-clean those.
 import excel using "`datapath'\version09\1-input\2022-07-18_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
 
 count //19,812
@@ -1977,7 +1977,8 @@ destring nftype, replace
 label var nftype "NFType"
 label define nftype_lab 1 "Hospital" 2 "Polyclinic/Dist.Hosp." 3 "Lab-Path" 4 "Lab-Cyto" 5 "Lab-Haem" 6 "Imaging" ///
 						7 "Private Physician" 8 "Death Certif./Post Mort." 9 "QEH Death Rec Bks" 10 "RT Reg. Bk" ///
-						11 "Haem NF" 12 "Bay View Bk" 13 "Other" 14 "Unknown" 15 "NFs", modify
+						11 "Haem NF" 12 "Bay View Bk" 13 "Other" 14 "Unknown" 15 "NFs" 16 "Phone Call" ///
+						17 "MEDDATA" 18 "QEH A&E List" , modify
 label values nftype nftype_lab
 
 ** Source Name
@@ -2939,7 +2940,7 @@ replace bascheckcat=4 if basis==0 & morph==8000 & regexm(hx, "MASS") & recstatus
 replace bascheckcat=5 if basis==0 & regexm(comments, "Notes seen")
 replace bascheckcat=6 if basis!=4 & basis!=7 & topography==619 & regexm(comments, "PSA")
 replace bascheckcat=7 if basis==9 & regexm(comments, "Notes seen")
-replace bascheckcat=8 if basis!=7 & topography==421 & nftype==3 //see IARC manual pg.20
+replace bascheckcat=8 if basis!=7 & topography==421 & (nftype==3|nftype==5) //see IARC manual pg.20
 replace bascheckcat=9 if basis!=5 & basis!=7 & topography==421 & (regexm(comments, "blood")|regexm(comments, "Blood")) //see IARC manual pg. 19/20
 label var bascheckcat "Basis<>Morph Check Category"
 label define bascheckcat_lab 1 "Check 1: morph==8000 & (basis==6|basis==7|basis==8)" 2 "Check 2: hx=...OMA & basis!=6/7/8" ///
@@ -3230,6 +3231,7 @@ replace flag148=dxyr if pid=="20210074" & regexm(cr5id,"T1")
 
 destring flag12 ,replace
 destring flag107 ,replace
+format flag12 flag107 %dD_m_CY
 replace flag12=sampledate if pid=="20212052" & cr5id=="T1S1"
 replace sampledate=sampledate+365 if pid=="20212052" & cr5id=="T1S1"
 replace flag107=sampledate if pid=="20212052" & cr5id=="T1S1"
@@ -3240,6 +3242,7 @@ replace flag148=dxyr if pid=="20212127 " & regexm(cr5id,"T1")
 
 destring flag14 ,replace
 destring flag109 ,replace
+format flag14 flag109 %dD_m_CY
 replace flag14=rptdate if pid=="20170511" & cr5id=="T1S1"
 replace rptdate=rptdate+365 if pid=="20170511" & cr5id=="T1S1"
 replace flag109=rptdate if pid=="20170511" & cr5id=="T1S1"
@@ -3324,6 +3327,8 @@ label var str_no "No."
 //generate rptd3 = string(rptdate, "%td") if flag109!=.
 
 //replace flag12=sampled2 if flag12!=.
+
+format flag12 flag14 flag107 flag109 %dD_m_CY
 
 ** Create excel errors list before deleting incorrect records
 ** Use below code to automate file names using current date
