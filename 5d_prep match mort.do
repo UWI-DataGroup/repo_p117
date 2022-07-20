@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      30-JUN-2022
-    //  date last modified      14-JUL-2022
+    //	date last modified		20-JUL-2022
     //  algorithm task          Prep, format and combine 2021 death data with 2015-2020 death dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned 2015-2021 death data for matching with cancer incidence dataset.
@@ -48,9 +48,9 @@
 ** JC 30jun2022: decided not to use the dataset prepared in p141 as this would not have the record_id from the multi-year database so will import and prep based on multi-year death db
 
 ** LOAD the national registry deaths 2021 excel dataset
-import excel using "`datapath'\version09\1-input\BNRDeathData20082021-CancerMatching2021De_DATA_2022-07-14_1034_excel.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version09\1-input\BNRDeathData20082021-CancerMatching2021De_DATA_2022-07-20_0633_excel.xlsx" , firstrow case(lower)
 
-count //3133; 3136; 3142 - note: there are 3 cases from 2020 that were collected after 2020 was cleaned
+count //3133; 3136; 3142; 3143 - note: there are 3 cases from 2020 that were collected after 2020 was cleaned
 
 
 *******************
@@ -673,9 +673,9 @@ note: TS This dataset can be used for combining 2021 deaths with 2015-2020 death
 **     Append 2015-2020 
 **	Death Matching Dataset **
 *****************************
-count //3,136; 3142
+count //3,136; 3142; 3143
 append using "`datapath'\version04\3-output\2015-2020_deaths_for_matching"
-count //18,552
+count //18,559
 
 ** JC 12jul2022: correction found incidentally
 replace dd_natregno=subinstr(dd_natregno,"2","7",.) if record_id==22335
@@ -698,10 +698,10 @@ tab dd_dodyear,m
        2017 |      2,530       13.63       40.41
        2018 |      2,527       13.62       54.03
        2019 |      2,786       15.01       69.04
-       2020 |      2,606       14.04       83.09
-       2021 |      3,139       16.91      100.00
+       2020 |      2,606       14.04       83.08
+       2021 |      3,140       16.92      100.00
 ------------+-----------------------------------
-      Total |     18,558      100.00
+      Total |     18,559      100.00
 */
 
 ** Create dataset without name changes for matching (see dofile 50)
