@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      20-JULY-2022
+    // 	date last modified      21-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -688,7 +688,7 @@ replace ptda="09" if pid=="20145017"
 destring ptda,replace
 count if ptda==. //0
 label define ptda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
-					  13 "KWG" 14 "TH" 22 "MC" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
+					  13 "KWG" 14 "TH" 22 "MC" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
 label values ptda ptda_lab
 
 ** Casefinding Date
@@ -887,7 +887,7 @@ destring ttda, replace
 ** DOES NOT contain a nonnumeric character so no correction needed
 label var ttda "TT Data Abstractor"
 label define ttda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
-					  13 "KWG" 14 "TH" 22 "MC" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
+					  13 "KWG" 14 "TH" 22 "MC" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
 label values ttda ttda_lab
 
 ** Abstraction Date
@@ -1961,7 +1961,7 @@ count if non_numeric_stda //0
 destring stda,replace
 label var stda "STDataAbstractor"
 label define stda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
-					  13 "KWG" 14 "TH" 22 "MC" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
+					  13 "KWG" 14 "TH" 22 "MC" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
 label values stda stda_lab
 
 ** Source Date
