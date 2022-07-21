@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      19-JULY-2022
+    // 	date last modified      20-JULY-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -1655,30 +1655,6 @@ count if morphcheckcat==57 //0
 ** morphcheckcat 58: Hx==mesothelioma & Hx!=fibrous or sarcoma or epithelioid/papillary or cystic & morph!=9050
 count if morphcheckcat==58 //2 - correct
 //list pid primarysite hx morph morphology basis beh cr5id if morphcheckcat==58
-/* JC 14jul2022: previously corrected cases
-replace flag39=primarysite if pid=="20180469"
-replace primarysite="UNKNOWN" if pid=="20180469" & regexm(cr5id, "T1")
-replace flag134=primarysite if pid=="20180469"
-
-destring flag40 ,replace
-destring flag135 ,replace
-replace flag40=topography if pid=="20180469"
-replace topography=809 if pid=="20180469" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20180469"
-replace topcat=70 if pid=="20180469" & regexm(cr5id,"T1")
-
-replace flag42=morph if pid=="20180469"
-replace morph=9050 if pid=="20180469" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20180469"
-
-replace flag80=comments if pid=="20180469"
-replace comments="JC 31MAY2022: Please verify T1 TOPOGRAPHY with Prof Prussia + NS, the path rpt indicates mass in lung/pleura was metastatic - maybe using too much interpretation/inference here instead of performing surveillance."+" "+comments if pid=="20180469"
-replace flag175=comments if pid=="20180469"
-
-replace flag32=recstatus if pid=="20180469" & regexm(cr5id, "T1")
-replace recstatus=6 if pid=="20180469" & regexm(cr5id, "T1")
-replace flag127=recstatus if pid=="20180469" & regexm(cr5id, "T1")
-*/
 
 ** morphcheckcat 59: Hx==fibrous or sarcomatoid mesothelioma & Hx!=epithelioid/papillary or cystic & morph!=9051
 count if morphcheckcat==59 //0
@@ -1867,10 +1843,19 @@ count if morphcheckcat==95 //0
 count if morphcheckcat==96 //0
 //list pid hx morph morphology cr5id if morphcheckcat==96
 
+** morphcheckcat 97: Hx=B-lymphoblastic leukemia/lymphoma(M9836) & morph!=9811 & dxyr>2009
+** M9811 to be used for cases dx 2010 onwards; M9836 is obsolete (cases dx 2001-2009)
+count if morphcheckcat==97 //0
+//list pid hx morph morphology cr5id if morphcheckcat==97
+
 ** Check 76 - invalid(primarysite vs hx)
 ** hxcheckcat 1: PrimSite=Blood/Bone Marrow & Hx=Lymphoma 
 count if hxcheckcat==1 //17
 //list pid cr5id top hx morph morphology dxyr basis bascheckcat nftype if hxcheckcat==1, string(15)
+/* 
+JC 20jul2022: SEER Haem manual module 7 PH26 states to code NHL to bone marrow ONLY if "neoplasm is present only in the bone marrow and/or peripheral blood.
+Note 1: All available physical exams, scans, and other work-up must be negative for lymph node, tissue, or organ involvement OR no other workup was done OR unknown if other work-up done".
+
 replace flag39=primarysite if pid=="20150067" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20150067" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20150067" & regexm(cr5id,"T1")
@@ -1880,15 +1865,19 @@ destring flag135 ,replace
 replace flag40=topography if pid=="20150067" & regexm(cr5id,"T1")
 replace topography=779 if pid=="20150067" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20150067" & regexm(cr5id,"T1")
+replace top="779" if pid=="20150067" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20150067" & regexm(cr5id,"T1")
-
+*/
 replace flag39=primarysite if pid=="20160176" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20160176" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20160176" & regexm(cr5id,"T1")
 
+destring flag40 ,replace
+destring flag135 ,replace
 replace flag40=topography if pid=="20160176" & regexm(cr5id,"T1")
 replace topography=779 if pid=="20160176" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20160176" & regexm(cr5id,"T1")
+replace top="779" if pid=="20160176" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20160176" & regexm(cr5id,"T1")
 
 destring flag46 ,replace
@@ -1904,6 +1893,7 @@ replace flag134=primarysite if pid=="20160565" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20160565" & regexm(cr5id,"T1")
 replace topography=772 if pid=="20160565" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20160565" & regexm(cr5id,"T1")
+replace top="772" if pid=="20160565" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20160565" & regexm(cr5id,"T1")
 
 replace flag46=basis if pid=="20161088" & regexm(cr5id, "T1")
@@ -1917,6 +1907,7 @@ replace flag134=primarysite if pid=="20161088" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20161088" & regexm(cr5id,"T1")
 replace topography=779 if pid=="20161088" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20161088" & regexm(cr5id,"T1")
+replace top="779" if pid=="20161088" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20161088" & regexm(cr5id,"T1")
 
 replace flag39=primarysite if pid=="20162047" & regexm(cr5id,"T1")
@@ -1926,6 +1917,7 @@ replace flag134=primarysite if pid=="20162047" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20162047" & regexm(cr5id,"T1")
 replace topography=779 if pid=="20162047" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20162047" & regexm(cr5id,"T1")
+replace top="779" if pid=="20162047" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20162047" & regexm(cr5id,"T1")
 
 replace flag39=primarysite if pid=="20170210" & regexm(cr5id,"T1")
@@ -1935,7 +1927,12 @@ replace flag134=primarysite if pid=="20170210" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20170210" & regexm(cr5id,"T1")
 replace topography=778 if pid=="20170210" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20170210" & regexm(cr5id,"T1")
+replace top="778" if pid=="20170210" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20170210" & regexm(cr5id,"T1")
+
+replace flag46=basis if pid=="20170210" & regexm(cr5id, "T1")
+replace basis=7 if pid=="20170210" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20170210" & regexm(cr5id, "T1")
 
 replace flag39=primarysite if pid=="20170719" & regexm(cr5id,"T1")
 replace primarysite="HAEMATOPOIETIC SYSTEM, NOS" if pid=="20170719" & regexm(cr5id, "T1")
@@ -1944,6 +1941,7 @@ replace flag134=primarysite if pid=="20170719" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20170719" & regexm(cr5id,"T1")
 replace topography=424 if pid=="20170719" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20170719" & regexm(cr5id,"T1")
+replace top="424" if pid=="20170719" & regexm(cr5id, "T1")
 replace topcat=38 if pid=="20170719" & regexm(cr5id,"T1")
 
 replace flag41=hx if pid=="20170719" & regexm(cr5id, "T1")
@@ -1966,6 +1964,7 @@ replace flag134=primarysite if pid=="20170754" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20170754" & regexm(cr5id,"T1")
 replace topography=779 if pid=="20170754" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20170754" & regexm(cr5id,"T1")
+replace top="779" if pid=="20170754" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20170754" & regexm(cr5id,"T1")
 
 ** hxcheckcat 2: PrimSite=Thymus & MorphCat!=13 (Thymic epithe. neo.) & Hx!=carcinoma
@@ -2036,12 +2035,23 @@ replace flag134=primarysite if pid=="20160884" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20160884" & regexm(cr5id,"T1")
 replace topography=778 if pid=="20160884" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20160884" & regexm(cr5id,"T1")
+replace top="778" if pid=="20160884" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20160884" & regexm(cr5id,"T1")
 
 replace flag42=morph if pid=="20160884" & regexm(cr5id, "T1")
 replace morph=9702 if pid=="20160884" & regexm(cr5id, "T1")
 replace flag137=morph if pid=="20160884" & regexm(cr5id, "T1")
 replace morphcat=44 if pid=="20160884" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20160983" & regexm(cr5id,"T1")
+replace primarysite="LYMPH NODE-NOS" if pid=="20160983" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20160983" & regexm(cr5id,"T1")
+
+replace flag40=topography if pid=="20160983" & regexm(cr5id,"T1")
+replace topography=779 if pid=="20160983" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20160983" & regexm(cr5id,"T1")
+replace top="779" if pid=="20160983" & regexm(cr5id, "T1")
+replace topcat=69 if pid=="20160983" & regexm(cr5id,"T1")
 
 replace flag46=basis if pid=="20160983" & regexm(cr5id, "T1")
 replace basis=6 if pid=="20160983" & regexm(cr5id, "T1")
@@ -2054,6 +2064,7 @@ replace flag134=primarysite if pid=="20170682" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20170682" & regexm(cr5id,"T1")
 replace topography=772 if pid=="20170682" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20170682" & regexm(cr5id,"T1")
+replace top="772" if pid=="20170682" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20170682" & regexm(cr5id,"T1")
 
 expand=2 if pid=="20180028" & cr5id=="T1S1", gen (dupobs2)
@@ -2068,6 +2079,7 @@ replace flag134=primarysite if pid=="20180028" & regexm(cr5id,"T1")
 replace flag40=topography if pid=="20180028" & regexm(cr5id,"T1")
 replace topography=778 if pid=="20180028" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20180028" & regexm(cr5id,"T1")
+replace top="778" if pid=="20180028" & regexm(cr5id, "T1")
 replace topcat=69 if pid=="20180028" & regexm(cr5id,"T1")
 
 replace flag52=dot if pid=="20180028" & regexm(cr5id, "T1")
@@ -2314,6 +2326,7 @@ replace flag134=primarysite if pid=="20172041" & regexm(cr5id, "T2")
 replace flag40=topography if pid=="20172041" & regexm(cr5id, "T2")
 replace topography=508 if pid=="20172041" & regexm(cr5id, "T2")
 replace flag135=topography if pid=="20172041" & regexm(cr5id, "T2")
+replace top="508" if pid=="20172041" & regexm(cr5id, "T2")
 
 replace flag43=lat if pid=="20172041" & regexm(cr5id, "T2")
 replace lat=1 if pid=="20172041" & regexm(cr5id, "T2")
@@ -2348,6 +2361,7 @@ replace flag134=primarysite if pid=="20190171" & regexm(cr5id, "T1")
 replace flag40=topography if pid=="20190171" & regexm(cr5id, "T1")
 replace topography=504 if pid=="20190171" & regexm(cr5id, "T1")
 replace flag135=topography if pid=="20190171" & regexm(cr5id, "T1")
+replace top="504" if pid=="20190171" & regexm(cr5id, "T1")
 
 expand=2 if pid=="20190171" & cr5id=="T1S3", gen (dupobs5)
 replace cr5id="T1S5" if pid=="20190171" & dupobs5==1
@@ -2462,78 +2476,35 @@ replace flag138=lat if pid=="20170926" & regexm(cr5id, "T1")
 ** latcheckcat 14: lat=N/A & latcat!=0
 count if latcheckcat==14 //2 - corrected above
 //list pid cr5id topography lat latcat if latcheckcat==14
-STOP
+
 ** latcheckcat 15: lat=unk for a paired site
 count if latcheckcat==15 //99
-//list pid cr5id topography lat latcat cfdx if latcheckcat==15, string(50)
-replace latcat=0 if pid=="20180469" & regexm(cr5id, "T1")
+//list pid cr5id morphology nftype topography lat latcat cfdx if latcheckcat==15, string(20)
+replace flag43=lat if pid=="20170214" & regexm(cr5id, "T1")|pid=="20170720" & regexm(cr5id, "T1")
+replace lat=1 if pid=="20170214" & regexm(cr5id, "T1")
+replace lat=2 if pid=="20170720" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20170214" & regexm(cr5id, "T1")|pid=="20170720" & regexm(cr5id, "T1")
 
-replace flag41=hx if pid=="20180639" //3 changes
-replace hx="POORLY DIFFERENTIATED MAMMARY CARCINOMA, LOBULAR SUBTYPE" if pid=="20180639" & regexm(cr5id, "T1")
-replace flag136=hx if pid=="20180639" //3 changes
+replace flag46=basis if pid=="20180157" & regexm(cr5id, "T1")|pid=="20180477" & regexm(cr5id, "T1")
+replace basis=6 if pid=="20180157" & regexm(cr5id, "T1")|pid=="20180477" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20180157" & regexm(cr5id, "T1")|pid=="20180477" & regexm(cr5id, "T1")
 
-replace flag42=morph if pid=="20180639"
-replace morph=8522 if pid=="20180639" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20180639"
-
-replace flag43=lat if pid=="20180639"
-replace lat=1 if pid=="20180639" & regexm(cr5id, "T1")
-replace flag138=lat if pid=="20180639"
-
-replace flag39=primarysite if pid=="20180920" & regexm(cr5id, "T1")
-replace primarysite="UNKNOWN" if pid=="20180920" & regexm(cr5id, "T1")
-replace flag134=primarysite if pid=="20180920" & regexm(cr5id, "T1")
-
-replace flag40=topography if pid=="20180920" & regexm(cr5id, "T1")
-replace topography=809 if pid=="20180920" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20180920" & regexm(cr5id, "T1")
-replace topcat=70 if pid=="20180920" & regexm(cr5id,"T1")
-
-replace flag43=lat if pid=="20180920" & regexm(cr5id, "T1")
-replace lat=0 if pid=="20180920" & regexm(cr5id, "T1")
-replace flag138=lat if pid=="20180920" & regexm(cr5id, "T1")
-replace latcat=0 if pid=="20180920" & regexm(cr5id,"T1")
-
-destring flag46 ,replace
-destring flag141 ,replace
-replace flag46=basis if pid=="20181079"|pid=="20181161"|pid=="20182303"
-replace basis=6 if pid=="20181079" & regexm(cr5id, "T1")|pid=="20181161" & regexm(cr5id, "T1")|pid=="20182303" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20181079"|pid=="20181161"|pid=="20182303"
+replace flag42=morph if pid=="20181161" & regexm(cr5id, "T1")
+replace morph=8312 if pid=="20181161" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20181161" & regexm(cr5id, "T1")
+replace morphcat=6 if pid=="20181161" & regexm(cr5id, "T1")
 
 ** latcheckcat 16: lat=9 & top=ovary
 count if latcheckcat==16 //47
-//list pid cr5id topography lat latcat cfdx if latcheckcat==16, string(100)
-replace flag46=basis if pid=="20180350"|pid==""|pid==""
-replace basis=6 if pid=="20180350" & regexm(cr5id, "T1")|pid=="" & regexm(cr5id, "T1")|pid=="" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20180350"|pid==""|pid==""
+//list pid cr5id basis morphology nftype topography lat latcat cfdx if latcheckcat==16, string(30)
+replace flag46=basis if pid=="20160206" & regexm(cr5id, "T1")|pid=="20160320" & regexm(cr5id, "T1")|pid=="20160643" & regexm(cr5id, "T1")|pid=="20180852" & regexm(cr5id, "T1")
+replace basis=6 if pid=="20160206" & regexm(cr5id, "T1")|pid=="20160320" & regexm(cr5id, "T1")|pid=="20160643" & regexm(cr5id, "T1")
+replace basis=0 if pid=="20180852" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20160206" & regexm(cr5id, "T1")|pid=="20160320" & regexm(cr5id, "T1")|pid=="20160643" & regexm(cr5id, "T1")|pid=="20180852" & regexm(cr5id, "T1")
 
-replace flag43=lat if pid=="20180405" & regexm(cr5id, "T1")
-replace lat=1 if pid=="20180405" & regexm(cr5id, "T1")
-replace flag138=lat if pid=="20180405" & regexm(cr5id, "T1")
-
-replace flag39=primarysite if pid=="20180493" & regexm(cr5id, "T1")
-replace primarysite="ENDOMETRIUM" if pid=="20180493" & regexm(cr5id, "T1")
-replace flag134=primarysite if pid=="20180493" & regexm(cr5id, "T1")
-
-replace flag40=topography if pid=="20180493" & regexm(cr5id, "T1")
-replace topography=541 if pid=="20180493" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20180493" & regexm(cr5id, "T1")
-replace topcat=47 if pid=="20180493" & regexm(cr5id,"T1")
-
-replace flag41=hx if pid=="20180493" //3 changes
-replace hx="SEROUS PAPILLARY CARCINOMA" if pid=="20180493" & regexm(cr5id, "T1")
-replace flag136=hx if pid=="20180493" //3 changes
-
-replace flag42=morph if pid=="20180493"
-replace morph=8460 if pid=="20180493" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20180493"
-replace morphcat=9 if pid=="20180493" & regexm(cr5id,"T1")
-
-replace flag43=lat if pid=="20180493" & regexm(cr5id, "T1")
-replace lat=0 if pid=="20180493" & regexm(cr5id, "T1")
-replace flag138=lat if pid=="20180493" & regexm(cr5id, "T1")
-replace latcat=0 if pid=="20180493" & regexm(cr5id,"T1")
-
+replace flag78=dlc if pid=="20161040"
+replace dlc=d(22dec2020) if pid=="20161040"
+replace flag173=dlc if pid=="20161040"
 
 ***************
 ** Behaviour **
@@ -2655,7 +2626,7 @@ count if gradecheckcat==4 //0
 //list pid grade beh morph morphology cr5id if gradecheckcat==4
 
 ** gradecheckcat 5: Grade!=5 or 7 & Hx=9714 & DxYr>2013
-count if gradecheckcat==5 //0
+count if gradecheckcat==5 //1 - correct
 //list pid grade beh morph morphology cr5id if gradecheckcat==5
 
 ** gradecheckcat 6: Grade!=5 or 8 & Hx=9700/9701/9719/9831 & DxYr>2013
@@ -2687,29 +2658,40 @@ count if gradecheckcat==12 //0
 //list pid grade beh morph morphology cr5id if gradecheckcat==12
 
 ** gradecheckcat 13: Grade=9 & cfdx/md/consrpt=Gleason & DxYr>2013
-count if gradecheckcat==13 //0
+count if gradecheckcat==13 //4
 ** list pid grade cfdx md consrpt cr5id if gradecheckcat==13
 //list pid grade cr5id if gradecheckcat==13
+replace flag45=grade if pid=="20160506" & regexm(cr5id, "T1")|pid=="20182067" & regexm(cr5id, "T1")
+replace grade=2 if pid=="20182067" & regexm(cr5id, "T1")
+replace grade=3 if pid=="20160506" & regexm(cr5id, "T1")
+replace flag140=grade if pid=="20160506" & regexm(cr5id, "T1")|pid=="20182067" & regexm(cr5id, "T1")
 
 ** gradecheckcat 14: Grade=9 & cfdx/md/consrpt=Nottingham/Bloom & DxYr>2013
-count if gradecheckcat==14 //2 - all correct
-//list pid grade cfdx md consrpt cr5id if gradecheckcat==14
+count if gradecheckcat==14 //4 - 3 correct
+//list pid grade cfdx md consrpt cr5id if gradecheckcat==14, string(30)
+replace flag45=grade if pid=="20150116" & regexm(cr5id, "T1")
+replace grade=2 if pid=="20150116" & regexm(cr5id, "T1")
+replace flag140=grade if pid=="20150116" & regexm(cr5id, "T1")
 
 ** gradecheckcat 15: Grade=9 & cfdx/md/consrpt=Fuhrman & DxYr>2013
 count if gradecheckcat==15 //0
 //list pid grade cfdx md consrpt cr5id if gradecheckcat==15
 
 ** gradecheckcat 16: Grade!=6 & Hx=9732 & DxYr>2013 (see MM in HemeDb for grade)
-count if gradecheckcat==16 //73
+count if gradecheckcat==16 //96
 //list pid grade beh morph morphology cr5id if gradecheckcat==16
 replace flag45=grade if gradecheckcat==16
 replace grade=6 if gradecheckcat==16
-replace flag140=grade if gradecheckcat==16 //73 changes
+replace flag140=grade if gradecheckcat==16 //96 changes
 
 ** gradecheckcat 17: Grade!=9/blank & DxYr<2014
-count if (grade!=9 & grade!=.) & dxyr<2014 //0
-//list pid grade dxyr cr5id if (grade!=9 & grade!=.) & dxyr<2014
+count if gradecheckcat==17 //0
+//list pid grade dxyr cr5id if gradecheckcat==17
 //replace grade=9 if (grade!=9 & grade!=.) & dxyr<2014 //7 changes
+
+** gradecheckcat 18: Hx=MPN/PCV & Grade!=9
+count if gradecheckcat==18 //0
+//list pid grade dxyr cr5id if gradecheckcat==18
 
 ************************
 ** Basis of Diagnosis **
@@ -2730,20 +2712,20 @@ count if bas!="" & length(bas)!=1 //0
 ** Check 98 - invalid(basis)
 
 ** bascheckcat 1: morph==8000 & (basis==6|basis==7|basis==8)
-count if bascheckcat==1 //6
+count if bascheckcat==1 //24
 //list pid cr5id hx basis dxyr if bascheckcat==1
-replace flag46=basis if pid=="20181076"
-replace basis=2 if pid=="20181076" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20181076"
+replace flag46=basis if pid=="20160888" & regexm(cr5id, "T1")
+replace basis=9 if pid=="20160888" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20160888" & regexm(cr5id, "T1")
 
-replace flag41=hx if pid=="20181177" //3 changes
-replace hx="MALIGNANT EPITHELIAL NEOPLASM" if pid=="20181177" & regexm(cr5id, "T1")
-replace flag136=hx if pid=="20181177" //3 changes
+replace flag41=hx if pid=="20170853" & regexm(cr5id, "T1")
+replace hx="CARCINOMA" if pid=="20170853" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20170853" & regexm(cr5id, "T1")
 
-replace flag42=morph if pid=="20181177"
-replace morph=8010 if pid=="20181177" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20181177"
-replace morphcat=2 if pid=="20181177" & regexm(cr5id,"T1")
+replace flag42=morph if pid=="20170853" & regexm(cr5id, "T1")
+replace morph=8010 if pid=="20170853" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20170853" & regexm(cr5id, "T1")
+replace morphcat=2 if pid=="20170853" & regexm(cr5id, "T1")
 
 ** bascheckcat 2: hx=...OMA & basis!=6/7/8
 count if bascheckcat==2 //0
@@ -2758,49 +2740,159 @@ count if bascheckcat==4 //0
 //list pid cr5id primarysite hx morph morphology basis dxyr if bascheckcat==4
 
 ** bascheckcat 5: Basis=DCO; Comments='Notes seen'
-count if bascheckcat==5 //11 - all correct
+count if bascheckcat==5 //28 - all correct
 //list pid basis dxyr cr5id comments if bascheckcat==5 ,string(100)
 ** Check in main CR5 db to see if true DCO then dot=dlc or if to correct basis,dot,dxyr (e.g. if notes seen by DA etc.)
+replace flag46=basis if pid=="20161089" & regexm(cr5id, "T1")|pid=="20180760" & regexm(cr5id, "T1")|pid=="20180879" & regexm(cr5id, "T1")|pid=="20180880" & regexm(cr5id, "T1")
+replace basis=9 if pid=="20161089" & regexm(cr5id, "T1")|pid=="20180760" & regexm(cr5id, "T1")|pid=="20180879" & regexm(cr5id, "T1")|pid=="20180880" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20161089" & regexm(cr5id, "T1")|pid=="20180760" & regexm(cr5id, "T1")|pid=="20180879" & regexm(cr5id, "T1")|pid=="20180880" & regexm(cr5id, "T1")
+
+replace flag52=dot if pid=="20161089" & regexm(cr5id, "T1")
+replace dot=d(12jan2016) if pid=="20161089" & regexm(cr5id, "T1")
+replace flag147=dot if pid=="20161089" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20180880" & regexm(cr5id, "T1")
+replace primarysite="GANGLIA,NOS" if pid=="20180880" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20180880" & regexm(cr5id, "T1")
+
+replace flag40=topography if pid=="20180880" & regexm(cr5id, "T1")
+replace topography=479 if pid=="20180880" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20180880" & regexm(cr5id, "T1")
+replace top="479" if pid=="20180880" & regexm(cr5id, "T1")
+replace topcat=40 if pid=="20180880" & regexm(cr5id, "T1")
+
+replace flag41=hx if pid=="20180880" & regexm(cr5id, "T1")
+replace hx="METASTATIC PARAGANGLIOMA" if pid=="20180880" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20180880" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20180880" & regexm(cr5id, "T1")
+replace morph=8680 if pid=="20180880" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180880" & regexm(cr5id, "T1")
+replace morphcat=15 if pid=="20180880" & regexm(cr5id, "T1")
+
+replace flag52=dot if pid=="20180880" & regexm(cr5id, "T1")
+replace dot=d(04jan2016) if pid=="20180880" & regexm(cr5id, "T1")
+replace flag147=dot if pid=="20180880" & regexm(cr5id, "T1")
+
+expand=2 if pid=="20180880" & cr5id=="T1S1", gen (dupobs7)
+replace cr5id="T1S2" if pid=="20180880" & dupobs7==1
+replace nftype=17 if pid=="20180880" & cr5id=="T1S2"
+replace sourcename=1 if pid=="20180880" & cr5id=="T1S2"
+replace docaddr="QEH" if pid=="20180880" & cr5id=="T1S2"
+replace recnum="" if pid=="20180880" & cr5id=="T1S2"
+replace cr5cod="" if pid=="20180880" & cr5id=="T1S2"
+replace certifier="" if pid=="20180880" & cr5id=="T1S2"
+replace cfdx="MEDDATA DX SECTION QEH 04JAN2016: 'SECONDARY MALIGNANT NEOPLASM OF BONE AND BONE MARROW; MALIGNANT NEOPLASM: LIVER,UNSPECIFIED...23AUG2016: MALIGNANT NEOPLASM: VERTEBRAL COLUMN.'" if pid=="20180880" & cr5id=="T1S2"
 
 ** bascheckcat 6: Basis!=lab test; Comments=PSA; top=prostate
-count if bascheckcat==6 //3 - 2 correct
-//list pid basis dxyr cr5id comment if bascheckcat==6 ,string(100)
-replace flag52=dot if pid=="20170324" & regexm(cr5id, "T1")
-replace dot=d(11sep2017) if pid=="20170324" & regexm(cr5id, "T1")
-replace flag147=dot if pid=="20170324" & regexm(cr5id, "T1")
+count if bascheckcat==6 //15 - 2 correct
+//list pid basis dxyr cr5id comment if bascheckcat==6 ,string(50)
+replace flag46=basis if pid=="20160688" & regexm(cr5id, "T1")|pid=="20161155" & regexm(cr5id, "T1")|pid=="20162055" & regexm(cr5id, "T1")|pid=="20170653" & regexm(cr5id, "T1")|pid=="20170984" & regexm(cr5id, "T1")|pid=="20180753" & regexm(cr5id, "T1")
+replace basis=1 if pid=="20170984" & regexm(cr5id, "T1")
+replace basis=4 if pid=="20160688" & regexm(cr5id, "T1")|pid=="20161155" & regexm(cr5id, "T1")|pid=="20162055" & regexm(cr5id, "T1")|pid=="20170653" & regexm(cr5id, "T1")|pid=="20180753" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20160688" & regexm(cr5id, "T1")|pid=="20161155" & regexm(cr5id, "T1")|pid=="20162055" & regexm(cr5id, "T1")|pid=="20170653" & regexm(cr5id, "T1")|pid=="20170984" & regexm(cr5id, "T1")|pid=="20180753" & regexm(cr5id, "T1")
 
-destring flag53 ,replace
-destring flag148 ,replace
-replace flag53=dxyr if pid=="20170324"
-replace dxyr=2017 if pid=="20170324" & regexm(cr5id, "T1")
-replace flag148=dxyr if pid=="20170324"
-
-replace flag46=basis if pid=="20170324"
-replace basis=7 if pid=="20170324" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20170324"
-
-replace flag80=comments if pid=="20170324" & regexm(cr5id, "T1")
-replace comments="JC 01JUN2022: conclusive/confirmatory term 'suspicious for' used in 2017 bx (see eligibility criteria SOP) so please update InciDate, dxyr and BOD."+" "+comments if pid=="20170324" & regexm(cr5id, "T1")
-replace flag175=comments if pid=="20170324" & regexm(cr5id, "T1")
+replace flag52=dot if pid=="20160688" & regexm(cr5id, "T1")
+replace dot=d(21may2016) if pid=="20160688" & regexm(cr5id, "T1")
+replace flag147=dot if pid=="20160688" & regexm(cr5id, "T1")
 
 ** bascheckcat 7: Basis=unk; Comments=Notes seen
-count if bascheckcat==7 //1 - correct
+count if bascheckcat==7 //4 - 3 correct
 //list pid basis dxyr cr5id comment if bascheckcat==7 ,string(100)
+replace flag46=basis if pid=="20170922" & regexm(cr5id, "T1")
+replace basis=1 if pid=="20170922" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20170922" & regexm(cr5id, "T1")
+
+replace flag52=dot if pid=="20170922" & regexm(cr5id, "T1")
+replace dot=d(08may2017) if pid=="20170922" & regexm(cr5id, "T1")
+replace flag147=dot if pid=="20170922" & regexm(cr5id, "T1")
+
+replace flag80=comments if pid=="20170922" & regexm(cr5id, "T1")
+replace comments="JC 20JUL2022: Entered S2 with MedData info - no PSA result in MedData."+" "+comments if pid=="20170922" & regexm(cr5id, "T1")
+replace flag175=comments if pid=="20170922" & regexm(cr5id, "T1")
+
+expand=2 if pid=="20170922" & cr5id=="T1S1", gen (dupobs8)
+replace cr5id="T1S2" if pid=="20170922" & dupobs8==1
+replace nftype=17 if pid=="20170922" & cr5id=="T1S2"
+replace sourcename=1 if pid=="20170922" & cr5id=="T1S2"
+replace docaddr="RPPC" if pid=="20170922" & cr5id=="T1S2"
+replace recnum="" if pid=="20170922" & cr5id=="T1S2"
+replace cr5cod="" if pid=="20170922" & cr5id=="T1S2"
+replace certifier="" if pid=="20170922" & cr5id=="T1S2"
+replace cfdx="MEDDATA NOTES SECTION QEH 08MAY2017: 'ANAEMIA ??CAUSE R/O OCCULT MALIGNANCY...FOR FOB TEST, PSA.'" if pid=="20170922" & cr5id=="T1S2"
+
+KWG to email me dot from A&E log for pid 20180714
 
 ** bascheckcat 8: Basis!=hx of prim; top=haem; nftype=BM
-count if bascheckcat==8 //2
-//list pid basis dxyr cr5id comment if bascheckcat==8 ,string(100)
-replace flag46=basis if pid=="20180019"|pid=="20180219"
-replace basis=7 if pid=="20180019" & regexm(cr5id, "T1")|pid=="20180219" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20180019"|pid=="20180219"
+count if bascheckcat==8 //87
+//list pid basis dxyr cr5id comment if bascheckcat==8 ,string(50)
+count if basis!=7 & topography==421 & (nftype==3|nftype==5) //78 - removed ones corrected in the above code as this check is generated in dofile 15 which precedes this dofile.
+gen tempvarn=1 if basis!=7 & topography==421 & (nftype==3|nftype==5) //78 changes - created temp variable for flagging corrections below
+count if tempvarn==1 //78
+//list pid cr5id morphology grade basis dxyr comment if basis!=7 & topography==421 & (nftype==3|nftype==5) ,string(50) //see IARC manual pg.20
+
+/*
+JC 20jul2022: SEER Haem manual module 7 PH26 states to code NHL to bone marrow ONLY if "neoplasm is present only in the bone marrow and/or peripheral blood.
+Note 1: All available physical exams, scans, and other work-up must be negative for lymph node, tissue, or organ involvement OR no other workup was done OR unknown if other work-up done".
+*/
+replace flag46=basis if tempvarn==1 & pid!="20160074" & pid!="20160938" & pid!="20160983" & pid!="20170034" & pid!="20170035" & pid!="20170756" & pid!="20180011" & pid!="20180025" & pid!="20181028" & pid!="20181068" //69 changes
+
+replace basis=7 if  tempvarn==1 & pid!="20160074" & pid!="20160938" & pid!="20160983" & pid!="20170034" & pid!="20170035" & pid!="20170756" & pid!="20180011" & pid!="20180025" & pid!="20181028" & pid!="20181068" //69 changes
+replace basis=6 if pid=="20160072" & regexm(cr5id, "T1")|pid=="20180401" & regexm(cr5id, "T1") //8 changes
+replace basis=4 if pid=="20161188" & regexm(cr5id, "T1")|pid=="20180399" & regexm(cr5id, "T1")|pid=="20180583" & regexm(cr5id, "T1")|pid=="20180766" & regexm(cr5id, "T1")|pid=="20180857" & regexm(cr5id, "T1")|pid=="20180916" & regexm(cr5id, "T1")|pid=="20181055" & regexm(cr5id, "T1")|pid=="20190360" & regexm(cr5id, "T1") //19 changes
+
+replace flag141=basis if  tempvarn==1 & pid!="20160074" & pid!="20160938" & pid!="20160983" & pid!="20170034" & pid!="20170035" & pid!="20170756" & pid!="20180011" & pid!="20180025" & pid!="20181028" & pid!="20181068" //69 changes
+
+replace flag52=dot if pid=="20160013" & regexm(cr5id, "T1")
+replace dot=d(11jan2016) if pid=="20160013" & regexm(cr5id, "T1")
+replace flag147=dot if pid=="20160013" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20180401" & regexm(cr5id,"T1")
+replace primarysite="LYMPH NODE-NOS" if pid=="20180401" & regexm(cr5id, "T1")
+replace flag134=primarysite if pid=="20180401" & regexm(cr5id,"T1")
+
+replace flag40=topography if pid=="20180401" & regexm(cr5id,"T1")
+replace topography=779 if pid=="20180401" & regexm(cr5id, "T1")
+replace flag135=topography if pid=="20180401" & regexm(cr5id,"T1")
+replace top="779" if pid=="20180401" & regexm(cr5id, "T1")
+replace topcat=69 if pid=="20180401" & regexm(cr5id,"T1")
+
+replace flag42=morph if pid=="20180401" & regexm(cr5id, "T1")
+replace morph=9811 if pid=="20180401" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180401" & regexm(cr5id, "T1")
+replace morphcat=50 if pid=="20180401" & regexm(cr5id, "T1")
+
+replace flag80=comments if pid=="20180401" & regexm(cr5id, "T1")
+replace comments="JC 20JUL2022: M9836 is obsolete - see SEER Haem Db; now to use M9811 for this hx."+" "+comments if pid=="20180401" & regexm(cr5id, "T1")
+replace flag175=comments if pid=="20180401" & regexm(cr5id, "T1")
+
+expand=2 if pid=="20180401" & cr5id=="T1S3", gen (dupobs9)
+replace cr5id="T1S4" if pid=="20180401" & dupobs9==1
+replace nftype=17 if pid=="20180401" & cr5id=="T1S4"
+replace sourcename=1 if pid=="20180401" & cr5id=="T1S4"
+replace docaddr="QEH" if pid=="20180401" & cr5id=="T1S4"
+replace recnum="" if pid=="20180401" & cr5id=="T1S4"
+replace cfdx="MEDDATA DX SECTION QEH 30AUG2018: 'GENERALIZED ENLARGED LYMPH NODES'." if pid=="20180401" & cr5id=="T1S4"
+
+replace flag42=morph if pid=="20180625" & regexm(cr5id, "T1")
+replace morph=9811 if pid=="20180625" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20180625" & regexm(cr5id, "T1")
+replace morphcat=50 if pid=="20180401" & regexm(cr5id, "T1")
+
+replace flag80=comments if pid=="20180625" & regexm(cr5id, "T1")
+replace comments="JC 20JUL2022: M9836 is obsolete - see SEER Haem Db; now to use M9811 for this hx."+" "+comments if pid=="20180625" & regexm(cr5id, "T1")
+replace flag175=comments if pid=="20180625" & regexm(cr5id, "T1")
 
 ** bascheckcat 9: Basis!=haem/hx of prim; top=haem; Comments=blood
-count if bascheckcat==9 //6 - 2 correct
-//list pid basis dxyr cr5id comment if bascheckcat==9 ,string(100)
-replace flag46=basis if pid=="20180021"
-replace basis=7 if pid=="20180021" & regexm(cr5id, "T1")
-replace flag141=basis if pid=="20180021"
+count if bascheckcat==9 //10 - 2 correct
+//list pid cr5id grade morph basis dxyr comment if bascheckcat==9 ,string(50)
+replace flag46=basis if pid=="20160021" & regexm(cr5id, "T1")|pid=="20162059" & regexm(cr5id, "T1")|pid=="20170660" & regexm(cr5id, "T1")|pid=="20181051" & regexm(cr5id, "T1")
+replace basis=4 if pid=="20170660" & regexm(cr5id, "T1")
+replace basis=5 if pid=="20160021" & regexm(cr5id, "T1")|pid=="20181051" & regexm(cr5id, "T1")
+replace basis=7 if pid=="20162059" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20160021" & regexm(cr5id, "T1")|pid=="20162059" & regexm(cr5id, "T1")|pid=="20170660" & regexm(cr5id, "T1")|pid=="20181051" & regexm(cr5id, "T1")
 
+STOP
 *************
 ** Staging **
 *************
@@ -3961,6 +4053,8 @@ gen obsid=_n
 //list pid cr5id fname lname age natregno addr slc if duppt>0 & dup==1 & inrange(obsid, 1113, 2224), sepby(lname)
 drop dup dupnrn duppt obsid
 
+check how many true errors there are for top, morph, lat, basis, dot, dxyr, etc.
+perform a dup of pid to exclude multiple sources.
 /*
 ** Export corrections before dropping duplicate tumours/sources since errors maybe in dup source records
 ** Prepare this dataset for export to excel (prior to removing non-2018 cases)

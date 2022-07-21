@@ -55,6 +55,9 @@ replace morphcat=6 if pid=="20130299" & regexm(cr5id, "T1")
 JC 14jul2022: KWG emailed to say he abstracted this pid today as a 2015 case: 20160419
 JC manually reviewed T1 of above case (dxyr=2015) on 14jul2022 and no errors found.
 
+Remove morphcheckcat from previous nonreportable ds so that I can re-clean using the newly created checks in the allyrs prepped ds
+e.g. morphcheckcat==97
+
 *******************************
 ** 2014 Non-survival Dataset **
 *******************************

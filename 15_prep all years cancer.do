@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      19-JULY-2022
+    // 	date last modified      20-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -2507,6 +2507,7 @@ replace morphcheckcat=93 if regexm(hx, "ACIN") & topography==619 & morph!=8140
 replace morphcheckcat=94 if (morph>9582 & morph<9650) & !strmatch(strupper(hx), "*NON*") & regexm(hx, "HODGKIN")
 replace morphcheckcat=95 if morph==9729 & regexm(hx,"LEU")
 replace morphcheckcat=96 if morph==9837 & regexm(hx,"OMA")
+replace morphcheckcat=97 if morph==9836 & dxyr>2009 //added by JC on 20jul2022
 
 label var morphcheckcat "Hx<>Morph Check Category"
 label define morphcheckcat_lab 	1 "Check 1: Hx=Undifferentiated Ca & Morph!=8020" 2 "Check 2: Hx!=Undifferentiated Ca & Morph==8020" 3 "Check 3: Hx=Papillary ca & Morph!=8050" ///
@@ -2563,7 +2564,8 @@ label define morphcheckcat_lab 	1 "Check 1: Hx=Undifferentiated Ca & Morph!=8020
 								89 "Check 89: Hx=refractory anemia & excess blasts &  Hx!=sidero & morph!=9983" ///
 								90 "Check 90: Hx=myelodysplasia & Hx!=syndrome & recstatus!=inelig. & morph==9989" 91 "Check 91: Hx=acinar & morph!=8550" ///
 								92 "Check 92: Hx!=fibro & histiocytoma & morph=8830" 93 "Check 93: Hx=acinar & top=prostate & morph!=8140" ///
-								94 "Check 94: Hx=hodgkin & morph=non-hodgkin" 95 "Check 95: Hx=leukaemia & morph=9729" 96 "Check 96: Hx=lymphoma & morph=9837" ,modify
+								94 "Check 94: Hx=hodgkin & morph=non-hodgkin" 95 "Check 95: Hx=leukaemia & morph=9729" 96 "Check 96: Hx=lymphoma & morph=9837" ///
+								97 "Check 97: Hx=B-lymphoblastic leukemia/lymphoma(M9836) & morph!=9811 & dxyr>2009" ,modify
 label values morphcheckcat morphcheckcat_lab
 
 ** Create category for histology/primarysite check
@@ -2916,6 +2918,8 @@ replace gradecheckcat=14 if grade==9 & (regexm(cfdx, "NOTTINGHAM")|regexm(cfdx, 
 							|regexm(cfdx, "BLOOM")|regexm(cfdx, "Bloom")|regexm(md, "BLOOM")|regexm(md, "Bloom")|regexm(consrpt, "BLOOM")|regexm(consrpt, "Bloom")) & dxyr>2013
 replace gradecheckcat=15 if grade==9 & (regexm(cfdx, "FUHRMAN")|regexm(cfdx, "Fuhrman")|regexm(md, "FUHRMAN")|regexm(md, "Fuhrman")|regexm(consrpt, "FUHRMAN")|regexm(consrpt, "Fuhrman")) & dxyr>2013
 replace gradecheckcat=16 if grade!=6 & morph==9732 & dxyr>2013
+replace gradecheckcat=17 if (grade!=9 & grade!=.) & dxyr<2014
+replace gradecheckcat=18 if (morph==9975|morph==9950) & grade!=9 //added on 20jul2022 in line with SEER Haem db manual
 label var gradecheckcat "Grade/Hx Check Category"
 label define gradecheckcat_lab 	 1 "Check 1: Beh<3 & Grade<9 & DxYr>2013" 2 "Check 2: Grade>=5 & <=8 & Hx<9590 & DxYr>2013" ///
 								 3 "Check 3: Grade>=1 & <=4 & Hx>=9590 & DxYr>2013" ///
@@ -2926,7 +2930,8 @@ label define gradecheckcat_lab 	 1 "Check 1: Beh<3 & Grade<9 & DxYr>2013" 2 "Che
 								 10 "Check 10: Grade!=2 & Hx=8249/8332/8858/9083/9243/9372 & DxYr>2013" 11 "Check 11: Grade!=3 & HX=8631/8634 & DxYr>2013" ///
 								 12 "Check 12: Grade!=4 & Hx=8020/8021/8805/9062/9082/9392/9401/9451/9505/9512 & DxYr>2013" ///
 								 13 "Check 13: Grade=9 & cfdx/md/consrpt=Gleason & DxYr>2013" 14 "Check 14: Grade=9 & cfdx/md/consrpt=Nottingham/Bloom & DxYr>2013" ///
-								 15 "Check 15: Grade=9 & cfdx/md/consrpt=Fuhrman & DxYr>2013" 16 "Check 16: Grade!=6 & Hx=9732(MM) & DxYr>2013" ,modify
+								 15 "Check 15: Grade=9 & cfdx/md/consrpt=Fuhrman & DxYr>2013" 16 "Check 16: Grade!=6 & Hx=9732(MM) & DxYr>2013" ///
+								 17 "Check 17: Grade!=9/blank & DxYr<2014" 18 "Check 18: Hx=MPN/PCV & Grade!=9" ,modify
 label values gradecheckcat gradecheckcat_lab
 
 ** Create category for basis/morphology check

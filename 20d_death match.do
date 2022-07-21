@@ -42,6 +42,8 @@ use "`datapath'\version02\2-working\2008_2013_2014_2015_cancer ds_2015-2020 deat
 ** Remove deceased cases from cancer dataset
 count //4,066
 count if slc==2 //2,303
+
+JC 20jul2022: don't drop deceased cases instead drop cases wherein deathid/record_id is blank so the ones wherein dod was entered at abstraction can be merged with death dataset
 drop if slc==2 //2,303 deleted
 
 ** Add death dataset
