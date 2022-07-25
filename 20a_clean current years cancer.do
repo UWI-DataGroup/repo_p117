@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      21-JULY-2022
+    // 	date last modified      25-JULY-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -566,6 +566,7 @@ count if slc==1 & dlc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatu
 //list pid slc dlc dod recstatus cr5id if slc==1 & dlc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5
 destring flag78 ,replace
 destring flag173 ,replace
+format flag78 flag173 %dD_m_CY
 replace flag78=dlc if slc==1 & dlc==. & recstatus!=2 & recstatus!=3 & recstatus!=4 & recstatus!=5  //2 changes
 replace dlc=d(24feb2022) if pid=="20181134" //2 changes
 replace flag173=dlc if pid=="20181134" //2 changes
@@ -622,7 +623,11 @@ count if dod==. & slc==2 & recstatus!=2 & recstatus!=3 & recstatus!=5 //0
 ** to be used when cleaning dates
 count if dod!=. & dod>currentdatept //0
 
-
+** JC 25jul2022: added new cleaning check for DLC, DOD below
+count if dlc>dod //3
+//list pid cr5id slc dlc dod if dlc>dod
+JC 25jul2022: CHECK MEDDATA FOR THE DATES RELATING TO PID 20180393 AS DLC BEFORE DOD
+STOP
 **************
 ** Comments **
 **************
@@ -3119,7 +3124,8 @@ replace flag147=dot if pid=="20160541" & regexm(cr5id, "T1")|pid=="20160702" & r
 ** Diagnosis Year **
 ********************
 ** JC 21jul2022: From lab # year check in dofile 15_prep all years cancer.do I believe the below are 2019 cases not 2018
-** KWG to f/u at the lab to verify but due to report time constraints the cases will be dropped now and included in 2019 annual rpt
+** KWG to f/u at the lab to verify but due to report time constraints the cases will be dropped now and included in 2019 annual rpt.
+** KWG completed f/u and emailed on 22jul2022 confirming these are 2019 cases.
 drop if pid=="20190075"|pid=="20190077" //6 deleted
 
 ** Check 107 - DxYr missing
@@ -3601,8 +3607,15 @@ replace flag107=sampledate if pid=="20170296" & cr5id=="T1S3"
 replace flag108=recvdate if rptcheckcat==6 & pid!="20160057" & pid!="20170069" & pid!="20160653"
 replace flag109=rptdate if rptcheckcat==6 & pid!="20160057" & pid!="20170069" & pid!="20180597" & pid!="20160228" & pid!="20160653"
 
-
-KWG to f/u pid 20181053 at lab since S4 doesn't match rest of case - may need to be abstracted
+/*
+JC 21jul2022:KWG to f/u pid 20181053 at lab since S4 doesn't match rest of case - may need to be abstracted.
+KWG's email 22jul2022:
+	The source in question belongs to PID 20181133. Before going to the Lab I did the following filter: 
+	`DiagnosisYear = 2017' AND 		`LabNumber = 17113181' and both PIDs came up, the incorrect one mentioned in this email subject and
+	the correct one I mentioned above already abstracted and completed. A check at the lab confirmed what I did. 
+	So I will delete this source from 20181053.
+*/
+drop if pid=="20181053" & cr5id=="T1S4" //1 deleted
 
 ** rptcheckcat 7: sampledate before InciD
 count if rptcheckcat==7 //6 - 5 corrected above; KWG to f/u at lab for 1
@@ -3631,178 +3644,75 @@ replace flag80=comments if pid=="20181055" & regexm(cr5id, "T1")
 replace comments="JC 21JUL2022: Changed InciDate from 20170113 to 20170105 based on QEH admission date using ENCR defintion of InciDate."+" "+comments if pid=="20181055" & regexm(cr5id, "T1")
 replace flag175=comments if pid=="20181055" & regexm(cr5id, "T1")
 
-STOP
+
 ** rptcheckcat 9: rptdate before InciD
 count if rptcheckcat==9 //40
 //list pid cr5id recstatus dot sampledate recvdate rptdate dxyr stda if rptcheckcat==9
-replace flag13=recvdate if pid=="20180602" & cr5id=="T1S1"
-swapval recvdate rptdate if pid=="20180602" & cr5id=="T1S1"
-replace flag108=recvdate if pid=="20180602" & cr5id=="T1S1"
+replace flag12=sampledate if pid=="20170322" & cr5id=="T1S1"
+swapval sampledate rptdate if pid=="20170322" & cr5id=="T1S1"
+replace flag107=sampledate if pid=="20170322" & cr5id=="T1S1"
 
-replace flag52=dot if pid=="20180119" & regexm(cr5id, "T1")|pid=="20180172" & regexm(cr5id, "T1")|pid=="20180183" & regexm(cr5id, "T1")|pid=="20180219" & regexm(cr5id, "T1")|pid=="20180272" & regexm(cr5id, "T1")|pid=="20180345" & regexm(cr5id, "T1")|pid=="20180350" & regexm(cr5id, "T1")|pid=="20180385" & regexm(cr5id, "T1")|pid=="20180391" & regexm(cr5id, "T1")|pid=="20180456" & regexm(cr5id, "T1")|pid=="20180494" & regexm(cr5id, "T1")|pid=="20180507" & regexm(cr5id, "T1")|pid=="20180598" & regexm(cr5id, "T1")|pid=="20180602" & regexm(cr5id, "T1")|pid=="20182295" & regexm(cr5id, "T1")
+replace flag52=dot if pid=="20151104" & regexm(cr5id, "T1")|pid=="20160143" & regexm(cr5id, "T1")|pid=="20160161" & regexm(cr5id, "T1")|pid=="20160164" & regexm(cr5id, "T1")|pid=="20160191" & regexm(cr5id, "T1")|pid=="20161042" & regexm(cr5id, "T1")|pid=="20170171" & regexm(cr5id, "T1")|pid=="20170315" & regexm(cr5id, "T1")|pid=="20170322" & regexm(cr5id, "T1")|pid=="20170395" & regexm(cr5id, "T1")
 
-replace dot=sampledate if pid=="20180119" & cr5id=="T1S2"|pid=="20180183" & cr5id=="T1S1"|pid=="20180219" & cr5id=="T1S2"|pid=="20180272" & cr5id=="T1S2"|pid=="20180385" & cr5id=="T1S2"|pid=="20180456" & cr5id=="T1S3"|pid=="20180598" & cr5id=="T1S3"|pid=="20182295" & cr5id=="T1S2"
+replace dot=sampledate if pid=="20151104" & cr5id=="T1S2"|pid=="20160143" & cr5id=="T1S2"|pid=="20160161" & cr5id=="T1S2"|pid=="20160164" & cr5id=="T1S4"|pid=="20160191" & cr5id=="T1S1"|pid=="20161042" & cr5id=="T1S4"|pid=="20170171" & cr5id=="T1S1"|pid=="20170315" & cr5id=="T1S2"|pid=="20170322" & cr5id=="T1S1"|pid=="20170395" & cr5id=="T1S2"
 
-replace dot=recvdate if pid=="20180172" & cr5id=="T1S2"|pid=="20180345" & cr5id=="T1S2"|pid=="20180350" & cr5id=="T1S2"|pid=="20180391" & cr5id=="T1S1"|pid=="20180494" & cr5id=="T1S2"|pid=="20180507" & cr5id=="T1S2"|pid=="20180602" & cr5id=="T1S1"
+replace dot=. if pid=="20151104" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20160143" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20160161" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20160164" & regexm(cr5id, "T1") & cr5id!="T1S4"|pid=="20160191" & regexm(cr5id, "T1") & cr5id!="T1S1"|pid=="20161042" & regexm(cr5id, "T1") & cr5id!="T1S4"|pid=="20170171" & regexm(cr5id, "T1") & cr5id!="T1S1"|pid=="20170315" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20170322" & regexm(cr5id, "T1") & cr5id!="T1S1"|pid=="20170395" & regexm(cr5id, "T1") & cr5id!="T1S2"
 
-replace dot=. if pid=="20180119" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180172" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180183" & regexm(cr5id, "T1") & cr5id!="T1S1"|pid=="20180219" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180272" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180345" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180350" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180385" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180391" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180456" & regexm(cr5id, "T1") & cr5id!="T1S3"|pid=="20180494" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180507" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20180598" & regexm(cr5id, "T1") & cr5id!="T1S3"|pid=="20180602" & regexm(cr5id, "T1") & cr5id!="T1S1"|pid=="20182295" & regexm(cr5id, "T1") & cr5id!="T1S2"
+fillmissing dot if pid=="20151104" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20160143" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20160161" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20160164" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20160191" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20161042" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20170171" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20170315" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20170322" & regexm(cr5id, "T1")
+fillmissing dot if pid=="20170395" & regexm(cr5id, "T1")
 
-fillmissing dot if pid=="20180119" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180172" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180183" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180219" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180272" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180345" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180350" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180385" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180391" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180456" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180494" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180507" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180598" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20180602" & regexm(cr5id, "T1")
-fillmissing dot if pid=="20182295" & regexm(cr5id, "T1")
+replace flag147=dot if pid=="20151104" & regexm(cr5id, "T1")|pid=="20160143" & regexm(cr5id, "T1")|pid=="20160161" & regexm(cr5id, "T1")|pid=="20160164" & regexm(cr5id, "T1")|pid=="20160191" & regexm(cr5id, "T1")|pid=="20161042" & regexm(cr5id, "T1")|pid=="20170171" & regexm(cr5id, "T1")|pid=="20170315" & regexm(cr5id, "T1")|pid=="20170322" & regexm(cr5id, "T1")|pid=="20170395" & regexm(cr5id, "T1")
 
-replace flag147=dot if pid=="20180119" & regexm(cr5id, "T1")|pid=="20180172" & regexm(cr5id, "T1")|pid=="20180183" & regexm(cr5id, "T1")|pid=="20180219" & regexm(cr5id, "T1")|pid=="20180272" & regexm(cr5id, "T1")|pid=="20180345" & regexm(cr5id, "T1")|pid=="20180350" & regexm(cr5id, "T1")|pid=="20180385" & regexm(cr5id, "T1")|pid=="20180391" & regexm(cr5id, "T1")|pid=="20180456" & regexm(cr5id, "T1")|pid=="20180494" & regexm(cr5id, "T1")|pid=="20180507" & regexm(cr5id, "T1")|pid=="20180598" & regexm(cr5id, "T1")|pid=="20180602" & regexm(cr5id, "T1")|pid=="20182295" & regexm(cr5id, "T1")
+replace flag14=rptdate if pid=="20160136" & cr5id=="T2S1"|pid=="20160562" & cr5id=="T1S2"|pid=="20170114" & cr5id=="T2S1"|pid=="20180225" & cr5id=="T1S4"
+replace rptdate=rptdate+366 if pid=="20160136" & cr5id=="T2S1"
+replace rptdate=rptdate+366 if pid=="20160562" & cr5id=="T1S2"
+replace rptdate=d(26jul2017) if pid=="20170114" & cr5id=="T2S1"
+replace rptdate=d(31jan2018) if pid=="20180225" & cr5id=="T1S4"
+replace flag109=rptdate if pid=="20160136" & cr5id=="T2S1"|pid=="20160562" & cr5id=="T1S2"|pid=="20170114" & cr5id=="T2S1"|pid=="20180225" & cr5id=="T1S4"
 
-replace flag14=rptdate if pid=="20180401" & cr5id=="T1S2"|pid=="20180487" & cr5id=="T1S1"|pid=="20180525" & cr5id=="T1S1"
-replace rptdate=d(04jan2019) if pid=="20180401" & cr5id=="T1S2"
-replace rptdate=d(07jan2019) if pid=="20180487" & cr5id=="T1S1"
-replace rptdate=d(18jan2019) if pid=="20180525" & cr5id=="T1S1"
-replace flag109=rptdate if pid=="20180401" & cr5id=="T1S2"|pid=="20180487" & cr5id=="T1S1"|pid=="20180525" & cr5id=="T1S1"
-
-replace flag13=recvdate if pid=="20180487" & cr5id=="T1S1"
-replace recvdate=d(07jan2019) if pid=="20180487" & cr5id=="T1S1"
-replace flag108=recvdate if pid=="20180487" & cr5id=="T1S1"
-
-** JC 01jun2022: missed MP 20182295
-replace flag42=morph if pid=="20182295"
-replace morph=8312 if pid=="20182295" & regexm(cr5id, "T1")
-replace flag137=morph if pid=="20182295"
-
-expand=2 if pid=="20182295" & cr5id=="T1S3", gen (dupobs2)
-replace cr5id="T2S1" if dupobs2==1
-
-replace flag43=lat if pid=="20182295" & regexm(cr5id, "T2")
-replace lat=1 if pid=="20182295" & regexm(cr5id, "T2")
-replace flag138=lat if pid=="20182295" & regexm(cr5id, "T2")
-
-replace flag80=comments if pid=="20182295" & cr5id=="T2S1"
-replace comments="JC 01JUN2022: missed Kidney MP, right - please abstract according to corrections excel sheet."+" "+comments if pid=="20182295" & cr5id=="T2S1"
-replace flag175=comments if pid=="20182295" & cr5id=="T2S1"
+replace flag13=recvdate if pid=="20160562" & cr5id=="T1S2"
+replace recvdate=recvdate+366 if pid=="20160562" & cr5id=="T1S2"
+replace flag108=recvdate if pid=="20160562" & cr5id=="T1S2"
 
 
 ** rptcheckcat 10: sampledate after DLC
-count if rptcheckcat==10 //37
-//list pid cr5id basis dlc sampledate recvdate rptdate dxyr stda if rptcheckcat==10
-order pid cr5id
-destring flag78 ,replace
-destring flag173 ,replace
-format flag78 flag173 %dD_m_CY
-replace flag78=dlc if rptcheckcat==10 & pid!="20180636" & pid!="20182111" & pid!="20182117"
-replace dlc=sampledate if rptcheckcat==10 & pid!="20180636" & pid!="20182111" & pid!="20182117"
-egen dlc2=max(dlc) if pid=="20180019"
-replace dlc=dlc2 if pid=="20180019"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20180152"
-replace dlc=dlc2 if pid=="20180152"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20180199"
-replace dlc=dlc2 if pid=="20180199"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20180203"
-replace dlc=dlc2 if pid=="20180203"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20180334"
-replace dlc=dlc2 if pid=="20180334"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20180393"
-replace dlc=dlc2 if pid=="20180393"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20180412"
-replace dlc=dlc2 if pid=="20180412"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20180459"
-replace dlc=dlc2 if pid=="20180459"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20181010"
-replace dlc=dlc2 if pid=="20181010"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20181190"
-replace dlc=dlc2 if pid=="20181190"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20181201"
-replace dlc=dlc2 if pid=="20181201"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182040"
-replace dlc=dlc2 if pid=="20182040"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182043"
-replace dlc=dlc2 if pid=="20182043"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182044"
-replace dlc=dlc2 if pid=="20182044"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182048"
-replace dlc=dlc2 if pid=="20182048"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182051"
-replace dlc=dlc2 if pid=="20182051"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182075"
-replace dlc=dlc2 if pid=="20182075"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182080"
-replace dlc=dlc2 if pid=="20182080"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182131"
-replace dlc=dlc2 if pid=="20182131"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182143"
-replace dlc=dlc2 if pid=="20182143"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182152"
-replace dlc=dlc2 if pid=="20182152"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182182"
-replace dlc=dlc2 if pid=="20182182"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182208"
-replace dlc=dlc2 if pid=="20182208"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182209"
-replace dlc=dlc2 if pid=="20182209"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182246"
-replace dlc=dlc2 if pid=="20182246"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182266"
-replace dlc=dlc2 if pid=="20182266"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182283"
-replace dlc=dlc2 if pid=="20182283"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182300"
-replace dlc=dlc2 if pid=="20182300"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182325"
-replace dlc=dlc2 if pid=="20182325"
-drop dlc2
-egen dlc2=max(dlc) if pid=="20182382"
-replace dlc=dlc2 if pid=="20182382"
-drop dlc2
-replace flag173=dlc if rptcheckcat==10 & pid!="20180636" & pid!="20182111" & pid!="20182117"
+count if rptcheckcat==10 //19
+//list pid cr5id nftype basis dot dod dlc sampledate recvdate rptdate dxyr stda if rptcheckcat==10 ,string(20)
+replace flag78=dlc if rptcheckcat==10 & pid!="20170683" & pid!="20170702" & pid!="20172093"
 
-replace flag78=dlc if pid=="20180636" & regexm(cr5id, "T1")|pid=="20182111" & regexm(cr5id, "T1")|pid=="20182117" & regexm(cr5id, "T1")
-replace dlc=sampledate if pid=="20180636" & cr5id=="T1S2"|pid=="20182111" & cr5id=="T1S3"|pid=="20182117" & cr5id=="T1S3"
-replace dlc=. if pid=="20180636" & regexm(cr5id, "T1") & cr5id!="T1S2"|pid=="20182111" & regexm(cr5id, "T1") & cr5id!="T1S3"|pid=="20182117" & regexm(cr5id, "T1") & cr5id!="T1S3"
-fillmissing dlc if pid=="20180636"
-fillmissing dlc if pid=="20182111"
-fillmissing dlc if pid=="20182117"
-replace flag173=dlc if pid=="20180636" & regexm(cr5id, "T1")|pid=="20182111" & regexm(cr5id, "T1")|pid=="20182117" & regexm(cr5id, "T1")
+replace dlc=sampledate if pid=="20150116" & cr5id=="T1S3"|pid=="20160062" & cr5id=="T2S1"|pid=="20160078" & cr5id=="T1S2"|pid=="20160098" & cr5id=="T1S2"|pid=="20160318" & cr5id=="T1S3"|pid=="20160331" & cr5id=="T1S3"|pid=="20170096" & cr5id=="T1S4"|pid=="20170300" & cr5id=="T1S3"|pid=="20170337" & cr5id=="T1S3"|pid=="20170517" & cr5id=="T1S3"|pid=="20170610" & cr5id=="T1S2"|pid=="20172011" & cr5id=="T1S5"|pid=="20172086" & cr5id=="T1S2"|pid=="20180019" & cr5id=="T1S3"|pid=="20180203" & cr5id=="T2S2"
 
+replace dlc=. if pid=="20150116" & cr5id!="T1S3"|pid=="20160062" & cr5id!="T2S1"|pid=="20160078" & cr5id!="T1S2"|pid=="20160098" & cr5id!="T1S2"|pid=="20160318" & cr5id!="T1S3"|pid=="20160331" & cr5id!="T1S3"|pid=="20170096" & cr5id!="T1S4"|pid=="20170300" & cr5id!="T1S3"|pid=="20170337" & cr5id!="T1S3"|pid=="20170517" & cr5id!="T1S3"|pid=="20170610" & cr5id!="T1S2"|pid=="20172011" & cr5id!="T1S5"|pid=="20172086" & cr5id!="T1S2"|pid=="20180019" & cr5id!="T1S3"|pid=="20180203" & cr5id!="T2S2"
+fillmissing dlc if pid=="20150116"
+fillmissing dlc if pid=="20160062"
+fillmissing dlc if pid=="20160078"
+fillmissing dlc if pid=="20160098"
+fillmissing dlc if pid=="20160318"
+fillmissing dlc if pid=="20160331"
+fillmissing dlc if pid=="20170096"
+fillmissing dlc if pid=="20170300"
+fillmissing dlc if pid=="20170337"
+fillmissing dlc if pid=="20170517"
+fillmissing dlc if pid=="20170610"
+fillmissing dlc if pid=="20172011"
+fillmissing dlc if pid=="20172086"
+fillmissing dlc if pid=="20180019"
+fillmissing dlc if pid=="20180203"
+replace flag173=dlc if rptcheckcat==10 & pid!="20170683" & pid!="20170702" & pid!="20172093"
+
+JC 25jul2022: CHECK ADM DATE FOR PID 20172093 as sampledate after dod and it isn't a PM (MedData is currently down) - FROM ABOVE CHECK 10
+ALSO CHECK PID 20170970 S2 AND IF CYTO/HAEM RPT AND SAMPLEDATE SEEN ON MEDDATA - FROM BELOW CHECK 11
+STOP
 ** rptcheckcat 11: sampledate!=. & nftype!=lab~ & labnum=. (to filter out autopsies with hx)
-count if rptcheckcat==11 //3 - correct all PMs
+count if rptcheckcat==11 //4 - correct all PMs
 //list pid cr5id basis nftype sampledate dxyr stda if rptcheckcat==11
 
 ** rptcheckcat 12: recvdate!=. & nftype!=lab~ & labnum=. (to filter out autopsies with hx)
@@ -3810,74 +3720,40 @@ count if rptcheckcat==12 //0
 //list pid cr5id basis nftype recvdate dxyr stda if rptcheckcat==12
 
 ** rptcheckcat 13: rptdate!=. & nftype!=lab~ & labnum=. (to filter out autopsies with hx)
-count if rptcheckcat==13 //11 - correct no hx seen
+count if rptcheckcat==13 //25 - correct no hx seen
 //list pid cr5id basis nftype rptdate dxyr stda if rptcheckcat==13
 
 ** JC 01JUN2022: add this code to the prep dofile when performing 2016-2018 annual report
-rename SurgicalFindings sxfinds 
-//rename SurgicalFindingsDate sxfindsdate 
-rename PhysicalExam physexam
-//rename PhysicalExamDate physexamdate 
-rename ImagingResults imaging 
-//rename ImagingResultsDate imagingdate
 
-** Surgical Findings
-label var sxfinds "Surgical Findings"
-** Surgical Findings Date
-replace SurgicalFindingsDate=20000101 if SurgicalFindingsDate==99999999
-nsplit SurgicalFindingsDate, digits(4 2 2) gen(sxyear sxmonth sxday)
-gen sxfindsdate=mdy(sxmonth, sxday, sxyear)
-format sxfindsdate %dD_m_CY
-drop SurgicalFindingsDate
-label var sxfindsdate "Surgical Findings Date"
+				
+** Check 149 - invalid(imaging)
+** imagecheckcat 1: Imaging missing
+count if imagecheckcat==1 //9
+//list pid cr5id basis nftype rptdate dxyr stda if imagecheckcat==1
+//list pid cr5id cytofinds md nftype rptdate dxyr stda if imagecheckcat==1, string(10)
 
-** Physical Exam
-label var physexam "Physical Exam"
-** Physical Exam Date
-replace PhysicalExamDate=20000101 if PhysicalExamDate==99999999
-nsplit PhysicalExamDate, digits(4 2 2) gen(physyear physmonth physday)
-gen physexamdate=mdy(physmonth, physday, physyear)
-format physexamdate %dD_m_CY
-drop PhysicalExamDate
-label var physexamdate "Physical Exam Date"
+replace flag23=imaging if imagecheckcat==1
+replace imaging=cytofinds if imagecheckcat==1 & cytofinds!="" & cytofinds!="99"
+replace imaging=md if imagecheckcat==1 & md!="" & md!="99"
+replace flag118=imaging if imagecheckcat==1
 
-** Imaging Results
-label var imaging "Imaging Results"
-** Imaging Results Date
-replace ImagingResultsDate=20000101 if ImagingResultsDate==99999999
-nsplit ImagingResultsDate, digits(4 2 2) gen(imgyear imgmonth imgday)
-gen imagingdate=mdy(imgmonth, imgday, imgyear)
-format imagingdate %dD_m_CY
-drop ImagingResultsDate
-label var imagingdate "Imaging Results Date"
-
-count if nftype==6 & imaging=="" //9
-gen imagingcheckcat=1 if nftype==6 & imaging==""
-//list pid cr5id basis nftype rptdate dxyr stda if imagingcheckcat==1
-//list pid cr5id cytofinds md nftype rptdate dxyr stda if imagingcheckcat==1, string(10)
-
-replace flag23=imaging if imagingcheckcat==1
-replace imaging=cytofinds if imagingcheckcat==1 & cytofinds!="" & cytofinds!="99"
-replace imaging=md if imagingcheckcat==1 & md!="" & md!="99"
-replace flag118=imaging if imagingcheckcat==1
-
-replace imagingcheckcat=2 if nftype==6 & (imagingdate==.|imagingdate==d(01jan2000))
-//list pid cr5id basis nftype rptdate dxyr stda if imagingcheckcat==2
-//list pid cr5id cytofinds md nftype rptdate dxyr stda if imagingcheckcat==2, string(10)
-//list pid cr5id rptdate nftype imagingdate dxyr stda if imagingcheckcat==2, string(10)
+count if imagecheckcat==2
+//list pid cr5id basis nftype rptdate dxyr stda if imagecheckcat==2
+//list pid cr5id cytofinds md nftype rptdate dxyr stda if imagecheckcat==2, string(10)
+//list pid cr5id rptdate nftype imagingdate dxyr stda if imagecheckcat==2, string(10)
 
 destring flag24 ,replace
 destring flag119 ,replace
 format flag24 flag119 %dD_m_CY
-replace flag24=imagingdate if imagingcheckcat==2
-replace imagingdate=rptdate if imagingcheckcat==2 & pid!="20180575"
+replace flag24=imagingdate if imagecheckcat==2
+replace imagingdate=rptdate if imagecheckcat==2 & pid!="20180575"
 replace imagingdate=d(15feb2018) if pid=="20180575" & cr5id=="T1S2" //used unk day missing value
-replace flag119=imagingdate if imagingcheckcat==2
+replace flag119=imagingdate if imagecheckcat==2
 
 **********************
 ** Clinical Details **
 **********************
-** Check 149 - Clinical Details missing / Clinical Details missing if nftype=Lab~
+** Check 150 - Clinical Details missing / Clinical Details missing if nftype=Lab~
 count if clindets=="" //885
 //list pid nftype clindets dxyr cr5id if clindets==""
 count if clindets=="" & (nftype>2 & nftype<6) //50

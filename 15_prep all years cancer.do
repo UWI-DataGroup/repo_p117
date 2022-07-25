@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      21-JULY-2022
+    // 	date last modified      25-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -419,6 +419,9 @@ rename ClinicalDetails clindets
 rename CytologicalFindings cytofinds
 rename MicroscopicDescription md
 rename ConsultationReport consrpt
+rename SurgicalFindings sxfinds
+rename PhysicalExam physexam
+rename ImagingResults imaging
 rename DurationOfIllness duration
 rename OnsetDeathInterval onsetint
 rename Certifier certifier
@@ -738,7 +741,7 @@ label define slc_lab 1 "Alive" 2 "Deceased" 3 "Emigrated" 9 "Unknown", modify
 label values slc slc_lab
 
 ** Date Last Contact
-replace DateLastContact=20000101 if DateLastContact==99999999
+replace DateLastContact=. if DateLastContact==99999999
 nsplit DateLastContact, digits(4 2 2) gen(year month day)
 gen dlc=mdy(month, day, year)
 format dlc %dD_m_CY
@@ -746,7 +749,7 @@ drop day month year DateLastContact
 label var dlc "Date of Last Contact"
 
 ** Date Of Death
-replace DateOfDeath=20000101 if DateOfDeath==99999999
+replace DateOfDeath=. if DateOfDeath==99999999
 nsplit DateOfDeath, digits(4 2 2) gen(year month day)
 gen dod=mdy(month, day, year)
 format dod %dD_m_CY
@@ -2042,6 +2045,39 @@ label var md "MicroscopicDescription"
 ** Consultation Report
 label var consrpt "ConsultationReport"
 
+** Surgical Findings
+label var sxfinds "Surgical Findings"
+
+** Surgical Findings Date
+replace SurgicalFindingsDate=20000101 if SurgicalFindingsDate==99999999
+nsplit SurgicalFindingsDate, digits(4 2 2) gen(sxyear sxmonth sxday)
+gen sxfindsdate=mdy(sxmonth, sxday, sxyear)
+format sxfindsdate %dD_m_CY
+drop SurgicalFindingsDate
+label var sxfindsdate "Surgical Findings Date"
+
+** Physical Exam
+label var physexam "Physical Exam"
+
+** Physical Exam Date
+replace PhysicalExamDate=20000101 if PhysicalExamDate==99999999
+nsplit PhysicalExamDate, digits(4 2 2) gen(physyear physmonth physday)
+gen physexamdate=mdy(physmonth, physday, physyear)
+format physexamdate %dD_m_CY
+drop PhysicalExamDate
+label var physexamdate "Physical Exam Date"
+
+** Imaging Results
+label var imaging "Imaging Results"
+
+** Imaging Results Date
+replace ImagingResultsDate=20000101 if ImagingResultsDate==99999999
+nsplit ImagingResultsDate, digits(4 2 2) gen(imgyear imgmonth imgday)
+gen imagingdate=mdy(imgmonth, imgday, imgyear)
+format imagingdate %dD_m_CY
+drop ImagingResultsDate
+label var imagingdate "Imaging Results Date"
+
 ** Cause(s) of Death
 label var cr5cod "CausesOfDeath"
 
@@ -3191,6 +3227,14 @@ label define rptcheckcat_lab 1 "Check 1: Sample Date missing" 2 "Check 2: Receiv
 							 11 "Check 11: sampledate!=. & nftype!=lab~" 12 "Check 12: recvdate!=. & nftype!=lab~" 13 "Check 13: rptdate!=. & nftype!=lab~" ///
 							 ,modify
 label values rptcheckcat rptcheckcat_lab
+
+** Create category for Imaging check
+gen imagecheckcat=.
+replace imagecheckcat=1 if nftype==6 & imaging==""
+replace imagecheckcat=2 if nftype==6 & (imagingdate==.|imagingdate==d(01jan2000))
+label var imagecheckcat "Imaging Check Category"
+label define imagecheckcat_lab 1 "Check 1: nftype=imaging & Imaging=blank" 2 "Check 2: nftype=imaging & ImagingDate=blank" 	 ,modify
+label values imagecheckcat imagecheckcat_lab
 
 ** Create category for Admission, DFC and RT Dates check
 gen datescheckcat=.
