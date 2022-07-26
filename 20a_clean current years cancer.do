@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      25-JULY-2022
+    // 	date last modified      26-JULY-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -626,8 +626,11 @@ count if dod!=. & dod>currentdatept //0
 ** JC 25jul2022: added new cleaning check for DLC, DOD below
 count if dlc>dod //3
 //list pid cr5id slc dlc dod if dlc>dod
-JC 25jul2022: CHECK MEDDATA FOR THE DATES RELATING TO PID 20180393 AS DLC BEFORE DOD
-STOP
+replace flag78=dlc if pid=="20180393"
+replace dlc=dod if pid=="20180393"
+replace flag173=dlc if pid=="20180393"
+** JC 25jul2022: CHECK MEDDATA FOR THE DATES RELATING TO PID 20180393 AS DLC BEFORE DOD - I'm going to assume the DA got the sampledate incorrect for the path rpt and that it was actual the path rpt associated with the PM.
+
 **************
 ** Comments **
 **************
@@ -1877,12 +1880,10 @@ replace flag39=primarysite if pid=="20160176" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20160176" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20160176" & regexm(cr5id,"T1")
 
-destring flag40 ,replace
-destring flag135 ,replace
-replace flag40=topography if pid=="20160176" & regexm(cr5id,"T1")
-replace topography=779 if pid=="20160176" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20160176" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20160176" & regexm(cr5id,"T1")
 replace top="779" if pid=="20160176" & regexm(cr5id, "T1")
+replace topography=779 if pid=="20160176" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20160176" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20160176" & regexm(cr5id,"T1")
 
 destring flag46 ,replace
@@ -1895,10 +1896,10 @@ replace flag39=primarysite if pid=="20160565" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-RETROPERITONEAL PARA-AORTIC" if pid=="20160565" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20160565" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20160565" & regexm(cr5id,"T1")
-replace topography=772 if pid=="20160565" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20160565" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20160565" & regexm(cr5id,"T1")
 replace top="772" if pid=="20160565" & regexm(cr5id, "T1")
+replace topography=772 if pid=="20160565" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20160565" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20160565" & regexm(cr5id,"T1")
 
 replace flag46=basis if pid=="20161088" & regexm(cr5id, "T1")
@@ -1909,30 +1910,30 @@ replace flag39=primarysite if pid=="20161088" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20161088" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20161088" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20161088" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20161088" & regexm(cr5id,"T1")
 replace topography=779 if pid=="20161088" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20161088" & regexm(cr5id,"T1")
 replace top="779" if pid=="20161088" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20161088" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20161088" & regexm(cr5id,"T1")
 
 replace flag39=primarysite if pid=="20162047" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20162047" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20162047" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20162047" & regexm(cr5id,"T1")
-replace topography=779 if pid=="20162047" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20162047" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20162047" & regexm(cr5id,"T1")
 replace top="779" if pid=="20162047" & regexm(cr5id, "T1")
+replace topography=779 if pid=="20162047" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20162047" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20162047" & regexm(cr5id,"T1")
 
 replace flag39=primarysite if pid=="20170210" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-PELVIS,INGUINAL" if pid=="20170210" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20170210" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20170210" & regexm(cr5id,"T1")
-replace topography=778 if pid=="20170210" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20170210" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20170210" & regexm(cr5id,"T1")
 replace top="778" if pid=="20170210" & regexm(cr5id, "T1")
+replace topography=778 if pid=="20170210" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20170210" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20170210" & regexm(cr5id,"T1")
 
 replace flag46=basis if pid=="20170210" & regexm(cr5id, "T1")
@@ -1943,10 +1944,10 @@ replace flag39=primarysite if pid=="20170719" & regexm(cr5id,"T1")
 replace primarysite="HAEMATOPOIETIC SYSTEM, NOS" if pid=="20170719" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20170719" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20170719" & regexm(cr5id,"T1")
-replace topography=424 if pid=="20170719" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20170719" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20170719" & regexm(cr5id,"T1")
 replace top="424" if pid=="20170719" & regexm(cr5id, "T1")
+replace topography=424 if pid=="20170719" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20170719" & regexm(cr5id,"T1")
 replace topcat=38 if pid=="20170719" & regexm(cr5id,"T1")
 
 replace flag41=hx if pid=="20170719" & regexm(cr5id, "T1")
@@ -1966,10 +1967,10 @@ replace flag39=primarysite if pid=="20170754" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20170754" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20170754" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20170754" & regexm(cr5id,"T1")
-replace topography=779 if pid=="20170754" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20170754" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20170754" & regexm(cr5id,"T1")
 replace top="779" if pid=="20170754" & regexm(cr5id, "T1")
+replace topography=779 if pid=="20170754" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20170754" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20170754" & regexm(cr5id,"T1")
 
 ** hxcheckcat 2: PrimSite=Thymus & MorphCat!=13 (Thymic epithe. neo.) & Hx!=carcinoma
@@ -2037,10 +2038,10 @@ replace flag39=primarysite if pid=="20160884" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-CERVICAL,MEDIASTINAL,AXILLAR,ABDOMINAL,PELVIC" if pid=="20160884" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20160884" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20160884" & regexm(cr5id,"T1")
-replace topography=778 if pid=="20160884" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20160884" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20160884" & regexm(cr5id,"T1")
 replace top="778" if pid=="20160884" & regexm(cr5id, "T1")
+replace topography=778 if pid=="20160884" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20160884" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20160884" & regexm(cr5id,"T1")
 
 replace flag42=morph if pid=="20160884" & regexm(cr5id, "T1")
@@ -2052,10 +2053,10 @@ replace flag39=primarysite if pid=="20160983" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20160983" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20160983" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20160983" & regexm(cr5id,"T1")
-replace topography=779 if pid=="20160983" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20160983" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20160983" & regexm(cr5id,"T1")
 replace top="779" if pid=="20160983" & regexm(cr5id, "T1")
+replace topography=779 if pid=="20160983" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20160983" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20160983" & regexm(cr5id,"T1")
 
 replace flag46=basis if pid=="20160983" & regexm(cr5id, "T1")
@@ -2066,10 +2067,10 @@ replace flag39=primarysite if pid=="20170682" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-INTRAABDOMINAL" if pid=="20170682" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20170682" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20170682" & regexm(cr5id,"T1")
-replace topography=772 if pid=="20170682" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20170682" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20170682" & regexm(cr5id,"T1")
 replace top="772" if pid=="20170682" & regexm(cr5id, "T1")
+replace topography=772 if pid=="20170682" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20170682" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20170682" & regexm(cr5id,"T1")
 
 expand=2 if pid=="20180028" & cr5id=="T1S1", gen (dupobs2)
@@ -2081,10 +2082,10 @@ replace flag39=primarysite if pid=="20180028" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NECK,SUBMANDIBULAR,AXILLARY,GROIN" if pid=="20180028" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20180028" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20180028" & regexm(cr5id,"T1")
-replace topography=778 if pid=="20180028" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20180028" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20180028" & regexm(cr5id,"T1")
 replace top="778" if pid=="20180028" & regexm(cr5id, "T1")
+replace topography=778 if pid=="20180028" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20180028" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20180028" & regexm(cr5id,"T1")
 
 replace flag52=dot if pid=="20180028" & regexm(cr5id, "T1")
@@ -2328,10 +2329,10 @@ replace flag39=primarysite if pid=="20172041" & regexm(cr5id, "T2")
 replace primarysite="BREAST-OVERLAP.UPPER" if pid=="20172041" & regexm(cr5id, "T2")
 replace flag134=primarysite if pid=="20172041" & regexm(cr5id, "T2")
 
-replace flag40=topography if pid=="20172041" & regexm(cr5id, "T2")
-replace topography=508 if pid=="20172041" & regexm(cr5id, "T2")
-replace flag135=topography if pid=="20172041" & regexm(cr5id, "T2")
+replace flag40=top if pid=="20172041" & regexm(cr5id, "T2")
 replace top="508" if pid=="20172041" & regexm(cr5id, "T2")
+replace topography=508 if pid=="20172041" & regexm(cr5id, "T2")
+replace flag135=top if pid=="20172041" & regexm(cr5id, "T2")
 
 replace flag43=lat if pid=="20172041" & regexm(cr5id, "T2")
 replace lat=1 if pid=="20172041" & regexm(cr5id, "T2")
@@ -2363,10 +2364,10 @@ replace flag39=primarysite if pid=="20190171" & regexm(cr5id, "T1")
 replace primarysite="BREAST-UPPER OUTER QUADRANT" if pid=="20190171" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20190171" & regexm(cr5id, "T1")
 
-replace flag40=topography if pid=="20190171" & regexm(cr5id, "T1")
-replace topography=504 if pid=="20190171" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20190171" & regexm(cr5id, "T1")
+replace flag40=top if pid=="20190171" & regexm(cr5id, "T1")
 replace top="504" if pid=="20190171" & regexm(cr5id, "T1")
+replace topography=504 if pid=="20190171" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20190171" & regexm(cr5id, "T1")
 
 expand=2 if pid=="20190171" & cr5id=="T1S3", gen (dupobs5)
 replace cr5id="T1S5" if pid=="20190171" & dupobs5==1
@@ -2760,10 +2761,10 @@ replace flag39=primarysite if pid=="20180880" & regexm(cr5id, "T1")
 replace primarysite="GANGLIA,NOS" if pid=="20180880" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20180880" & regexm(cr5id, "T1")
 
-replace flag40=topography if pid=="20180880" & regexm(cr5id, "T1")
-replace topography=479 if pid=="20180880" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20180880" & regexm(cr5id, "T1")
+replace flag40=top if pid=="20180880" & regexm(cr5id, "T1")
 replace top="479" if pid=="20180880" & regexm(cr5id, "T1")
+replace topography=479 if pid=="20180880" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20180880" & regexm(cr5id, "T1")
 replace topcat=40 if pid=="20180880" & regexm(cr5id, "T1")
 
 replace flag41=hx if pid=="20180880" & regexm(cr5id, "T1")
@@ -2856,10 +2857,10 @@ replace flag39=primarysite if pid=="20180401" & regexm(cr5id,"T1")
 replace primarysite="LYMPH NODE-NOS" if pid=="20180401" & regexm(cr5id, "T1")
 replace flag134=primarysite if pid=="20180401" & regexm(cr5id,"T1")
 
-replace flag40=topography if pid=="20180401" & regexm(cr5id,"T1")
-replace topography=779 if pid=="20180401" & regexm(cr5id, "T1")
-replace flag135=topography if pid=="20180401" & regexm(cr5id,"T1")
+replace flag40=top if pid=="20180401" & regexm(cr5id,"T1")
 replace top="779" if pid=="20180401" & regexm(cr5id, "T1")
+replace topography=779 if pid=="20180401" & regexm(cr5id, "T1")
+replace flag135=top if pid=="20180401" & regexm(cr5id,"T1")
 replace topcat=69 if pid=="20180401" & regexm(cr5id,"T1")
 
 replace flag42=morph if pid=="20180401" & regexm(cr5id, "T1")
@@ -3708,9 +3709,16 @@ fillmissing dlc if pid=="20180019"
 fillmissing dlc if pid=="20180203"
 replace flag173=dlc if rptcheckcat==10 & pid!="20170683" & pid!="20170702" & pid!="20172093"
 
-JC 25jul2022: CHECK ADM DATE FOR PID 20172093 as sampledate after dod and it isn't a PM (MedData is currently down) - FROM ABOVE CHECK 10
-ALSO CHECK PID 20170970 S2 AND IF CYTO/HAEM RPT AND SAMPLEDATE SEEN ON MEDDATA - FROM BELOW CHECK 11
-STOP
+** JC 25jul2022: CHECK ADM DATE FOR PID 20172093 as sampledate after dod and it isn't a PM (MedData is currently down) - FROM ABOVE CHECK 10: 26jul2022: I'm going to assume the DA got the sampledate incorrect as the pt admitted on 18apr2017 but no dx recorded in MedData.
+replace flag12=sampledate if pid=="20172093" & cr5id=="T1S1"
+replace sampledate=dod if pid=="20172093" & cr5id=="T1S1"
+replace flag107=sampledate if pid=="20172093" & cr5id=="T1S1"
+
+** ALSO CHECK PID 20170970 S2 AND IF CYTO/HAEM RPT AND SAMPLEDATE SEEN ON MEDDATA - FROM BELOW CHECK 11: JC 26jul2022 no info relating to basis seen on MedData.
+replace flag46=basis if pid=="20170970" & regexm(cr5id, "T1")
+replace basis=9 if pid=="20170970" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20170970" & regexm(cr5id, "T1")
+
 ** rptcheckcat 11: sampledate!=. & nftype!=lab~ & labnum=. (to filter out autopsies with hx)
 count if rptcheckcat==11 //4 - correct all PMs
 //list pid cr5id basis nftype sampledate dxyr stda if rptcheckcat==11
@@ -3720,70 +3728,67 @@ count if rptcheckcat==12 //0
 //list pid cr5id basis nftype recvdate dxyr stda if rptcheckcat==12
 
 ** rptcheckcat 13: rptdate!=. & nftype!=lab~ & labnum=. (to filter out autopsies with hx)
-count if rptcheckcat==13 //25 - correct no hx seen
-//list pid cr5id basis nftype rptdate dxyr stda if rptcheckcat==13
-
-** JC 01JUN2022: add this code to the prep dofile when performing 2016-2018 annual report
+count if rptcheckcat==13 //25 - correct no hx seen or NFs/imaging placed in rpt fields
+//list pid cr5id recstatus basis nftype rptdate dxyr stda if rptcheckcat==13
 
 				
 ** Check 149 - invalid(imaging)
 ** imagecheckcat 1: Imaging missing
-count if imagecheckcat==1 //9
+count if imagecheckcat==1 //0
 //list pid cr5id basis nftype rptdate dxyr stda if imagecheckcat==1
 //list pid cr5id cytofinds md nftype rptdate dxyr stda if imagecheckcat==1, string(10)
 
-replace flag23=imaging if imagecheckcat==1
-replace imaging=cytofinds if imagecheckcat==1 & cytofinds!="" & cytofinds!="99"
-replace imaging=md if imagecheckcat==1 & md!="" & md!="99"
-replace flag118=imaging if imagecheckcat==1
-
-count if imagecheckcat==2
+count if imagecheckcat==2 //14
 //list pid cr5id basis nftype rptdate dxyr stda if imagecheckcat==2
-//list pid cr5id cytofinds md nftype rptdate dxyr stda if imagecheckcat==2, string(10)
+//list pid cr5id cytofinds md consrpt nftype rptdate dxyr stda if imagecheckcat==2, string(10)
 //list pid cr5id rptdate nftype imagingdate dxyr stda if imagecheckcat==2, string(10)
 
 destring flag24 ,replace
 destring flag119 ,replace
 format flag24 flag119 %dD_m_CY
-replace flag24=imagingdate if imagecheckcat==2
-replace imagingdate=rptdate if imagecheckcat==2 & pid!="20180575"
-replace imagingdate=d(15feb2018) if pid=="20180575" & cr5id=="T1S2" //used unk day missing value
+replace flag24=imagingdate if imagecheckcat==2 & rptdate!=.
+replace imagingdate=rptdate if imagecheckcat==2 & rptdate!=.
 replace flag119=imagingdate if imagecheckcat==2
+
+replace flag23=imaging if imagecheckcat==2 & md!="" & md!="99"
+replace imaging=cytofinds if imagecheckcat==2 & cytofinds!="" & cytofinds!="99"
+replace imaging=md if imagecheckcat==2 & md!="" & md!="99"
+replace flag118=imaging if imagecheckcat==2 & md!="" & md!="99"
 
 **********************
 ** Clinical Details **
 **********************
 ** Check 150 - Clinical Details missing / Clinical Details missing if nftype=Lab~
-count if clindets=="" //885
+count if clindets=="" //3230
 //list pid nftype clindets dxyr cr5id if clindets==""
-count if clindets=="" & (nftype>2 & nftype<6) //50
+count if clindets=="" & (nftype>2 & nftype<6) //120
 //list pid nftype clindets dxyr cr5id if clindets=="" & (nftype>2 & nftype<6)
-replace clindets="99" if clindets=="" & (nftype>2 & nftype<6) //16 changes
+replace clindets="99" if clindets=="" & (nftype>2 & nftype<6) //120 changes
 
 ** Check 150 - Clinical Details invalid ND code
 ** (Checked data in main CR5 to determine invalid ND values by filtering in CR5 Browse/Edit by Source table, sorted by field, looking at all variables and scrolling through entire field column.)
 count if clindets=="Not Stated"|clindets=="NIL"|regexm(clindets, "NONE")|clindets=="9" //0
 //list pid clindets dxyr cr5id if clindets=="Not Stated"|clindets=="NIL"|regexm(clindets, "NONE")|clindets=="9"
-replace clindets="99" if clindets=="Not Stated"|clindets=="NIL"|regexm(clindets, "NONE")|clindets=="9" //5 changes
+replace clindets="99" if clindets=="Not Stated"|clindets=="NIL"|regexm(clindets, "NONE")|clindets=="9" //0 changes
 
 
 **************************
 ** Cytological Findings **
 **************************
 ** Check 151 - Cytological Findings missing / Cytological Findings missing if nftype=Lab-Cyto
-count if cytofinds=="" //1974
-count if cytofinds=="" & (nftype>2 & nftype<6) //1134
-count if nftype!=4 & (regexm(specimen, "FNA")|regexm(specimen, "Aspirat")|regexm(specimen, "ASPIRAT")) //13 - leave as is
+count if cytofinds=="" //6376
+count if cytofinds=="" & (nftype>2 & nftype<6) //3252
+count if nftype!=4 & (regexm(specimen, "FNA")|regexm(specimen, "Aspirat")|regexm(specimen, "ASPIRAT")) //20 - leave as is
 //list pid nftype specimen cytofinds dxyr cr5id if nftype!=4 & (regexm(specimen, "FNA")|regexm(specimen, "Aspirat")|regexm(specimen, "ASPIRAT"))
-/*
-replace flag3=nftype if pid=="20180303" & cr5id=="T2S1"|pid=="20180306" & cr5id=="T2S1"|pid=="20180823" & cr5id=="T1S3"|pid=="20182029" & cr5id=="T1S1"|pid=="20182089" & cr5id=="T2S1"|pid=="20182120" & cr5id=="T1S1"|pid=="20182180" & cr5id=="T1S2"
-replace nftype=4 if pid=="20180303" & cr5id=="T2S1"|pid=="20180306" & cr5id=="T2S1"|pid=="20182029" & cr5id=="T1S1"|pid=="20182089" & cr5id=="T2S1"|pid=="20182120" & cr5id=="T1S1"|pid=="20182180" & cr5id=="T1S2"
-replace nftype=5 if pid=="20180823" & cr5id=="T1S3"|pid=="" & cr5id=="T2S1"
-replace flag97=nftype if pid=="20180303" & cr5id=="T2S1"|pid=="20180306" & cr5id=="T2S1"|pid=="20180823" & cr5id=="T1S3"|pid=="20182029" & cr5id=="T1S1"|pid=="20182089" & cr5id=="T2S1"|pid=="20182120" & cr5id=="T1S1"|pid=="20182180" & cr5id=="T1S2"
-*/
+
 count if cytofinds=="" & nftype==4 //1 - leave as is
 //list pid nftype cytofinds dxyr cr5id if cytofinds=="" & nftype==4
 //replace cytofinds="99" if cytofinds=="" & nftype==4 //4 changes
+destring flag3 ,replace
+destring flag97 ,replace
+replace flag3=nftype if pid=="20180119" & cr5id=="T1S2"
+replace nftype=3 if pid=="20180119" & cr5id=="T1S2"
+replace flag97=nftype if pid=="20180119" & cr5id=="T1S2"
 
 ** Check 152 - Cytological Findings invalid ND code
 ** (Checked data in main CR5 to determine invalid ND values by filtering in CR5 Browse/Edit by Source table, sorted by field, looking at all variables and scrolling through entire field column.)
@@ -3795,15 +3800,16 @@ count if cytofinds=="Not Stated"|cytofinds=="9" //0
 ** Microscopic Description **
 *****************************
 ** Check 153 - MD missing / MD missing if nftype=Lab~
-count if md=="" //891
-count if md=="" & (nftype>2 & nftype<6) //64
-count if md=="" & (nftype==3|nftype==5) //27
+count if md=="" //3266
+count if md=="" & (nftype>2 & nftype<6) //151
+count if md=="" & (nftype==3|nftype==5) //89 - stand-alone IHC rpts
 //list pid nftype specimen md dxyr cr5id if md=="" & (nftype==3|nftype==5)
+/*
 replace flag17=md if pid=="20181121" & cr5id=="T1S2"
 replace md=consrpt if pid=="20181121" & cr5id=="T1S2"
 replace flag112=md if pid=="20181121" & cr5id=="T1S2"
-
-replace md="99" if  md=="" & (nftype==3|nftype==5) //11 changes
+*/
+replace md="99" if  md=="" & (nftype==3|nftype==5) //89 changes
 
 ** Check 154 - MD invalid ND code
 ** (Checked data in main CR5 to determine invalid ND values by filtering in CR5 Browse/Edit by Source table, sorted by field, looking at all variables and scrolling through entire field column.)
@@ -3817,9 +3823,9 @@ count if md=="Not Stated."|md=="Not Stated"|md=="9" //0
 ** NOTE 1: Met with SAF and KWG on 22may18 and decision made to remove checks for this variable; also removed checkflags from excel export code below.
 
 ** Check 155 - Consult.Rpt missing / Consult.Rpt missing if nftype=Lab~
-count if consrpt=="" & (nftype==3|nftype==5) //1031
+count if consrpt=="" & (nftype==3|nftype==5) //2801
 //list pid nftype consrpt dxyr cr5id if consrpt=="" & (nftype==3|nftype==5)
-replace consrpt="99" if consrpt=="" & (nftype==3|nftype==5) //1031
+replace consrpt="99" if consrpt=="" & (nftype==3|nftype==5) //2801
 
 ** Check 156 - Consult.Rpt invalid ND code
 ** (Checked data in main CR5 to determine invalid ND values by filtering in CR5 Browse/Edit by Source table, sorted by field, looking at all variables and scrolling through entire field column.)
@@ -3847,21 +3853,22 @@ To quickly identify duplicates:
 (8) for those that do not  match then double check in main CR5 db and then email cancer team
 */
 duplicates tag pid, gen(dup)
-count if dup>0 //1845
-count if dup==0 //379
+count if dup>0 //5740
+count if dup==0 //1181
 
-count if (cr5cod!="" & cr5cod!="99") & dxyr==2018 //400
-count if (cr5cod!="" & cr5cod!="99") & dxyr==2018 & dup>0 //299 - none with differing CODs
+count if (cr5cod!="" & cr5cod!="99") //1592
+count if (cr5cod!="" & cr5cod!="99") & dup>0 //1176 - none with differing CODs
 //list pid cr5id cr5cod if (cr5cod!="" & cr5cod!="99") & dxyr==2018 & dup>0, nolabel sepby(pid) string(50)
 //list pid cr5id cr5cod if (cr5cod!="" & cr5cod!="99") & dxyr==2018, string(50)
 //list pid cr5id cr5cod if (cr5cod!="" & cr5cod!="99") & dxyr==2018 & dup>0, string(50)
 //list cr5cod if (cr5cod!="" & cr5cod!="99") & dxyr==2018
+** JC 26jul2022: due to restrictive deadline for reporting the above check not performed.
 
 ** Check 157b - COD missing / COD missing if nftype=Death~
-count if cr5cod=="" //1801
+count if cr5cod=="" //5251
 //list pid nftype cr5cod dxyr cr5id if cr5cod==""
-count if cr5cod=="" & (nftype==8|nftype==9) //9 - all are PMs
-//list pid nftype cr5cod dxyr cr5id if cr5cod=="" & (nftype==8|nftype==9)
+count if cr5cod=="" & (nftype==8|nftype==9) //17 - all are PMs
+//list pid cr5id recstatus nftype cr5cod md dxyr if cr5cod=="" & (nftype==8|nftype==9), string(50)
 
 
 ** Check 158 - COD invalid ND code
@@ -3870,18 +3877,18 @@ count if regexm(cr5cod, "Not")|regexm(cr5cod, "not")|cr5cod=="NIL."|cr5cod=="Not
 //list pid cr5cod dxyr cr5id if regexm(cr5cod, "Not")|regexm(cr5cod, "not")|cr5cod=="NIL."|cr5cod=="Not Stated"|cr5cod=="9"
 
 ** Check 159 - COD invalid entry(lowercase)
-count if cr5cod!="99" & cr5cod!="" & regexm(cr5cod, "[a-z]") //87
+count if cr5cod!="99" & cr5cod!="" & regexm(cr5cod, "[a-z]") //574
 //list pid cr5cod dxyr cr5id if cr5cod!="99" & cr5cod!="" & regexm(cr5cod, "[a-z]")
-replace cr5cod=upper(cr5cod) if cr5cod!="99" & cr5cod!="" & regexm(cr5cod, "[a-z]") //87 changes
+replace cr5cod=upper(cr5cod) if cr5cod!="99" & cr5cod!="" & regexm(cr5cod, "[a-z]") //574 changes
 
 
 *************************
 ** Duration of Illness **
 *************************
 ** Check 160 - Duration of Illness missing / Duration of Illness missing if nftype=Death~
-count if duration=="" & nftype==8 //285 - 06nov18 SAF (by email) indicated to run code only on death certificates and not QEH death bks so removed 'nftype==9' from code.
+count if duration=="" & nftype==8 //936 - 06nov18 SAF (by email) indicated to run code only on death certificates and not QEH death bks so removed 'nftype==9' from code.
 //list pid nftype duration onsetint dxyr cr5id if duration=="" & nftype==8
-replace duration="99" if duration=="" & nftype==8 //285 changes
+replace duration="99" if duration=="" & nftype==8 //936 changes
 
 ** Check 161 - Duration of Illness invalid ND code
 ** (Checked data in main CR5 to determine invalid ND values by filtering in CR5 Browse/Edit by Source table, sorted by field, looking at all variables and scrolling through entire field column.)
@@ -3889,17 +3896,17 @@ count if regexm(duration, "UNKNOWN")|regexm(duration, "Not")|regexm(duration, "n
 //list pid duration dxyr cr5id if regexm(duration, "UNKNOWN")|regexm(duration, "Not")|regexm(duration, "not")|duration=="NIL."|duration=="Not Stated"|duration=="9"
 
 ** Check 162 - Duration of Illness invalid entry(lowercase)
-count if duration!="99" & duration!="" & regexm(duration, "[a-z]") //1
+count if duration!="99" & duration!="" & regexm(duration, "[a-z]") //4
 //list pid duration dxyr cr5id if duration!="99" & duration!="" & regexm(duration, "[a-z]")
-replace duration=upper(duration) if duration!="99" & duration!="" & regexm(duration, "[a-z]") //1 change
+replace duration=upper(duration) if duration!="99" & duration!="" & regexm(duration, "[a-z]") //4 changes
 
 *****************************
 ** Onset to Death Interval **
 *****************************
 ** Check 163 - Onset to Death Interval missing / Onset to Death Interval missing if nftype=Death~
-count if onsetint=="" & nftype==8 //286 - 06nov18 SAF (by email) indicated to run code only on death certificates and not QEH death bks so removed 'nftype==9' from code.
+count if onsetint=="" & nftype==8 //956 - 06nov18 SAF (by email) indicated to run code only on death certificates and not QEH death bks so removed 'nftype==9' from code.
 //list pid nftype onsetint dxyr cr5id if onsetint=="" & nftype==8
-replace onsetint="99" if onsetint=="" & nftype==8 //286 changes
+replace onsetint="99" if onsetint=="" & nftype==8 //956 changes
 
 ** Check 164 - Onset to Death Interval invalid ND code
 ** (Checked data in main CR5 to determine invalid ND values by filtering in CR5 Browse/Edit by Source table, sorted by field, looking at all variables and scrolling through entire field column.)
@@ -3917,9 +3924,9 @@ count if onsetint!="99" & onsetint!="" & regexm(onsetint, "[a-z]") //0
 ** NOTE 1: Met with SAF and KWG on 22may18 and decision made to remove checks for this variable from review/corrections code; also removed checkflags from excel export code below.
 
 ** Check 166 - Certifier missing / Certifier missing if nftype=Death~
-count if certifier=="" & (nftype==8|nftype==9) //14
+count if certifier=="" & (nftype==8|nftype==9) //48
 //list pid nftype certifier dxyr cr5id if certifier=="" & (nftype==8|nftype==9)
-replace certifier="99" if certifier=="" & (nftype==8|nftype==9) //14 changes
+replace certifier="99" if certifier=="" & (nftype==8|nftype==9) //48 changes
 
 ** Check 167 - Certifier invalid ND code
 ** (Checked data in main CR5 to determine invalid ND values by filtering in CR5 Browse/Edit by Source table, sorted by field, looking at all variables and scrolling through entire field column.)
@@ -3950,16 +3957,24 @@ count if rtdate!=. & rtdate>currentdatest //0
 ** Check 173 - invalid(admdate,dfc,rtdate)
 
 ** datescheckcat 1: Admission Date missing
-count if datescheckcat==1 //1303 - leave as is since SAF/KWG to decide if to collect missing dates
+count if datescheckcat==1 //3792 - leave as is since SAF/KWG to decide if to collect missing dates
 //list pid cr5id sourcename nftype admdate dfc rtdate dxyr stda if datescheckcat==1
 
 ** datescheckcat 2: DFC missing
-count if datescheckcat==2 //501 - leave as is since SAF/KWG to decide if to collect missing dates
+count if datescheckcat==2 //1398 - leave as is since SAF/KWG to decide if to collect missing dates
 //list pid cr5id sourcename nftype admdate dfc rtdate dxyr stda if datescheckcat==2
 
 ** datescheckcat 3: RT Date missing
-count if datescheckcat==3 //0
-//list pid cr5id sourcename nftype admdate dfc rtdate dxyr stda if datescheckcat==3
+count if datescheckcat==3 //0; 1 - 26jul2022 pid 20162007 corrected in 15_prep all years cancer.do since rtdate put in certifier field
+//list pid cr5id sourcename nftype certifier admdate dfc rtdate dxyr stda if datescheckcat==3
+/*
+destring flag31 ,replace
+destring flag126 ,replace
+format flag31 flag126 %dD_m_CY
+replace flag31=rtdate if pid=="20162007" & cr5id=="T1S3"
+replace rtdate=certifier if pid=="20162007" & cr5id=="T1S3"
+replace flag126=rtdate if pid=="20162007" & cr5id=="T1S3"
+*/
 
 ** datescheckcat 4: admdate/dfc/rtdate BEFORE InciD
 count if datescheckcat==4 //0
@@ -3970,15 +3985,61 @@ count if datescheckcat==5 //0
 //list pid cr5id dlc admdate dfc rtdate dxyr stda if datescheckcat==5
 
 ** datescheckcat 6: admdate!=. & sourcename!=hosp
-count if datescheckcat==6 //1
-//list pid cr5id sourcename nftype admdate dfc rtdate dxyr stda if datescheckcat==6
-replace flag52=dot if pid=="20180662" & cr5id=="T1S1"
-replace dot=admdate if pid=="20180662" & cr5id=="T1S1"
-replace flag147=dot if pid=="20180662" & cr5id=="T1S1"
+count if datescheckcat==6 //34
+//list pid cr5id recstatus sourcename nftype dot admdate dfc rtdate dxyr stda if datescheckcat==6
+
+replace flag52=dot if pid=="20180662" & cr5id=="T1S1"|pid=="20170981" & cr5id=="T1S2"|pid=="20170937" & cr5id=="T1S2"|pid=="20170936" & cr5id=="T1S2"|pid=="20170803" & cr5id=="T2S2"
+replace dot=admdate if pid=="20180662" & cr5id=="T1S1"|pid=="20170981" & cr5id=="T1S2"|pid=="20170937" & cr5id=="T1S2"|pid=="20170936" & cr5id=="T1S2"|pid=="20170803" & cr5id=="T2S2"
+
+replace dot=. if pid=="20170803" & cr5id!="T2S2"
+fillmissing dot if pid=="20170803"
+
+replace flag147=dot if pid=="20180662" & cr5id=="T1S1"|pid=="20170981" & cr5id=="T1S2"|pid=="20170937" & cr5id=="T1S2"|pid=="20170936" & cr5id=="T1S2"|pid=="20170803" & cr5id=="T2S2"
+
+destring flag29 ,replace
+destring flag124 ,replace
+format flag29 flag124 %dD_m_CY
+replace flag29=admdate if pid=="20170907" & cr5id=="T1S2"
+replace admdate=dot if pid=="20170907" & cr5id=="T1S2"
+replace flag124=admdate if pid=="20170907" & cr5id=="T1S2"
 
 ** datescheckcat 7: dfc!=. & sourcename!=PrivPhys/IPS
-count if datescheckcat==7 //0
-//list pid cr5id sourcename nftype admdate dfc rtdate dxyr stda if datescheckcat==7
+count if datescheckcat==7 //3
+//list pid cr5id recstatus sourcename nftype dot admdate dfc rtdate dxyr stda if datescheckcat==7
+replace flag46=basis if pid=="20161011" & regexm(cr5id, "T1")|pid=="20175000" & regexm(cr5id, "T1")
+replace basis=9 if pid=="20161011" & regexm(cr5id, "T1")|pid=="20175000" & regexm(cr5id, "T1")
+replace flag141=basis if pid=="20161011" & regexm(cr5id, "T1")|pid=="20175000" & regexm(cr5id, "T1")
+
+replace flag39=primarysite if pid=="20172026" & regexm(cr5id,"T1")
+replace primarysite="LYMPH NODES-OVERLAP.MESENTERIC,PARA-AORTIC,PELVIC" if pid=="20172026" & regexm(cr5id,"T1")
+replace flag134=primarysite if pid=="20172026" & regexm(cr5id,"T1")
+
+replace flag40=top if pid=="20172026" & regexm(cr5id,"T1")
+replace top="778" if pid=="20172026" & regexm(cr5id,"T1")
+replace topography=778 if pid=="20172026" & regexm(cr5id,"T1")
+replace topcat=69 if pid=="20172026" & regexm(cr5id,"T1")
+replace flag135=top if pid=="20172026" & regexm(cr5id,"T1")
+
+replace flag41=hx if pid=="20172026" & regexm(cr5id, "T1")
+replace hx="NON-HODGKIN LYMPHOMA" if pid=="20172026" & regexm(cr5id, "T1")
+replace flag136=hx if pid=="20172026" & regexm(cr5id, "T1")
+
+replace flag42=morph if pid=="20172026" & regexm(cr5id, "T1")
+replace morph=9591 if pid=="20172026" & regexm(cr5id, "T1")
+replace flag137=morph if pid=="20172026" & regexm(cr5id, "T1")
+replace morphcat=41 if pid=="20172026" & regexm(cr5id, "T1")
+
+replace flag43=lat if pid=="20172026" & regexm(cr5id, "T1")
+replace lat=0 if pid=="20172026" & regexm(cr5id, "T1")
+replace flag138=lat if pid=="20172026" & regexm(cr5id, "T1")
+
+replace flag45=grade if pid=="20172026" & regexm(cr5id,"T1")
+replace grade=6 if pid=="20172026" & regexm(cr5id,"T1")
+replace flag140=grade if pid=="20172026" & regexm(cr5id,"T1")
+
+replace flag52=dot if pid=="20172026" & regexm(cr5id,"T1")
+replace dot=d(17jan2017) if pid=="20172026" & regexm(cr5id,"T1")
+replace flag147=dot if pid=="20172026" & regexm(cr5id,"T1")
 
 ** datescheckcat 8: rtdate!=. & nftype!=RT
 count if datescheckcat==8 //0
@@ -3992,14 +4053,14 @@ count if datescheckcat==8 //0
 ** Check if morph and morphology do not match (added this check on 31may2022)
 gen morph2=morph
 tostring morph2 ,replace
-count if morph2!=morphology //281
+count if morph2!=morphology //768
 replace morphology=morph2
 drop morph2
 
 ** Check if morph and morphology do not match (added this check on 31may2022)
 gen topography2=topography
 tostring topography2 ,replace
-count if topography2!=top //297
+count if topography2!=top //776
 replace top=topography2
 drop topography2
 
@@ -4009,19 +4070,19 @@ drop laterality behaviour str_grade bas diagyr notiftype
 drop dup
 sort pid
 quietly by pid:  gen dup = cond(_N==1,0,_n)
-count if dup>1 //1138
+count if dup>1 //3601
 //drop if dup>1
 //drop dup
 
 ** Check for matches by natregno and pt names
 duplicates tag natregno, gen(dupnrntag)
-count if dupnrntag>0 //1863
-count if dupnrntag==0 //361
+count if dupnrntag>0 //5820
+count if dupnrntag==0 //1101
 
 sort natregno lname fname pid
 quietly by natregno :  gen dupnrn = cond(_N==1,0,_n)
 sort natregno
-count if dupnrn>0 //1863
+count if dupnrn>0 //5820
 sort lname fname pid cr5id
 order pid cr5id fname lname sex age natregno
 count if dupnrn>0 & natregno!="" & natregno!="9999999999" & natregno!="999999-9999" & dup==1 & dupnrntag==0 //0 - no matches (used data editor and filtered)
@@ -4031,84 +4092,96 @@ count if dupnrn>0 & natregno!="" & natregno!="9999999999" & natregno!="999999-99
 sort lname fname cr5id pid
 quietly by lname fname :  gen duppt = cond(_N==1,0,_n)
 sort lname fname
-count if duppt>0 //2198
+count if duppt>0 //5760
 sort lname fname pid cr5id
-count if duppt>0 & dup==1 //707 - no matches (used below lists)
+count if duppt>0 & dup==1 //2139 - no matches (used below lists) - JC 26jul2022 not checked at this stage due to multiple sources; will check later before analysis
 gen obsid=_n
 //list pid cr5id fname lname age natregno addr slc if duppt>0 & dup==1 & inrange(obsid, 0, 1112), sepby(lname)
 //list pid cr5id fname lname age natregno addr slc if duppt>0 & dup==1 & inrange(obsid, 1113, 2224), sepby(lname)
-drop dup dupnrn duppt obsid
+drop dupnrn duppt obsid
 
-check how many true errors there are for top, morph, lat, basis, dot, dxyr, etc.
-perform a dup of pid to exclude multiple sources.
 /*
 ** Export corrections before dropping duplicate tumours/sources since errors maybe in dup source records
 ** Prepare this dataset for export to excel (prior to removing non-2018 cases)
 preserve
 sort pid
+** Remove the multiple sources by separating the source excel sheets from the tumour+patient excel sheets
 ** Checked for those that are not string by using Variables Manager and filtering by 'flag' and sorting by Type
-drop if  flag1==. & flag2=="" & flag3==. & flag4==. & flag5=="" & flag6=="" & flag7=="" & flag8=="" & flag9=="" & flag10=="" ///
+drop if  flag1=="" & flag2==. & flag3==. & flag4==. & flag5=="" & flag6=="" & flag7=="" & flag8=="" & flag9=="" & flag10=="" ///
 		 & flag11=="" & flag12==. & flag13==. & flag14==. & flag15=="" & flag16=="" & flag17=="" & flag18=="" & flag19=="" & flag20=="" ///
-		 & flag21=="" & flag22=="" & flag23=="" & flag24==. & flag25=="" & flag26=="" & flag27=="" & flag28=="" & flag29=="" & flag30=="" ///
-		 & flag31=="" & flag32==. & flag33=="" & flag34=="" & flag35=="" & flag36=="" & flag37=="" & flag38==. & flag39=="" & flag40==. ///
-		 & flag41=="" & flag42==. & flag43==. & flag44=="" & flag45==. & flag46==. & flag47=="" & flag48==. & flag49=="" & flag50==. ///
+		 & flag21=="" & flag22=="" & flag23=="" & flag24==. & flag25=="" & flag26=="" & flag27=="" & flag28=="" & flag29==. & flag30=="" ///
+		 & flag31=="" & flag32==. & flag33=="" & flag34==. & flag35=="" & flag36=="" & flag37=="" & flag38==. & flag39=="" & flag40=="" ///
+		 & flag41=="" & flag42==. & flag43==. & flag44=="" & flag45==. & flag46==. & flag47=="" & flag48=="" & flag49=="" & flag50=="" ///
 		 & flag51==. & flag52==. & flag53==. & flag54=="" & flag55=="" & flag56=="" & flag57=="" & flag58=="" & flag59=="" & flag60=="" ///
 		 & flag61=="" & flag62=="" & flag63=="" & flag64=="" & flag65=="" & flag66=="" & flag67=="" & flag68=="" & flag69=="" & flag70=="" ///
-		 & flag71=="" & flag72==. & flag73==. & flag74=="" & flag75=="" & flag76=="" & flag77==. & flag78==. & flag79==. & flag80=="" ///
-		 & flag81=="" & flag82==. & flag83=="" & flag84==. & flag85=="" & flag86=="" & flag87=="" & flag88=="" & flag89=="" & flag90=="" ///
-		 & flag91=="" & flag92=="" & flag93=="" & flag94=="" & flag95==. & flag96=="" & flag97==. & flag98==. & flag99=="" & flag100=="" ///
+		 & flag71=="" & flag72==. & flag73==. & flag74=="" & flag75=="" & flag76==. & flag77==. & flag78==. & flag79==. & flag80=="" ///
+		 & flag81=="" & flag82==. & flag83=="" & flag84==. & flag85==. & flag86=="" & flag87=="" & flag88=="" & flag89=="" & flag90=="" ///
+		 & flag91=="" & flag92=="" & flag93=="" & flag94=="" & flag95=="" & flag96==. & flag97==. & flag98==. & flag99=="" & flag100=="" ///
 		 & flag101=="" & flag102=="" & flag103=="" & flag104=="" & flag105=="" & flag106=="" & flag107==. & flag108==. & flag109==. & flag110=="" ///
 		 & flag111=="" & flag112=="" & flag113=="" & flag114=="" & flag115=="" & flag116=="" & flag117=="" & flag118=="" & flag119==. & flag120=="" ///
-		 & flag121=="" & flag122=="" & flag123=="" & flag124=="" & flag125=="" & flag126=="" & flag127==. & flag128=="" & flag129=="" & flag130=="" ///
-		 & flag131=="" & flag132=="" & flag133==. & flag134=="" & flag135==. & flag136=="" & flag137==. & flag138==. & flag139=="" & flag140==. ///
-		 & flag141==. & flag142=="" & flag143==. & flag144=="" & flag145==. & flag146==. & flag147==. & flag148==. & flag149=="" & flag150=="" ///
+		 & flag121=="" & flag122=="" & flag123=="" & flag124==. & flag125=="" & flag126=="" & flag127==. & flag128=="" & flag129==. & flag130=="" ///
+		 & flag131=="" & flag132=="" & flag133==. & flag134=="" & flag135=="" & flag136=="" & flag137==. & flag138==. & flag139=="" & flag140==. ///
+		 & flag141==. & flag142=="" & flag143=="" & flag144=="" & flag145=="" & flag146==. & flag147==. & flag148==. & flag149=="" & flag150=="" ///
 		 & flag151=="" & flag152=="" & flag153=="" & flag154=="" & flag155=="" & flag156=="" & flag157=="" & flag158=="" & flag159=="" & flag160=="" ///
 		 & flag161=="" & flag162=="" & flag163=="" & flag164=="" & flag165=="" & flag166=="" & flag167==. & flag168==. & flag169=="" & flag170=="" ///
-		 & flag171=="" & flag172==. & flag173==. & flag174==. & flag175=="" & flag176=="" & flag177=="" & flag178=="" & flag179==. & flag180=="" ///
+		 & flag171==. & flag172==. & flag173==. & flag174==. & flag175=="" & flag176=="" & flag177==. & flag178=="" & flag179==. & flag180==. ///
 		 & flag181=="" & flag182=="" & flag183=="" & flag184=="" & flag185=="" & flag186=="" & flag187=="" & flag188=="" & flag189==""
 // deleted
 
 gen str_no= _n
 label var str_no "No."
+** Format the date flags so they are exported as dates not numbers
+format flag2 flag12 flag13 flag14 flag24 flag29 flag34 flag52 flag72 flag78 flag79 flag82 flag85 flag96 flag107 flag108 flag109 flag119 flag124 flag129 flag147 flag167 flag173 flag174 flag177 flag180  %dD_m_CY
 
 ** Create excel errors list before deleting incorrect records
 ** Use below code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no pid cr5id flag1-flag94 if ///
-		flag1!=. | flag2!="" | flag3!=. | flag4!=. | flag5!="" | flag6!="" | flag7!="" | flag8!="" | flag9!="" | flag10!="" ///
-		|flag11!="" | flag12!=. | flag13!=. | flag14!=. | flag15!="" | flag16!="" | flag17!="" | flag18!="" | flag19!="" | flag20!="" ///
-		|flag21!="" | flag22!="" | flag23!="" | flag24!=. | flag25!="" | flag26!="" | flag27!="" | flag28!="" | flag29!="" | flag30!="" ///
-		|flag31!="" | flag32!=. | flag33!="" | flag34!="" | flag35!="" | flag36!="" | flag37!="" | flag38!=. | flag39!="" | flag40!=. ///
-		|flag41!="" | flag42!=. | flag43!=. | flag44!="" | flag45!=. | flag46!=. | flag47!="" | flag48!=. | flag49!="" | flag50!=. ///
-		|flag51!=. | flag52!=. | flag53!=. | flag54!="" | flag55!="" | flag56!="" | flag57!="" | flag58!="" | flag59!="" | flag60!="" ///
-		|flag61!="" | flag62!="" | flag63!="" | flag64!="" | flag65!="" | flag66!="" | flag67!="" | flag68!="" | flag69!="" | flag70!="" ///
-		|flag71!="" | flag72!=. | flag73!=. | flag74!="" | flag75!="" | flag76!="" | flag77!=. | flag78!=. | flag79!=. | flag80!="" ///
-		|flag81!="" | flag82!=. | flag83!="" | flag84!=. | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
-		|flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
-using "`datapath'\version09\3-output\CancerCleaning2016-2018_`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
-capture export_excel str_no pid cr5id flag95-flag189 if ///
-		 flag95!=. | flag96!="" | flag97!=. | flag98!=. | flag99!="" | flag100!="" ///
-		 |flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!=. | flag108!=. | flag109!=. | flag110!="" ///
-		 |flag111!="" | flag112!="" | flag113!="" | flag114!="" | flag115!="" | flag116!="" | flag117!="" | flag118!="" | flag119!=. | flag120!="" ///
-		 |flag121!="" | flag122!="" | flag123!="" | flag124!="" | flag125!="" | flag126!="" | flag127!=. | flag128!="" | flag129!="" | flag130!="" ///
-		 |flag131!="" | flag132!="" | flag133!=. | flag134!="" | flag135!=. | flag136!="" | flag137!=. | flag138!=. | flag139!="" | flag140!=. ///
-		 |flag141!=. | flag142!="" | flag143!=. | flag144!="" | flag145!=. | flag146!=. | flag147!=. | flag148!=. | flag149!="" | flag150!="" ///
-		 |flag151!="" | flag152!="" | flag153!="" | flag154!="" | flag155!="" | flag156!="" | flag157!="" | flag158!="" | flag159!="" | flag160!="" ///
-		 |flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!=. | flag168!=. | flag169!="" | flag170!="" ///
-		 |flag171!="" | flag172!=. | flag173!=. | flag174!=. | flag175!="" | flag176!="" | flag177!=. | flag178!="" | flag179!=. | flag180!="" ///
-		 |flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
-using "`datapath'\version09\3-output\CancerCleaning2016-2018_`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+capture export_excel str_no pid cr5id dxyr flag1-flag31 if ///
+		flag1!="" | flag2!=. | flag3!=. | flag4!=. | flag5!="" | flag6!="" | flag7!="" | flag8!="" | flag9!="" | flag10!="" ///
+		 | flag11!="" | flag12!=. | flag13!=. | flag14!=. | flag15!="" | flag16!="" | flag17!="" | flag18!="" | flag19!="" | flag20!="" ///
+		 | flag21!="" | flag22!="" | flag23!="" | flag24!=. | flag25!="" | flag26!="" | flag27!="" | flag28!="" | flag29!=. | flag30!=""| flag31!="" ///
+using "`datapath'\version09\3-output\CancerCleaning2016-2018_SOURCE_`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+capture export_excel str_no pid cr5id flag95-flag126 if ///
+		 flag95!="" | flag96!=. | flag97!=. | flag98!=. | flag99!="" | flag100!="" ///
+		 | flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!=. | flag108!=. | flag109!=. | flag110!="" ///
+		 | flag111!="" | flag112!="" | flag113!="" | flag114!="" | flag115!="" | flag116!="" | flag117!="" | flag118!="" | flag119!=. | flag120!="" ///
+		 | flag121!="" | flag122!="" | flag123!="" | flag124!=. | flag125!="" | flag126!="" ///
+using "`datapath'\version09\3-output\CancerCleaning2016-2018_SOURCE_`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+
+** Remove duplicate sources using dup from pid duplicate check above
+drop if dup>1 // deleted
+capture export_excel str_no pid cr5id dxyr flag32-flag94 if ///
+		 flag32!=. | flag33!="" | flag34!=. | flag35!="" | flag36!="" | flag37!="" | flag38!=. | flag39!="" | flag40!="" ///
+		 | flag41!="" | flag42!=. | flag43!=. | flag44!="" | flag45!=. | flag46!=. | flag47!="" | flag48!="" | flag49!="" | flag50!="" ///
+		 | flag51!=. | flag52!=. | flag53!=. | flag54!="" | flag55!="" | flag56!="" | flag57!="" | flag58!="" | flag59!="" | flag60!="" ///
+		 | flag61!="" | flag62!="" | flag63!="" | flag64!="" | flag65!="" | flag66!="" | flag67!="" | flag68!="" | flag69!="" | flag70!="" ///
+		 | flag71!="" | flag72!=. | flag73!=. | flag74!="" | flag75!="" | flag76!=. | flag77!=. | flag78!=. | flag79!=. | flag80!="" ///
+		 | flag81!="" | flag82!=. | flag83!="" | flag84!=. | flag85!=. | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
+		 | flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
+using "`datapath'\version09\3-output\CancerCleaning2016-2018_TUMOUR+PATIENT_`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+capture export_excel str_no pid cr5id dxyr flag127-flag189 if ///
+		 flag127!=. | flag128!="" | flag129!=. | flag130!="" ///
+		 | flag131!="" | flag132!="" | flag133!=. | flag134!="" | flag135!="" | flag136!="" | flag137!=. | flag138!=. | flag139!="" | flag140!=. ///
+		 | flag141!=. | flag142!="" | flag143!="" | flag144!="" | flag145!="" | flag146!=. | flag147!=. | flag148!=. | flag149!="" | flag150!="" ///
+		 | flag151!="" | flag152!="" | flag153!="" | flag154!="" | flag155!="" | flag156!="" | flag157!="" | flag158!="" | flag159!="" | flag160!="" ///
+		 | flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!=. | flag168!=. | flag169!="" | flag170!="" ///
+		 | flag171!=. | flag172!=. | flag173!=. | flag174!=. | flag175!="" | flag176!="" | flag177!=. | flag178!="" | flag179!=. | flag180!=. ///
+		 | flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
+using "`datapath'\version09\3-output\CancerCleaning2016-2018_TUMOUR+PATIENT_`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
 restore
 */
+drop dup
+STOP
 
-************************
-**  Prep dataset for  **
-** PAB ASIRs analysis **
-************************
+********************************
+**  Prep dataset for analysis **
+********************************
 //delete ineligibles (recstatus, resident), dxyr!=2018 etc.
 
 tab dxyr ,m
-drop if dxyr!=2018 //1 deleted - 2017 case
+/*
+
+*/
 
 *****************************
 ** Identifying & Labelling **

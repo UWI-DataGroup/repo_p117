@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      25-JULY-2022
+    // 	date last modified      26-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -2089,6 +2089,10 @@ label var onsetint "OnsetDeathInterval"
 
 ** Certifier
 label var certifier "Certifier"
+**JC 26jul2022: error picked up in dofile 20a_clean current years cancer.do but corrected here as RT Date mistakenly put into certifier field
+replace flag28=certifier if pid=="20162007" & cr5id=="T1S3"
+replace RTRegDate=certifier if pid=="20162007" & cr5id=="T1S3"
+replace flag123=certifier if pid=="20162007" & cr5id=="T1S3"
 
 ** Admission Date
 replace AdmissionDate=20000101 if AdmissionDate==99999999
