@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      26-JULY-2022
+    // 	date last modified      27-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -1860,8 +1860,8 @@ label values tnmantstage etnmantstage antstage_lab
 ** Summary Staging
 label var staging "Staging"
 label define staging_lab 0 "In situ" 1 "Localised only" 2 "Regional: direct ext." 3 "Regional: LNs only" ///
-						 4 "Regional: both dir. ext & LNs" 5 "Regional: NOS" 7 "Distant site(s)/LNs" ///
-						 8 "NA" 9 "Unknown; DCO case", modify
+						 4 "Regional: both dir. ext & LNs" 5 "Regional: NOS" 6 "Not enough info to stage" ///
+						 7 "Distant site(s)/LNs" 8 "NA" 9 "Unknown; DCO case", modify
 label values staging staging_lab
 
 ** Incidence Date
@@ -1987,7 +1987,7 @@ label values nftype nftype_lab
 ** Source Name
 label var sourcename "SourceName"
 label define sourcename_lab 1 "QEH" 2 "Bay View" 3 "Private Physician" 4 "IPS-ARS" 5 "Death Registry" ///
-							6 "Polyclinic" 7 "BNR Database" 8 "Other" 9 "Unknown", modify
+							6 "Polyclinic" 7 "BNR Database" 8 "Other" 9 "Unknown" , modify
 label values sourcename sourcename_lab
 
 ** Doctor
@@ -2344,6 +2344,8 @@ replace topcheckcat=114 if regexm(primarysite, "NODE") & (topography<770|topogra
 replace topcheckcat=115 if !(strmatch(strupper(primarysite), "*OVERLAP*")) & topography==778
 replace topcheckcat=116 if regexm(primarysite, "UNKNOWN") & topography!=809
 replace topcheckcat=117 if (topography>439 & topography<450 & morph!=8720)|morph==8832
+replace topcheckcat=118 if morph==9140 & (topography<440 | topography>449) //JC added on 27jul2022
+
 label var topcheckcat "PrimSite<>Top Check Category"
 label define topcheckcat_lab 	1 "Check 1: Lip" 2 "Check 2: Lip-Overlap" 3 "Check 3: Tongue" 4 "Check 4: Tongue-Overlap" 5 "Check 5: Gum" 6 "Check 6: Mouth" ///
 								7 "Check 7: Mouth-Overlap" 8 "Check 8: Palate-Overlap" 9 "Check 9: Mouth Other-Overlap" 10 "Check 10: Glands" 11 "Check 11: Glands-Overlap" ///
@@ -2374,7 +2376,7 @@ label define topcheckcat_lab 	1 "Check 1: Lip" 2 "Check 2: Lip-Overlap" 3 "Check
 							   106 "Check 106: Spinal Cord/CNS" 107 "Check 107: Brain/CNS-Overlap" 108 "Check 108: Thyroid" ///
 							   109 "Check 109: Adrenal Gland" 110 "Check 110: Endocrine-Other" 111 "Check 111: Endocrine-Overalp" ///
 							   112 "Check 112: Other/Ill defined" 113 "Check 113: Ill-defined-Overlap" 114 "Check 114: LNs" ///
-							   115 "Check 115: LNs-Overlap" 116 "Check 116: PSU" 117 "Check 117: NMSCs" ,modify
+							   115 "Check 115: LNs-Overlap" 116 "Check 116: PSU" 117 "Check 117: NMSCs" 118 "Check 118: Kaposi sarcoma; top!=skin" ,modify
 label values topcheckcat topcheckcat_lab
 
 ** Create category for morphology according to groupings in ICD-O-3 book

@@ -46,6 +46,193 @@ count if slc==2 //2,303
 JC 20jul2022: don't drop deceased cases instead drop cases wherein deathid/record_id is blank so the ones wherein dod was entered at abstraction can be merged with death dataset
 drop if slc==2 //2,303 deleted
 
+Below taken from 20a dofile - maybe perform after death matching completed in final clean dofile?:
+/*
+** JC 02JUN2022: below check not done as death matching not done for PAB ASIRs
+
+** Check for cases where cancer=2-not cancer but it has been abstracted
+count if cancer==2 & pid!="" //32
+sort pid deathid
+//list pid deathid fname lname top cr5cod cod if cancer==2 & pid!="", nolabel string(90)
+//list cr5cod if cancer==2 & pid!=""
+//list cod1a if cancer==2 & pid!=""
+** Corrections from above list
+replace cod=1 if pid=="20150063"|pid=="20150351"|pid=="20151023"|pid=="20151039"|pid=="20151050"| ///
+				 pid=="20151095"|pid=="20151113"|pid=="20151278 "|pid=="20155201" //8 changes
+replace cancer=1 if pid=="20150063"|pid=="20150351"|pid=="20151039"|pid=="20151095"|pid=="20151113"|pid=="20151278"|pid=="20155201" //7 changes
+//replace dcostatus=1 if pid=="20140047" //1 change
+preserve
+drop if basis!=0
+keep pid fname lname natregno dod cr5cod doctor docaddr certifier
+capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier ///
+		using "`datapath'\version09\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
+//JC remember to change V01 to V02 when running list a 2nd time!
+restore
+*/
+
+** Create variable to identify patient records
+gen ptrectot=.
+replace ptrectot=1 if eidmp==1 //971; 1119 changes
+replace ptrectot=3 if eidmp==2 //13; 15 changes
+replace ptrectot=2 if regexm(pid, "20159") //149 changes
+label define ptrectot_lab 1 "CR5 pt with single event" 2 "DC with single event" 3 "CR5 pt with multiple events" ///
+						  4 "DC with multiple events" 5 "CR5 pt: single event but multiple DC events" , modify
+label values ptrectot ptrectot_lab
+/*
+Now check:
+	(1) patient record with T1 are included in category 3 of ptrectot but leave eidmp=single tumour so this var can be used to count MPs
+	(2) patient records with only 1 tumour but maybe labelled as T2 are not included in eidmp and are included in category 1 of ptrectot
+*/
+count if eidmp==2 & dupsource==1 //11; 13
+order pid record_id cr5id eidmp dupsource ptrectot primarysite
+//list pid eidmp dupsource duppid cr5id fname lname if eidmp==2 & dupsource==1
+
+replace ptrectot=3 if pid=="20150238" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20150277" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20150468" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20150506" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20151200" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20151202" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20151236" & cr5id=="T1S1" //1 change
+replace ptrectot=1 if pid=="20151369" & cr5id=="T1S1" //1 change
+replace eidmp=1 if pid=="20151369" & cr5id=="T1S1" //1 change
+replace eidmp=. if pid=="20151369" & cr5id=="T1S2" //1 change
+replace eidmp=. if pid=="20151369" & cr5id=="T1S3" //1 change
+replace ptrectot=3 if pid=="20155043" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20155094" & cr5id=="T1S1" //1 change
+replace ptrectot=3 if pid=="20155104" & cr5id=="T1S1" //1 change
+replace ptrectot=4 if pid=="20159029" //2 changes
+replace ptrectot=4 if pid=="20159116" //2 changes
+
+count if ptrectot==.
+
+** Count # of patients with eligible non-dup tumours
+count if ptrectot==1 //962; 963
+
+** Count # of eligible non-dup tumours
+count if eidmp==1 //972; 1120
+
+** Count # of eligible non-dup MPs
+count if eidmp==2 //10; 12
+
+** JC 14nov18 - I forgot about missed 2013 cases in dataset so stats for 2014 only:
+** Count # of patients with eligible non-dup tumours
+count if ptrectot==1 & dxyr==2015 //926; 927
+
+** Count # of eligible non-dup tumours
+count if eidmp==1 & dxyr==2015 //936; 1074
+
+** Count # of eligible non-dup MPs
+count if eidmp==2 & dxyr==2015 //10; 12
+
+/* 
+Count # of multiple source records per tumour:
+(1)Create variables based on built-in Stata variables (_n, _N) to calculate obs count:
+		(a) _n is Stata notation for the current observation number (varname: pidobsid)
+		(b) _N is Stata notation for the total number of observations (varname: pidobstot)
+(2)Create variables to store overall obs # and obs total (obsid, obstot) for DQI
+*/
+
+tab pidobstot ,m //all tumours - need to drop dup sources records to assess DQI for multiple sources per tumour
+/*
+  pidobstot |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        642       25.15       25.15
+          2 |        832       32.59       57.74
+          3 |        669       26.20       83.94
+          4 |        280       10.97       94.91
+          5 |        110        4.31       99.22
+          6 |         12        0.47       99.69
+          8 |          8        0.31      100.00
+------------+-----------------------------------
+      Total |      2,553      100.00
+
+  pidobstot |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          1 |        548       24.98       24.98
+          2 |        776       35.37       60.35
+          3 |        621       28.30       88.65
+          4 |        180        8.20       96.86
+          5 |         55        2.51       99.36
+          6 |          6        0.27       99.64
+          8 |          8        0.36      100.00
+------------+-----------------------------------
+      Total |      2,194      100.00
+*/
+
+** Create variable to identify DCI/DCN vs DCO
+gen dcostatus=.
+label define dcostatus_lab ///
+1 "Eligible DCI/DCN-cancer,in CR5db" ///
+2 "DCO" ///
+3 "Ineligible DCI/DCN" ///
+4 "NA-not cancer,not in CR5db" ///
+5 "NA-dead,CR5db no death source" ///
+6 "NA-alive" ///
+7 "NA-not alive/dead" , modify
+label values dcostatus dcostatus_lab
+label var dcostatus "death certificate status"
+
+order pid record_id cr5id eidmp dupsource ptrectot dcostatus primarysite
+** Assign DCO Status=NA for all events that are not cancer 
+replace dcostatus=2 if nftype==8 //256; 265
+replace dcostatus=2 if basis==0 //14; 136
+replace dcostatus=4 if cancer==2 //7463; 85 changes
+count if slc!=2 //10524; 978
+//list cr5cod if slc!=2
+replace dcostatus=6 if slc==1 //962 changes
+replace dcostatus=7 if slc==9 //0 changes
+count if dcostatus==. & cr5cod!="" //2898; 755
+replace dcostatus=1 if cr5cod!="" & dcostatus==. & pid!="" //730; 755 changes
+count if dcostatus==. & record_id!=. //2169; 3
+count if dcostatus==. & pid!="" & record_id!=. //2-leave as is; it's a multiple source
+//list pid cr5id record_id basis recstatus eidmp nftype dcostatus if dcostatus==. & pid!="" & record_id!=. ,nolabel
+//replace dcostatus=5 if dcostatus==. & pid!="" & record_id!=.
+replace dcostatus=1 if pid=="20150468" & cr5id=="T2S1" //1 change
+count if dcostatus==. //2189; 22
+count if dcostatus==. & pid=="" //2168; 0
+count if dcostatus==. & pid!="" //21; 22
+count if dcostatus==. & pid!="" & slc==2 //5; 6
+//list pid cr5id record_id basis recstatus eidmp nftype if dcostatus==. & pid!=""
+replace dcostatus=1 if pid=="20150031" //2 changes
+replace dcostatus=1 if pid=="20150506" //2 changes
+replace dcostatus=1 if pid=="20155213" //2 changes
+
+** Remove unmatched death certificates
+count if pid=="" //9546 - deaths from all years (2008-2018)
+count if _merge==2 & pid=="" //0
+drop if pid=="" //9546 deleted; 0 deleted
+
+count //2045; 2194
+count if dupsource==. //0
+count if eidmp==. //1062
+count if cr5id=="" //0
+
+** Additional records have been added so need to drop these as they are duplicates created by Stata bysort/missing
+count if eidmp==1 //1120
+//list pid cr5id eidmp ptrectot if eidmp==1 , sepby(pid)
+drop duppidcr5id
+sort pid cr5id
+quietly by pid cr5id :  gen duppidcr5id = cond(_N==1,0,_n)
+sort pid cr5id
+count if duppidcr5id>0 //17
+//list pid cr5id record_id eidmp ptrectot primarysite duppidcr5id _merge_org if duppidcr5id>0
+count if _merge_org==5 //39 - some are correct so don't drop
+//list pid cr5id record_id eidmp ptrectot primarysite duppidcr5id _merge_org if _merge_org==5
+count if duppidcr5id>0 & _merge_org==5 //10
+//list pid cr5id record_id eidmp ptrectot primarysite duppidcr5id _merge_org if duppidcr5id>0 & _merge_org==5
+** Need to avoid inadvertently deleting a correct source record so need to tag the duplicate cr5id
+duplicates tag pid cr5id, gen(dup_cr5id)
+count if dup_cr5id>0 & _merge_org==5 //10
+//list pid cr5id dup_cr5id duppidcr5id _merge_org if dup_cr5id>0, nolabel sepby(pid)
+drop if dup_cr5id>0 & _merge_org==5 //10; 11 deleted
+
+count //2035; 2183
+
+tab dxyr ,m 
+tab dxyr eidmp ,m
+*/
+
 ** Add death dataset
 append using "`datapath'\version02\3-output\2015-2020_deaths_for_appending"
 
