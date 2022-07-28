@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JULY-2022
-    // 	date last modified      27-JULY-2022
+    // 	date last modified      28-JULY-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -691,7 +691,7 @@ replace ptda="09" if pid=="20145017"
 destring ptda,replace
 count if ptda==. //0
 label define ptda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
-					  13 "KWG" 14 "TH" 22 "MC" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
+					  13 "KWG" 14 "TH" 22 "MC" 26 "AB" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
 label values ptda ptda_lab
 
 ** Casefinding Date
@@ -718,6 +718,7 @@ nsplit birthdate, digits(4 2 2) gen(dobyear dobmonth dobday)
 gen dob=mdy(dobmonth, dobday, dobyear)
 format dob %dD_m_CY
 label var dob "Birth Date"
+tostring birthdate ,replace //to be used in the cross-check process in 20b_update previous years cancer.do
 
 ** Sex
 label var sex "Sex"
@@ -890,7 +891,7 @@ destring ttda, replace
 ** DOES NOT contain a nonnumeric character so no correction needed
 label var ttda "TT Data Abstractor"
 label define ttda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
-					  13 "KWG" 14 "TH" 22 "MC" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
+					  13 "KWG" 14 "TH" 22 "MC" 26 "AB" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
 label values ttda ttda_lab
 
 ** Abstraction Date
@@ -1964,7 +1965,7 @@ count if non_numeric_stda //0
 destring stda,replace
 label var stda "STDataAbstractor"
 label define stda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
-					  13 "KWG" 14 "TH" 22 "MC" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
+					  13 "KWG" 14 "TH" 22 "MC" 26 "AB" 27 "KN" 88 "Doctor" 98 "Intern" 99 "Unknown", modify
 label values stda stda_lab
 
 ** Source Date
@@ -3415,6 +3416,69 @@ using "`datapath'\version09\3-output\CancerCleaningALL`listdate'.xlsx", sheet("C
 restore
 */
 
+/* 
+	JC 28jul2022: For cross-check process (20b_update previous years cancer.do), create variables that:
+	(1)	identifies which PIDs have been updated since the last CR5db export from 2015AnnualReportV03's cross-check dofile (45_prep cross-check.do)
+	(2) differentiates the PIDs in this dataset from the previous years dataset
+*/
+count if ttupdate>=d(21may2021) //8,210
+gen crosschk=1 if ttupdate>=d(21may2021) //21may2021 date chosen based on date of CR5db .txt file used in 45_prep cross-check.do
+count if crosschk==1 & (dxyr==2008|dxyr==2013|dxyr==2014|dxyr==2015) //763 - to review in CR5db alongside iarc-hub ds opened in a 2nd Stata Browse/Edit window then added updates in 15_cancer.do in section before creating iarc-hub ds (drop non-reportable skin cancers from iarc-hub ds)
+
+gen pid_all="allds_"+pid
+
+gen crosschk_id=pid+"_"+cr5id
+
+** Check for duplicate crosschk_id and correct
+sort crosschk_id
+quietly by crosschk_id:  gen dupcross = cond(_N==1,0,_n)
+count if dupcross>1 //18
+//list pid cr5id crosschk_id dot top morph dxyr dupcross if dupcross>1
+/*
+list pid cr5id dupcross dxyr dot crosschk_id recstatus stda top morph if ///
+pid=="20080336"|pid=="20080626"|pid=="20080659"|pid=="20080728"|pid=="20080753"|pid=="20081085" ///
+|pid=="20130137"|pid=="20130160"|pid=="20130865"|pid=="20141393"|pid=="20190081"|pid=="20190379" ///
+|pid=="20190392"|pid=="20190465"|pid=="20190989"|pid=="20201028"
+*/
+replace cr5id="T2S1" if pid=="20080336" & dupcross==1
+replace cr5id="T7S1" if pid=="20080626" & dupcross==1
+replace cr5id="T2S1" if pid=="20080659" & dupcross==2
+replace cr5id="T5S1" if pid=="20080728" & dupcross==1
+replace cr5id="T5S2" if pid=="20080728" & cr5id=="T1S2"
+replace cr5id="T5S3" if pid=="20080728" & cr5id=="T1S3"
+replace cr5id="T2S1" if pid=="20080753" & dupcross==2
+replace cr5id="T2S1" if pid=="20081085" & dupcross==2
+replace cr5id="T2S2" if pid=="20130137" & dupcross==1
+replace cr5id="T2S1" if pid=="20130160" & dupcross==2
+replace cr5id="T2S4" if pid=="20130865" & dupcross==1
+replace cr5id="T2S1" if pid=="20141393" & cr5id=="T1S1" & dupcross==1
+replace cr5id="T2S2" if pid=="20141393" & cr5id=="T1S2" & dupcross==1
+replace cr5id="T2S3" if pid=="20141393" & cr5id=="T1S3"
+replace cr5id="T2S1" if pid=="20190081" & dupcross==2
+replace cr5id="T2S1" if pid=="20190379" & dupcross==1
+replace cr5id="T2S2" if pid=="20190379" & cr5id=="T1S2"
+replace cr5id="T2S1" if pid=="20190392" & dupcross==2
+replace cr5id="T2S1" if pid=="20190465" & cr5id=="T1S1" & dupcross==1
+replace cr5id="T2S2" if pid=="20190465" & cr5id=="T1S2" & dupcross==2
+replace cr5id="T1S2" if pid=="20190465" & cr5id=="T1S1" & dupcross==2
+replace cr5id="T1S1" if pid=="20190465" & cr5id=="T1S2" & dupcross==1
+replace cr5id="T2S1" if pid=="20190989" & dupcross==1
+replace cr5id="T2S1" if pid=="20201028" & dupcross==1
+
+drop crosschk_id dupcross
+gen crosschk_id=pid+"_"+cr5id
+
+sort crosschk_id
+quietly by crosschk_id:  gen dupcross = cond(_N==1,0,_n)
+count if dupcross>1 //0
+drop dupcross
+
+//list pid cr5id crosschk_id if crosschk==1 & (dxyr==2008|dxyr==2013|dxyr==2014|dxyr==2015)
+order pid cr5id crosschk_id ttupdate tumourupdatedby stda stdoa nftype sourcename comments
+//JC 28jul2022: this list has been manually using Browse/Edit window and Excel saved for use in 20b_update previous years cancer.do: "`datapath'\version09\2-working\crosscheckPIDs_20220728.xlsx"
+
+tab sex ,m //73 unk
+
 ** Put variables in order they are to appear	  
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
@@ -3424,4 +3488,3 @@ count //19,812
 
 ** Create dataset to use for 2018 cleaning
 save "`datapath'\version09\2-working\allyears_prepped cancer", replace
-

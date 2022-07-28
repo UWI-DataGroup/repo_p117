@@ -33,6 +33,7 @@
     capture log close
     log using "`logpath'\50_death match.smcl", replace
 ** HEADER -----------------------------------------------------
+JC 28jul2022: (1) once both datasets have been joined then perform IARCcrgTools MP Check
 
 * ************************************************************************
 * PREP AND FORMAT
