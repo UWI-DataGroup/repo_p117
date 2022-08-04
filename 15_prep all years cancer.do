@@ -4,8 +4,8 @@ cls
     //  algorithm name          15_prep all years cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JULY-2022
-    // 	date last modified      28-JULY-2022
+    //  date first created      12-JUL-2022
+    // 	date last modified      28-JUL-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:

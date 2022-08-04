@@ -4,8 +4,8 @@ cls
     //  algorithm name          20a_clean current years cancer.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JULY-2022
-    // 	date last modified      28-JULY-2022
+    //  date first created      12-JUL-2022
+    // 	date last modified      03-AUG-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -47,6 +47,7 @@ use "`datapath'\version09\2-working\allyears_prepped cancer", clear
 
 count //19,812
 
+JC 03aug2022: MANUALLY REVIEW 20140286 + 20140455 IN CR5DB THEN INCLUDE IN THIS DOFILE!
 ** JC 14jul2022: KWG emailed to say he abstracted this pid today as a 2015 case: 20160419 (T1)
 ** JC manually reviewed T1 of above case (dxyr=2015) on 14jul2022 and 1 error found (rptcheckcat=6).
 keep if dxyr==2016|dxyr==2017|dxyr==2018|pid=="20160419" & regexm(cr5id,"T1")|pid=="20080661" & regexm(cr5id,"T1") //12,886 deleted
