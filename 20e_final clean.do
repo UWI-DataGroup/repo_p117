@@ -37,6 +37,8 @@ JC 28jul2022: (1) once both datasets have been joined then perform IARCcrgTools 
 (2) create dcostatus ptrectot variables and perform duplicates checks
 (3) age check, etc.
 (4) pid 20080661 is a missed 2008 NMSC so needs to be dropped from reportable ds
+(5) check if dod!=. & dodyear==.
+(6) drop sitear + flags
 
 ** Load cleaned pre-matched cancer dataset from dofile 15
 use "`datapath'\version02\2-working\2008_2013_2014_2015_cancer ds_2015-2020 death matching", clear
