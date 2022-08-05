@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      28-JUL-2022
-    // 	date last modified      03-AUG-2022
+    // 	date last modified      04-AUG-2022
     //  algorithm task          Matching prepared all years CanReg5 dataset with cleaned previous (2008, 2013-2015) cancer dataset
     //  status                  Completed
     //  objective               To have a uncleaned but prepared current dataset to cross-check with cleaned previous dataset to update previous dataset
@@ -89,6 +89,7 @@ append using "`datapath'\version09\2-working\allyears_crosschk cancer"
 		("`datapath'\version09\2-working\crosscheckPIDs_20220728.xlsx");
 	(2) Check Comments in CR5db for each PID to determine what was updated on the above list;
 	(3) Check for PID in Stata Browse/Edit window using the filter: pid_prev!=""
+		(NOTE: for 2015 cases they were cross-checked in the CI5 ds: p117\version02\3-output\2013_2014_2015_cancer_ci5.dta)
 	(4) Update the previous dataset if necessary;
 	(5) Add the PID into the reviewed code below so you know how many records are left to be reviewed.
 	(6) Instead of doing (5) above just add 'Yes' to 'Completed' column in excel list.
@@ -100,9 +101,22 @@ order pid cr5id dxyr slc dlc dod tnmcatstage tnmantstage etnmcatstage etnmantsta
 	  
 sort pid pid_prev pid_all
 
+** Add in missed 2015 cases (20150095, 20151048 + 20160793) from CI5 dataset (v02 or 2015AnnualReportV03 branch)
+preserve
+use "`datapath'\version02\3-output\2013_2014_2015_cancer_ci5" ,clear
+drop if pid!="20150095" & pid!="20151048" & pid!="20160793"
+count //3
+gen pid_prev="prevds_"+pid
+save "`datapath'\version09\2-working\20150095+20151048+20160793_ci5" ,replace
+restore
+
+append using "`datapath'\version09\2-working\20150095+20151048+20160793_ci5" ,force
+erase "`datapath'\version09\2-working\20150095+20151048+20160793_ci5.dta"
+
+sort pid
 STOP
-13% reviewed as of 28jul2022
-87% pending review as of 28jul2022
+
+6 to abs; 76 to review then include in 20a dofile then complete this dofile process and proceed to death matching.
 
 ** Updates to previous dataset
 replace dlc=d(25oct2021) if pid=="20080119"
@@ -266,36 +280,212 @@ fillmissing hospnum if pid=="20139999"
 replace init="" if pid=="20139999" & pid_prev!=""
 fillmissing init if pid=="20139999"
 replace init=lower(init) if pid=="20139999" & pid_prev!=""
+replace dlc=d(22apr2021) if pid=="20080729" //date taken from MedData by KWG 04aug2022
+replace init="" if pid=="20140488" & pid_prev!=""
+fillmissing init if pid=="20140488"
+replace init=lower(init) if pid=="20140488" & pid_prev!=""
+replace hospnum="" if pid=="20140659" & pid_prev!=""
+fillmissing hospnum if pid=="20140659"
+replace dlc=d(19jul2022) if pid=="20140878" //date taken from MedData
+replace dlc=rtdate if pid=="20140983" & cr5id=="T2S1"
+replace dlc=. if pid=="20140983" & cr5id!="T2S1"
+fillmissing dlc if pid=="20140983"
+replace dlc=d(10nov2021) if pid=="20140988" //date taken from MedData
+replace hospnum="" if pid=="20140998" & pid_prev!=""
+fillmissing hospnum if pid=="20140998"
+replace slc=2 if pid=="20140998" & pid_prev!=""
+replace dod=d(16apr2021) if pid=="20140998" & pid_prev!="" //date taken from MedData + multi-yr REDCap deathdb
+replace dlc=d(05nov2021) if pid=="20141136" //date taken from MedData
+replace slc=2 if pid=="20141174" & pid_prev!=""
+replace dod=d(19jan2021) if pid=="20141174" & pid_prev!="" //date taken from MedData + multi-yr REDCap deathdb
+replace slc=. if pid=="20141188" & pid_prev!=""
+fillmissing slc if pid=="20141188"
+replace dod=. if pid=="20141188" & pid_prev!=""
+fillmissing dod if pid=="20141188"
+replace dlc=d(09may2022) if pid=="20141205" //date taken from MedData
+
+** JC 04aug2022 - missed MP: colon should be T2 and stomach T1
+expand=2 if pid=="20141254" & pid_prev!="", gen (dupobs1)
+replace cr5id="T2S1" if dupobs1==1
+
+replace primarysite="STOMACH" if pid=="20141254" & regexm(cr5id,"T1") & pid_prev!=""
+replace top="169" if pid=="20141254" & regexm(cr5id,"T1") & pid_prev!=""
+replace topography=169 if pid=="20141254" & regexm(cr5id,"T1") & pid_prev!=""
+replace topcat=17 if pid=="20141254" & regexm(cr5id,"T1") & pid_prev!=""
+replace icd10="C169" if pid=="20141254" & regexm(cr5id,"T1") & pid_prev!=""
+replace siteiarc=11 if pid=="20141254" & regexm(cr5id,"T1") & pid_prev!=""
+replace sitecr5db=3 if pid=="20141254" & regexm(cr5id,"T1") & pid_prev!=""
+
+replace grade=9 if pid=="20141254" & regexm(cr5id,"T2") & pid_prev!=""
+replace dot=dlc if pid=="20141254" & regexm(cr5id,"T2") & pid_prev!=""
+replace crosschk_id="20141254_T2S1" if pid=="20141254" & regexm(cr5id,"T2") & pid_prev!=""
+replace eidmp=2 if pid=="20141254" & regexm(cr5id,"T2") & pid_prev!=""
+replace ptrectot=3 if pid=="20141254" & regexm(cr5id,"T2") & pid_prev!=""
+replace patient=2 if pid=="20141254" & regexm(cr5id,"T2") & pid_prev!=""
+replace persearch=2 if pid=="20141254" & regexm(cr5id,"T2") & pid_prev!=""
+
+replace comments="" if pid=="20141254" & pid_prev!=""
+fillmissing comments if pid=="20141254"
+replace slc=. if pid=="20141254" & pid_prev!=""
+fillmissing slc if pid=="20141254"
+replace dod=. if pid=="20141254" & pid_prev!=""
+fillmissing dod if pid=="20141254"
+*************************************************************************************************
+
+replace hospnum="" if pid=="20141288" & pid_prev!=""
+fillmissing hospnum if pid=="20141288"
+replace dlc=d(20jul2022) if pid=="20141358" //date taken from MedData
+replace hospnum="" if pid=="20141383" & pid_prev!=""
+fillmissing hospnum if pid=="20141383"
+replace slc=. if pid=="20141400" & pid_prev!=""
+fillmissing slc if pid=="20141400"
+replace dod=. if pid=="20141400" & pid_prev!=""
+fillmissing dod if pid=="20141400"
+replace hospnum="" if pid=="20141414" & pid_prev!=""
+fillmissing hospnum if pid=="20141414"
+replace dlc=d(25feb2020) if pid=="20141414" //date taken from MedData
+replace slc=. if pid=="20141549" & pid_prev!=""
+fillmissing slc if pid=="20141549"
+replace dod=. if pid=="20141549" & pid_prev!=""
+fillmissing dod if pid=="20141549"
+replace dlc=d(05jun2022) if pid=="20145054" //date taken from MedData
+replace slc=. if pid=="20145077" & pid_prev!=""
+fillmissing slc if pid=="20145077"
+replace dod=. if pid=="20145077" & pid_prev!=""
+fillmissing dod if pid=="20145077"
+replace slc=. if pid=="20150004" & pid_prev!=""
+fillmissing slc if pid=="20150004"
+replace dod=. if pid=="20150004" & pid_prev!=""
+fillmissing dod if pid=="20150004"
+replace hospnum="" if pid=="20150013" & pid_prev!=""
+fillmissing hospnum if pid=="20150013"
+replace hospnum="" if pid=="20150091" & pid_prev!=""
+fillmissing hospnum if pid=="20150091"
+replace dlc=. if pid=="20150091" & pid_prev!=""
+fillmissing dlc if pid=="20150091"
+replace dlc=. if pid=="20150093" & pid_prev!=""
+fillmissing dlc if pid=="20150093"
+replace hospnum="" if pid=="20150094" & pid_prev!=""
+fillmissing hospnum if pid=="20150094"
+replace dlc=. if pid=="20150094" & pid_prev!=""
+fillmissing dlc if pid=="20150094"
+replace dlc=d(08feb2022) if pid=="20150160" //date taken from MedData
+replace hospnum="" if pid=="20150170" & pid_prev!=""
+fillmissing hospnum if pid=="20150170"
+replace dlc=d(19jul2022) if pid=="20150180" //date taken from MedData
+replace dlc=d(18jul2022) if pid=="20150196" //date taken from MedData
+replace slc=. if pid=="20150234" & pid_prev!=""
+fillmissing slc if pid=="20150234"
+replace dod=. if pid=="20150234" & pid_prev!=""
+fillmissing dod if pid=="20150234"
+replace hospnum="" if pid=="20150234" & pid_prev!=""
+fillmissing hospnum if pid=="20150234"
+replace hospnum="" if pid=="20150254" & pid_prev!=""
+fillmissing hospnum if pid=="20150254"
+replace dlc=d(08jun2022) if pid=="20150254" //date taken from MedData
+replace dlc=d(12dec2021) if pid=="20150291" //date taken from MedData
+replace init="o" if pid=="20150298"
+replace hospnum="" if pid=="20150303" & pid_prev!=""
+fillmissing hospnum if pid=="20150303"
+replace dlc=d(07mar2022) if pid=="20150303" //date taken from MedData
+replace slc=. if pid=="20150313" & pid_prev!=""
+fillmissing slc if pid=="20150313"
+replace dod=. if pid=="20150313" & pid_prev!=""
+fillmissing dod if pid=="20150313"
+replace hospnum="" if pid=="20150313" & pid_prev!=""
+fillmissing hospnum if pid=="20150313"
+replace hospnum="" if pid=="20150314" & pid_prev!=""
+fillmissing hospnum if pid=="20150314"
+replace hospnum="" if pid=="20150333" & pid_prev!=""
+fillmissing hospnum if pid=="20150333"
+replace dlc=d(11apr2017) if pid=="20150333" //date taken from MedData
+replace slc=. if pid=="20150335" & pid_prev!=""
+fillmissing slc if pid=="20150335"
+replace dod=. if pid=="20150335" & pid_prev!=""
+fillmissing dod if pid=="20150335"
+replace hospnum="" if pid=="20150348" & pid_prev!=""
+fillmissing hospnum if pid=="20150348"
+replace dlc=d(18jul2022) if pid=="20150348" //date taken from MedData
+replace resident=. if pid=="20150439" & pid_prev!=""
+fillmissing resident if pid=="20150439"
+replace recstatus=. if pid=="20150439" & pid_prev!="" //ineligible
+fillmissing recstatus if pid=="20150439"
+replace dlc=. if pid=="20150565" & pid_prev!=""
+fillmissing dlc if pid=="20150565"
+replace hospnum="" if pid=="20151012" & pid_prev!=""
+fillmissing hospnum if pid=="20151012"
+replace hospnum="" if pid=="20151033" & pid_prev!=""
+fillmissing hospnum if pid=="20151033"
+replace dlc=d(28apr2021) if pid=="20151033" //date taken from MedData
+replace slc=. if pid=="20151103" & pid_prev!=""
+fillmissing slc if pid=="20151103"
+replace dod=. if pid=="20151103" & pid_prev!=""
+fillmissing dod if pid=="20151103"
+replace dlc=d(03aug2022) if pid=="20151115" //date taken from MedData
+replace slc=2 if pid=="20151132" & pid_prev!=""
+replace dod=d(14sep2021) if pid=="20151132" & pid_prev!="" //date taken from multi-yr REDCap deathdb
+replace dlc=d(28jul2022) if pid=="20151190" //date taken from MedData
+replace hospnum="" if pid=="20151240" & pid_prev!=""
+fillmissing hospnum if pid=="20151240"
+replace hospnum="" if pid=="20151296" & pid_prev!=""
+fillmissing hospnum if pid=="20151296"
+replace hospnum="" if pid=="20151300" & pid_prev!=""
+fillmissing hospnum if pid=="20151300"
+replace hospnum="" if pid=="20151323" & pid_prev!=""
+fillmissing hospnum if pid=="20151323"
+replace hospnum="" if pid=="20151381" & pid_prev!=""
+fillmissing hospnum if pid=="20151381"
+replace dlc=d(23mar2022) if pid=="20151381" //date taken from MedData
+replace hospnum="" if pid=="20155021" & pid_prev!=""
+fillmissing hospnum if pid=="20155021"
+replace dlc=d(11jul2022) if pid=="20155211" //date taken from MedData
+replace hospnum="" if pid=="20159021" & pid_prev!=""
+fillmissing hospnum if pid=="20159021"
+replace init="" if pid=="20159030" & pid_prev!=""
+fillmissing init if pid=="20159030"
+replace init=lower(init) if pid=="20159030" & pid_prev!=""
+replace hospnum="" if pid=="20159030" & pid_prev!=""
+fillmissing hospnum if pid=="20159030"
+replace init="" if pid=="20159063" & pid_prev!=""
+fillmissing init if pid=="20159063"
+replace init=lower(init) if pid=="20159063" & pid_prev!=""
+replace init="" if pid=="20159064" & pid_prev!=""
+fillmissing init if pid=="20159064"
+replace init=lower(init) if pid=="20159064" & pid_prev!=""
+replace init="" if pid=="20159120" & pid_prev!=""
+fillmissing init if pid=="20159120"
+replace init=lower(init) if pid=="20159120" & pid_prev!=""
+replace hospnum="" if pid=="20159120" & pid_prev!=""
+fillmissing hospnum if pid=="20159120"
+replace hospnum="" if pid=="20160029" & pid_prev!=""
+fillmissing hospnum if pid=="20160029"
+replace init="" if pid=="20180750" & pid_prev!=""
+fillmissing init if pid=="20180750"
+replace init=lower(init) if pid=="20180750" & pid_prev!=""
 
 
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
-replace dlc=d() if pid==""
 
+
+
+
+NOT SURE THESE UPDATES WILL WORK AND ARE NECESSARY AT THIS POINT DUE TO STRINGENT DEADLINE
 
 //fillmissing tnmcatstage if pid=="" & regexm()
+count if notesseen!=. & notesseen!=3 & pid_prev!=""
+gen nochange=1 if notesseen!=. & notesseen!=3 & pid_prev!=""
+
+replace notesseen=. if nochange!=1 & pid_prev!=""
+fillmissing notesseen if nochange!=1
+drop nochange
+
+count if hospnum="" & pid_prev!=""
+gen change=1 if hospnum="" & pid_prev!=""
+fillmissing hospnum if change==1
 
 
 count //
+
+
 
 save "`datapath'\version09\2-working\2008-2022_cancer_crosschk_dp" ,replace
 label data "BNR-Cancer prepared 2008-2022 cross-check data"
