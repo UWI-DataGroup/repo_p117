@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JUL-2022
-    // 	date last modified      04-AUG-2022
+    // 	date last modified      09-AUG-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -48,7 +48,6 @@ use "`datapath'\version09\2-working\allyears_prepped cancer", clear
 count //19,812
 
 JC 04aug2022: to manually review 76 missed 2013, 2014 + 2015 cases from dofile 20b cross-check process and include in this dofile.
-JC 04aug2022: to abstract 6 missed 2013, 2014 + 2015 cases from dofile 20b cross-check process and include in this dofile.
 ** JC 14jul2022: KWG emailed to say he abstracted this pid today as a 2015 case: 20160419 (T1)
 ** JC manually reviewed T1 of above case (dxyr=2015) on 14jul2022 and 1 error found (rptcheckcat=6).
 ** JC 04aug2022: manually reviewed 20140286, 20140455 + 20145099 as missed 2013 and 2015 cases from previous reporting (errors found, corrected below and emailed to KWG)
@@ -70,6 +69,46 @@ replace doctor="99" if pid=="20140455" & cr5id=="T1S3"
 replace ICCCcode="12b" if pid=="20140455" & cr5id=="T1S3"
 
 replace dlc=d(15jun2022) if pid=="20145099" //date taken from MedData
+
+
+** JC 09aug2022: 6 newly-abstracted cases identified (abstracted on 05aug2022 by KWG) during the cross-check process (20b_update previous years cancer.do) were manually reviewed and below are the corrections:
+replace comments=comments+" "+"JC 09AUG2022: MedData Notes section on 14-Oct-2021 notes this pt's PMH (post chemo and RT)." if pid=="20161015"
+replace dlc=d(21jun2022) if pid=="20161015"
+
+** JC 09aug2022: T2 abstracted without death certificate source info so duplicate the source info from T1S1 (death certificate) but first switch cr5id so fillmissing command can be used
+replace cr5id="T1S2" if pid=="20170903" & nftype==8
+replace cr5id="T1S1" if pid=="20170903" & nftype==17
+sort pid cr5id
+fillmissing stda stdoa nftype sourcename doctor docaddr recnum certifier cr5cod if pid=="20170903" & cr5id!="T1S1"
+replace cr5id="T1S1" if pid=="20170903" & nftype==8
+replace cr5id="T1S2" if pid=="20170903" & nftype==17
+
+** JC 09aug2022: 76 cases identified during cross-check process (20b_update previous years cancer.do) were manually reviewed  and below are the corrections:
+replace resident=1 if pid=="20150036"
+replace notesseen=4 if pid=="20150036"
+replace dlc=d(04aug2022) if pid=="20150036"
+replace lat=2 if pid=="20150036" & regexm(cr5id,"T1")
+replace grade=6 if pid=="20150036" & regexm(cr5id,"T1")
+
+replace grade=6 if pid=="20160001" & regexm(cr5id,"T1")
+
+replace lat=0 if pid=="20160346" & regexm(cr5id,"T1")
+replace staging=6 if pid=="20160346" & regexm(cr5id,"T1")
+replace rx1=1 if pid=="20160346" & regexm(cr5id,"T1")
+replace rx1d=dot if pid=="20160346" & regexm(cr5id,"T1")
+
+replace lat=0 if pid=="20160667" & regexm(cr5id,"T1")
+replace dot=d(24mar2016) if pid=="20160667" & regexm(cr5id,"T1")
+replace dxyr=2016 if pid=="20160667" & regexm(cr5id,"T1")
+
+replace dot=d(04may2016) if pid=="20160711" & regexm(cr5id,"T1")
+replace dxyr=2016 if pid=="20160711" & regexm(cr5id,"T1")
+
+replace dot=d(26jul2016) if pid=="20160795" & regexm(cr5id,"T1")
+replace dxyr=2016 if pid=="20160795" & regexm(cr5id,"T1")
+
+STOPPED at pid 20160842 so continue reviewing from 20160844 (see excel sheet from cross-check process)
+
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
 	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.

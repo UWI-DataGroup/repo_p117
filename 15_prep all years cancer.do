@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JUL-2022
-    // 	date last modified      28-JUL-2022
+    // 	date last modified      09-AUG-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -119,6 +119,42 @@ cls
 import excel using "`datapath'\version09\1-input\2022-07-18_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
 
 count //19,812
+
+** JC 09aug2022: 6 newly-abstracted cases identified (abstracted on 05aug2022 by KWG) during the cross-check process (20b_update previous years cancer.do) to be added as a separate import. First remove those cases from the previous main import then append the newly-abstracted cases:
+drop if RegistryNumber=="20161015"|RegistryNumber=="20170869"|RegistryNumber=="20170903"|RegistryNumber=="20170953"|RegistryNumber=="20180590"|RegistryNumber=="20180883" //9 deleted
+
+count //19,803
+
+preserve
+clear
+import excel using "`datapath'\version09\1-input\2022-08-09_MAIN Source+Tumour+Patient_KWG_FORJC_6cases_excel.xlsx", firstrow
+tostring LabNumber ,replace
+tostring SurgicalNumber ,replace
+tostring CytologicalFindings ,replace
+tostring ConsultationReport ,replace
+tostring SurgicalFindings ,replace
+tostring PhysicalExam ,replace
+tostring ImagingResults ,replace
+tostring DurationOfIllness ,replace
+tostring OnsetDeathInterval ,replace
+tostring RTRegDate ,replace
+tostring STReviewer ,replace
+tostring cr5id ,replace
+tostring TNMCatStage ,replace
+tostring EssTNMCatStage ,replace
+tostring OtherTreatment2 ,replace
+tostring TTReviewer ,replace
+tostring HospitalNumber ,replace
+tostring FurtherRetrievalSource ,replace
+tostring PTReviewer ,replace
+count //14
+save "`datapath'\version09\2-working\crosschk_abs" ,replace
+restore
+
+append using "`datapath'\version09\2-working\crosschk_abs"
+
+count //19,817
+erase "`datapath'\version09\2-working\crosschk_abs.dta" //delete ds to save space on SharePoint
 
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
@@ -3483,7 +3519,7 @@ tab sex ,m //73 unk
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //19,812
+count //19,812; 19,817
 
 
 ** Create dataset to use for 2018 cleaning
