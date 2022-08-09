@@ -391,9 +391,9 @@ putdocx paragraph, style(Title)
 putdocx text ("CANCER 2018 Annual Report: Stata Results"), bold
 putdocx textblock begin
 Date Prepared: 10-MAY-2022. 
-Prepared by: JC using Stata 
-CanReg5 (incidence) data release date: 21-May-2021.
-REDCap (death) data release date: 06-May-2022.
+Prepared by: JC using Stata v17.0
+CanReg5 v5.43 (incidence) data release date: 21-May-2021.
+REDCap v12.3.3 (death) data release date: 06-May-2022.
 Generated using Dofile: 30_report cancer.do
 putdocx textblock end
 putdocx paragraph, halign(center)
