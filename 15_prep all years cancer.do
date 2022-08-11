@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JUL-2022
-    // 	date last modified      09-AUG-2022
+    // 	date last modified      10-AUG-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -154,6 +154,42 @@ restore
 append using "`datapath'\version09\2-working\crosschk_abs"
 
 count //19,817
+erase "`datapath'\version09\2-working\crosschk_abs.dta" //delete ds to save space on SharePoint
+
+** JC 10aug2022: 1 newly-abstracted 2018 MP identified (abstracted on 10aug2022 by JC) during the cross-check process (20b_update previous years cancer.do) to be added as a separate import (corrections also performed to the same PID. First remove this cases from the previous main import then append the newly-abstracted cases:
+drop if RegistryNumber=="20180094" //7 deleted
+
+count //19,810
+
+preserve
+clear
+import excel using "`datapath'\version09\1-input\2022-08-10_MAIN Source+Tumour+Patient_JC_excel.xlsx", firstrow
+tostring LabNumber ,replace
+tostring SurgicalNumber ,replace
+tostring CytologicalFindings ,replace
+tostring ConsultationReport ,replace
+tostring SurgicalFindings ,replace
+tostring PhysicalExam ,replace
+tostring ImagingResults ,replace
+tostring DurationOfIllness ,replace
+tostring OnsetDeathInterval ,replace
+tostring RTRegDate ,replace
+tostring STReviewer ,replace
+tostring cr5id ,replace
+tostring TNMCatStage ,replace
+tostring EssTNMCatStage ,replace
+tostring OtherTreatment2 ,replace
+tostring TTReviewer ,replace
+tostring HospitalNumber ,replace
+tostring FurtherRetrievalSource ,replace
+tostring PTReviewer ,replace
+count //8
+save "`datapath'\version09\2-working\crosschk_abs" ,replace
+restore
+
+append using "`datapath'\version09\2-working\crosschk_abs"
+
+count //19,818
 erase "`datapath'\version09\2-working\crosschk_abs.dta" //delete ds to save space on SharePoint
 
 /*
@@ -3469,7 +3505,7 @@ gen crosschk_id=pid+"_"+cr5id
 sort crosschk_id
 quietly by crosschk_id:  gen dupcross = cond(_N==1,0,_n)
 count if dupcross>1 //18
-//list pid cr5id crosschk_id dot top morph dxyr dupcross if dupcross>1
+//list pid cr5id crosschk_id dot top morph dxyr dupcross if dupcross>1, sepby(pid)
 /*
 list pid cr5id dupcross dxyr dot crosschk_id recstatus stda top morph if ///
 pid=="20080336"|pid=="20080626"|pid=="20080659"|pid=="20080728"|pid=="20080753"|pid=="20081085" ///
@@ -3519,7 +3555,7 @@ tab sex ,m //73 unk
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //19,812; 19,817
+count //19,812; 19,817; 19,818
 
 
 ** Create dataset to use for 2018 cleaning

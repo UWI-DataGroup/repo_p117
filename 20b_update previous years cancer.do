@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      28-JUL-2022
-    // 	date last modified      04-AUG-2022
+    // 	date last modified      10-AUG-2022
     //  algorithm task          Matching prepared all years CanReg5 dataset with cleaned previous (2008, 2013-2015) cancer dataset
     //  status                  Completed
     //  objective               To have a uncleaned but prepared current dataset to cross-check with cleaned previous dataset to update previous dataset
@@ -114,9 +114,6 @@ append using "`datapath'\version09\2-working\20150095+20151048+20160793_ci5" ,fo
 erase "`datapath'\version09\2-working\20150095+20151048+20160793_ci5.dta"
 
 sort pid
-STOP
-
-6 to abs; 76 to review then include in 20a dofile then complete this dofile process and proceed to death matching.
 
 ** Updates to previous dataset
 replace dlc=d(25oct2021) if pid=="20080119"
@@ -463,12 +460,14 @@ replace init="" if pid=="20180750" & pid_prev!=""
 fillmissing init if pid=="20180750"
 replace init=lower(init) if pid=="20180750" & pid_prev!=""
 
+replace resident=1 if pid=="20150036" //JC 10aug2022: misread excel sheet for this instead of 20150536 but still keep these corrections
+replace notesseen=4 if pid=="20150036"
+replace dlc=d(04aug2022) if pid=="20150036"
+replace lat=2 if pid=="20150036" & regexm(cr5id,"T1")
+replace grade=6 if pid=="20150036" & regexm(cr5id,"T1")
 
-
-
-
-
-NOT SURE THESE UPDATES WILL WORK AND ARE NECESSARY AT THIS POINT DUE TO STRINGENT DEADLINE
+/*
+JC 10aug2022: NOT SURE THESE UPDATES WILL WORK AND ARE NECESSARY AT THIS POINT DUE TO STRINGENT DEADLINE
 
 //fillmissing tnmcatstage if pid=="" & regexm()
 count if notesseen!=. & notesseen!=3 & pid_prev!=""
@@ -481,59 +480,13 @@ drop nochange
 count if hospnum="" & pid_prev!=""
 gen change=1 if hospnum="" & pid_prev!=""
 fillmissing hospnum if change==1
-
+*/
 
 count //
 
-
-
-save "`datapath'\version09\2-working\2008-2022_cancer_crosschk_dp" ,replace
+save "`datapath'\version09\3-output\2008_2013_2014_2015_crosschk_nonreportable" ,replace
 label data "BNR-Cancer prepared 2008-2022 cross-check data"
 notes _dta :These data prepared for 2008,2013-2015 cross-check matching for data updated post-cleaning (2016-2018 annual report)
-
-drop if pid_prev==""
-
-JC 28JUL2022: save updated nonsurvival nonreportable ds for reference but will use reportable ds for appending to 2016-2018 ds in prep for death matching and final clean
-
-** Removing cases not included for reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
-//drop dup_id
-sort pid
-duplicates tag pid, gen(dup_id)
-list pid cr5id patient eidmp persearch if dup_id>0, nolabel sepby(pid)
-drop if resident==2 //0 deleted - nonresident
-drop if resident==99 //0 deleted - resident unknown
-drop if recstatus==3 //0 deleted - ineligible case definition
-drop if sex==9 //0 deleted - sex unknown
-drop if beh!=3 //0 deleted - nonmalignant
-drop if persearch>2 //1 to be deleted
-drop if siteiarc==25 //0 deleted - nonreportable skin cancers
-
-count //2418
-
-** Save this corrected dataset with only internationally reportable cases
-save "`datapath'\version09\2-working\2008_2013-2015_cancer_nonsurvival_reportable", replace
-label data "2008 2013 2014 2015 BNR-Cancer analysed + updated data - Non-survival Reportable Dataset"
-note: TS This dataset was used for 2016-2018 annual report
-note: TS Excludes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs
-
-AFTER COMBINING PREVIOUS AND CURRENT YEARS - PERFORM DUP PID SEARCH + IARC MP CHECK
-
-CREATE IDENTIFIABLE AND DE-IDENTIFIED DS
-** Save this corrected dataset with reportable cases and identifiable data
-save "`datapath'\version09\3-output\2018_cancer_nonsurvival_identifiable", replace
-label data "2018 BNR-Cancer identifiable data - Non-survival Identifiable Dataset"
-note: TS This dataset was NOT used for 2018 annual report; it was used for PAB 07-June-2022
-note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
-
-
-** Create corrected dataset with reportable cases but de-identified data
-drop fname lname natregno init dob resident parish recnum cfdx labnum SurgicalNumber specimen clindets cytofinds md consrpt sxfinds physexam imaging duration onsetint certifier dfc streviewer addr birthdate hospnum comments dobyear dobmonth dobday dob_yr dob_year dobchk sname nrnday nrnid dupnrntag
-
-save "`datapath'\version09\3-output\2018_cancer_nonsurvival_deidentified", replace
-label data "2018 BNR-Cancer de-identified data - Non-survival De-identified Dataset"
-note: TS This dataset was NOT used for 2018 annual report; it was used for PAB 07-June-2022
-note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
-note: TS Excludes identifiable data but contains unique IDs to allow for linking data back to identifiable data
 
 erase "`datapath'\version09\2-working\allyears_crosschk cancer.dta" //not needed for later processes so delete to save space on SharePoint
 

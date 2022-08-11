@@ -33,12 +33,186 @@
     capture log close
     log using "`logpath'\16_final clean.smcl", replace
 ** HEADER -----------------------------------------------------
-JC 28jul2022: (1) once both datasets have been joined then perform IARCcrgTools MP Check
+JC 28jul2022: 
+(1) once both datasets have been joined then perform IARCcrgTools MP Check then update persearch eidmp etc.
 (2) create dcostatus ptrectot variables and perform duplicates checks
 (3) age check, etc.
 (4) pid 20080661 is a missed 2008 NMSC so needs to be dropped from reportable ds
 (5) check if dod!=. & dodyear==.
 (6) drop sitear + flags
+*********************************
+JC 10aug2022: cut and pasted final clean code from dofile 20a_clean current years.do
+
+** Create variable called "deceased" - same as AR's 2008 dofile called '3_merge_cancer_deaths.do'
+tab slc ,m
+count if slc!=2 & dod!=. //0
+//list pid cr5id recstatus eidmp dupsource persearch dxyr if slc!=2 & dod!=. 
+gen deceased=1 if slc==2 //1547 changes
+label var deceased "whether patient is deceased"
+label define deceased_lab 1 "dead" 2 "alive at last contact" , modify
+label values deceased deceased_lab
+replace deceased=2 if slc==1 //1466 changes
+
+tab slc deceased ,m
+
+** Create the "patient" variable - same as AR's 2008 dofile called '3_merge_cancer_deaths.do'
+gen patient=.  
+label var patient "cancer patient"
+label define pt_lab 1 "patient" 2 "separate event",modify
+label values patient pt_lab
+replace patient=1 if eidmp==1 //2973 changes
+replace patient=2 if eidmp==2 //44 changes
+tab patient ,m
+
+** Convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //3017changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //2771 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //3017 changes
+	  
+** Ensure death date is correct IF PATIENT IS DEAD
+count if dod==. & slc==2 //0
+gen dodyear=year(dod) if dod!=.
+count if dodyear==. & dod!=. //0
+//list pid cr5id fname lname nftype dlc if dod==. & slc==2
+
+
+** Check DCOs
+tab basis ,m
+/*
+                     Basis Of Diagnosis |      Freq.     Percent        Cum.
+----------------------------------------+-----------------------------------
+                                    DCO |        215        7.13        7.13
+                          Clinical only |        242        8.02       15.15
+Clinical Invest./Ult Sound/Exploratory  |        155        5.14       20.29
+             Lab test (biochem/immuno.) |         61        2.02       22.31
+                          Cytology/Haem |         69        2.29       24.59
+     Hx of mets/Autopsy with Hx of mets |         59        1.96       26.55
+Hx of primary/Autopsy with Hx of primar |      2,173       72.03       98.57
+                                Unknown |         43        1.43      100.00
+----------------------------------------+-----------------------------------
+                                  Total |      3,017      100.00
+*/
+** Re-assign dcostatus for cases with updated death trace-back: still pending as of 19feb2020 TBD by NS
+//tab dcostatus ,m
+//replace dcostatus=1 if pid=="20150468" & dcostatus==. //1 change; 0 changes
+//count if dcostatus==2 & basis!=0
+//list pid basis if dcostatus==2 & basis!=0 - autopsy w/ hx
+
+** Remove non-residents (see IARC validity presentation)
+tab resident ,m //0 missing
+//list pid cr5id recstatus addr if resident!=1
+label drop resident_lab
+label define resident_lab 1 "Yes" 2 "No" 99 "Unknown", modify
+label values resident resident_lab
+replace resident=99 if resident==9 //0 changes
+//list pid natregno nrn addr dd_address if resident==99
+replace resident=1 if resident==99 & addr!="99" & addr!="" //0 changes
+//replace resident=1 if resident==99 & dd_address!="99" & dd_address!="" //0
+//replace natregno=nrn if natregno=="" & nrn!="" & resident==99 //3 changes
+replace resident=1 if natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //0 changes
+** Check electoral list and CR5db for those resident=99
+//list pid fname lname nrn natregno dob if resident==99
+//list pid fname lname addr if resident==99
+tab resident ,m //0 unknown
+
+** Check parish
+count if parish!=. & parish!=99 & addr=="" //0
+count if parish==. & addr!="" & addr!="99" //0
+//list pid fname lname natregno parish addr if parish!=. & parish!=99 & addr==""
+//bysort pid (cr5id) : replace addr = addr[_n-1] if missing(addr) //1 change - 20140566/
+
+** Check missing sex
+tab sex ,m //none missing
+
+** Check for missing age & 100+
+tab age ,m //0 missing - none are 100+: f/u was done but age not found
+//list pid natregno dd_natregno if age==999
+
+** Check for missing follow-up
+label drop slc_lab
+label define slc_lab 1 "Alive" 2 "Deceased" 3 "Emigrated" 99 "Unknown", modify
+label values slc slc_lab
+replace slc=99 if slc==9 //0 changes
+tab slc ,m 
+** Check missing in CR5db
+//list pid if slc==99
+count if dlc==. //0
+//tab dlc ,m
+
+** Check for non-malignant
+tab beh ,m //3016 malignant
+tab morph if beh!=3
+
+** Check for ineligibles
+tab recstatus ,m //198 Abs, Pending REG Review
+drop if recstatus==3 //0 deleted
+
+** Check for duplicate tumours
+tab persearch ,m //0 excluded
+
+** Check dob
+count if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*9999*")) //0
+//list pid natregno if dob==. & natregno!="" & !(strmatch(strupper(natregno), "*-9999*"))
+
+** Check age
+gen age2 = (dot - dob)/365.25
+gen checkage2=int(age2)
+drop age2
+count if dob!=. & dot!=. & age!=checkage2 //5
+//list pid dot dob age checkage2 cr5id if dob!=. & dot!=. & age!=checkage2
+replace age=checkage2 if dob!=. & dot!=. & age!=checkage2 //5 changes
+
+** Check no missing dxyr so this can be used in analysis
+tab dxyr ,m //0 missing
+/*
+  Diagnosis |
+       Year |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2008 |          1        0.03        0.03
+       2013 |          2        0.07        0.10
+       2015 |          4        0.13        0.23
+       2016 |      1,070       35.47       35.70
+       2017 |        978       32.42       68.11
+       2018 |        962       31.89      100.00
+------------+-----------------------------------
+      Total |      3,017      100.00
+*/
+
+** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
+//replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+
+count //3017
+** Check non-2018 dxyrs are reportable
+count if resident==2 //0
+count if resident==99 //0
+count if recstatus==3 //0
+count if sex==9 //0
+count if beh!=3 //0
+count if persearch>2 //0
+count if siteiarc==25 //11 - 10 are non-melanoma skin cancers but they don't fall into the non-reportable skin cancer category; 1 is missed 2008 NMSC to be included in 2008,2013-2015 nonreportable ds
+//list pid cr5id primarysite topography top morph morphology icd10 if siteiarc==25
+
+** Remove reportable-non-2018 dx - DO NOT REMOVE ANY AS THIS DS HAS ALL THE ELIGIBLE CASES FOR THIS ANNUAL RPT
+//drop if dxyr!=2018 //0 deleted
+
+** Save this cleaned dataset with reportable cases and identifiable data
+save "`datapath'\version09\3-output\2016-2018_cancer_nonsurvival_identifiable", replace
+label data "2016-2018 BNR-Cancer identifiable data - Non-survival Identifiable Dataset"
+note: TS This dataset was NOT used for 2016-2018 annual report
+note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
+
+** Create cleaned dataset with reportable cases but de-identified data
+drop fname lname natregno init dob resident parish recnum cfdx labnum SurgicalNumber specimen clindets cytofinds md consrpt sxfinds physexam imaging duration onsetint certifier dfc streviewer addr birthdate hospnum comments dobyear dobmonth dobday dob_yr dob_year dobchk sname nrnday nrnid dupnrntag
+
+save "`datapath'\version09\3-output\2016-2018_cancer_nonsurvival_deidentified", replace
+label data "2016-2018 BNR-Cancer de-identified data - Non-survival De-identified Dataset"
+note: TS This dataset was NOT used for 2016-2018 annual report
+note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
+note: TS Excludes identifiable data but contains unique IDs to allow for linking data back to identifiable data
+*********************************
 
 ** Load cleaned pre-matched cancer dataset from dofile 15
 use "`datapath'\version02\2-working\2008_2013_2014_2015_cancer ds_2015-2020 death matching", clear

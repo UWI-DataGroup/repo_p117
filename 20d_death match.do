@@ -33,7 +33,9 @@
     capture log close
     log using "`logpath'\50_death match.smcl", replace
 ** HEADER -----------------------------------------------------
-JC 28jul2022: (1) once both datasets have been joined then perform IARCcrgTools MP Check
+
+JC 10aug2022: combine ds from 20a and 20b dofiles then create a death matching ds based on cases wherein slc!=deceased AND deathid==.
+
 
 * ************************************************************************
 * PREP AND FORMAT
