@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      28-JUL-2022
-    // 	date last modified      10-AUG-2022
+    // 	date last modified      11-AUG-2022
     //  algorithm task          Matching prepared all years CanReg5 dataset with cleaned previous (2008, 2013-2015) cancer dataset
     //  status                  Completed
     //  objective               To have a uncleaned but prepared current dataset to cross-check with cleaned previous dataset to update previous dataset
@@ -58,7 +58,7 @@ replace morph=8140 if pid=="20130299" & regexm(cr5id, "T1") //0 changes
 replace morphcat=6 if pid=="20130299" & regexm(cr5id, "T1") //0 changes
 
 gen crosschk_id=pid+"_"+cr5id
-//gen prev=1
+gen prev=1
 
 preserve
 use "`datapath'\version09\2-working\allyears_prepped cancer" ,clear
@@ -75,7 +75,7 @@ label values sex sex_lab
 label var sex "Sex"
 tab sex ,m
 
-//gen all=1
+gen all=1
 save "`datapath'\version09\2-working\allyears_crosschk cancer" ,replace
 restore
 append using "`datapath'\version09\2-working\allyears_crosschk cancer"
@@ -107,6 +107,7 @@ use "`datapath'\version02\3-output\2013_2014_2015_cancer_ci5" ,clear
 drop if pid!="20150095" & pid!="20151048" & pid!="20160793"
 count //3
 gen pid_prev="prevds_"+pid
+gen prev=1
 save "`datapath'\version09\2-working\20150095+20151048+20160793_ci5" ,replace
 restore
 
@@ -482,11 +483,19 @@ gen change=1 if hospnum="" & pid_prev!=""
 fillmissing hospnum if change==1
 */
 
-count //
+** Remove the records from the allyears ds
+count if prev==1 //4028
+count if all==1 //19,818
+drop if all==1 //19,818 deleted
 
-save "`datapath'\version09\3-output\2008_2013_2014_2015_crosschk_nonreportable" ,replace
-label data "BNR-Cancer prepared 2008-2022 cross-check data"
-notes _dta :These data prepared for 2008,2013-2015 cross-check matching for data updated post-cleaning (2016-2018 annual report)
+** Create variable to differentiate current years from previous years in prep for death matching
+gen previousds=1
+
+count //4028
+
+save "`datapath'\version09\3-output\2008_2013_2014_2015_crosschecked_nonreportable" ,replace
+label data "BNR-Cancer prepared 2008-2022 cross-checked data"
+notes _dta :These data prepared for 2008,2013-2015 cross-check matching for data updated post-cleaning from 2015 annual report (2016-2018 annual report)
 
 erase "`datapath'\version09\2-working\allyears_crosschk cancer.dta" //not needed for later processes so delete to save space on SharePoint
 

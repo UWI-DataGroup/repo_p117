@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JUL-2022
-    // 	date last modified      10-AUG-2022
+    // 	date last modified      11-AUG-2022
     //  algorithm task          Formatting full (ALL YEARS) CanReg5 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with formatted data for:
@@ -191,6 +191,46 @@ append using "`datapath'\version09\2-working\crosschk_abs"
 
 count //19,818
 erase "`datapath'\version09\2-working\crosschk_abs.dta" //delete ds to save space on SharePoint
+
+** JC 11aug2022: 1 newly-abstracted 2016 MP identified (abstracted on 11aug2022 by JC) during the death matching process (20d_death match.do) to be added as a separate import (corrections also performed to the same PID. First remove this cases from the previous main import then append the newly-abstracted cases:
+drop if RegistryNumber=="20130092" //2 deleted
+
+count //19,816
+
+preserve
+clear
+import excel using "`datapath'\version09\1-input\2022-08-11_MAIN Source+Tumour+Patient_JC_20130092_excel.xlsx", firstrow
+tostring RecordNumber ,replace
+tostring Specimen ,replace
+tostring ClinicalDetails ,replace
+tostring MicroscopicDescription ,replace
+tostring LabNumber ,replace
+tostring SurgicalNumber ,replace
+tostring CytologicalFindings ,replace
+tostring ConsultationReport ,replace
+tostring SurgicalFindings ,replace
+tostring PhysicalExam ,replace
+tostring ImagingResults ,replace
+tostring DurationOfIllness ,replace
+tostring OnsetDeathInterval ,replace
+tostring RTRegDate ,replace
+tostring STReviewer ,replace
+tostring cr5id ,replace
+tostring TNMCatStage ,replace
+tostring EssTNMCatStage ,replace
+tostring OtherTreatment2 ,replace
+tostring TTReviewer ,replace
+tostring HospitalNumber ,replace
+tostring FurtherRetrievalSource ,replace
+tostring PTReviewer ,replace
+count //3
+save "`datapath'\version09\2-working\deathmatch_abs" ,replace
+restore
+
+append using "`datapath'\version09\2-working\deathmatch_abs"
+
+count //19,819
+erase "`datapath'\version09\2-working\deathmatch_abs.dta" //delete ds to save space on SharePoint
 
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
@@ -3555,7 +3595,7 @@ tab sex ,m //73 unk
 order pid fname lname init age sex dob natregno resident slc dlc dod /// 
 	  parish cr5cod primarysite morph top lat beh hx
 
-count //19,812; 19,817; 19,818
+count //19,812; 19,817; 19,818; 19,919
 
 
 ** Create dataset to use for 2018 cleaning

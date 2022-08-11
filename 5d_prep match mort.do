@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      30-JUN-2022
-    //	date last modified		03-AUG-2022
+    //  date last modified	  03-AUG-2022
     //  algorithm task          Prep, format and combine 2021 death data with 2015-2020 death dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned 2015-2021 death data for matching with cancer incidence dataset.
@@ -686,6 +686,11 @@ gen pname3=substr(dd_pname,-11,11) if record_id==22335
 replace dd_pname=pname3+" "+pname2 if record_id==22335
 drop pname2 pname3
 
+count if dd_natregno=="" & dd_nrn!=. //1 - checked in electoral list and this is the correct NRN for this person
+list record_id dd_fname dd_lname if dd_natregno=="" & dd_nrn!=.
+gen nrn2=dd_nrn if dd_natregno=="" & dd_nrn!=.
+tostring nrn2 ,replace
+replace dd_natregno=nrn2 if record_id==28513
 
 drop dd_dodyear
 gen dd_dodyear=year(dd_dod)

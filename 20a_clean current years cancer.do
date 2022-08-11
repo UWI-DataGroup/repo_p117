@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      12-JUL-2022
-    // 	date last modified      10-AUG-2022
+    // 	date last modified      11-AUG-2022
     //  algorithm task          Cleaning 2016-2018 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2016-2018 data for annual report.
@@ -329,6 +329,9 @@ replace dot=d(15oct2015) if pid=="20180889" & regexm(cr5id,"T1")
 
 count if sourcename!=6 & nftype==17 //241
 replace sourcename=6 if sourcename!=6 & nftype==17 //241 changes
+
+** JC 11aug2022: 1 newly-abstracted 2016 MP identified (abstracted on 11aug2022 by JC) during the death matching process (20d_death match.do) added as a separate import in 15_prep all years cancer.do - pid 20130092 T2 (dxyr=2016) so it should be included in this file, just checking to ensure it has been included:
+list pid cr5id top morph dot dxyr if pid=="20130092" //included and no check flags associated so no corrections needed
 
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
@@ -4549,11 +4552,11 @@ drop dup
 ** death matching + analysis **
 *******************************
 ** Copy CODs into cr5cod fields so the source will always have it in prep for death matching
-count if cr5cod=="" & slc==2 //2088
+count if cr5cod=="" & slc==2 //2089
 
-bysort pid : replace cr5cod = cr5cod[_n-1] if cr5cod=="" //1097 changes
-bysort pid : replace cr5cod = cr5cod[_n+1] if cr5cod=="" //713 changes
-bysort pid : replace cr5cod = cr5cod[_n+2] if cr5cod=="" //276 changes
+bysort pid : replace cr5cod = cr5cod[_n-1] if cr5cod=="" //1049 changes
+bysort pid : replace cr5cod = cr5cod[_n+1] if cr5cod=="" //730 changes
+bysort pid : replace cr5cod = cr5cod[_n+2] if cr5cod=="" //308 changes
 bysort pid : replace cr5cod = cr5cod[_n+3] if cr5cod=="" //11 changes
 
 count if cr5cod=="" & slc==2 //76 - no CODs recorded
@@ -4569,11 +4572,11 @@ tab dxyr ,m
        2013 |         19        0.27        0.30
        2014 |         33        0.46        0.76
        2015 |        117        1.65        2.41
-       2016 |      2,504       35.26       37.67
-       2017 |      2,147       30.24       67.91
+       2016 |      2,505       35.27       37.68
+       2017 |      2,147       30.23       67.91
        2018 |      2,279       32.09      100.00
 ------------+-----------------------------------
-      Total |      7,101      100.00
+      Total |      7,102      100.00
 */
 
 *****************************
@@ -4610,15 +4613,15 @@ tab recstatus ,m
 /*
                        Record Status |      Freq.     Percent        Cum.
 -------------------------------------+-----------------------------------
-                           Confirmed |      6,057       85.30       85.30
-                          Ineligible |        325        4.58       89.87
+                           Confirmed |      6,058       85.30       85.30
+                          Ineligible |        325        4.58       89.88
                            Duplicate |        321        4.52       94.40
 Eligible, Non-reportable(?residency) |         52        0.73       95.13
              Abs, Pending REG Review |        346        4.87      100.00
 -------------------------------------+-----------------------------------
-                               Total |      7,101      100.00
+                               Total |      7,102      100.00
 */
-replace dupsource=1 if (recstatus==1|recstatus>4) & recstatus!=5 & regexm(cr5id,"S1") //3178 confirmed - this is the # eligible non-duplicate tumours
+replace dupsource=1 if (recstatus==1|recstatus>4) & recstatus!=5 & regexm(cr5id,"S1") //3179 confirmed - this is the # eligible non-duplicate tumours
 replace dupsource=2 if (recstatus==1|recstatus>4) & recstatus!=5 & !strmatch(strupper(cr5id), "*S1") //3225 - confirmed
 replace dupsource=3 if recstatus==4 & regexm(cr5id,"S1") //271 - duplicate
 replace dupsource=4 if recstatus==4 & !strmatch(strupper(cr5id), "*S1") //50 - duplicate
@@ -4638,7 +4641,7 @@ by pid: generate pidobstot=_N //give total count for each pid that is duplicated
 
 sort pid obsid
 ** Now check list of only eligible non-duplicate tumours for 'true' and 'false' MPs by first & last names - JC 27jul2022 NOT DONE DUE TO TIME CONSTRAINTS; WILL CHECK FOR DUPLICATES LATER WHEN DS IS MERGED WITH PREVIOUS YEAR
-count if dupsource==1 //3178
+count if dupsource==1 //3179
 //list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 0, 700), sepby(pid)
 //list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 701, 1400), sepby(pid)
 //list pid cr5id fname lname dupsource recstatus duppid duppid_all obsid if inrange(obsid, 1401, 2035), sepby(pid)
@@ -4651,11 +4654,11 @@ tab dxyr if dupsource==1
        2013 |          8        0.25        0.28
        2014 |         22        0.69        0.98
        2015 |         54        1.70        2.67
-       2016 |      1,094       34.42       37.10
-       2017 |      1,005       31.62       68.72
-       2018 |        994       31.28      100.00
+       2016 |      1,095       34.44       37.12
+       2017 |      1,005       31.61       68.73
+       2018 |        994       31.27      100.00
 ------------+-----------------------------------
-      Total |      3,178      100.00
+      Total |      3,179      100.00
 */
 
 ** Export dataset to run data in IARCcrg Tools (Check Programme)
@@ -4757,12 +4760,12 @@ tab persearch ,m
 /*
               Person Search |      Freq.     Percent        Cum.
 ----------------------------+-----------------------------------
-                   Not done |      6,852       96.49       96.49
+                   Not done |      6,853       96.49       96.49
           Done: Non-IARC MP |         28        0.39       96.89
 Done: IARCcrgTools Excluded |        111        1.56       98.45
                           . |        110        1.55      100.00
 ----------------------------+-----------------------------------
-                      Total |      7,101      100.00
+                      Total |      7,102      100.00
 */
 
 ** Assign MPs first based on IARCcrgTools MP report (use later InciDate as the MP)
@@ -4838,13 +4841,13 @@ tab persearch ,m
               Person Search |      Freq.     Percent        Cum.
 ----------------------------+-----------------------------------
                    Not done |        377        5.31        5.31
-                   Done: OK |      3,057       43.05       48.36
-                   Done: MP |         44        0.62       48.98
-            Done: Duplicate |      3,486       49.09       98.07
+                   Done: OK |      3,058       43.06       48.37
+                   Done: MP |         44        0.62       48.99
+            Done: Duplicate |      3,486       49.08       98.07
           Done: Non-IARC MP |         28        0.39       98.47
 Done: IARCcrgTools Excluded |        109        1.53      100.00
 ----------------------------+-----------------------------------
-                      Total |      7,101      100.00
+                      Total |      7,102      100.00
 */
 tab dupsource persearch ,m
 
@@ -4859,11 +4862,11 @@ tab eidmp ,m
      CR5 tumour |
          events |      Freq.     Percent        Cum.
 ----------------+-----------------------------------
-  single tumour |      3,057       43.05       43.05
-multiple tumour |         44        0.62       43.67
-              . |      4,000       56.33      100.00
+  single tumour |      3,058       43.06       43.06
+multiple tumour |         44        0.62       43.68
+              . |      4,000       56.32      100.00
 ----------------+-----------------------------------
-          Total |      7,101      100.00
+          Total |      7,102      100.00
 */
 
 tab eidmp dxyr
@@ -4871,10 +4874,10 @@ tab eidmp dxyr
      CR5 tumour |                                Diagnosis Year
          events |      2008       2013       2014       2015       2016       2017       2018 |     Total
 ----------------+-----------------------------------------------------------------------------+----------
-  single tumour |         1          8         22         54      1,055        968        949 |     3,057 
+  single tumour |         1          8         22         54      1,056        968        949 |     3,058 
 multiple tumour |         0          0          0          0         19         11         14 |        44 
 ----------------+-----------------------------------------------------------------------------+----------
-          Total |         1          8         22         54      1,074        979        963 |     3,101
+          Total |         1          8         22         54      1,075        979        963 |     3,102 
 */
 ** Check if eidmp below match with MPs identified on hardcopy list (JC 27jul2022: NOT DONE DUE TO TIME CONSTRAINTS)
 count if dupsource==1 //3178
@@ -4893,18 +4896,18 @@ drop if dxyr!=2016 //4597 deleted: removed non-2016 records
 gen dupdqi=.
 replace dupdqi=1 if eidmp==. & dupsource>1 & dupsource<5 //1277 changes
 replace dupdqi=1 if eidmp==. & dupsource==1 //20 changes
-replace dupdqi=2 if eidmp==1 & dupsource==1 //1055 changes
+replace dupdqi=2 if eidmp==1 & dupsource==1 //1056 changes
 replace dupdqi=3 if dupsource==5|dupsource==6 //133 changes
 tab dupdqi ,m
 /*
      dupdqi |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-          1 |      1,297       51.80       51.80
-          2 |      1,055       42.13       93.93
+          1 |      1,297       51.78       51.78
+          2 |      1,056       42.16       93.93
           3 |        133        5.31       99.24
           . |         19        0.76      100.00
 ------------+-----------------------------------
-      Total |      2,504      100.00
+      Total |      2,505      100.00
 */
 tab dxyr dupdqi ,m
 replace dupdqi=2 if dupdqi==. //19 changes
@@ -4917,11 +4920,11 @@ tab dupdqi ,m
 /*
         dupdqi |      Freq.     Percent        Cum.
 ---------------+-----------------------------------
-    duplicates |      1,297       51.80       51.80
-non-duplicates |      1,074       42.89       94.69
+    duplicates |      1,297       51.78       51.78
+non-duplicates |      1,075       42.91       94.69
    ineligibles |        133        5.31      100.00
 ---------------+-----------------------------------
-         Total |      2,504      100.00
+         Total |      2,505      100.00
 */
 tab dupsource dupdqi ,m
 contract dupdqi, freq(count) percent(percentage)
@@ -4935,7 +4938,7 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2016-2018 Annual Report: DQI"), bold
 putdocx textblock begin
-Date Prepared: 10-AUG-2022. 
+Date Prepared: 11-AUG-2022. 
 Prepared by: JC using Stata (v17.0) & Redcap (v12.3.3) data release date: 18-Jul-2022. 
 Generated using Dofiles: 15_prep all years cancer.do and 20a_clean current years cancer.do
 putdocx textblock end
@@ -4946,12 +4949,12 @@ putdocx text ("# duplicates: "), bold font(Helvetica,10)
 putdocx text ("1,297"), shading("yellow") bold font(Helvetica,10)
 putdocx paragraph
 putdocx text ("# non-duplicates: "), bold font(Helvetica,10)
-putdocx text ("1,074"), shading("yellow") bold font(Helvetica,10)
+putdocx text ("1,075"), shading("yellow") bold font(Helvetica,10)
 putdocx paragraph
 putdocx text ("# ineligibles: "), bold font(Helvetica,10)
 putdocx text ("133"), shading("yellow") bold font(Helvetica,10)
 putdocx paragraph, halign(center)
-putdocx text ("Duplicates (total records/n=2,504)"), bold font(Helvetica,14,"blue")
+putdocx text ("Duplicates (total records/n=2,505)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename dupdqi Total_Duplicates
 rename count Total_Records
@@ -4960,7 +4963,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2022-08-10_DQI.docx", replace
+putdocx save "`datapath'\version09\3-output\2022-08-11_DQI.docx", replace
 putdocx clear
 
 //save "`datapath'\version09\2-working\2016_cancer_dqi_dups.dta" ,replace
@@ -4973,7 +4976,7 @@ restore
 **********
 preserve
 ** % tumours - Duplicates
-drop if dxyr!=2017 //4954 deleted: removed non-2017 records
+drop if dxyr!=2017 //4955 deleted: removed non-2017 records
 gen dupdqi=.
 replace dupdqi=1 if eidmp==. & dupsource>1 & dupsource<5 //1046 changes
 replace dupdqi=1 if eidmp==. & dupsource==1 //26 changes
@@ -5037,7 +5040,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2022-08-10_DQI.docx", append
+putdocx save "`datapath'\version09\3-output\2022-08-11_DQI.docx", append
 putdocx clear
 
 //save "`datapath'\version09\2-working\2016_cancer_dqi_dups.dta" ,replace
@@ -5050,7 +5053,7 @@ restore
 **********
 preserve
 ** % tumours - Duplicates
-drop if dxyr!=2018 //4822 deleted: removed non-2018 records
+drop if dxyr!=2018 //4823 deleted: removed non-2018 records
 gen dupdqi=.
 replace dupdqi=1 if eidmp==. & dupsource>1 & dupsource<5 //1137 changes
 replace dupdqi=1 if eidmp==. & dupsource==1 //31 changes
@@ -5115,7 +5118,7 @@ putdocx table tbl_dups = data("Total_Duplicates Total_Records Pct_Multiple_Dupli
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_dups(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2022-08-10_DQI.docx", append
+putdocx save "`datapath'\version09\3-output\2022-08-11_DQI.docx", append
 putdocx clear
 
 //save "`datapath'\version09\2-working\2016_cancer_dqi_dups.dta" ,replace
@@ -5144,10 +5147,10 @@ putdocx begin
 putdocx paragraph, style(Heading1)
 putdocx text ("Sources: 2016"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Sources (total records/n=2,504)"), bold font(Helvetica,14,"blue")
+putdocx text ("Sources (total records/n=2,505)"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
 putdocx text ("2016 Completeness: Sources per Record = 2.33"), bold font(Helvetica,12,"red")
-//nonsurvival ds has 1070 tumours so 2504/1074=2.33 sources per record
+//nonsurvival ds has 1070 tumours so 2505/1075=2.33 sources per record
 putdocx paragraph, halign(center)
 putdocx text ("2015 Completeness: Sources per Record = 1.98"), bold font(Helvetica,12,"lightpink")
 //nonsurvival ds has 1062 tumours so 2108/1062=1.98 sources per record
@@ -5162,7 +5165,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
 putdocx table tbl_source(1,.), bold
 putdocx pagebreak
 
-putdocx save "`datapath'\version09\3-output\2022-08-10_DQI.docx", append
+putdocx save "`datapath'\version09\3-output\2022-08-11_DQI.docx", append
 putdocx clear
 
 //save "`datapath'\version09\2-working\2016_cancer_dqi_source.dta" ,replace
@@ -5174,7 +5177,7 @@ restore
 ** 2017 **
 **********
 preserve
-drop if dxyr!=2017 //4954 deleted: removed non-2017 records
+drop if dxyr!=2017 //4955 deleted: removed non-2017 records
 count if sourcename==7 & length(labnum)<8 //0
 replace sourcename=4 if sourcename==7 & length(labnum)<8 //0 changes
 count if sourcename==7 //0
@@ -5195,7 +5198,7 @@ putdocx text ("2017 Completeness: Sources per Record = 2.19"), bold font(Helveti
 //nonsurvival ds has 978 tumours so 2147/979=2.19 sources per record
 putdocx paragraph, halign(center)
 putdocx text ("2016 Completeness: Sources per Record = 2.33"), bold font(Helvetica,12,"lightpink")
-//nonsurvival ds has 1070 tumours so 2504/1074=2.33 sources per record
+//nonsurvival ds has 1070 tumours so 2505/1075=2.33 sources per record
 putdocx paragraph, halign(center)
 putdocx text ("2015 Completeness: Sources per Record = 1.98"), bold font(Helvetica,12,"lightpink")
 //nonsurvival ds has 1062 tumours so 2108/1062=1.98 sources per record
@@ -5209,7 +5212,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2022-08-10_DQI.docx", append
+putdocx save "`datapath'\version09\3-output\2022-08-11_DQI.docx", append
 putdocx clear
 
 //save "`datapath'\version09\2-working\2016_cancer_dqi_source.dta" ,replace
@@ -5221,7 +5224,7 @@ restore
 ** 2018 **
 **********
 preserve
-drop if dxyr!=2018 //4822 deleted: removed non-2018 records
+drop if dxyr!=2018 //4823 deleted: removed non-2018 records
 count if sourcename==7 & length(labnum)<8 //0
 replace sourcename=4 if sourcename==7 & length(labnum)<8 //0 changes
 count if sourcename==7 //0
@@ -5245,7 +5248,7 @@ putdocx text ("2017 Completeness: Sources per Record = 2.19"), bold font(Helveti
 //nonsurvival ds has 978 tumours so 2147/979=2.19 sources per record
 putdocx paragraph, halign(center)
 putdocx text ("2016 Completeness: Sources per Record = 2.33"), bold font(Helvetica,12,"lightpink")
-//nonsurvival ds has 1070 tumours so 2504/1074=2.33 sources per record
+//nonsurvival ds has 1070 tumours so 2505/1075=2.33 sources per record
 putdocx paragraph, halign(center)
 putdocx text ("2015 Completeness: Sources per Record = 1.98"), bold font(Helvetica,12,"lightpink")
 //nonsurvival ds has 1062 tumours so 2108/1062=1.98 sources per record
@@ -5259,7 +5262,7 @@ putdocx table tbl_source = data("Source Total_Records Pct_Source"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_source(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2022-08-10_DQI.docx", append
+putdocx save "`datapath'\version09\3-output\2022-08-11_DQI.docx", append
 putdocx clear
 
 //save "`datapath'\version09\2-working\2016_cancer_dqi_source.dta" ,replace
@@ -5274,7 +5277,7 @@ notes _dta :These data prepared from CanReg5 (BNR-C) database
 save "`datapath'\version09\2-working\2016-2018_cancer_dups" ,replace
 note: TS This dataset can be used for quality parameter of completeness in assessing number of sources per record
 
-count //7101
+count //7102
 
 
 ** Remove duplicate source records, ineligible and non-reportable cases
@@ -5282,13 +5285,13 @@ tab recstatus ,m
 /*
                        Record Status |      Freq.     Percent        Cum.
 -------------------------------------+-----------------------------------
-                           Confirmed |      6,057       85.30       85.30
-                          Ineligible |        325        4.58       89.87
+                           Confirmed |      6,058       85.30       85.30
+                          Ineligible |        325        4.58       89.88
                            Duplicate |        321        4.52       94.40
 Eligible, Non-reportable(?residency) |         52        0.73       95.13
              Abs, Pending REG Review |        346        4.87      100.00
 -------------------------------------+-----------------------------------
-                               Total |      7,101      100.00
+                               Total |      7,102      100.00
 */
 //drop if recstatus>1 & recstatus<6 //698 deleted
 drop if recstatus>1 & recstatus<5 //646 deleted - keep this ds as the nonreportable and the final clean dofile will have the reportable deidentified ds
@@ -5298,24 +5301,24 @@ tab persearch ,m
               Person Search |      Freq.     Percent        Cum.
 ----------------------------+-----------------------------------
                    Not done |         52        0.81        0.81
-                   Done: OK |      3,057       47.36       48.16
+                   Done: OK |      3,058       47.37       48.17
                    Done: MP |         44        0.68       48.85
-            Done: Duplicate |      3,168       49.08       97.92
+            Done: Duplicate |      3,168       49.07       97.92
           Done: Non-IARC MP |         28        0.43       98.36
 Done: IARCcrgTools Excluded |        106        1.64      100.00
 ----------------------------+-----------------------------------
-                      Total |      6,455      100.00
+                      Total |      6,456      100.00
 */
 
 tab dupsource ,m
 /*
                     Multiple Sources |      Freq.     Percent        Cum.
 -------------------------------------+-----------------------------------
-                  MS-Conf Tumour Rec |      3,178       49.23       49.23
-                  MS-Conf Source Rec |      3,225       49.96       99.19
+                  MS-Conf Tumour Rec |      3,179       49.24       49.24
+                  MS-Conf Source Rec |      3,225       49.95       99.19
           MS-Ineligible Tumour 1 Rec |         52        0.81      100.00
 -------------------------------------+-----------------------------------
-                               Total |      6,455      100.00
+                               Total |      6,456      100.00
 */
 
 tab dupsource dxyr ,m
@@ -5323,11 +5326,11 @@ tab dupsource dxyr ,m
                       |                                Diagnosis Year
      Multiple Sources |      2008       2013       2014       2015       2016       2017       2018 |     Total
 ----------------------+-----------------------------------------------------------------------------+----------
-   MS-Conf Tumour Rec |         1          8         22         54      1,094      1,005        994 |     3,178 
+   MS-Conf Tumour Rec |         1          8         22         54      1,095      1,005        994 |     3,179 
    MS-Conf Source Rec |         1         11         11         63      1,149        965      1,025 |     3,225 
 MS-Ineligible Tumour  |         0          0          0          0         18         22         12 |        52 
 ----------------------+-----------------------------------------------------------------------------+----------
-                Total |         2         19         33        117      2,261      1,992      2,031 |     6,455
+                Total |         2         19         33        117      2,262      1,992      2,031 |     6,456
 */
 tab eidmp dxyr ,m
 tab recstatus dxyr ,m
@@ -5336,11 +5339,11 @@ tab eidmp ,m
      CR5 tumour |
          events |      Freq.     Percent        Cum.
 ----------------+-----------------------------------
-  single tumour |      3,057       47.36       47.36
-multiple tumour |         44        0.68       48.04
-              . |      3,354       51.96      100.00
+  single tumour |      3,058       47.37       47.37
+multiple tumour |         44        0.68       48.05
+              . |      3,354       51.95      100.00
 ----------------+-----------------------------------
-          Total |      6,455      100.00
+          Total |      6,456      100.00
 */
 tab eidmp dxyr if dupsource==2 ,m
 tab eidmp beh ,m
@@ -5355,7 +5358,7 @@ replace eidmp=1 if nonreportable==1 //158 changes
 drop if eidmp==.  //3196 deleted
 
 tab dupsource ,m
-count //3259
+count //3260
 
 ** JC 10aug2022: copied the below batch of code to the final clean dofile as this ds will be the nonreportable ds
 /*
@@ -5495,12 +5498,12 @@ tab dxyr ,m //0 missing
 */
 */
 ** To match with 2014 format, convert names to lower case and strip possible leading/trailing blanks
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
-replace init = lower(rtrim(ltrim(itrim(init)))) //0 changes
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //3260 changes
+replace init = lower(rtrim(ltrim(itrim(init)))) //2961 changes
 //replace mname = lower(rtrim(ltrim(itrim(mname)))) //0 changes
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //3260 changes
 
-count //3259
+count //3260
 /*
 ** Check if ICD10 codes have changed since CR5db export by using IARCcrgTools Conversion check
 export delimited pid cr5id dxyr mpseq sex topography morph beh grade basis dot_iarc dob_iarc age persearch ICD10 ///
@@ -5820,7 +5823,7 @@ replace siteicd10=4 if (regexm(icd10,"C40")|regexm(icd10,"C41")) //8 changes
 replace siteicd10=5 if siteiarc==24 //13 changes
 replace siteicd10=6 if siteiarc==25 //11 changes
 replace siteicd10=7 if (regexm(icd10,"C45")|regexm(icd10,"C46")|regexm(icd10,"C47")|regexm(icd10,"C48")|regexm(icd10,"C49")) //18 changes
-replace siteicd10=8 if regexm(icd10,"C50") //496 changes
+replace siteicd10=8 if regexm(icd10,"C50") //506 changes
 replace siteicd10=9 if (regexm(icd10,"C51")|regexm(icd10,"C52")|regexm(icd10,"C53")|regexm(icd10,"C54")|regexm(icd10,"C55")|regexm(icd10,"C56")|regexm(icd10,"C57")|regexm(icd10,"C58")) //257 changes
 replace siteicd10=10 if regexm(icd10,"C61") //785 changes
 replace siteicd10=11 if (regexm(icd10,"C60")|regexm(icd10,"C62")|regexm(icd10,"C63")) //9 changes
@@ -5855,7 +5858,7 @@ count if siteiarc==25 //11 - 10 are non-melanoma skin cancers but they don't fal
 //drop if dxyr!=2018 //0 deleted
 */
 
-count //3259
+count //3260
 
 ** Removing cases not included for international reporting: if case with MPs ensure record with persearch=1 is not dropped as used in survival dataset
 //duplicates tag pid, gen(dup_id)
@@ -5866,10 +5869,10 @@ tab eidmp ,m
      CR5 tumour |
          events |      Freq.     Percent        Cum.
 ----------------+-----------------------------------
-  single tumour |      3,215       98.65       98.65
+  single tumour |      3,216       98.65       98.65
 multiple tumour |         44        1.35      100.00
 ----------------+-----------------------------------
-          Total |      3,259      100.00
+          Total |      3,260      100.00
 */
 
 tab eidmp dxyr ,m
@@ -5877,10 +5880,10 @@ tab eidmp dxyr ,m
      CR5 tumour |                                Diagnosis Year
          events |      2008       2013       2014       2015       2016       2017       2018 |     Total
 ----------------+-----------------------------------------------------------------------------+----------
-  single tumour |         1          8         22         54      1,111      1,023        996 |     3,215 
+  single tumour |         1          8         22         54      1,112      1,023        996 |     3,216 
 multiple tumour |         0          0          0          0         19         11         14 |        44 
 ----------------+-----------------------------------------------------------------------------+----------
-          Total |         1          8         22         54      1,130      1,034      1,010 |     3,259 
+          Total |         1          8         22         54      1,131      1,034      1,010 |     3,260
 */
 
 tab persearch ,m
@@ -5888,11 +5891,11 @@ tab persearch ,m
               Person Search |      Freq.     Percent        Cum.
 ----------------------------+-----------------------------------
                    Not done |         52        1.60        1.60
-                   Done: OK |      3,057       93.80       95.40
+                   Done: OK |      3,058       93.80       95.40
                    Done: MP |         44        1.35       96.75
 Done: IARCcrgTools Excluded |        106        3.25      100.00
 ----------------------------+-----------------------------------
-                      Total |      3,259      100.00
+                      Total |      3,260      100.00
 */
 
 tab persearch dxyr,m
@@ -5901,11 +5904,11 @@ tab persearch dxyr,m
         Person Search |      2008       2013       2014       2015       2016       2017       2018 |     Total
 ----------------------+-----------------------------------------------------------------------------+----------
              Not done |         0          0          0          0         18         22         12 |        52 
-             Done: OK |         1          8         22         54      1,055        968        949 |     3,057 
+             Done: OK |         1          8         22         54      1,056        968        949 |     3,058 
              Done: MP |         0          0          0          0         19         11         14 |        44 
 Done: IARCcrgTools Ex |         0          0          0          0         38         33         35 |       106 
 ----------------------+-----------------------------------------------------------------------------+----------
-                Total |         1          8         22         54      1,130      1,034      1,010 |     3,259
+                Total |         1          8         22         54      1,131      1,034      1,010 |     3,260
 */
 
 ** Change sex label for matching with population data
@@ -5921,7 +5924,23 @@ label values sex sex_lab
 label var sex "Sex"
 tab sex ,m
 
-count //3259
+** Incidentally seeing cases where pt found on MedData and BOD=clinical instead of unknown
+count if nftype==17 & basis==1 //8 - check these in CR5db to confirm BOD
+list pid cr5id top morph if nftype==17 & basis==1
+replace basis=9 if nftype==17 & basis==1 //8 changes
+replace basis=9 if pid=="20160939" & regexm(cr5id,"T1") //1 change
+replace basis=9 if pid=="20161004" & regexm(cr5id,"T1") //1 change
+replace basis=9 if pid=="20162049" & regexm(cr5id,"T1") //1 change
+replace basis=9 if pid=="20162063" & regexm(cr5id,"T1") //1 change
+
+** Remove hyphen in NRN to match with previous and death datasets
+count if regexm(natregno,"-") //3260
+replace natregno=subinstr(natregno,"-","",.) if regexm(natregno,"-") //3260 changes
+
+** Create variable to differentiate current years from previous years in prep for death matching
+gen currentds=1
+
+count //3260
 
 ** Save this cleaned dataset with nonreportable cases and identifiable data
 save "`datapath'\version09\3-output\2016-2018_cancer_nonreportable_identifiable", replace
