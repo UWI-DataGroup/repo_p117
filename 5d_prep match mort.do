@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      30-JUN-2022
-    //  date last modified	  03-AUG-2022
+    //  date last modified	  	03-AUG-2022
     //  algorithm task          Prep, format and combine 2021 death data with 2015-2020 death dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned 2015-2021 death data for matching with cancer incidence dataset.
@@ -691,7 +691,41 @@ list record_id dd_fname dd_lname if dd_natregno=="" & dd_nrn!=.
 gen nrn2=dd_nrn if dd_natregno=="" & dd_nrn!=.
 tostring nrn2 ,replace
 replace dd_natregno=nrn2 if record_id==28513
+drop nrn2
 
+** JC 15aug2022: corrections found incidentally
+drop if record_id==37080 // duplicate of record_id 37361
+drop if record_id==28415 // duplicate of record_id 32639
+
+preserve
+clear
+import excel using "`datapath'\version09\2-working\IncorrectDeathName_20220815.xlsx" , firstrow case(lower)
+save "`datapath'\version09\2-working\incorrect_death" ,replace
+restore
+
+merge 1:1 record_id using "`datapath'\version09\2-working\incorrect_death" ,force
+/*
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                        18,559
+        from master                    18,559  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                                 1  (_merge==3)
+    -----------------------------------------
+*/
+replace dd_pname=elec_pname if _merge==3 //1 change
+replace dd_fname=elec_fname if _merge==3 //1 change
+replace dd_mname=elec_mname if _merge==3 //1 change
+replace dd_lname=elec_lname if _merge==3 //1 change
+replace dd_nrn=elec_nrn if _merge==3 //1 change
+tostring elec_natregno ,replace
+replace dd_natregno=elec_natregno if _merge==3 //1 change
+replace dd_age=elec_age if _merge==3 //1 change
+drop elec_* _merge
+erase "`datapath'\version09\2-working\incorrect_death.dta"
+
+** Finish formatting data
 drop dd_dodyear
 gen dd_dodyear=year(dd_dod)
 tab dd_dodyear,m
@@ -708,6 +742,15 @@ tab dd_dodyear,m
 ------------+-----------------------------------
       Total |     18,562      100.00
 */
+
+** JC 15aug2022: Create an identifier for the death dataset in prep for the death matching process
+gen deathds=1
+
+** Remove, relabel certain variables for appending to cancer incidence dataset in prep for death matching process
+rename dd_fname fname
+rename dd_lname lname
+rename dd_natregno natregno
+rename record_id deathid
 
 ** Create dataset without name changes for matching (see dofile 50)
 label data "BNR MORTALITY data 2015-2021"

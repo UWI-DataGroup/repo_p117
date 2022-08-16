@@ -1,17 +1,17 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          16_final clean.do
+    //  algorithm name          20d_final clean.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      09-AUG-2021
-    // 	date last modified      28-OCT-2021
-    //  algorithm task          Final cleaning of 2008,2013-2015 cancer dataset; Preparing datasets for analysis
+    //  date first created      15-AUG-2022
+    // 	date last modified      15-AUG-2022
+    //  algorithm task          Final cleaning of 2008,2013-2018 cancer dataset; Preparing datasets for analysis
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2008, 2013, 2014 data for inclusion in 2015 cancer report.
+    //  objective               To have one dataset with cleaned and grouped 2008, 2013-2018 data for inclusion in 2016-2018 cancer report.
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
 
     ** General algorithm set-up
-    version 16.0
+    version 17.0
     clear all
     macro drop _all
     set more off
@@ -31,10 +31,107 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\16_final clean.smcl", replace
+    log using "`logpath'\20d_final clean.smcl", replace
 ** HEADER -----------------------------------------------------
+
+** Load 2008,2013-2018 incidence dataset created in 20c_death match.do
+use "`datapath'\version09\3-output\2008_2013-2018_nonreportable_identifiable" ,clear
+
+count //7288
+
+** Merge death data by NRN using the NRN merge ds from 20c_death match.do
+merge m:1 natregno using "`datapath'\version09\2-working\2015-2021_deaths_for_merging_NRN" ,update replace
+/*
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         5,426
+        from master                     5,426  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                             1,862
+        not updated                         0  (_merge==3)
+        missing updated                 1,638  (_merge==4)
+        nonmissing conflict               224  (_merge==5)
+    -----------------------------------------
+*/
+count //7288
+drop if deathds==1 & _merge==2 //0 deleted
+
+** Merge death data by DOB using the DOB merge ds from 20c_death match.do
+drop _merge
+merge m:1 fname lname birthdate using "`datapath'\version09\2-working\2015-2021_deaths_for_merging_DOB" ,update replace
+/*
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         7,273
+        from master                     7,273  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                                15
+        not updated                         0  (_merge==3)
+        missing updated                     0  (_merge==4)
+        nonmissing conflict                15  (_merge==5)
+    -----------------------------------------
+*/
+count //7288
+drop if deathds==1 & _merge==2 //0 deleted
+//check natregno for pid 20080653 + 20080734 to see if they updated to the death ds natregno - YES
+//check dd_dod updated - NO
+
+
+** Merge death data by DOB + LNAME using the DOBLN merge ds from 20c_death match.do
+drop _merge
+merge m:1 pid cr5id using "`datapath'\version09\2-working\2015-2021_deaths_for_merging_DOBLNAME" ,update replace
+/*
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         7,280
+        from master                     7,280  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                                 8
+        not updated                         0  (_merge==3)
+        missing updated                     0  (_merge==4)
+        nonmissing conflict                 8  (_merge==5)
+    -----------------------------------------
+*/
+count //7288
+drop if deathds==1 & _merge==2 //0 deleted
+
+
+** Merge death data by NAMES using the NRN merge ds from 20c_death match.do
+drop _merge
+merge m:1 pid cr5id using "`datapath'\version09\2-working\2015-2021_deaths_for_merging_NAMES" ,update replace
+/*
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                         7,240
+        from master                     7,240  (_merge==1)
+        from using                          0  (_merge==2)
+
+    Matched                                48
+        not updated                         0  (_merge==3)
+        missing updated                    44  (_merge==4)
+        nonmissing conflict                 4  (_merge==5)
+    -----------------------------------------
+*/
+count //7288
+drop if deathds==1 & _merge==2 //0 deleted
+count //
+//check natregno for pid 20130432 to see if they updated to the death ds natregno - YES
+//check natregno for pid 20181096 to see if they updated to the death ds natregno i.e. natregno was removed - NO so wasn't removed
+//check natregno for pid 20182158 to see if they updated to the death ds natregno - if not then change using below:
+//replace natregno=subinstr(natregno,"20","25",.) if pid=="20182158" - YES
+
+**JC 15aug2022: Correction found incidentally when reviewing possible death matches by NAMES in 20c_death match.do
+replace slc=1 if pid=="20160225"
+replace dod=. if pid=="20160225"
+replace dlc=sampledate if pid=="20160225"
+replace cr5cod="" if pid=="20160225"
+
+STOP
 JC 28jul2022: 
-(1) After merging with death data, update slc and dod fields + fillmissing for those with MPs that only merge to T1S1, e.g. see PID 20080728
+(1) After merging with death data, update slc and dod fields + fillmissing for those with MPs that only merge to T1S1, e.g. see PID 20080728; check all DCOs + slc=2 have deathid
 (2) once both datasets have been joined then perform IARCcrgTools MP Check then update persearch eidmp etc.
 (3) create dcostatus ptrectot variables and perform duplicates checks
 (4) age check, etc.
