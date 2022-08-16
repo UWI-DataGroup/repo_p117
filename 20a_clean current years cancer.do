@@ -1425,6 +1425,52 @@ count if top!="" & length(top)!=3 //0
 
 ** No other checks needed as covered in primarysite checks 62 & 63
 
+*******************
+** CLL/SLL M9823 **
+*******************
+count if morph==9823 & topography==421 //20 reviewed
+//Review these cases - If unk if bone marrow involved then topography=lymph node-unk (C779)
+display `"{browse "https://seer.cancer.gov/tools/heme/Hematopoietic_Instructions_and_Rules.pdf":HAEM-RULES}"'
+order pid cr5id dxyr recstatus morph top
+
+/* 
+	No correction needed for PIDs:	
+		20160544
+		20160645
+		20160892
+		20170028
+		20170034	
+*/
+replace primarysite="LYMPH NODES-UNK" if pid=="20160043" & regexm(cr5id,"T1")
+replace top="779" if pid=="20160043" & regexm(cr5id,"T1")
+replace topography=779 if pid=="20160043" & regexm(cr5id,"T1")
+replace topcat=69 if pid=="20160043" & regexm(cr5id,"T1")
+replace comments="JC 16AUG2022: Based on Haem & Lymph Coding manual Module 3 PH5 and PH6 the primary site has been changed to LNs unk since no bone marrow report found to support that as the primary site."+" "+comments if pid=="20160043" & regexm(cr5id,"T1")
+
+replace primarysite="LYMPH NODES-UNK" if pid=="20170630" & regexm(cr5id,"T1")
+replace top="778" if pid=="20170630" & regexm(cr5id,"T1")
+replace topography=778 if pid=="20170630" & regexm(cr5id,"T1")
+replace topcat=69 if pid=="20170630" & regexm(cr5id,"T1")
+replace comments="JC 16AUG2022: Based on Haem & Lymph Coding manual Module 3 PH5 and PH6 the primary site has been changed to LNs unk since no bone marrow report found to support that as the primary site."+" "+comments if pid=="20170630" & regexm(cr5id,"T1")
+
+replace primarysite="LYMPH NODES-UNK" if pid=="20180008" & regexm(cr5id,"T1")
+replace top="779" if pid=="20180008" & regexm(cr5id,"T1")
+replace topography=779 if pid=="20180008" & regexm(cr5id,"T1")
+replace topcat=69 if pid=="20180008" & regexm(cr5id,"T1")
+replace comments="JC 16AUG2022: Based on Haem & Lymph Coding manual Module 3 PH5 and PH6 the primary site has been changed to LNs unk since no bone marrow report found to support that as the primary site."+" "+comments if pid=="20180008" & regexm(cr5id,"T1")
+
+replace primarysite="LYMPH NODES-UNK" if pid=="20180679" & regexm(cr5id,"T1")
+replace top="779" if pid=="20180679" & regexm(cr5id,"T1")
+replace topography=779 if pid=="20180679" & regexm(cr5id,"T1")
+replace topcat=69 if pid=="20180679" & regexm(cr5id,"T1")
+replace comments="JC 16AUG2022: Based on Haem & Lymph Coding manual Module 3 PH5 and PH6 the primary site has been changed to LNs unk since no bone marrow report found to support that as the primary site."+" "+comments if pid=="20180679" & regexm(cr5id,"T1")
+
+replace primarysite="LYMPH NODES-UNK" if pid=="20180743" & regexm(cr5id,"T1")
+replace top="773" if pid=="20180743" & regexm(cr5id,"T1")
+replace topography=773 if pid=="20180743" & regexm(cr5id,"T1")
+replace topcat=69 if pid=="20180743" & regexm(cr5id,"T1")
+replace comments="JC 16AUG2022: Based on Haem & Lymph Coding manual Module 3 PH5 and PH6 the primary site has been changed to LNs unk since no bone marrow report found to support that as the primary site."+" "+comments if pid=="20180743" & regexm(cr5id,"T1")
+
 ****************************
 ** Histology & Morphology **
 ****************************

@@ -395,7 +395,7 @@ replace matched=1 if deathid==22856|deathid==20271|deathid==20014|deathid==22945
 				|deathid==36452|deathid==19933|deathid==24293
 //163 changes
 
-count if matched==1 //1799
+count if matched==1 //1779
 
 
 *********
