@@ -526,8 +526,6 @@ replace icd10dqi="All" if sitecr5db==40
 putdocx clear
 putdocx begin
 
-// Create a paragraph
-//putdocx pagebreak
 putdocx paragraph, style(Title)
 putdocx text ("CANCER 2016-2018 Annual Report: DQI"), bold
 putdocx textblock begin
@@ -538,7 +536,7 @@ putdocx textblock end
 putdocx paragraph, style(Heading1)
 putdocx text ("Basis - MV%, DCO%, CLIN%, UNK%: 2016"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
+putdocx text ("Basis (# tumours/n=1070): 2016"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename sitecr5db Cancer_Site
 rename boddqi Total_DQI
@@ -566,11 +564,10 @@ contract siteagedqi, freq(count) percent(percentage)
 putdocx clear
 putdocx begin
 
-// Create a paragraph
 putdocx paragraph, style(Heading1)
 putdocx text ("Unknown - Site, DOB & Age: 2016"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Site,DOB,Age (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
+putdocx text ("Site,DOB,Age (# tumours/n=1070): 2016"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename siteagedqi Total_DQI
 rename count Total_Records
@@ -1054,19 +1051,10 @@ replace icd10dqi="All" if sitecr5db==40
 putdocx clear
 putdocx begin
 
-// Create a paragraph
-//putdocx pagebreak
-putdocx paragraph, style(Title)
-putdocx text ("CANCER 2016-2018 Annual Report: DQI"), bold
-putdocx textblock begin
-Date Prepared: 18-AUG-2022. 
-Prepared by: JC using Stata & Redcap data release date: 21-May-2021. 
-Generated using Dofiles: 20a_clean current years cancer.do and 25b_analysis sites.do
-putdocx textblock end
 putdocx paragraph, style(Heading1)
 putdocx text ("Basis - MV%, DCO%, CLIN%, UNK%: 2017"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx text ("Basis (# tumours/n=977): 2017"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename sitecr5db Cancer_Site
 rename boddqi Total_DQI
@@ -1098,7 +1086,7 @@ putdocx begin
 putdocx paragraph, style(Heading1)
 putdocx text ("Unknown - Site, DOB & Age: 2017"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Site,DOB,Age (# tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx text ("Site,DOB,Age (# tumours/n=977): 2017"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename siteagedqi Total_DQI
 rename count Total_Records
@@ -1580,19 +1568,10 @@ replace icd10dqi="All" if sitecr5db==40
 putdocx clear
 putdocx begin
 
-// Create a paragraph
-//putdocx pagebreak
-putdocx paragraph, style(Title)
-putdocx text ("CANCER 2016-2018 Annual Report: DQI"), bold
-putdocx textblock begin
-Date Prepared: 18-AUG-2022. 
-Prepared by: JC using Stata & Redcap data release date: 21-May-2021. 
-Generated using Dofiles: 20a_clean current years cancer.do and 25b_analysis sites.do
-putdocx textblock end
 putdocx paragraph, style(Heading1)
 putdocx text ("Basis - MV%, DCO%, CLIN%, UNK%: 2018"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=960)"), bold font(Helvetica,14,"blue")
+putdocx text ("Basis (# tumours/n=960): 2018"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename sitecr5db Cancer_Site
 rename boddqi Total_DQI
@@ -1621,10 +1600,11 @@ putdocx clear
 putdocx begin
 
 // Create a paragraph
+putdocx pagebreak
 putdocx paragraph, style(Heading1)
 putdocx text ("Unknown - Site, DOB & Age: 2018"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Site,DOB,Age (# tumours/n=960)"), bold font(Helvetica,14,"blue")
+putdocx text ("Site,DOB,Age (# tumours/n=960): 2018"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename siteagedqi Total_DQI
 rename count Total_Records
