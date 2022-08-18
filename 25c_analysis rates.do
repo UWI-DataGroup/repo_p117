@@ -2,14 +2,14 @@
 cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          25_analysis cancer.do
+    //  algorithm name          25c_analysis rates.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      02-JUN-2022
-    // 	date last modified      02-JUN-2022
-    //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASIRs for PAB 07-Jun-2022
+    //  date first created      18-AUG-2022
+    // 	date last modified      18-AUG-2022
+    //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASIRs for 2016-2018 annual report
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2018 data for inclusion in PAB presentation.
+    //  objective               To have one dataset with cleaned and grouped 2018 data for inclusion in the 2016-2018 annual report.
     //  methods                 See 30_report cancer.do for detailed methods of each statistic
 
     ** General algorithm set-up
@@ -36,310 +36,18 @@ cls
     log using "`logpath'/25_analysis cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
-
-***************************************************************************
-* SECTION 1: NUMBERS 
-*        (1.1) total number & number of multiple events
-*        (1.2) DCOs
-*    	 (1.3) tumours by age-group: 
-*				NOTE: missing/unknown age (code 999) are 
-*				to be included in the age group that has a median total if 
-*			  	total number of unk age is small, i.e. 5 cases with unk age; 
-*			  	if larger then they would be distributed amongst more than
-*			  	one age groups with median totals (NS update on 14-Oct-2020)
-****************************************************************************
- 
-** LOAD cancer incidence dataset INCLUDING DCOs
-use "`datapath'\version04\3-output\2018_cancer_nonsurvival_deidentified" ,clear
-
-** CASE variable
-*drop case
-gen case=1
-label var case "cancer patient (tumour)"
- 
-*************************************************
-** (1.1) Total number of events & multiple events
-*************************************************
-count //949
-tab dxyr ,m
-
-** For 2016-2018 annual report, check 2015 annual report for the full version of this dofile as code not needed for PAB was removed 
-** Analysis point to look for raised at cancer mtg on 25jan2022
-//CHECK FOR BOD=CLINICAL AND TIME BETWEEN DOT AND DOD as KWG noticed alot of cases where pts sought medical attention late and seemed like an increase from previous yrs.
-
-*************************
-** Number of cases by sex
-*************************
-tab sex ,m
-
-tab sex patient,m
-
-** Mean age by sex overall (where sex: male=1, female=2)... BY TUMOUR
-ameans age
-ameans age if sex==1
-ameans age if sex==2
-
- 
-** Mean age by sex overall (where sex: male=1, female=2)... BY PATIENT
-preserve
-keep if patient==1 //42 obs deleted
-ameans age
-ameans age if sex==1
-ameans age if sex==2
-restore
- 
-***********************************
-** 1.4 Number of cases by age-group
-***********************************
-** Age labelling
-gen age5 = recode(age,4,9,14,19,24,29,34,39,44,49,54,59,64,69,74,79,84,200)
-
-recode age5 4=1 9=2 14=3 19=4 24=5 29=6 34=7 39=8 44=9 49=10 54=11 59=12 64=13 /// 
-                        69=14 74=15 79=16 84=17 200=18
-
-label define age5_lab 1 "0-4" 	 2 "5-9"    3 "10-14" ///
-					  4 "15-19"  5 "20-24"  6 "25-29" ///
-					  7 "30-34"  8 "35-39"  9 "40-44" ///
-					 10 "45-49" 11 "50-54" 12 "55-59" ///
-					 13 "60-64" 14 "65-69" 15 "70-74" ///
-					 16 "75-79" 17 "80-84" 18 "85 & over", modify
-label values age5 age5_lab
-gen age_10 = recode(age5,3,5,7,9,11,13,15,17,200)
-recode age_10 3=1 5=2 7=3 9=4 11=5 13=6 15=7 17=8 200=9
-
-label define age_10_lab 1 "0-14"   2 "15-24"  3 "25-34" ///
-                        4 "35-44"  5 "45-54"  6 "55-64" ///
-                        7 "65-74"  8 "75-84"  9 "85 & over" , modify
-
-label values age_10 age_10_lab
-
-sort sex age_10
-
-tab age_10 ,m
-
-** Save this new dataset without population data
-label data "2018 BNR-Cancer analysed data - Numbers"
-note: TS This dataset does NOT include population data 
-save "`datapath'\version04\2-working\2018_cancer_numbers", replace
-
-
-*******************************************************************************************************************
 * *********************************************
 * ANALYSIS: SECTION 3 - cancer sites
 * Covering:
-*  3.1  Classification of cancer by site
-*  3.2 	ASIRs by site; overall, men and women
+* 	- ASIRs by site; overall, men and women
 * *********************************************
 ** NOTE: bb popn and WHO popn data prepared by IH are ALL coded M=2 and F=1
 ** Above note by AR from 2008 dofile
 
 ** Load the dataset
-use "`datapath'\version04\2-working\2018_cancer_numbers", clear
+use "`datapath'\version09\2-working\2013-2018_cancer_numbers", clear
 
-****************************************************************************** 2015 ****************************************************************************************
-
-drop if dxyr!=2018 //0 deleted
-count //949
-
-***********************
-** 3.1 CANCERS BY SITE
-***********************
-tab icd10 if beh<3 ,m //18 in-situ
-
-tab icd10 ,m //0 missing
-
-tab siteiarc ,m //0 missing
-
-tab sex ,m
-
-** Note: O&U, NMSCs (non-reportable skin cancers) and in-situ tumours excluded from top ten analysis
-tab siteiarc if siteiarc!=25 & siteiarc!=64
-//for 2018 don't remove non-melanoma skin cancers as these are not SCC or any of the non-reportable morph categories for skin
-tab siteiarc if siteiarc!=64
-tab siteiarc ,m //949 - 36 O&U
-tab siteiarc patient
-
-** NS decided on 18march2019 to use IARC site groupings so variable siteiarc will be used instead of sitear
-** IARC site variable created based on CI5-XI incidence classifications (see chapter 3 Table 3.1. of that volume) based on icd10
-display `"{browse "http://ci5.iarc.fr/CI5-XI/Pages/Chapter3.aspx":IARC-CI5-XI-3}"'
-
-
-** For annual report - Section 1: Incidence - Table 2a
-** Below top 10 code added by JC for 2015
-** All sites excl. in-situ, O&U, non-reportable skin cancers
-** THIS USED IN ANNUAL REPORT TABLE 1
-preserve
-drop if siteiarc>60 //| siteiarc==25 //38 deleted - for 2018 don't remove non-melanoma skin cancers as these are not SCC or any of the non-reportable morph categories for skin
-tab siteiarc ,m
-bysort siteiarc: gen n=_N
-bysort n siteiarc: gen tag=(_n==1)
-replace tag = sum(tag)
-sum tag , meanonly
-gen top10 = (tag>=(`r(max)'-9))
-sum n if tag==(`r(max)'-9), meanonly
-replace top10 = 1 if n==`r(max)'
-tab siteiarc top10 if top10!=0
-contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
-summ
-describe
-gsort -count
-drop top10
-/*
-siteiarc									count	percentage
-Prostate (C61)								221		29.91
-Breast (C50)								172		23.27
-Colon (C18)									114		15.43
-Corpus uteri (C54)							 50		 6.77
-Rectum (C19-20)								 33		 4.47
-Pancreas (C25)								 31		 4.19
-Multiple myeloma (C90)						 29		 3.92
-Lung (incl. trachea and bronchus) (C33-34)	 28		 3.79
-Non-Hodgkin lymphoma (C82-86,C96)			 23		 3.11
-Stomach (C16)								 19		 2.57
-Kidney (C64)								 19		 2.57 - drop kidney as it tied with stomach
-*/
-total count //739
-restore
-
-labelbook sex_lab
-tab sex ,m
-
-
-** For annual report - unsure which section of report to be used in
-** Below top 10 code added by JC for 2015
-** All sites excl. in-situ, O&U, non-reportable skin cancers
-** Requested by SF on 16-Oct-2020: Numbers of top 10 by sex
-preserve
-drop if siteiarc>60 //| siteiarc==25 //38 deleted
-tab siteiarc ,m
-bysort siteiarc: gen n=_N
-bysort n siteiarc: gen tag=(_n==1)
-replace tag = sum(tag)
-sum tag , meanonly
-gen top10 = (tag>=(`r(max)'-9))
-sum n if tag==(`r(max)'-9), meanonly
-replace top10 = 1 if n==`r(max)'
-gsort -top10
-tab siteiarc top10 if top10!=0
-tab siteiarc top10 if top10!=0 & sex==1 //female
-tab siteiarc top10 if top10!=0 & sex==2 //male
-contract siteiarc top10 sex if top10!=0, freq(count) percent(percentage)
-summ
-describe
-gsort -count
-drop top10
-/*
-year	cancer_site									number	sex
-2018	Stomach (C16)								 11		female
-2018	Stomach (C16)								  8		male
-2018	Colon (C18)									 58		female
-2018	Colon (C18)									 56		male
-2018	Rectum (C19-20)								  8		female
-2018	Rectum (C19-20)								 25		male
-2018	Pancreas (C25)								 18		female
-2018	Pancreas (C25)								 13		male
-2018	Lung (incl. trachea and bronchus) (C33-34)	  7		female
-2018	Lung (incl. trachea and bronchus) (C33-34)	 21		male
-2018	Breast (C50)								171		female
-2018	Breast (C50)								  1		male
-2018	Corpus uteri (C54)							 50		female
-2018	Prostate (C61)								221		male
-2018	Non-Hodgkin lymphoma (C82-86,C96)			 13		female
-2018	Non-Hodgkin lymphoma (C82-86,C96)			 10		male
-2018	Multiple myeloma (C90)						 14		female
-2018	Multiple myeloma (C90)						 15		male
-*/
-total count //739
-drop percentage
-gen year=2018
-rename count number
-rename siteiarc cancer_site
-sort cancer_site sex
-order year cancer_site number
-save "`datapath'\version04\2-working\2018_top10_sex" ,replace
-restore
-
-
-labelbook sex_lab
-tab sex ,m
-
-** For annual report - Section 1: Incidence - Table 1
-** FEMALE - using IARC's site groupings (excl. in-situ)
-preserve
-drop if sex==2 //477 deleted
-drop if siteiarc>60 //18 deleted
-bysort siteiarc: gen n=_N
-bysort n siteiarc: gen tag5=(_n==1)
-replace tag5 = sum(tag5)
-sum tag5 , meanonly
-gen top5 = (tag5>=(`r(max)'-4))
-sum n if tag5==(`r(max)'-4), meanonly
-replace top5 = 1 if n==`r(max)'
-gsort -top5
-tab siteiarc top5 if top5!=0
-contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
-gsort -count
-drop top5
-
-gen totpercent=(count/472)*100 //all cancers excl. male(477)
-gen alltotpercent=(count/949)*100 //all cancers
-/*
-siteiarc				count	percentage	totpercent	alltotpercent
-Breast (C50)			171		54.98		31.37615	16.52174
-Colon (C18)				 58		18.65		10.6422		 5.603865
-Corpus uteri (C54)		 50		16.08		 9.174312	 4.830918
-Pancreas (C25)			 18		 5.79		 3.302752	 1.73913
-Multiple myeloma (C90)	 14		 4.50		 2.568807	 1.352657
-*/
-total count //311
-restore
-
-** For annual report - Section 1: Incidence - Table 1
-** Below top 5 code added by JC for 2015
-** MALE - using IARC's site groupings
-preserve
-drop if sex==1 //472 deleted
-drop if siteiarc>60 //| siteiarc==25 //18 deleted
-bysort siteiarc: gen n=_N
-bysort n siteiarc: gen tag5=(_n==1)
-replace tag5 = sum(tag5)
-sum tag5 , meanonly
-gen top5 = (tag5>=(`r(max)'-4))
-sum n if tag5==(`r(max)'-4), meanonly
-replace top5 = 1 if n==`r(max)'
-gsort -top5
-tab siteiarc top5 if top5!=0
-contract siteiarc top5 if top5!=0, freq(count) percent(percentage)
-gsort -count
-drop top5
-
-gen totpercent=(count/477)*100 //all cancers excl. female(472)
-gen alltotpercent=(count/949)*100 //all cancers
-/*
-siteiarc									count	percentage	totpercent	alltotpercent
-Prostate (C61)								221		65.38		46.33124	23.28767
-Colon (C18)									 56		16.57		11.74004	 5.900949
-Rectum (C19-20)								 25		 7.40		 5.24109	 2.634352
-Lung (incl. trachea and bronchus) (C33-34)	 21		 6.21		 4.402516	 2.212856
-Multiple myeloma (C90)						 15		 4.44		 3.144654	 1.580611
-*/
-total count //338
-restore
-
-
-* *********************************************
-* ANALYSIS: SECTION 3 - cancer sites
-* Covering:
-*  3.1  Classification of cancer by site
-*  3.2 	ASIRs by site; overall, men and women
-* *********************************************
-** NOTE: bb popn and WHO popn data prepared by IH are ALL coded M=2 and F=1
-** Above note by AR from 2008 dofile
-
-** Load the dataset
-use "`datapath'\version04\2-working\2018_cancer_numbers", clear
-
-****************************************************************************** 2015 ****************************************************************************************
+****************************************************************************** 2018 ****************************************************************************************
 drop if dxyr!=2018 //0 deleted
 
 count //949

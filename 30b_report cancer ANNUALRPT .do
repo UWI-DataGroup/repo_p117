@@ -1,14 +1,14 @@
 cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          30b_report cancer 2016-2018.do
+    //  algorithm name          30b_report cancer ANNUALRPT.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      10-MAY-2022
-    // 	date last modified      29-JUN-2022
+    //  date first created      18-AUG-2022
+    // 	date last modified      18-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
-    //  objective               To have one dataset with report outputs for 2013-2018 data for 2018 annual report.
+    //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report.
     //  methods                 Use putdocx and Stata memory to produce tables and figures
 
     ** General algorithm set-up
@@ -32,48 +32,64 @@ cls
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\30b_report cancer 2016-2018.smcl", replace // error r(603)
+    log using "`logpath'\30b_report cancer ANNUALRPT.smcl", replace // error r(603)
 ** HEADER -----------------------------------------------------
 
-/*
+
 *************************
 **  SUMMARY STATISTICS **
 *************************
 ** Annual report: Table 1 (executive summary)
-** Load the NON-SURVIVAL dataset
-use "`datapath'\version04\3-output\2013_2014_2015_cancer_nonsurvival", clear // note pop_bb removed in the 
+** Load the REPORTABLE NON-SURVIVAL DEIDENTIFIED dataset
+use "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
 
 ** POPULATION
-gen poptot_2015=285327
-gen poptot_2014=284825
 gen poptot_2013=284294
+gen poptot_2014=284825
+gen poptot_2015=285327
 gen poptot_2016=285798
 gen poptot_2017=286229
 gen poptot_2018=286640
-gen poptot_2019=287021
-gen poptot_2020=287371
+//gen poptot_2019=287021
+//gen poptot_2020=287371
 
 ** TUMOURS
 egen tumourtot_2013=count(pid) if dxyr==2013
 egen tumourtot_2014=count(pid) if dxyr==2014
 egen tumourtot_2015=count(pid) if dxyr==2015
+egen tumourtot_2016=count(pid) if dxyr==2016
+egen tumourtot_2017=count(pid) if dxyr==2017
+egen tumourtot_2018=count(pid) if dxyr==2018
 gen tumourtotper_2013=tumourtot_2013/poptot_2013*100
 gen tumourtotper_2014=tumourtot_2014/poptot_2014*100
 gen tumourtotper_2015=tumourtot_2015/poptot_2015*100
-format tumourtotper_2013 tumourtotper_2014 tumourtotper_2015 %04.2f
+gen tumourtotper_2016=tumourtot_2016/poptot_2016*100
+gen tumourtotper_2017=tumourtot_2017/poptot_2017*100
+gen tumourtotper_2018=tumourtot_2018/poptot_2018*100
+format tumourtotper_2013 tumourtotper_2014 tumourtotper_2015 tumourtotper_2016 tumourtotper_2017 tumourtotper_2018 %04.2f
 ** PATIENTS
 egen patienttot_2013=count(pid) if patient==1 & dxyr==2013
 egen patienttot_2014=count(pid) if patient==1 & dxyr==2014
 egen patienttot_2015=count(pid) if patient==1 & dxyr==2015
+egen patienttot_2016=count(pid) if patient==1 & dxyr==2016
+egen patienttot_2017=count(pid) if patient==1 & dxyr==2017
+egen patienttot_2018=count(pid) if patient==1 & dxyr==2018
 ** DCOs
 egen dco_2013=count(pid) if basis==0 &  dxyr==2013
 egen dco_2014=count(pid) if basis==0 &  dxyr==2014
 egen dco_2015=count(pid) if basis==0 &  dxyr==2015
+egen dco_2016=count(pid) if basis==0 &  dxyr==2016
+egen dco_2017=count(pid) if basis==0 &  dxyr==2017
+egen dco_2018=count(pid) if basis==0 &  dxyr==2018
 gen dcoper_2013=dco_2013/tumourtot_2013*100
 gen dcoper_2014=dco_2014/tumourtot_2014*100
 gen dcoper_2015=dco_2015/tumourtot_2015*100
-format dcoper_2013 dcoper_2014 dcoper_2015 %2.1f
+gen dcoper_2016=dco_2016/tumourtot_2016*100
+gen dcoper_2017=dco_2017/tumourtot_2017*100
+gen dcoper_2018=dco_2018/tumourtot_2018*100
+format dcoper_2013 dcoper_2014 dcoper_2015 dcoper_2016 dcoper_2017 dcoper_2018 %2.1f
 
+STOP
 ** SURVIVAL
 ** Create frame for non-survival ds
 frame rename default nonsurv
@@ -1830,74 +1846,33 @@ label data "BNR-Cancer 2015 Cases by Parish"
 notes _dta :These data prepared for Natasha Sobers - 2015 annual report
 restore
 
+*/
 
-
-/*
-** Output for above ASIRs comparison using BSS vs WPP populations
-use "`datapath'\version04\2-working\ASIRs_BSS_WPP", clear
-format asir %04.2f
-sort cancer_site year asir
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-				****************************
+preserve
+use "`datapath'\version15\2-working\doddotdiff", clear
 putdocx clear
-putdocx begin, footer(foot1)
-putdocx paragraph, tofooter(foot1)
-putdocx text ("Page ")
-putdocx pagenumber
-putdocx paragraph, style(Title)
-putdocx text ("CANCER Population Report: BSS vs WPP"), bold
-putdocx textblock begin
-Date Prepared: 02-Dec-2019. 
-Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
-Generated using Dofile: repo_p117\20_analysis cancer.do
-putdocx textblock end
-putdocx paragraph
-putdocx text ("Methods"), bold
-putdocx textblock begin
-(1) Dataset: Excludes ineligible case definition, non-residents, non-malignant tumours, IARC non-reportable MPs; cancer dataset used: "`datapath'\version04\3-output\2008_2013_2014__2015_cancer_nonsurvival")
-putdocx textblock end
-putdocx textblock begin
-(2) ASIR (BSS_2013): stata command distrate used with pop_bss_2013-10 for 2013 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version04\2-working\pop_bss_2013-10")
-putdocx textblock end
-putdocx textblock begin
-(3) ASIR (WPP_2013): stata command distrate used with pop_wpp_2013-10 for 2013 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version04\2-working\pop_wpp_2013-10")
-putdocx textblock end
-putdocx textblock begin
-(4) ASIR (BSS_2014): stata command distrate used with pop_bss_2014-10 for 2014 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version04\2-working\pop_bss_2014-10")
-putdocx textblock end
-putdocx textblock begin
-(5) ASIR (WPP_2014): stata command distrate used with pop_wpp_2014-10 for 2014 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version04\2-working\pop_wpp_2014-10")
-putdocx textblock end
-putdocx textblock begin
-(6) ASIR (BSS_2015): stata command distrate used with pop_bss_2015-10 for 2015 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version04\2-working\pop_bss_2015-10")
-putdocx textblock end
-putdocx textblock begin
-(7) ASIR (WPP_2015): stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence and world population dataset: who2000_10-2; population datasets used: "`datapath'\version04\2-working\pop_wpp_2015-10")
-putdocx textblock end
-putdocx textblock begin
-(8) Population text files (BSS): saved in: "`datapath'\version04\2-working\BSS_population by sex_yyyy"
-putdocx textblock end
-putdocx textblock begin
-(9) Population text files (WPP): saved in: "`datapath'\version04\2-working\WPP_population by sex_yyyy"
-putdocx textblock end
-putdocx textblock begin
-(10) Population files (BSS): emailed to JCampbell from BSS' Socio-and-Demographic Statistics Division by Statistical Assistant on 29-Nov-2019.
-putdocx textblock end
-putdocx textblock begin
-(11) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019.
-putdocx textblock end
+putdocx begin
+
 putdocx pagebreak
-putdocx table tbl1 = data(population cancer_site year asir ci_lower ci_upper), halign(center) varnames
+putdocx paragraph, style(Heading1)
+putdocx text ("Date Difference"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Date Difference (Dofile: SAForde_CME_Aug2022.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Length of Time Between Diagnosis and Death in MONTHS (Median, Range and Mean), 2008-2018."), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx text ("Below table uses the variables [dot] and [dod] to display results for patients by tumour (i.e. MPs not excluded) that have died. It does not include cases where [dod] is missing, i.e. Alive patients.")
+
+putdocx paragraph, halign(center)
+
+putdocx table tbl1 = data(year median_doddotdiff range_lower range_upper mean_doddotdiff), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version04\3-output\2019-12-02_population_comparison.docx", replace
-putdocx clear
 
-save "`datapath'\version04\3-output\population_comparison_BSS_WPP" ,replace
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version15\3-output\Cancer_2008_2013-2018_CMEStats_`listdate'.docx", append
+putdocx clear
+restore
