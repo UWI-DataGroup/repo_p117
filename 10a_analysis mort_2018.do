@@ -35,7 +35,7 @@
 
 ** Load the dataset
 ** JC 22aug2022: mortality analyses was done in p117version04 for the Globocan comparison requested by NS + the 2022 BNR CME webinar so using the dofiles and ds from that version (version04/3-output)
-use "`datapath'\version09\3-output\2018_prep mort_deidentified", replace
+use "`datapath'\version09\3-output\2018_prep mort_deidentified", clear
 
 ** JC 13jun2022: SF emailed on 02jun2022 with correction to dod year from 2018 to 2019 so re-ran the prep and analysis dofiles for 2018 ASMRs
 
