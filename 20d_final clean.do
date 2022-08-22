@@ -2181,8 +2181,8 @@ label data "2008, 2013-2018 BNR-Cancer identifiable data - Reportable Non-surviv
 note: TS This dataset was NOT used for 2016-2018 annual report
 note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
 
-** Create cleaned dataset with reportable cases but de-identified data (DO NOT DROP DOB AS NEEDED FOR dofile 25b_analysis sites.do - for DQI document)
-drop fname lname natregno init resident parish recnum cfdx labnum SurgicalNumber specimen clindets cytofinds md consrpt sxfinds physexam imaging duration onsetint certifier dfc streviewer addr birthdate hospnum comments
+** Create cleaned dataset with reportable cases but de-identified data (DO NOT DROP DOB + RESIDENT AS NEEDED FOR dofile 25b_analysis sites.do + 23_survival.do respectively - for DQI document)
+drop fname lname natregno init parish recnum cfdx labnum SurgicalNumber specimen clindets cytofinds md consrpt sxfinds physexam imaging duration onsetint certifier dfc streviewer addr birthdate hospnum comments
 
 save "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified", replace
 label data "2008, 2013-2018 BNR-Cancer de-identified data - Reportable Non-survival De-identified Dataset"

@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      18-AUG-2022
+    // 	date last modified      22-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report.
@@ -96,7 +96,20 @@ frame rename default nonsurv
 frame create surv 
 frame change surv
 ** Copy patient totals from survival dataset into this dataset by creating new frame for survival dataset
-use "`datapath'\version09\3-output\2013_2014_2015_cancer_survival", clear
+use "`datapath'\version09\3-output\2013-2018_cancer_survival_deidentified", clear
+** 1-yr survival
+egen surv1yr_2018_censor=count(surv1yr_2018) if surv1yr_2018==0
+egen surv1yr_2018_dead=count(surv1yr_2018) if surv1yr_2018==1
+drop surv1yr_2018
+gen surv1yr_2018=surv1yr_2018_censor/pttotsurv_2018*100
+egen surv1yr_2017_censor=count(surv1yr_2017) if surv1yr_2017==0
+egen surv1yr_2017_dead=count(surv1yr_2017) if surv1yr_2017==1
+drop surv1yr_2017
+gen surv1yr_2017=surv1yr_2017_censor/pttotsurv_2017*100
+egen surv1yr_2016_censor=count(surv1yr_2016) if surv1yr_2016==0
+egen surv1yr_2016_dead=count(surv1yr_2016) if surv1yr_2016==1
+drop surv1yr_2016
+gen surv1yr_2016=surv1yr_2016_censor/pttotsurv_2016*100
 egen surv1yr_2015_censor=count(surv1yr_2015) if surv1yr_2015==0
 egen surv1yr_2015_dead=count(surv1yr_2015) if surv1yr_2015==1
 drop surv1yr_2015
@@ -110,6 +123,18 @@ egen surv1yr_2013_dead=count(surv1yr_2013) if surv1yr_2013==1
 drop surv1yr_2013
 gen surv1yr_2013=surv1yr_2013_censor/pttotsurv_2013*100
 ** 3-yr survival
+egen surv3yr_2018_censor=count(surv3yr_2018) if surv3yr_2018==0
+egen surv3yr_2018_dead=count(surv3yr_2018) if surv3yr_2018==1
+drop surv3yr_2018
+gen surv3yr_2018=surv3yr_2018_censor/pttotsurv_2018*100
+egen surv3yr_2017_censor=count(surv3yr_2017) if surv3yr_2017==0
+egen surv3yr_2017_dead=count(surv3yr_2017) if surv3yr_2017==1
+drop surv3yr_2017
+gen surv3yr_2017=surv3yr_2017_censor/pttotsurv_2017*100
+egen surv3yr_2016_censor=count(surv3yr_2016) if surv3yr_2016==0
+egen surv3yr_2016_dead=count(surv3yr_2016) if surv3yr_2016==1
+drop surv3yr_2016
+gen surv3yr_2016=surv3yr_2016_censor/pttotsurv_2016*100
 egen surv3yr_2015_censor=count(surv3yr_2015) if surv3yr_2015==0
 egen surv3yr_2015_dead=count(surv3yr_2015) if surv3yr_2015==1
 drop surv3yr_2015
@@ -123,6 +148,8 @@ egen surv3yr_2013_dead=count(surv3yr_2013) if surv3yr_2013==1
 drop surv3yr_2013
 gen surv3yr_2013=surv3yr_2013_censor/pttotsurv_2013*100
 ** 5-yr survival
+egen surv5yr_2016_censor=count(surv5yr_2016) if surv5yr_2016==0
+egen surv5yr_2016_dead=count(surv5yr_2016) if surv5yr_2016==1
 egen surv5yr_2015_censor=count(surv5yr_2015) if surv5yr_2015==0
 egen surv5yr_2015_dead=count(surv5yr_2015) if surv5yr_2015==1
 egen surv5yr_2014_censor=count(surv5yr_2014) if surv5yr_2014==0
@@ -133,7 +160,8 @@ drop surv5yr_2013 surv5yr_2014 surv5yr_2015
 gen surv5yr_2013=surv5yr_2013_censor/pttotsurv_2013*100
 gen surv5yr_2014=surv5yr_2014_censor/pttotsurv_2014*100
 gen surv5yr_2015=surv5yr_2015_censor/pttotsurv_2015*100
-format surv1yr_2015 surv1yr_2014 surv1yr_2013 surv3yr_2015 surv3yr_2014 surv3yr_2013 surv5yr_2015 surv5yr_2014 surv5yr_2013 %2.1f
+gen surv5yr_2016=surv5yr_2016_censor/pttotsurv_2016*100
+format surv1yr_2018 surv1yr_2017 surv1yr_2016 surv1yr_2015 surv1yr_2014 surv1yr_2013 surv3yr_2018 surv3yr_2017 surv3yr_2016 surv3yr_2015 surv3yr_2014 surv3yr_2013 surv5yr_2016 surv5yr_2015 surv5yr_2014 surv5yr_2013 %2.1f
 ** Input 1yr, 3yr, 5yr, 10yr survival variables from survival ds to nonsurvival ds
 frame change nonsurv
 **remove duplicates
@@ -143,12 +171,19 @@ frame surv: duplicates drop pid, force
 //frame nonsurv: describe
 frlink m:1 pid, frame(surv) //132 unmatched
 //list pid fname lname if surv==.
+frget surv1yr_2018 = surv1yr_2018, from(surv)
+frget surv1yr_2017 = surv1yr_2017, from(surv)
+frget surv1yr_2016 = surv1yr_2016, from(surv)
 frget surv1yr_2015 = surv1yr_2015, from(surv)
 frget surv1yr_2014 = surv1yr_2014, from(surv)
 frget surv1yr_2013 = surv1yr_2013, from(surv)
+frget surv3yr_2018 = surv3yr_2018, from(surv)
+frget surv3yr_2017 = surv3yr_2017, from(surv)
+frget surv3yr_2016 = surv3yr_2016, from(surv)
 frget surv3yr_2015 = surv3yr_2015, from(surv)
 frget surv3yr_2014 = surv3yr_2014, from(surv)
 frget surv3yr_2013 = surv3yr_2013, from(surv)
+frget surv5yr_2016 = surv5yr_2016, from(surv)
 frget surv5yr_2015 = surv5yr_2015, from(surv)
 frget surv5yr_2014 = surv5yr_2014, from(surv)
 frget surv5yr_2013 = surv5yr_2013, from(surv)
