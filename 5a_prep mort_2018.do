@@ -3,8 +3,8 @@
     //  algorithm name          5a_prep_mort.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      06-MAY-2022
-    // 	date last modified      13-JUN-2022
+    //  date first created      06-MAY-2022 (version04)
+    // 	date last modified      13-JUN-2022 (version04)
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -60,7 +60,8 @@
 ** DATA IMPORT  
 ***************
 ** LOAD the national registry deaths 2008-2020 excel dataset
-import excel using "`datapath'\version04\1-input\BNRDeathData20082020_DATA_2022-05-06_1222_excel.xlsx" , firstrow case(lower)
+** JC 22aug2022: mortality analyses was done in p117version04 for the Globocan comparison requested by NS + the 2022 BNR CME webinar so using the dofiles and ds from that version (version04/3-output)
+import excel using "`datapath'\version09\1-input\BNRDeathData20082020_DATA_2022-05-06_1222_excel.xlsx" , firstrow case(lower)
 
 count //32,467
 
@@ -144,7 +145,7 @@ count //15,416
 
 label data "BNR MORTALITY data 2015-2020: REDCap"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\2-working\2015-2020_deaths_redcap" ,replace
+save "`datapath'\version09\2-working\2015-2020_deaths_redcap" ,replace
 note: TS Only select data is included in this dataset
 
 
@@ -153,7 +154,7 @@ note: TS Only select data is included in this dataset
 **	previously-prepared **
 ** 	  2015-2020 Deaths  **
 **************************
-use "`datapath'\version04\1-input\2015-2020_deaths_for_matching" ,clear
+use "`datapath'\version09\1-input\2015-2020_deaths_for_matching" ,clear
 
 rename dd6yrs_* dd_*
 rename dob dd_dob
@@ -167,12 +168,12 @@ replace dd_record_id=34120 if dd_record_id==25341 //record is 34120 in REDCapdb 
 ** Update corrected NRNs + COD info from above duplicates
 preserve
 clear
-import excel using "`datapath'\version04\2-working\NRNelectoral_20220506.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version09\2-working\NRNelectoral_20220506.xlsx" , firstrow case(lower)
 tostring elec_natregno ,replace
-save "`datapath'\version04\2-working\electoral_nrn" ,replace
+save "`datapath'\version09\2-working\electoral_nrn" ,replace
 restore
 
-merge 1:1 dd_record_id using "`datapath'\version04\2-working\electoral_nrn" ,force
+merge 1:1 dd_record_id using "`datapath'\version09\2-working\electoral_nrn" ,force
 /*
     Result                      Number of obs
     -----------------------------------------
@@ -198,15 +199,15 @@ drop elec_* _merge
 ** Add in three 2018 cases from REDCapdb that were missing from previously-prepared dataset
 preserve
 clear
-import excel using "`datapath'\version04\2-working\MissingDeaths_20220506.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version09\2-working\MissingDeaths_20220506.xlsx" , firstrow case(lower)
 destring dd_regnum ,replace
 tostring dd_mname ,replace
 tostring dd_natregno ,replace
-save "`datapath'\version04\2-working\missingdeaths" ,replace
+save "`datapath'\version09\2-working\missingdeaths" ,replace
 restore
 
-append using "`datapath'\version04\2-working\missingdeaths"
-erase "`datapath'\version04\2-working\missingdeaths.dta" //remove datasets to reduce storage space on SharePoint
+append using "`datapath'\version09\2-working\missingdeaths"
+erase "`datapath'\version09\2-working\missingdeaths.dta" //remove datasets to reduce storage space on SharePoint
 
 replace dd_mname="" if dd_mname=="." //3 changes
 replace dd_cod1d="99" if dd_cod1d=="099" //3 changes
@@ -220,7 +221,7 @@ count //15,416
 
 ** Combine previously-prepared dataset with REDCap dataset
 preserve
-append using "`datapath'\version04\2-working\2015-2020_deaths_redcap"
+append using "`datapath'\version09\2-working\2015-2020_deaths_redcap"
 count //30,832
 
 replace record_id=dd_record_id if record_id==. & dd_record_id!=.
@@ -250,7 +251,7 @@ restore
 ** Now that some of the data has been corrected, merge the datasets for a final check
 rename dd_record_id record_id
 
-merge 1:1 record_id using "`datapath'\version04\2-working\2015-2020_deaths_redcap"
+merge 1:1 record_id using "`datapath'\version09\2-working\2015-2020_deaths_redcap"
 /*
     Result                      Number of obs
     -----------------------------------------
@@ -318,11 +319,11 @@ replace dd_dodyear=2019 if record_id==26742
 
 ** Remove redcap variables
 drop rc_pname rc_nrnnd rc_nrn rc_dod rc_dodyear rc_natregno _merge
-erase "`datapath'\version04\2-working\2015-2020_deaths_redcap.dta"
+erase "`datapath'\version09\2-working\2015-2020_deaths_redcap.dta"
 
 label data "BNR MORTALITY data 2015-2020"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2015-2020_deaths_for_matching" ,replace
+save "`datapath'\version09\3-output\2015-2020_deaths_for_matching" ,replace
 note: TS This dataset can be used for matching 2015-2020 deaths with incidence data
 
 *********************
@@ -330,7 +331,7 @@ note: TS This dataset can be used for matching 2015-2020 deaths with incidence d
 ** 	  2018 Deaths  **
 **	 for analysis  **
 *********************
-use "`datapath'\version04\3-output\2015-2020_deaths_for_matching" ,clear
+use "`datapath'\version09\3-output\2015-2020_deaths_for_matching" ,clear
 
 count //15,416
 /*
@@ -854,12 +855,12 @@ count if age==. //0
 ** Add missing NRNs flagged above with list of NRNs manually created using electoral list (this ensures dofile remains de-identified)
 preserve
 clear
-import excel using "`datapath'\version04\2-working\MissingNRNs_mort_20220510.xlsx" , firstrow case(lower)
+import excel using "`datapath'\version09\2-working\MissingNRNs_mort_20220510.xlsx" , firstrow case(lower)
 format elec_nrn %15.0g
 replace elec_natregno=subinstr(elec_natregno,"-","",.)
-save "`datapath'\version04\2-working\electoral_missingnrn" ,replace
+save "`datapath'\version09\2-working\electoral_missingnrn" ,replace
 restore
-merge 1:1 record_id using "`datapath'\version04\2-working\electoral_missingnrn" ,force
+merge 1:1 record_id using "`datapath'\version09\2-working\electoral_missingnrn" ,force
 /*
     Result                      Number of obs
     -----------------------------------------
@@ -873,7 +874,7 @@ merge 1:1 record_id using "`datapath'\version04\2-working\electoral_missingnrn" 
 replace nrn=elec_nrn if _merge==3 //3 changes
 replace natregno=elec_natregno if _merge==3 //3 changes
 drop elec_* _merge
-erase "`datapath'\version04\2-working\electoral_missingnrn.dta"
+erase "`datapath'\version09\2-working\electoral_missingnrn.dta"
 
 ** Check dob** Creating dob variable as none in national death data
 ** perform data cleaning on the age variable
@@ -931,7 +932,7 @@ replace dodyear=year(dod) if dodyear!=year(dod) //0 changes
 
 label data "BNR MORTALITY data 2018"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2018_prep mort_ALL" ,replace
+save "`datapath'\version09\3-output\2018_prep mort_ALL" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes all 2018 CODs
 
@@ -1608,7 +1609,7 @@ order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear c
 ** Save this death dataset with identifiable data
 label data "BNR MORTALITY data 2018: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2018_prep mort_identifiable" ,replace
+save "`datapath'\version09\3-output\2018_prep mort_identifiable" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 
@@ -1618,6 +1619,6 @@ drop fname lname natregno nrn pname mname dob parish regnum address pod placeofd
 ** Save this death dataset with de-identified data
 label data "BNR MORTALITY data 2018: De-identified Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2018_prep mort_deidentified" ,replace
+save "`datapath'\version09\3-output\2018_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death

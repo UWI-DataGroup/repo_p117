@@ -3,8 +3,8 @@
     //  algorithm name          10c_analysis_mort 2017.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      18-MAY-2022
-    // 	date last modified      13-JUN-2022
+    //  date first created      18-MAY-2022 (version04)
+    // 	date last modified      13-JUN-2022 (version04)
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASMRs
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2017 death data for inclusion in 2016-2018 cancer report.
@@ -34,7 +34,8 @@
 ** HEADER -----------------------------------------------------
 
 ** Load the dataset
-use "`datapath'\version04\3-output\2017_prep mort_deidentified", replace
+** JC 22aug2022: mortality analyses was done in p117version04 for the Globocan comparison requested by NS + the 2022 BNR CME webinar so using the dofiles and ds from that version (version04/3-output)
+use "`datapath'\version09\3-output\2017_prep mort_deidentified", replace
 
 count // 670 cancer deaths in 2017
 tab age_10 sex ,m
@@ -106,7 +107,7 @@ label define year_lab 1 "2017" 2 "2015" 3 "2014" 4 "2013" 5 "2008",modify
 label values year year_lab
 sort cancer_site
 gen rpt_id = _n
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 ** proportions for Table 1 using IARC's site groupings
@@ -132,7 +133,7 @@ restore
 //tab siteiarc ,m
 //JC 19may2022: use age5 population and groupings for distrate per IH's + NS' recommendation
 //JC 13jun2022: Above correction not performed - will perform in a separate dofile when using IH's rate calculation method
-merge m:m sex age_10 using "`datapath'\version04\2-working\pop_wpp_2017-10"
+merge m:m sex age_10 using "`datapath'\version09\2-working\pop_wpp_2017-10"
 /*
     Result                      Number of obs
     -----------------------------------------
@@ -177,7 +178,7 @@ rename siteiarc cancer_site
 rename mortrate age_specific_rate
 drop pfu case pop_wpp
 order year cancer_site sex age_10 age_specific_rate
-save "`datapath'\version04\2-working\2017_top10mort_age+sex_rates" ,replace
+save "`datapath'\version09\2-working\2017_top10mort_age+sex_rates" ,replace
 restore
 
 ** AGE
@@ -198,7 +199,7 @@ rename siteiarc cancer_site
 rename mortrate age_specific_rate
 drop pfu case pop_wpp
 order year cancer_site age_10 age_specific_rate
-save "`datapath'\version04\2-working\2017_top10mort_age_rates" ,replace
+save "`datapath'\version09\2-working\2017_top10mort_age_rates" ,replace
 restore
 
 ** Check for missing age as these would need to be added to the median group for that site when assessing ASMRs to prevent creating an outlier
@@ -223,7 +224,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR ALL TUMOURS - STD TO WHO WORLD pop_wppN 
 /*
@@ -256,7 +257,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=1 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="all" if rpt_id==.
@@ -266,7 +267,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==1 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 ** PROSTATE
@@ -314,7 +315,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR PC - STD TO WHO WORLD pop_wppN 
 /*
@@ -346,7 +347,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=2 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="prost" if rpt_id==.
@@ -356,7 +357,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==2 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 ** BREAST
@@ -453,7 +454,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR BC (M&F) - STD TO WHO WORLD pop_wppN 
 
@@ -492,7 +493,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=3 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="fem.breast" if rpt_id==.
@@ -502,7 +503,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==3 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 
@@ -581,7 +582,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR COLON CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
@@ -614,7 +615,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=4 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="colon" if rpt_id==.
@@ -624,7 +625,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==4 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 ** PANCREAS
@@ -696,7 +697,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR PANCREATIC CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
@@ -729,7 +730,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=5 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="panc" if rpt_id==.
@@ -739,7 +740,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==5 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 ** RECTUM
@@ -819,7 +820,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR RECTAL CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
@@ -852,7 +853,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=6 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="rect" if rpt_id==.
@@ -862,7 +863,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==6 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 
@@ -942,7 +943,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR LUNG CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
@@ -975,7 +976,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=7 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="lung" if rpt_id==.
@@ -985,7 +986,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==7 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 
@@ -1066,7 +1067,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR MULTIPLE MYELOMA (M&F)- STD TO WHO WORLD pop_wppN 
 /*
@@ -1098,7 +1099,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=8 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="MM" if rpt_id==.
@@ -1108,7 +1109,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==8 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 
@@ -1165,7 +1166,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR CORPUS UTERI (WOMEN)- STD TO WHO WORLD pop_wppN 
 
@@ -1198,7 +1199,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=9 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="corpus" if rpt_id==.
@@ -1208,7 +1209,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==9 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 
@@ -1251,7 +1252,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR OVARY (F)- STD TO WHO WORLD pop_wppN 
 
@@ -1284,7 +1285,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=10 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="cervix" if rpt_id==.
@@ -1294,7 +1295,7 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==10 & asmr_id==""
 drop asmr_id
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 ** STOMACH
@@ -1401,7 +1402,7 @@ preserve
 sort age_10
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version04\2-working\who2000_10-2", 	///	
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
 		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR STOMACH CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
@@ -1434,7 +1435,7 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/670*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version04\2-working\ASMRs_wpp_2017"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
 replace cancer_site=11 if cancer_site==.
 replace year=1 if year==.
 gen asmr_id="stom" if rpt_id==.
@@ -1446,11 +1447,11 @@ drop if cancer_site==11 & asmr_id==""
 drop asmr_id rpt_id
 format asmr %04.2f
 format percentage %04.1f
-save "`datapath'\version04\2-working\ASMRs_wpp_2017" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2017" ,replace
 restore
 
 
 label data "BNR MORTALITY rates 2017"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2017_analysis mort_wpp" ,replace
+save "`datapath'\version09\3-output\2017_analysis mort_wpp" ,replace
 note: TS This dataset includes patients with multiple eligible cancer causes of death; used WPP population
