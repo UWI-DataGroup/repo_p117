@@ -1,10 +1,10 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          5c_prep_mort 2019+2020.do
+    //  algorithm name          5e_prep mort 2021.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      13-JUN-2022 (version04)
-    // 	date last modified      29-JUN-2022 (version04)
+    //  date first created      22-AUG-2022
+    // 	date last modified      22-AUG-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -46,18 +46,25 @@
 	** JC 13jun2022: SF emailed on 02jun2022 with correction to dod year for record_id 26742 so corrected in 5a_prep mort.do (which created the dataset used in this dofile) 
 					 and re-ran 10a_analysis mort.do
 */
+/*
+
+	JC 22aug2022:
+	
+		NS requested 2021 cancer deaths that also had COVID in the COD for Adanna Grandison to use at 
+		the BNR CME 2022 webinar this week. 
+		
+*/
 
 ***************
 ** DATA IMPORT  
 ***************
-** JC 22aug2022: mortality analyses was done in p117version04 for the Globocan comparison requested by NS + the 2022 BNR CME webinar so using the dofiles and ds from that version (version04/3-output)
-use "`datapath'\version09\3-output\2015-2020_deaths_for_matching" ,clear
+use "`datapath'\version09\3-output\2015-2021_deaths_for_matching" ,clear
 
-************************
-**     Preparing      **
-** 2019 + 2020 Deaths **
-**	 for analysis     **
-************************
+********************
+**   Preparing    **
+** 	2021 Deaths   **
+**	for analysis  **
+********************
 count //15,416
 /*
 This dataset preparation differs from the death matching ds in below ways:
@@ -68,7 +75,7 @@ This dataset preparation differs from the death matching ds in below ways:
 	 - need to assign each death by site as ASMR reported by site
 	 - only need cancer deaths for specific reporting year
 */
-
+STOP
 ** Remove death data prefix from variable names for this process (only needed when matching death and incidence datasets)
 rename dd_* *
 

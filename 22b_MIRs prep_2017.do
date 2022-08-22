@@ -1,11 +1,11 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          66_MIR_prep_2014.do
+    //  algorithm name          22b_MIRs prep_2017.do
 	//  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      06-OCT-2021
-    // 	date last modified      06-OCT-2021
-    //  algorithm task          Creating IARC site variable on 2014 mortality dataset in preparation for mortality:incidence ratio analysis
+    //  date first created      22-AUG-2022
+    // 	date last modified      22-AUG-2022
+    //  algorithm task          Creating IARC site variable on 2017 mortality dataset in preparation for mortality:incidence ratio analysis
     //  status                  Completed
     //  objective               To have cause(s) of death assigned the same site codes as the incidence data
 	//							To have multiple cancer causes of death identified and labelled with the correct site code
@@ -32,14 +32,14 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\66_MIR_prep_2014.smcl", replace
+    log using "`logpath'\22b_MIRs prep_2017.smcl", replace
 ** HEADER -----------------------------------------------------
 
 
 * ************************************************************************
 * PREP AND FORMAT: MORTALITY DATA
 **************************************************************************
-use "`datapath'\version02\1-input\2014_cancer_mort_dc", clear
+use "`datapath'\version09\3-output\2017_prep mort_identifiable", clear
 
 ** Ensure all deaths have an IARC site code assigned
 tab siteiarc ,m
@@ -49,7 +49,7 @@ tab sitecr5db ,m
 count if sitecr5db==. //0
 
 ** Create death dataset with CODs assigned a site code
-save "`datapath'\version02\2-working\2014_mir_mort_prep", replace
+save "`datapath'\version09\2-working\2017_mir_mort_prep", replace
 
 ** Create variable for site groupings by sex to be used for M:I ratios
 ***********
@@ -210,26 +210,26 @@ contract dodyear sitecr5db sex cases
 drop _freq
 order dodyear sitecr5db sex cases
 
-gen mort=1
+gen mortds=1
 
 ** Create death dataset to use for mortality:incidence ratio
-save "`datapath'\version02\2-working\2014_mir_mort", replace
+save "`datapath'\version09\2-working\2017_mir_mort", replace
 
 clear
 
 * ************************************************************************
 * PREP AND FORMAT: INCIDENCE DATA
 **************************************************************************
-use "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_reportable", clear
+use "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_identifiable", clear
 
-drop if dxyr!=2014
+drop if dxyr!=2017
 count if sitecr5db==. //0
 
 tab sitecr5db ,m
 count if sitecr5db==. //0
 
 ** Create death dataset with CODs assigned a site code
-save "`datapath'\version02\2-working\2014_mir_incid_prep", replace
+save "`datapath'\version09\2-working\2017_mir_incid_prep", replace
 
 ** Create variable for site groupings by sex to be used for M:I ratios
 ***********
@@ -393,4 +393,4 @@ order dxyr sitecr5db sex cases
 gen incid=1
 
 ** Create death dataset to use for mortality:incidence ratio
-save "`datapath'\version02\2-working\2014_mir_incid", replace
+save "`datapath'\version09\2-working\2017_mir_incid", replace

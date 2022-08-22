@@ -89,7 +89,7 @@ gen dcoper_2017=dco_2017/tumourtot_2017*100
 gen dcoper_2018=dco_2018/tumourtot_2018*100
 format dcoper_2013 dcoper_2014 dcoper_2015 dcoper_2016 dcoper_2017 dcoper_2018 %2.1f
 
-STOP
+
 ** SURVIVAL
 ** Create frame for non-survival ds
 frame rename default nonsurv
@@ -487,6 +487,25 @@ putdocx textblock begin
 putdocx textblock end
 putdocx textblock begin
 (11) 1-yr, 3-yr, 5-yr (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2013, surv5yr_2014; dataset used: "`datapath'\version09\3-output\2013_2014_2015_cancer_survival")
+putdocx textblock end
+putdocx textblock begin
+putdocx textblock begin
+(12) MIRs: For the incidence dataset, the 2015 annual report incidence dataset was used to organize the data into a format to perform the M:I analysis (cancer dataset used: "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_identifiable"; Note: 2008 cases were ultimately excluded)
+putdocx textblock end
+putdocx textblock begin
+(13) MIRs: For the mortality dataset, the 2013, 2014 and 2015 annual report mortality datasets were used to organize the data into a format to perform the M:I analysis (cancer dataset used: (2016) "`datapath'\version09\3-output\2016_prep mort_identifiable"; (2017) "`datapath'\version09\3-output\2017_prep mort_identifiable"; (2018) "`datapath'\version09\3-output\2018_prep mort_identifiable").
+putdocx textblock end
+putdocx textblock begin
+(14) MIRs: All the incidence and mortality datasets were checked to ensure the site variable, sitecr5db, was not missing and site codes were assigned if it was missing in the dataset.
+putdocx textblock end
+putdocx textblock begin
+(15) MIRs: The calculation used for the M:I ratio was number of death cases per site per sex / number of incident cases per site per sex.
+putdocx textblock end
+putdocx textblock begin
+(16) MIRs: Sites that had a M:I ratio exceeding a value of 1 (one) or >99% were checked case by case using the Mortality data + the Casefinding database to determine why that death case was excluded from the incidence dataset.  The datasets and database used for this comparison review process are: MORTALITY:"`datapath'\version09\2-working\yyyy_mir_mort_prep"; INCIDENCE:"`datapath'\version09\2-working\yyyy_mir_incid_prep" and "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_identifiable"; CASEFINDING DATABASES:"...Sync\Cancer\CF Database\MasterDb\SyncDb\Databases\Master" and CanReg5 database. The outcome of this investigation can be found in the excel workbook saved in the pathway: "...The University of the West Indies\FORDE, Shelly-Ann - BNR\REPORTS\Annual Reports\2016-2018 Cancer Report\2022-08-22_mir_reviews.xlsx" and also in the pathway: "`datapath'\version09\3-output\2022-08-22_mir_reviews.xlsx".
+putdocx textblock end
+putdocx textblock begin
+(17) MIRs: Based on the above review, the deaths that were captured either at casefinding or abstraction were removed from the deaths totals and the MIRs were re-calculated. Note: missed eligible cases were not removed but were sent to BNR-C DAs to abstract for inclusion in the next annual report.
 putdocx textblock end
 //putdocx pagebreak
 /*
@@ -2025,7 +2044,11 @@ notes _dta :These data prepared for Natasha Sobers - 2015 annual report
 restore
 
 */
-
+				*******************************
+				*	     MS WORD REPORT       *
+				*   ANNUAL REPORT STATISTICS  *
+                *   Length of Time (DX + DOD) *
+				*******************************
 preserve
 use "`datapath'\version15\2-working\doddotdiff", clear
 putdocx clear
@@ -2051,6 +2074,81 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version15\3-output\Cancer_2008_2013-2018_CMEStats_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate.docx", append
+putdocx clear
+restore
+
+				*******************************
+				*	     MS WORD REPORT       *
+				*   ANNUAL REPORT STATISTICS  *
+                *  Basis of Diagnosis by DxYr *
+				*******************************
+
+** SF requested via Zoom meeting on 18aug2022: table with dxyr and basis
+preserve
+use "`datapath'\version15\1-input\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
+
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Most Valid Basis Of Diagnosis"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Basis Of Diagnosis (Dofile: 25a_analysis numbers.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis Of Diagnosis, 2008-2018."), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx text ("Below table uses the variables [basis] and [dxyr] to display results for patients by tumour (i.e. MPs not excluded).")
+
+putdocx paragraph, halign(center)
+putdocx text ("2008,2013-2018"), bold font(Helvetica,10,"blue")
+tab2docx basis if dxyr>2007
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate.docx", append
+putdocx clear
+restore
+
+
+				****************************
+				* 	    MS WORD REPORT     *
+				* ANNUAL REPORT STATISTICS *
+				* 	 Mortality:Incidence   * 
+				*       Ratio RESULTS      *
+				****************************
+** Create MS Word results table with absolute case totals + the MIRs for grouped years (2016-2018), by site, by sex 
+preserve
+use "`datapath'\version09\3-output\2016-2018_mirs_adjusted" ,clear
+
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Mortality:Incidence Ratios"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("MIRs Grouped (Dofile: 22d_MIRs_2016-2018.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Table: Case Totals + Mortality:Incidence Ratios for BNR-Cancer Grouped Years (2016-2018)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx text ("Background"), bold
+putdocx textblock begin
+A data quality assessment performed by the IARC Hub noted large M:I ratios in certain sites. IARC Hub used mortality data from the CARPHA mortality database, which collects data from Ministry of Health and Wellness. This report performs a secondary check using mortality data collected directly from the Barbados Registration Dept. This data quality indicator is one method of assessing completeness.
+putdocx textblock end
+
+putdocx paragraph, halign(center)
+
+putdocx table tbl1 = data(sitecr5db sex mir_all mir_iarc cases_mort_all cases_incid_all), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate.docx", append
 putdocx clear
 restore
