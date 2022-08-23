@@ -716,7 +716,15 @@ list record_id fname lname dod dob age checkage2 if dob!=. & dod!=. & age!=check
 drop checkage2
 
 ** Check no missing dxyr so this can be used in analysis
-tab dodyear ,m //5017 - none missing
+tab dodyear ,m //5387 - none missing
+/*
+    dodyear |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2019 |      2,785       51.70       51.70
+       2020 |      2,602       48.30      100.00
+------------+-----------------------------------
+      Total |      5,387      100.00
+*/
 
 count if dodyear!=year(dod) //0
 //list pid record_id dod dodyear if dodyear!=year(dod)
@@ -728,17 +736,31 @@ save "`datapath'\version09\3-output\2019_2020_prep mort_ALL" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes all 2019 + 2020 CODs
 
+** Create corrected dataset with reportable cases but de-identified data (2020 only)
+preserve
+drop if dodyear!=2020
+drop fname lname natregno nrn pname mname dob parish regnum address certifier certifieraddr
+
+count //2602
+
+label data "BNR MORTALITY data 2020: De-identified Dataset"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version09\3-output\2020_prep mort_ALL_deidentified" ,replace
+note: TS This dataset is used for the BNR CME 2022 webinar
+note: TS This dataset includes all 2020 CODs
+restore
+
 *******************
 ** Check for MPs **
 **   in CODs     **
 *******************
-count //5017
+count //5387
 
 //list record_id
 //list cod1a
-tab cancer ,m //646 cancer CODs
-tab cancer dodyear ,m //640 cancer CODS in 2016; 653 in 2017
-drop if cancer!=1 //3,724 deleted
+tab cancer ,m //1333 cancer CODs
+tab cancer dodyear ,m //676 cancer CODS in 2019; 657 in 2020
+drop if cancer!=1 //4054 deleted
 
 ** MPs found above when assigning cancer variable in checking causes of death
 sort coddeath record_id

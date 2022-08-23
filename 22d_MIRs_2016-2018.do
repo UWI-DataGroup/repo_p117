@@ -425,7 +425,7 @@ putdocx pagenumber
 putdocx paragraph, style(Title)
 putdocx text ("CANCER Data Quality Report: Mortality/Incidence Ratio"), bold
 putdocx textblock begin
-Date Prepared: 08-AUG-2022. 
+Date Prepared: 22-AUG-2022. 
 Prepared by: JC using Stata v17.0
 CanReg5 v5.43 (incidence) data release date: 21-May-2021.
 REDCap v12.3.3 (death) data release date: 06-May-2022.
