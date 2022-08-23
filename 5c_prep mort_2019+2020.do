@@ -1624,3 +1624,15 @@ save "`datapath'\version09\3-output\2020_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 restore
+
+preserve
+** Create de-identified dataset that includes pod and placeofdeath for BNR CME 2022 webinar (p131/v16)
+drop fname lname natregno nrn pname mname dob parish regnum address certifier certifieraddr
+drop if did=="T2" //29 deleted
+** Save this death dataset with de-identified data
+label data "BNR MORTALITY data 2020: De-identified Dataset for BNR 2022 CME"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "X:/The University of the West Indies/DataGroup - repo_data/data_p131\version16\1-input\2020_prep mort_cancer_deidentified" ,replace
+note: TS This dataset is used for analysis for the BNR CME 2022 webinar
+note: TS This dataset DOES NOT include patients with multiple eligible cancer causes of death
+restore
