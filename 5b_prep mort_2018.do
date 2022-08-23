@@ -1,6 +1,6 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          5a_prep_mort.do
+    //  algorithm name          5b_prep mort_2018.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      06-MAY-2022 (version04)
@@ -32,7 +32,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\5_prep_mort.smcl", replace
+    log using "`logpath'\5b_prep mort_2018.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /* 

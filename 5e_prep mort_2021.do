@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      22-AUG-2022
-    // 	date last modified      22-AUG-2022
+    // 	date last modified      23-AUG-2022
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -32,7 +32,7 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\5c_prep_mort 2019+2020.smcl", replace
+    log using "`logpath'\5e_prep mort_2021.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /* 
@@ -47,12 +47,10 @@
 					 and re-ran 10a_analysis mort.do
 */
 /*
-
 	JC 22aug2022:
 	
 		NS requested 2021 cancer deaths that also had COVID in the COD for Adanna Grandison to use at 
 		the BNR CME 2022 webinar this week. 
-		
 */
 
 ***************
@@ -65,7 +63,7 @@ use "`datapath'\version09\3-output\2015-2021_deaths_for_matching" ,clear
 ** 	2021 Deaths   **
 **	for analysis  **
 ********************
-count //15,416
+count //18,560
 /*
 This dataset preparation differs from the death matching ds in below ways:
  (1) death matching ds used for matching with cancer incidence ds for survival analysis 
@@ -75,7 +73,7 @@ This dataset preparation differs from the death matching ds in below ways:
 	 - need to assign each death by site as ASMR reported by site
 	 - only need cancer deaths for specific reporting year
 */
-STOP
+
 ** Remove death data prefix from variable names for this process (only needed when matching death and incidence datasets)
 rename dd_* *
 
@@ -85,25 +83,26 @@ tab dodyear ,m
 /*
     dodyear |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-       2015 |      2,482       16.10       16.10
-       2016 |      2,488       16.14       32.24
-       2017 |      2,530       16.41       48.65
-       2018 |      2,527       16.39       65.04
-       2019 |      2,786       18.07       83.11
-       2020 |      2,603       16.89      100.00
+       2015 |      2,482       13.37       13.37
+       2016 |      2,488       13.41       26.78
+       2017 |      2,530       13.63       40.41
+       2018 |      2,527       13.62       54.02
+       2019 |      2,785       15.01       69.03
+       2020 |      2,606       14.04       83.07
+       2021 |      3,142       16.93      100.00
 ------------+-----------------------------------
-      Total |     15,416      100.00
+      Total |     18,560      100.00
 */
 gen dodyr=year(dod)
 count if dodyear!=dodyr //0
 drop dodyr
 
 
-drop if dodyear!=2019 & dodyear!=2020 //10,027 deleted
+drop if dodyear!=2021 //15,418 deleted
 ** Remove Tracking Form info (already previously removed)
 //drop if event==2 //0 deleted
 
-count //5389
+count //3142
 
 ** JC 13jun2022
 /*
@@ -229,6 +228,7 @@ replace fname = lower(rtrim(ltrim(itrim(fname)))) //2493 changes
 replace mname = lower(rtrim(ltrim(itrim(mname)))) //713 changes
 replace lname = lower(rtrim(ltrim(itrim(lname)))) //2493 changes
 
+rename deathid record_id
 order record_id pname fname mname lname namematch
 
 *************************
@@ -247,7 +247,7 @@ so the field namematch can be used as a guide for checking duplicates
 sort lname fname record_id
 quietly by lname fname : gen dupname = cond(_N==1,0,_n)
 sort lname fname record_id
-count if dupname>0 //216
+count if dupname>0 //64
 /* 
 Check below list (or Stata Browse window) for cases where namematch=no match but 
 there is a pt with same name then:
@@ -260,11 +260,7 @@ there is a pt with same name then:
 sort lname fname record_id
 order record_id pname namematch nrn dod coddeath
 
-drop if record_id==28415 //duplicate of record_id 32639 //1 deleted - in 16jun2022 email KG checked and indicated dod should be 2019 .
-replace dod=dod-366 if record_id==32639
-replace regdate=regdate-366 if record_id==32639
-replace dodyear=2019 if record_id==32639
-replace namematch=1 if dupname>0 & namematch!=1 //108 changes
+replace namematch=1 if dupname>0 & namematch!=1 //28 changes
 
 //replace namematch=2 if record_id==
 /*
@@ -294,13 +290,12 @@ restore
 sort lname fname dod
 quietly by lname fname dod: gen dupdod = cond(_N==1,0,_n)
 sort lname fname dod record_id
-count if dupdod>0 //0
+count if dupdod>0 //2 - no match; different pt
 list record_id namematch fname lname nrn dod sex age if dupdod>0
 count if dupdod>0 & namematch!=1 //0
 drop dupname dupdod
-drop if record_id==24065 //this record is a combination of info from record_id 24066 + 24073 so deleted this record in REDcapdb also
 
-count //5388
+count //3142
 
 
 ** JC 09may2022: The below was previously done when for 2015 annual report so code disabled
@@ -446,22 +441,13 @@ tab cancer ,m
      cancer |
   diagnoses |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-     cancer |      1,333       24.74       24.74
- not cancer |      4,055       75.26      100.00
+     cancer |        694       22.09       22.09
+ not cancer |      2,448       77.91      100.00
 ------------+-----------------------------------
-      Total |      5,388      100.00
+      Total |      3,142      100.00
 */
 
 tab cancer dodyear ,m
-/*
-    cancer |        dodyear
- diagnoses |      2019       2020 |     Total
------------+----------------------+----------
-    cancer |       676        657 |     1,333 
-not cancer |     2,109      1,946 |     4,055 
------------+----------------------+----------
-     Total |     2,785      2,603 |     5,388
-*/
 
 ** JC 13jun2022: The below was previously done when for 2015 annual report so code disabled
 
@@ -481,24 +467,14 @@ tab cod ,m
 /*
      COD categories |      Freq.     Percent        Cum.
 --------------------+-----------------------------------
-     Dead of cancer |      1,333       24.74       24.74
-Dead of other cause |      4,006       74.35       99.09
-          Not known |         49        0.91      100.00
+     Dead of cancer |        694       22.09       22.09
+Dead of other cause |      2,421       77.05       99.14
+          Not known |         27        0.86      100.00
 --------------------+-----------------------------------
-              Total |      5,388      100.00
+              Total |      3,142      100.00
 */
 
 tab cod dodyear ,m
-/*
-                    |        dodyear
-     COD categories |      2019       2020 |     Total
---------------------+----------------------+----------
-     Dead of cancer |       676        657 |     1,333 
-Dead of other cause |     2,083      1,923 |     4,006 
-          Not known |        26         23 |        49 
---------------------+----------------------+----------
-              Total |     2,785      2,603 |     5,388
-*/
 
 ** JC 09may2022: The below was previously done when for 2015 annual report so code disabled
 
@@ -517,21 +493,13 @@ tab sex ,m
 /*
         Sex |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-     Female |      2,659       49.35       49.35
-       Male |      2,729       50.65      100.00
+     Female |      1,543       49.11       49.11
+       Male |      1,599       50.89      100.00
 ------------+-----------------------------------
-      Total |      5,388      100.00
+      Total |      3,142      100.00
 */
 tab sex dodyear ,m
-/*
-           |        dodyear
-       Sex |      2019       2020 |     Total
------------+----------------------+----------
-    Female |     1,386      1,273 |     2,659 
-      Male |     1,399      1,330 |     2,729 
------------+----------------------+----------
-     Total |     2,785      2,603 |     5,388
-*/
+
 
 ********************
 **   Formatting   **
@@ -548,57 +516,56 @@ label define pod_lab 1 "QEH" 2 "At Home" 3 "Geriatric Hospital" ///
 label values pod pod_lab
 label var pod "Place of Death from National Register"
 
-replace pod=1 if regexm(placeofdeath, "ELIZABETH HOSP") & pod==. //62 changes
+replace pod=1 if regexm(placeofdeath, "ELIZABETH HOSP") & pod==. //0 changes
 replace pod=1 if regexm(placeofdeath, "QUEEN ELZ") & pod==. //0 changes
-replace pod=1 if regexm(placeofdeath, "QEH") & pod==. //2747 changes
-replace pod=1 if regexm(placeofdeath, "Q.E.H") & pod==. //59 changes
-replace pod=3 if regexm(placeofdeath, "GERIATRIC") & pod==. //163 changes
+replace pod=1 if regexm(placeofdeath, "QEH") & pod==. //1439 changes
+replace pod=1 if regexm(placeofdeath, "Q.E.H") & pod==. //0 changes
+replace pod=3 if regexm(placeofdeath, "GERIATRIC") & pod==. //80 changes
 replace pod=3 if regexm(placeofdeath, "GERIACTIRC") & pod==. //0 chagnes
 replace pod=3 if regexm(placeofdeath, "GERIACTRIC") & pod==. //0 chagnes
 replace pod=5 if regexm(placeofdeath, "CHILDRENS HOME") & pod==. //0 chagnes
-replace pod=4 if regexm(placeofdeath, "HOME") & pod==. //221 changes
-replace pod=4 if regexm(placeofdeath, "ELDERLY") & pod==. //4 changes
+replace pod=4 if regexm(placeofdeath, "HOME") & pod==. //118 changes
+replace pod=4 if regexm(placeofdeath, "ELDERLY") & pod==. //3 changes
 replace pod=4 if regexm(placeofdeath, "SERENITY MANOR") & pod==. //0 changes
 replace pod=4 if regexm(placeofdeath, "ADULT CARE") & pod==. //0 changes
 replace pod=4 if regexm(placeofdeath, "AGE ASSIST") & pod==. //0 changes
-replace pod=4 if regexm(placeofdeath, "SENIOR") & pod==. //6 changes
-replace pod=4 if regexm(placeofdeath, "RETREAT") & pod==. //27 changes
-replace pod=4 if regexm(placeofdeath, "RETIREMENT") & pod==. //3 changes
-replace pod=4 if regexm(placeofdeath, "NURSING") & pod==. //4 changes
+replace pod=4 if regexm(placeofdeath, "SENIOR") & pod==. //0 changes
+replace pod=4 if regexm(placeofdeath, "RETREAT") & pod==. //16 changes
+replace pod=4 if regexm(placeofdeath, "RETIREMENT") & pod==. //0 changes
+replace pod=4 if regexm(placeofdeath, "NURSING") & pod==. //1 change
 replace pod=5 if regexm(placeofdeath, "PRISON") & pod==. //0 changes
-replace pod=5 if regexm(placeofdeath, "POLYCLINIC") & pod==. //10 changes
 replace pod=5 if regexm(placeofdeath, "MINISTRIES") & pod==. //0 changes
-replace pod=5 if regexm(placeofdeath, "HIGHWAY") & pod==. //2 changes - FOR THESE CHECK COD TO DIFFERENTIATE BETWEEN ROAD ACCIDENT AND AT HOME DEATH
+replace pod=5 if regexm(placeofdeath, "HIGHWAY") & pod==. //3 changes - FOR THESE CHECK COD TO DIFFERENTIATE BETWEEN ROAD ACCIDENT AND AT HOME DEATH
 replace pod=5 if regexm(placeofdeath, "ROUNDABOUT") & pod==. //0 changes - FOR THESE CHECK COD TO DIFFERENTIATE BETWEEN ROAD ACCIDENT AND AT HOME DEATH
-replace pod=5 if regexm(placeofdeath, "JUNCTION") & pod==. //0 changes - FOR THESE CHECK COD TO DIFFERENTIATE BETWEEN ROAD ACCIDENT AND AT HOME DEATH
-replace pod=6 if regexm(placeofdeath, "STRICT HOSP") & pod==. //30 changes
-replace pod=6 if regexm(placeofdeath, "GORDON CUMM") & pod==. //0 changes
-replace pod=7 if regexm(placeofdeath, "PSYCHIATRIC HOSP") & pod==. //24 changes
+replace pod=5 if regexm(placeofdeath, "JUNCTION") & pod==. //1 change - FOR THESE CHECK COD TO DIFFERENTIATE BETWEEN ROAD ACCIDENT AND AT HOME DEATH
+replace pod=6 if regexm(placeofdeath, "STRICT HOSP") & pod==. //19 changes
+replace pod=6 if regexm(placeofdeath, "GORDON CUMM") & pod==. //2 changes
+replace pod=7 if regexm(placeofdeath, "PSYCHIATRIC HOSP") & pod==. //1 change
 replace pod=7 if regexm(placeofdeath, "PSYCIATRIC HOSP") & pod==. //0 changes
-replace pod=7 if regexm(placeofdeath, "PSYCHIATRIC") & pod==. //2 changes
-replace pod=8 if regexm(placeofdeath, "BAYVIEW") & pod==. //50 changes
-replace pod=8 if regexm(placeofdeath, "BAY VIEW HOSP") & pod==. //1 change
-replace pod=9 if regexm(placeofdeath, "SANDY CREST") & pod==. //8 changes
+replace pod=7 if regexm(placeofdeath, "PSYCHIATRIC") & pod==. //14 changes
+replace pod=8 if regexm(placeofdeath, "BAYVIEW") & pod==. //15 changes
+replace pod=8 if regexm(placeofdeath, "BAY VIEW HOSP") & pod==. //0 changes
+replace pod=9 if regexm(placeofdeath, "SANDY CREST") & pod==. //7 changes
 replace pod=9 if regexm(placeofdeath, "FMH CLINIC") & pod==. //0 changes
 replace pod=9 if regexm(placeofdeath, "FMH EMERGENCY") & pod==. //0 changes
-replace pod=9 if regexm(placeofdeath, "SPARMAN CLINIC") & pod==. //4 changes
-replace pod=9 if regexm(placeofdeath, "CLINIC") & pod==. //3 changes
-replace pod=10 if regexm(placeofdeath, "BRIDGETOWN PORT") & pod==. //12 changes
+replace pod=9 if regexm(placeofdeath, "SPARMAN CLINIC") & pod==. //0 changes
+replace pod=9 if regexm(placeofdeath, "CLINIC") & pod==. //4 changes
+replace pod=9 if regexm(placeofdeath, "POLYCLINIC") & pod==. //0 changes
+replace pod=10 if regexm(placeofdeath, "BRIDGETOWN PORT") & pod==. //0 changes
 replace pod=11 if regexm(placeofdeath, "HOTEL") & pod==. //3 changes
 replace pod=99 if placeofdeath=="" & pod==. //0 changes
-replace pod=99 if placeofdeath=="99" //46 changes
+replace pod=99 if placeofdeath=="99" //20 changes
 
 order record_id address placeofdeath parish deathparish coddeath
-count if pod==. //1897 - check address against placeofdeath in Stata Browse window
-//list record_id placeofdeath if pod==.
-count if pod==. & parish!=deathparish //139 - check COD to determine if road accident or at home death
+count if pod==. & parish!=deathparish & (regexm(coddeath, "CORONA")|regexm(coddeath, "COVID")) //217
+replace pod=12 if pod==. & parish!=deathparish & (regexm(coddeath, "CORONA")|regexm(coddeath, "COVID")) //217 changes
+count if pod==. & parish!=deathparish //88 - check COD to determine if road accident or at home death
 //list record_id address parish placeofdeath deathparish if pod==. & parish!=deathparish
-count if pod==. & parish!=deathparish & (regexm(coddeath, "CORONA")|regexm(coddeath, "COVID")) //12
-
-replace pod=2 if pod==. & address==placeofdeath //913 changes
-replace pod=2 if pod==. & parish==deathparish //852 changes
-replace pod=12 if pod==. & parish!=deathparish & (regexm(coddeath, "CORONA")|regexm(coddeath, "COVID")) //12 changes
-replace pod=11 if pod==. & parish!=deathparish & address!=placeofdeath //120 changes
+count if pod==. //1179 - check address against placeofdeath in Stata Browse window
+//list record_id placeofdeath if pod==.
+replace pod=2 if pod==. & address==placeofdeath //623 changes
+replace pod=2 if pod==. & parish==deathparish //473 changes
+replace pod=11 if pod==. & parish!=deathparish & address!=placeofdeath //83 changes
 
 //drop placeofdeath
 tab pod ,m //none unassigned
@@ -634,21 +601,22 @@ count if natregno!="" & natregno!="." & length(natregno)!=10 //0
 
 order record_id pname fname mname lname address parish age dod
 
-count if natregno=="" & nrn!=. //1
-gen double nrn2=nrn if record_id==28513
-tostring nrn2 ,replace
-replace nrn2=subinstr(nrn2,"3","3-",.) if record_id==28513
-replace natregno=nrn2 if record_id==28513
-drop nrn2
+count if natregno=="" & nrn!=. //0
+//gen double nrn2=nrn if record_id==28513
+//tostring nrn2 ,replace
+//replace nrn2=subinstr(nrn2,"3","3-",.) if record_id==28513
+//replace natregno=nrn2 if record_id==28513
+//drop nrn2
 
-count if natregno=="" //231
-count if natregno=="" & age!=0 //231
-count if natregno=="" & age!=0 & !(strmatch(strupper(address), "*BRIDGETOWN PORT*")) & !(strmatch(strupper(pname), "*BABY*")) //204 - checked against 2021 electoral list + updated NRN in REDCapdb
-replace pod=11 if record_id==29351|record_id==28202|record_id==27410
-drop if record_id==29548 //duplicate of record_id 27369
+count if natregno=="" //87
+count if natregno=="" & age!=0 //87
+count if natregno=="" & age!=0 & pod!=11 & !(strmatch(strupper(address), "*BRIDGETOWN PORT*")) & !(strmatch(strupper(address), "*BRIDGETOWN SEA PORT*")) & !(strmatch(strupper(address), "*HOTEL*")) & !(strmatch(strupper(address), "*BARBADOS PORT*")) & !(strmatch(strupper(address), "*AIRPORT*")) & !(strmatch(strupper(pname), "*BABY*")) //65 - checked against 2021 electoral list + updated NRN in REDCapdb
+count if pod!=11 & (regexm(address,"BRIDGETOWN PORT")|regexm(address,"BARBADOS PORT")|regexm(address,"AIRPORT")|regexm(address,"HOTEL")) //9
+replace pod=11 if pod==2 & (regexm(address,"BRIDGETOWN PORT")|regexm(address,"BARBADOS PORT")|regexm(address,"AIRPORT")|regexm(address,"HOTEL")) //3 changes
 count if age==. //0
 
 ** Add missing NRNs flagged above with list of NRNs manually created using electoral list (this ensures dofile remains de-identified)
+/*
 preserve
 clear
 import excel using "`datapath'\version09\2-working\MissingNRNs_mort_20220614.xlsx" , firstrow case(lower)
@@ -671,22 +639,25 @@ replace nrn=elec_nrn if _merge==3 //3 changes
 replace natregno=elec_natregno if _merge==3 //3 changes
 drop elec_* _merge
 erase "`datapath'\version09\2-working\electoral_missingnrn.dta"
+*/
 
 ** Check dob** Creating dob variable as none in national death data
 ** perform data cleaning on the age variable
 order record_id natregno age
-count if natregno==""|natregno=="." //226
+count if natregno==""|natregno=="." //87
 gen tempvarn=6 if natregno==""|natregno=="."
 gen yr = substr(natregno,1,1) if tempvarn!=6
 gen yr1=. if tempvarn!=6
 replace yr1 = 20 if yr=="0"
 replace yr1 = 19 if yr!="0"
 replace yr1 = 99 if natregno=="99"
-order record_id natregno nrn age yr yr1
+order record_id natregno nrn age agetxt yr yr1
 ** Check age and yr1 in Stata browse
-//list record_id natregno nrn age yr1 if yr1==20
+//list record_id natregno nrn age agetxt yr1 if yr1==20
+count if yr1==19 & age<21 //25
+replace yr1=20 if yr1==19 & age<21 //25 changes
 ** Initially need to run this code separately from entire dofile to determine which nrnyears should be '19' instead of '20' depending on age, e.g. for age 107 nrnyear=19
-replace yr1 = 19 if record_id==29610|record_id==30063
+//replace yr1 = 19 if record_id==|record_id==
 
 gen nrndob = substr(natregno,1,6) 
 destring nrndob, replace
@@ -703,38 +674,40 @@ format nrn1 %dD_m_CY
 rename nrn1 dobcheck
 gen age2 = (dod - dobcheck)/365.25
 gen ageyrs=int(age2)
-count if tempvarn!=6 & age!=ageyrs //27
+count if tempvarn!=6 & age!=ageyrs //7
 sort record_id
-list record_id fname lname address age ageyrs nrn natregno dob dobcheck dod yr1 if tempvarn!=6 & age!=ageyrs, string(20) //check against electoral list
-count if dobcheck!=. & dob==. //5,206
-replace dob=dobcheck if dobcheck!=. & dob==. //5,206 changes
+list record_id fname lname address age agetxt ageyrs nrn natregno dob dobcheck dod yr1 if tempvarn!=6 & age!=ageyrs, string(15) //check against electoral list
+count if dobcheck!=. & dob==. //0
+replace dob=dobcheck if dobcheck!=. & dob==. //0 changes
 //replace nrn=. if record_id==34112 - KG checked 24jun2022 and confirmed NRN and age are correct since pt's age = 18 months
 //replace natregno="" if record_id==34112
-replace age=ageyrs if tempvarn!=6 & age!=ageyrs & ageyrs<100 //11 changes
+replace age=ageyrs if tempvarn!=6 & age!=ageyrs & agetxt==6 & ageyrs<100 //3 changes
 drop day month dyear nrnyr yr yr1 year2 nrndob age2 ageyrs tempvarn dobcheck
 
 ** Check age
 gen age2 = (dod - dob)/365.25
 gen checkage2=int(age2)
 drop age2
-count if dob!=. & dod!=. & age!=checkage2 //15
-list record_id fname lname dod dob age checkage2 if dob!=. & dod!=. & age!=checkage2 //all correct
+count if dob!=. & dod!=. & age!=checkage2 //4
+list record_id fname lname dod dob age agetxt checkage2 if dob!=. & dod!=. & age!=checkage2 //all correct
 //replace age=checkage2 if dob!=. & dod!=. & age!=checkage2 //0 changes
 drop checkage2
 
 ** Check no missing dxyr so this can be used in analysis
-tab dodyear ,m //5017 - none missing
+tab dodyear ,m //3142 - none missing
 
 count if dodyear!=year(dod) //0
 //list pid record_id dod dodyear if dodyear!=year(dod)
 replace dodyear=year(dod) if dodyear!=year(dod) //0 changes
 
-label data "BNR MORTALITY data 2019 + 2020"
-notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version09\3-output\2019_2020_prep mort_ALL" ,replace
-note: TS This dataset is used for analysis of age-standardized mortality rates
-note: TS This dataset includes all 2019 + 2020 CODs
 
+label data "BNR MORTALITY data 2021"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'\version09\3-output\2021_prep mort_ALL" ,replace
+note: TS This dataset is used for analysis of age-standardized mortality rates
+note: TS This dataset includes all 2021 CODs
+
+STOP
 *******************
 ** Check for MPs **
 **   in CODs     **
@@ -1555,6 +1528,14 @@ replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C
 tab siteicd10 ,m //0 missing
 
 drop dupobs* dup_id
+
+Spelling variations noted re COVID:
+- COV19
+- 
+
+Cases where POD=isolation facility but COD!=COVID
+(regexm(placeofdeath,"HARRISON")|regexm(placeofdeath,"BLACKMAN")|regexm(placeofdeath,"ISOLATION")) & !(strmatch(strupper(coddeath), "*COVID*")) & !(strmatch(strupper(coddeath), "*CORONA*"))
+//6 in total
 
 order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear cancer siteiarc siteiarchaem pod coddeath
 
