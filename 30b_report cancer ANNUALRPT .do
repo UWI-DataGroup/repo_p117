@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      22-AUG-2022
+    // 	date last modified      23-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report.
@@ -2044,71 +2044,7 @@ notes _dta :These data prepared for Natasha Sobers - 2015 annual report
 restore
 
 */
-				*******************************
-				*	     MS WORD REPORT       *
-				*   ANNUAL REPORT STATISTICS  *
-                *   Length of Time (DX + DOD) *
-				*******************************
-preserve
-use "`datapath'\version15\2-working\doddotdiff", clear
-putdocx clear
-putdocx begin
 
-putdocx pagebreak
-putdocx paragraph, style(Heading1)
-putdocx text ("Date Difference"), bold
-putdocx paragraph, style(Heading2)
-putdocx text ("Date Difference (Dofile: SAForde_CME_Aug2022.do)"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Length of Time Between Diagnosis and Death in MONTHS (Median, Range and Mean), 2008-2018."), bold font(Helvetica,10,"blue")
-putdocx paragraph
-putdocx text ("Below table uses the variables [dot] and [dod] to display results for patients by tumour (i.e. MPs not excluded) that have died. It does not include cases where [dod] is missing, i.e. Alive patients.")
-
-putdocx paragraph, halign(center)
-
-putdocx table tbl1 = data(year median_doddotdiff range_lower range_upper mean_doddotdiff), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate.docx", append
-putdocx clear
-restore
-
-				*******************************
-				*	     MS WORD REPORT       *
-				*   ANNUAL REPORT STATISTICS  *
-                *  Basis of Diagnosis by DxYr *
-				*******************************
-
-** SF requested via Zoom meeting on 18aug2022: table with dxyr and basis
-preserve
-use "`datapath'\version15\1-input\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
-
-putdocx clear
-putdocx begin
-
-putdocx pagebreak
-putdocx paragraph, style(Heading1)
-putdocx text ("Most Valid Basis Of Diagnosis"), bold
-putdocx paragraph, style(Heading2)
-putdocx text ("Basis Of Diagnosis (Dofile: 25a_analysis numbers.do)"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Basis Of Diagnosis, 2008-2018."), bold font(Helvetica,10,"blue")
-putdocx paragraph
-putdocx text ("Below table uses the variables [basis] and [dxyr] to display results for patients by tumour (i.e. MPs not excluded).")
-
-putdocx paragraph, halign(center)
-putdocx text ("2008,2013-2018"), bold font(Helvetica,10,"blue")
-tab2docx basis if dxyr>2007
-
-local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate.docx", append
-putdocx clear
-restore
 
 
 				****************************
@@ -2152,3 +2088,175 @@ local listdate = string( d(`c(current_date)'), "%dCYND" )
 putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate.docx", append
 putdocx clear
 restore
+				*******************************
+				*	     MS WORD REPORT       *
+				*   ANNUAL REPORT STATISTICS  *
+                *   Length of Time (DX + DOD) *
+				*******************************
+preserve
+use "`datapath'\version15\2-working\doddotdiff", clear
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Date Difference"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Date Difference (Dofile: SAForde_CME_Aug2022.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Length of Time Between Diagnosis and Death in MONTHS (Median, Range and Mean), 2008-2018."), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx text ("Below table uses the variables [dot] and [dod] to display results for patients by tumour (i.e. MPs not excluded) that have died. It does not include cases where [dod] is missing, i.e. Alive patients.")
+
+putdocx paragraph, halign(center)
+
+putdocx table tbl1 = data(year median_doddotdiff range_lower range_upper mean_doddotdiff), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate.docx", append
+putdocx clear
+restore
+				*******************************
+				*	     MS WORD REPORT       *
+				*   ANNUAL REPORT STATISTICS  *
+                *   Resident Status by DxYr   *
+				*******************************
+
+** SF requested via WhatsApp on 23aug2022: table with dxyr and resident status as wants to see those that are nonreportable due to resident status
+preserve
+use "`datapath'\version09\3-output\2008_2013-2018_nonsurvival_nonreportable" ,clear
+
+table resident dxyr if resident!=1
+
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Resident Status"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Resident Status (Dofile: 20d_final clean.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Resident Status, 2008-2018."), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx text ("Below table uses the variables [resident] and [dxyr] to display results for patients only (i.e. MPs excluded).")
+
+putdocx paragraph, halign(center)
+putdocx text ("2008,2013-2018"), bold font(Helvetica,10,"blue")
+tab2docx resident if dxyr>2007 & patient==1
+
+putdocx paragraph, halign(center)
+putdocx text ("Non-Residents by Diagnosis Year, 2008-2018."), bold font(Helvetica,10,"blue")
+putdocx paragraph, halign(center)
+putdocx image "`datapath'\version09\2-working\ResidentStatusByYear.png", width(14.98) height(4.36)
+putdocx paragraph
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx" ,append
+putdocx clear
+restore
+
+				*******************************
+				*	     MS WORD REPORT       *
+				*   ANNUAL REPORT STATISTICS  *
+                *  Basis of Diagnosis by DxYr *
+				*******************************
+
+** SF requested via Zoom meeting on 18aug2022: table with dxyr and basis
+preserve
+use "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
+
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Most Valid Basis Of Diagnosis"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Basis Of Diagnosis (Dofile: 25a_analysis numbers.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Basis Of Diagnosis, 2008-2018."), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx text ("Below table uses the variables [basis] and [dxyr] to display results for patients by tumour (i.e. MPs not excluded).")
+
+putdocx paragraph, halign(center)
+putdocx text ("2008,2013-2018"), bold font(Helvetica,10,"blue")
+tab2docx basis if dxyr>2007
+
+putdocx paragraph, halign(center)
+putdocx text ("Basis Of Diagnosis by Diagnosis Year, 2008-2018."), bold font(Helvetica,10,"blue")
+putdocx paragraph, halign(center)
+putdocx image "`datapath'\version09\2-working\BODbyYear.png", width(17.94) height(5.08)
+putdocx paragraph
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx" ,append
+putdocx clear
+restore
+
+** SF requested via Zoom meeting on 18aug2022: table with dxyr and basis
+** For ease, I copied and pasted the below results into the Word doc:
+
+** LOAD 2008, 2013-2018 cleaned cancer incidence dataset from p117/version15/20d_final clean.do
+use "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
+
+count //6682
+
+tab basis dxyr
+/*
+                      |                                Diagnosis Year
+   Basis Of Diagnosis |      2008       2013       2014       2015       2016       2017       2018 |     Total
+----------------------+-----------------------------------------------------------------------------+----------
+                  DCO |        52         59         41        101         82         79         55 |       469 
+        Clinical only |        16         21         38         67        101         83         43 |       369 
+Clinical Invest./Ult  |        45         60         36         62         55         58         43 |       359 
+Lab test (biochem/imm |         7          5         10         14         31         13         17 |        97 
+        Cytology/Haem |        31         31         45         28         23         19         27 |       204 
+Hx of mets/Autopsy wi |        24         16         13         19         13         24         21 |       130 
+Hx of primary/Autopsy |       635        646        638        754        729        683        752 |     4,837 
+              Unknown |         5         46         63         47         36         18          2 |       217 
+----------------------+-----------------------------------------------------------------------------+----------
+                Total |       815        884        884      1,092      1,070        977        960 |     6,682
+*/
+table basis dxyr
+/*
+-------------------------------------------------------------------------------------------------------------------------------
+                                                                    |                       Diagnosis Year                     
+                                                                    |  2008   2013   2014    2015    2016   2017   2018   Total
+--------------------------------------------------------------------+----------------------------------------------------------
+Basis Of Diagnosis                                                  |                                                          
+  DCO                                                               |    52     59     41     101      82     79     55     469
+  Clinical only                                                     |    16     21     38      67     101     83     43     369
+  Clinical Invest./Ult Sound/Exploratory Surgery/Autopsy without hx |    45     60     36      62      55     58     43     359
+  Lab test (biochem/immuno.)                                        |     7      5     10      14      31     13     17      97
+  Cytology/Haem                                                     |    31     31     45      28      23     19     27     204
+  Hx of mets/Autopsy with Hx of mets                                |    24     16     13      19      13     24     21     130
+  Hx of primary/Autopsy with Hx of primary                          |   635    646    638     754     729    683    752   4,837
+  Unknown                                                           |     5     46     63      47      36     18      2     217
+  Total                                                             |   815    884    884   1,092   1,070    977    960   6,682
+-------------------------------------------------------------------------------------------------------------------------------
+*/
+
+
+contract basis dxyr
+rename _freq number
+
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, halign(center)
+
+putdocx table tbl1 = data(dxyr basis number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx" ,append
+putdocx clear
