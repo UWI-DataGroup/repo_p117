@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      23-AUG-2022
+    // 	date last modified      24-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report.
@@ -623,7 +623,9 @@ putdocx table tbl1(9,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -667,7 +669,9 @@ putdocx table tbl1(9,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -711,7 +715,9 @@ putdocx table tbl1(9,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -756,7 +762,9 @@ putdocx table tbl1(9,.), bold shading("yellow")
 putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -801,7 +809,9 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(11,.), bold shading("yellow")
 putdocx table tbl1(12,.), bold shading("yellow")
 //putdocx table tbl1(17,.), bold shading("yellow")
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -846,7 +856,9 @@ putdocx table tbl1(12,.), bold shading("yellow")
 //putdocx table tbl1(13,.), bold shading("yellow")
 putdocx table tbl1(14,.), bold shading("yellow")
 //putdocx table tbl1(15,.), bold shading("yellow")
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1186,6 +1198,10 @@ save "`datapath'\version09\3-output\2013_2014_2015_summstats" ,replace
 restore
 */
 
+
+****************
+** 2020 ASMRs **
+****************
 ** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
 				****************************
 				*	   MS WORD REPORT      *
@@ -1214,7 +1230,7 @@ putdocx textblock begin
 Date Prepared: 28-Jun-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10e_analysis mort 2020.do
+Generated using Dofile: 10h_analysis mort_2020_age10.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -1316,6 +1332,10 @@ putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05
 putdocx clear
 restore
 
+
+****************
+** 2019 ASMRs **
+****************
 ** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
 				****************************
 				*	   MS WORD REPORT      *
@@ -1344,7 +1364,7 @@ putdocx textblock begin
 Date Prepared: 28-Jun-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10d_analysis mort 2019.do
+Generated using Dofile: 10g_analysis mort_2019_age10.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -1446,6 +1466,10 @@ putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05
 putdocx clear
 restore
 
+
+****************
+** 2018 ASMRs **
+****************
 ** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
 				****************************
 				*	   MS WORD REPORT      *
@@ -1454,7 +1478,7 @@ restore
 				****************************
 
 ** Output for above ASMRs
-use "`datapath'\version09\2-working\ASMRs_wpp", clear
+use "`datapath'\version09\2-working\ASMRs_wpp_2018", clear
 //format asmr %04.2f
 //format percentage %04.1f
 sort cancer_site year asmr
@@ -1474,7 +1498,7 @@ putdocx textblock begin
 Date Prepared: 10-May-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10_analysis mort.do
+Generated using Dofile: 10f_analysis mort_2018_age10.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -1577,6 +1601,9 @@ putdocx clear
 restore
 
 
+****************
+** 2017 ASMRs **
+****************
 ** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
 				****************************
 				*	   MS WORD REPORT      *
@@ -1605,7 +1632,7 @@ putdocx textblock begin
 Date Prepared: 18-May-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10b_analysis mort 2016.do
+Generated using Dofile: 10e_analysis mort_2017_age10.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -1708,6 +1735,9 @@ putdocx clear
 restore
 
 
+****************
+** 2016 ASMRs **
+****************
 ** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
 				****************************
 				*	   MS WORD REPORT      *
@@ -1736,7 +1766,7 @@ putdocx textblock begin
 Date Prepared: 18-May-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10b_analysis mort 2016.do
+Generated using Dofile: 10d_analysis mort_2016_age10.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -1838,6 +1868,282 @@ putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05
 putdocx clear
 restore
 
+
+****************
+** 2014 ASMRs **
+****************
+** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASMRs - WPP        *
+				****************************
+
+** Output for above ASMRs
+use "`datapath'\version09\2-working\ASMRs_wpp_2014", clear
+//format asmr %04.2f
+//format percentage %04.1f
+sort cancer_site year asmr
+
+preserve
+putdocx clear
+putdocx begin, footer(foot1)
+putdocx pagebreak
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2014 Annual Report: ASMRs - WPP"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2014 (Population=284,825)"), bold font(Helvetica,10,"blue")
+putdocx textblock begin
+Date Prepared: 24-Aug-2022.
+Prepared by: JC using Stata 
+//REDCap (death) data release date: 06-May-2022.
+Generated using Dofile: 10b_analysis mort_2014_age10.do
+putdocx textblock end
+putdocx paragraph
+putdocx text ("Methods"), bold
+putdocx textblock begin
+(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version09\1-input\2014_cancer_mort_dc")
+putdocx textblock end
+putdocx textblock begin
+(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2016-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\1-input\2014_cancer_mort_dc")
+putdocx textblock end
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+This cancer death analysis was before the DataGroup SharePoint infrastrucutre so original files and data can be found in path: "...\Sync\DM\Stata\Stata do files\data_cleaning\2014\cancer\versions\version02\" + "...\Sync\DM\Stata\Stata do files\data_analysis\2014\cancer\versions\version01\".
+putdocx textblock end
+//putdocx pagebreak
+putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx table tbl1(1,7), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
+putdocx clear
+restore
+
+** Output for top10 age-specific rates
+preserve
+use "`datapath'\version09\2-working\2014_top10mort_age_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*      MORTALITY: 2014     *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific mortality rates for Top 10 cancers: 2014"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Mortality Top 10 - 2014"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no deaths (dataset used: "`datapath'\version09\2-working\2014_top10mort_age_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version09\2-working\2014_top10mort_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				* by sex - MORTALITY: 2014 *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific mortality rates for Top 10 cancers by Sex: 2014"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Mortality Top 10 - 2014"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no deaths (dataset used: "`datapath'\version09\2-working\2014_top10mort_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
+putdocx clear
+restore
+
+****************
+** 2013 ASMRs **
+****************
+** JC 10may2022: NS requested the ASMRs earlier than rest of stats for Globocan comparison process.
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASMRs - WPP        *
+				****************************
+
+** Output for above ASMRs
+use "`datapath'\version09\2-working\ASMRs_wpp_2013", clear
+//format asmr %04.2f
+//format percentage %04.1f
+sort cancer_site year asmr
+
+preserve
+putdocx clear
+putdocx begin, footer(foot1)
+putdocx pagebreak
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2013 Annual Report: ASMRs - WPP"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2013 (Population=284,294)"), bold font(Helvetica,10,"blue")
+putdocx textblock begin
+Date Prepared: 24-Aug-2022.
+Prepared by: JC using Stata 
+//REDCap (death) data release date: 06-May-2022.
+Generated using Dofile: 10f_analysis mort_2013+2014_age10.do
+putdocx textblock end
+putdocx paragraph
+putdocx text ("Methods"), bold
+putdocx textblock begin
+(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version09\1-input\2013_cancer_for_MR_only")
+putdocx textblock end
+putdocx textblock begin
+(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2013-10 and world population dataset: who2000_10-2; cancer death dataset used: "`datapath'\version09\1-input\2013_cancer_for_MR_only")
+putdocx textblock end
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+This cancer death database was based on A.Rose's method so cancer_site is the site groupings created by AR since the cancer CODs were not ICD-10 coded (original files and data can be found in path: "...\Sync\DM\Stata\Stata do files\data_cleaning\2013\cancer\versions\version03\" + "...\Sync\DM\Stata\Stata do files\data_analysis\2013\cancer\versions\version02\"). Site groupings differ slightly from 2014 onwards as 2014 onwards used ICD-10 coded cancer CODs + IARC's site groupings.
+putdocx textblock end
+//putdocx pagebreak
+putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx table tbl1(1,7), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
+putdocx clear
+restore
+
+** Output for top10 age-specific rates
+preserve
+use "`datapath'\version09\2-working\2013_top10mort_age_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*      MORTALITY: 2016     *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific mortality rates for Top 10 cancers: 2013"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Mortality Top 10 - 2013"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no deaths (dataset used: "`datapath'\version09\2-working\2013_top10mort_age_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version09\2-working\2013_top10mort_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				* by sex - MORTALITY: 2013 *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific mortality rates for Top 10 cancers by Sex: 2013"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Mortality Top 10 - 2013"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no deaths (dataset used: "`datapath'\version09\2-working\2013_top10mort_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV05_`listdate'.docx", append
+putdocx clear
+restore
 stop
 /*
 ** Output for cases by PARISH
