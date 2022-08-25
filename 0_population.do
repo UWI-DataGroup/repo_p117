@@ -4,12 +4,12 @@
     //  project:				BNR
     //  analysts:				Jacqueline CAMPBELL
     //  date first created      17-AUG-2022
-    // 	date last modified	    17-AUG-2022
+    // 	date last modified	    24-AUG-2022
     //  algorithm task			Prep for external population for incidence and mortality analyses
     //  status                  Completed
-    //  objective               To have one dataset with 2008, 2013-2018 population data for 2016-2018 cancer report.
+    //  objective               To have one dataset with 2008, 2013-2021 population data for 2016-2018 cancer report.
     //  methods                 (1) 2000 bb census updated to 2010 bb census; World Standard Population based on SEER (https://seer.cancer.gov/stdpopulations/world.who.html)
-	//							(2) 2008-2018 World Population Prospects (https://population.un.org/wpp/Download/Standard/Population/) checked previously-generated with ones on
+	//							(2) 2008-2021 World Population Prospects (https://population.un.org/wpp/Download/Standard/Population/) checked previously-generated with ones on
 	//								10-MAY-2022 to ensure they still match.
 
     ** DO FILE BASED ON
@@ -832,13 +832,14 @@ clear
 ** (World Population Prospects 2019) **
 ***************************************
 ** Written by JCampbell on 02-Dec-2019 as requested by NS for ASIRs comparisons with BSS vs UN WPP's populations
+** Downloaded 2021 population totals by JCampbell on 24-Aug-2022 for calculating 2021 ASMRs
 
 ***************
 ** DATA IMPORT  
 ***************
-** LOAD the 2019 WPP 2008,2013-2018 excel dataset, multiple sheets at once
+** LOAD the 2019 WPP 2008,2013-2021 excel dataset, multiple sheets at once
 import excel using "`datapath'\version09\1-input\WPP.xlsx" , describe
-forvalues i=9(-1)1 {  
+forvalues i=10(-1)1 {  
 import excel using "`datapath'\version09\1-input\WPP.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D37) clear
 import excel using "`datapath'\version09\1-input\WPP.xlsx", ///
@@ -855,7 +856,9 @@ import excel using "`datapath'\version09\1-input\WPP.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D37) clear
 import excel using "`datapath'\version09\1-input\WPP.xlsx", ///
          sheet(Sheet`i') cellrange(A2:D37) clear
-if `i'==9 {
+import excel using "`datapath'\version09\1-input\WPP.xlsx", ///
+         sheet(Sheet`i') cellrange(A2:D37) clear
+if `i'==10 {
     save "`datapath'\version09\2-working\pop_wpp", replace
   }
   else {
@@ -1044,7 +1047,7 @@ drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2019: 5-year age bands"
 save "`datapath'\version09\2-working\pop_wpp_2019-5" , replace
-note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+note: TS This dataset prepared using 2000-2019 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
 restore
 
 preserve
@@ -1053,7 +1056,7 @@ drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2019: 10-year age bands"
 save "`datapath'\version09\2-working\pop_wpp_2019-10" , replace
-note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+note: TS This dataset prepared using 2000-2019 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
 restore
 
 preserve
@@ -1062,7 +1065,7 @@ drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
 label data "UN WPP Population data 2020: 5-year age bands"
 save "`datapath'\version09\2-working\pop_wpp_2020-5" , replace
-note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+note: TS This dataset prepared using 2000-2020 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
 restore
 
 preserve
@@ -1071,5 +1074,23 @@ drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
 label data "UN WPP Population data 2020: 10-year age bands"
 save "`datapath'\version09\2-working\pop_wpp_2020-10" , replace
-note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+note: TS This dataset prepared using 2000-2020 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+restore
+
+preserve
+drop if year!=2021
+drop year age_10
+collapse (sum) pop_wpp, by(age5 sex)
+label data "UN WPP Population data 2021: 5-year age bands"
+save "`datapath'\version09\2-working\pop_wpp_2021-5" , replace
+note: TS This dataset prepared using 2000-2021 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
+restore
+
+preserve
+drop if year!=2021
+drop year age5
+collapse (sum) pop_wpp, by(age_10 sex)
+label data "UN WPP Population data 2021: 10-year age bands"
+save "`datapath'\version09\2-working\pop_wpp_2021-10" , replace
+note: TS This dataset prepared using 2000-2021 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 24-Aug-2022.
 restore

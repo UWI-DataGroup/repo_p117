@@ -226,7 +226,7 @@ rename count number
 	replace number=651 in 11
 	replace percentage=100 in 11
 
-label define cancer_siteiarc_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "lung" 6 "pancreas" 7 "multiple myeloma" 8 "corpus uteri" 9 "rectum" 10 "stomach" 11 "NHL" ,modify
+label define cancer_siteiarc_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "lung" 6 "pancreas" 7 "multiple myeloma" 8 "corpus uteri" 9 "rectum" 10 "stomach" 11 "non-hodgkin lymphoma" ,modify
 label values cancer_siteiarc cancer_siteiarc_lab
 label define year_lab 1 "2014" ,modify
 label values year year_lab

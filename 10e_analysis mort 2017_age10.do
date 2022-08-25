@@ -34,7 +34,7 @@
 ** HEADER -----------------------------------------------------
 
 ** Load the dataset
-** JC 22aug2022: mortality analyses was done in p117version04 for the Globocan comparison requested by NS + the 2022 BNR CME webinar so using the dofiles and ds from that version (version04/3-output)
+** JC 22aug2022: mortality analyses was done in p117/version04 for the Globocan comparison requested by NS + the 2022 BNR CME webinar so using the dofiles and ds from that version (version04/3-output)
 use "`datapath'\version09\3-output\2017_prep mort_deidentified", clear
 
 count // 670 cancer deaths in 2017

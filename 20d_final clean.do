@@ -2053,6 +2053,355 @@ erase "`datapath'\version09\2-working\2008_2013-2018_cr5rptdb.dta"
 drop dotmonth dotday dotyear2 str_sourcerecordid sourcetotal sourcetot_orig str_pid2 patienttotal patienttot str_patientidtumourtable mpseq2 sourceseq tumseq tumsourceseq dobyear dobmonth dobday rx1year rx1month rx1day rx2year rx2month rx2day rx3year rx3month rx3day stdyear stdmonth stdday rdyear rdmonth rdday rptyear rptmonth rptday sxyear sxmonth sxday physyear physmonth physday imgyear imgmonth imgday admyear admmonth admday dfcyear dfcmonth dfcday rtyear rtmonth rtday topcheckcat morphcheckcat hxcheckcat agecheckcat hxfamcat sexcheckcat sitecheckcat latcheckcat behcheckcat behsitecheckcat gradecheckcat bascheckcat stagecheckcat dotcheckcat dxyrcheckcat rxcheckcat othtreat1 orxcheckcat notreat1 notreat2 norxcheckcat sname sourcecheckcat doccheckcat docaddrcheckcat rptcheckcat imagecheckcat datescheckcat residentcheckcat crosschk pid_all currentdatept nrnday dob_yr dob_year year2 dobchk nrnid currentdatett checkage morphology dupobs1 dupobs2 dupobs3 dupobs4 dupobs5 dupobs6 dupobs7 dupobs8 tempvarn dupobs9 currentdatest dupst pidobsid pidobstot nonreportable currentds pid_prev cstatus sourcetot skin codcancer miss2013abs sitear dd_dodyear iarcflag prev all SurgicalFindings SurgicalFindingsDate ImagingResults ImagingResultsDate PhysicalExam PhysicalExamDate tnmcat tnmant esstnmcat esstnmant rx4year rx4month rx4day rx5year rx5month rx5day laterality behaviour str_grade bas diagyr notiftype survtime_days survtime_months dup_pid previousds tomatch deathds matched nomatch dupdob duplndob dup dupnrntag dot_iarc dob_iarc duppidtag mptot2 dupcr5id _merge
 
 
+** SF requested by email 16aug2022: length of time between Dx and Death for 2015 and 2018
+//	Mean and median duration in months from date of incident diagnosis to date of abstraction
+** First calculate the difference in months between these 2 dates 
+// (need to add in qualifier to ignore missing dod dates)
+gen doddotdiff = (dod - dot) / (365/12) if dod!=. & dot!=.
+** Now calculate the overall mean & median
+preserve
+drop if doddotdiff==. //2470 deleted
+summ doddotdiff //displays mean
+/*
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+  doddotdiff |      4,212    17.06014    25.28071          0   165.9945
+*/
+summ doddotdiff, detail //displays mean + median (median is the percentile next to 50%)
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs               4,212
+25%     .6246575              0       Sum of wgt.       4,212
+
+50%      5.70411                      Mean           17.06014
+                        Largest       Std. dev.      25.28071
+75%     24.01644       155.9014
+90%     49.70959       156.5918       Variance       639.1141
+95%     71.17809        158.926       Skewness       2.329444
+99%     121.1836       165.9945       Kurtosis        9.41532
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=1
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
+** Now calculate mean & median per diagnosis year
+// 2008
+preserve
+drop if dxyr!=2008 //5867 deleted
+drop if doddotdiff==. //197 deleted
+summ doddotdiff, detail
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%     .0328767              0       Obs                 618
+25%     1.446575              0       Sum of wgt.         618
+
+50%      14.9589                      Mean           34.18561
+                        Largest       Std. dev.      42.56738
+75%     56.35069       155.9014
+90%     104.0877       156.5918       Variance       1811.982
+95%     131.5397        158.926       Skewness       1.310217
+99%     152.2521       165.9945       Kurtosis       3.620028
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=2
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+append using "`datapath'\version09\2-working\doddotdiff"
+
+sort year
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
+// 2013
+preserve
+drop if dxyr!=2013 //5798 deleted
+drop if doddotdiff==. //276 deleted
+summ doddotdiff, detail
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs                 608
+25%      1.29863              0       Sum of wgt.         608
+
+50%     9.386302                      Mean           20.85838
+                        Largest       Std. dev.      26.17669
+75%     29.65479       97.05206
+90%      67.3315       99.09041       Variance       685.2192
+95%     81.66576       99.71507       Skewness       1.413478
+99%     95.60548       105.1397       Kurtosis       3.921642
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=3
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+append using "`datapath'\version09\2-working\doddotdiff"
+
+sort year
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
+// 2014
+preserve
+drop if dxyr!=2014 //5798 deleted
+drop if doddotdiff==. //303 deleted
+summ doddotdiff, detail
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs                 581
+25%     .7561644              0       Sum of wgt.         581
+
+50%     7.791781                      Mean           17.37599
+                        Largest       Std. dev.      22.09671
+75%     27.05754       87.12329
+90%     49.84109       87.71507       Variance       488.2645
+95%         67.2       87.87946       Skewness       1.485112
+99%     86.59726       88.99726       Kurtosis        4.39957
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=4
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+append using "`datapath'\version09\2-working\doddotdiff"
+
+sort year
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
+// 2015
+preserve
+drop if dxyr!=2015 //5590 deleted
+drop if doddotdiff==. //406 deleted
+summ doddotdiff, detail
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs                 686
+25%     .4273973              0       Sum of wgt.         686
+
+50%          4.8                      Mean           14.38797
+                        Largest       Std. dev.      19.12978
+75%     22.48767       77.72055
+90%     44.77808       80.51507       Variance       365.9486
+95%     58.22466       81.13972       Skewness       1.503493
+99%     74.10411       81.20548       Kurtosis       4.437584
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=5
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+append using "`datapath'\version09\2-working\doddotdiff"
+
+sort year
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
+// 2016
+preserve
+drop if dxyr!=2016 //5612 deleted
+drop if doddotdiff==. //418 deleted
+summ doddotdiff, detail
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs                 652
+25%     .3780822              0       Sum of wgt.         652
+
+50%     3.156164                      Mean           11.60644
+                        Largest       Std. dev.      16.29346
+75%     17.91781       63.58356
+90%     38.63014        63.8137       Variance       265.4768
+95%     51.18904       66.80548       Skewness       1.611021
+99%     62.56438        67.7589       Kurtosis         4.6604
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=6
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+append using "`datapath'\version09\2-working\doddotdiff"
+
+sort year
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
+// 2017
+preserve
+drop if dxyr!=2017 //5705 deleted
+drop if doddotdiff==. //400 deleted
+summ doddotdiff, detail
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs                 577
+25%     .3616438              0       Sum of wgt.         577
+
+50%     3.353425                      Mean           10.11606
+                        Largest       Std. dev.      13.64302
+75%     14.69589       53.85205
+90%     33.27123       54.96986       Variance       186.1321
+95%     42.54247       58.19178       Skewness       1.567533
+99%     51.84658       62.13699       Kurtosis       4.624403
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=7
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+append using "`datapath'\version09\2-working\doddotdiff"
+
+sort year
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
+// 2018
+preserve
+drop if dxyr!=2018 //5722 deleted
+drop if doddotdiff==. //470 deleted
+summ doddotdiff, detail
+/*
+                         doddotdiff
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs                 490
+25%     .3287671              0       Sum of wgt.         490
+
+50%     3.090411                      Mean           9.548471
+                        Largest       Std. dev.      12.27191
+75%     15.35343       43.79178
+90%     31.47945       43.85753       Variance       150.5998
+95%     36.59178       43.92329       Skewness       1.268874
+99%     43.52877       44.97534       Kurtosis       3.358156
+*/
+gen k=1
+drop if k!=1
+
+table k, stat(q2 doddotdiff) stat(min doddotdiff) stat(max doddotdiff) stat(mean doddotdiff)
+** Now save the p50, min, max and mean for  SF's data request
+sum doddotdiff
+sum doddotdiff ,detail
+gen median_doddotdiff=r(p50)
+gen mean_doddotdiff=r(mean)
+gen range_lower=r(min)
+gen range_upper=r(max)
+gen year=8
+
+collapse year median_doddotdiff range_lower range_upper mean_doddotdiff
+append using "`datapath'\version09\2-working\doddotdiff"
+
+sort year
+order year median_doddotdiff range_lower range_upper mean_doddotdiff
+
+label define year_lab 1 "2008,2013-2018" 2 "2008" 3 "2013" 4 "2014" 5 "2015" ///
+					  6 "2016" 7 "2017" 8 "2018" , modify
+label values year year_lab
+
+save "`datapath'\version09\2-working\doddotdiff" ,replace
+restore
+
 ** Tables for quick reference
 tab dxyr eidmp ,m
 /*
