@@ -1,11 +1,11 @@
 cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          30b_report cancer ANNUALRPT.do
+    //  algorithm name          30b_report cancer_ANNUALRPT.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      24-AUG-2022
+    // 	date last modified      25-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report.
@@ -32,7 +32,7 @@ cls
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\30b_report cancer ANNUALRPT.smcl", replace // error r(603)
+    log using "`logpath'\30b_report cancer_ANNUALRPT.smcl", replace // error r(603)
 ** HEADER -----------------------------------------------------
 
 
@@ -42,7 +42,7 @@ cls
 ** Annual report: Table 1 (executive summary)
 ** Load the REPORTABLE NON-SURVIVAL DEIDENTIFIED dataset
 use "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
-/*
+
 ** POPULATION
 gen poptot_2013=284294
 gen poptot_2014=284825
@@ -192,9 +192,12 @@ frget surv5yr_2013 = surv5yr_2013, from(surv)
 ** ASIRs
 ** Copy ASIR totals from ASIRs dataset into this dataset by creating new frame for ASIRs dataset
 append using "`datapath'\version09\2-working\ASIRs"
-gen asir_2015=asir if cancer_site==1 & year==1
-gen asir_2014=asir if cancer_site==1 & year==2
-gen asir_2013=asir if cancer_site==1 & year==3
+gen asir_2018=asir if cancer_site==1 & year==1
+gen asir_2017=asir if cancer_site==1 & year==2
+gen asir_2016=asir if cancer_site==1 & year==3
+gen asir_2015=asir if cancer_site==1 & year==4
+gen asir_2014=asir if cancer_site==1 & year==5
+gen asir_2013=asir if cancer_site==1 & year==6
 format asir_* %04.2f
 
 ** Re-arrange dataset
@@ -206,30 +209,57 @@ label define title_lab 1 "Year" 2 "No.registrations(tumours)" 3 "% of entire pop
 label values title title_lab
 label var title "Title"
 
+replace title=2 if tumourtot_2018!=.
+replace title=2 if tumourtot_2017!=.
+replace title=2 if tumourtot_2016!=.
 replace title=2 if tumourtot_2015!=.
 replace title=2 if tumourtot_2014!=.
 replace title=2 if tumourtot_2013!=.
+replace title=3 if tumourtotper_2018!=.
+replace title=3 if tumourtotper_2017!=.
+replace title=3 if tumourtotper_2016!=.
 replace title=3 if tumourtotper_2015!=.
 replace title=3 if tumourtotper_2014!=.
 replace title=3 if tumourtotper_2013!=.
+replace title=4 if patienttot_2018!=.
+replace title=4 if patienttot_2017!=.
+replace title=4 if patienttot_2016!=.
 replace title=4 if patienttot_2015!=.
 replace title=4 if patienttot_2014!=.
 replace title=4 if patienttot_2013!=.
+replace title=5 if asir_2018!=.
+replace title=5 if asir_2017!=.
+replace title=5 if asir_2016!=.
 replace title=5 if asir_2015!=.
 replace title=5 if asir_2014!=.
 replace title=5 if asir_2013!=.
+replace title=6 if dco_2018!=.
+replace title=6 if dco_2017!=.
+replace title=6 if dco_2016!=.
 replace title=6 if dco_2015!=.
 replace title=6 if dco_2014!=.
 replace title=6 if dco_2013!=.
+replace title=7 if dcoper_2018!=.
+replace title=7 if dcoper_2017!=.
+replace title=7 if dcoper_2016!=.
 replace title=7 if dcoper_2015!=.
 replace title=7 if dcoper_2014!=.
 replace title=7 if dcoper_2013!=.
+replace title=8 if surv1yr_2018!=.
+replace title=8 if surv1yr_2017!=.
+replace title=8 if surv1yr_2016!=.
 replace title=8 if surv1yr_2015!=.
 replace title=8 if surv1yr_2014!=.
 replace title=8 if surv1yr_2013!=.
+replace title=9 if surv3yr_2018!=.
+replace title=9 if surv3yr_2017!=.
+replace title=9 if surv3yr_2016!=.
 replace title=9 if surv3yr_2015!=.
 replace title=9 if surv3yr_2014!=.
 replace title=9 if surv3yr_2013!=.
+replace title=10 if surv5yr_2018!=.
+replace title=10 if surv5yr_2017!=.
+replace title=10 if surv5yr_2016!=.
 replace title=10 if surv5yr_2015!=.
 replace title=10 if surv5yr_2014!=.
 replace title=10 if surv5yr_2013!=.
@@ -305,39 +335,66 @@ tab title ,m //40 missing - remove blank titles as no data in any of the corresp
 drop if title==. //40 deleted
 
 ** Rearrange summ stats datast
+egen tumtot_2018=max(tumourtot_2018)
+egen tumtot_2017=max(tumourtot_2017)
+egen tumtot_2016=max(tumourtot_2016)
 egen tumtot_2015=max(tumourtot_2015)
 egen tumtot_2014=max(tumourtot_2014)
 egen tumtot_2013=max(tumourtot_2013)
 
+egen tumtotper_2018=max(tumourtotper_2018)
+egen tumtotper_2017=max(tumourtotper_2017)
+egen tumtotper_2016=max(tumourtotper_2016)
 egen tumtotper_2015=max(tumourtotper_2015)
 egen tumtotper_2014=max(tumourtotper_2014)
 egen tumtotper_2013=max(tumourtotper_2013)
-format tumtotper_2013 tumtotper_2014 tumtotper_2015 %04.2f
+format tumtotper_2013 tumtotper_2014 tumtotper_2015 tumtotper_2016 tumtotper_2017 tumtotper_2018 %04.2f
 
+egen pttot_2018=max(patienttot_2018)
+egen pttot_2017=max(patienttot_2017)
+egen pttot_2016=max(patienttot_2016)
 egen pttot_2015=max(patienttot_2015)
 egen pttot_2014=max(patienttot_2014)
 egen pttot_2013=max(patienttot_2013)
 
+egen asirtot_2018=max(asir_2018)
+egen asirtot_2017=max(asir_2017)
+egen asirtot_2016=max(asir_2016)
 egen asirtot_2015=max(asir_2015)
 egen asirtot_2014=max(asir_2014)
 egen asirtot_2013=max(asir_2013)
 
+egen dcotot_2018=max(dco_2018)
+egen dcotot_2017=max(dco_2017)
+egen dcotot_2016=max(dco_2016)
 egen dcotot_2015=max(dco_2015)
 egen dcotot_2014=max(dco_2014)
 egen dcotot_2013=max(dco_2013)
 
+egen dcototper_2018=max(dcoper_2018)
+egen dcototper_2017=max(dcoper_2017)
+egen dcototper_2016=max(dcoper_2016)
 egen dcototper_2015=max(dcoper_2015)
 egen dcototper_2014=max(dcoper_2014)
 egen dcototper_2013=max(dcoper_2013)
 
+egen surv1yrtot_2018=max(surv1yr_2018)
+egen surv1yrtot_2017=max(surv1yr_2017)
+egen surv1yrtot_2016=max(surv1yr_2016)
 egen surv1yrtot_2015=max(surv1yr_2015)
 egen surv1yrtot_2014=max(surv1yr_2014)
 egen surv1yrtot_2013=max(surv1yr_2013)
 
+egen surv3yrtot_2018=max(surv3yr_2018)
+egen surv3yrtot_2017=max(surv3yr_2017)
+egen surv3yrtot_2016=max(surv3yr_2016)
 egen surv3yrtot_2015=max(surv3yr_2015)
 egen surv3yrtot_2014=max(surv3yr_2014)
 egen surv3yrtot_2013=max(surv3yr_2013)
 
+egen surv5yrtot_2018=max(surv5yr_2018)
+egen surv5yrtot_2017=max(surv5yr_2017)
+egen surv5yrtot_2016=max(surv5yr_2016)
 egen surv5yrtot_2015=max(surv5yr_2015)
 egen surv5yrtot_2014=max(surv5yr_2014)
 egen surv5yrtot_2013=max(surv5yr_2013)
@@ -347,20 +404,31 @@ egen surv5yrtot_2013=max(surv5yr_2013)
 replace dcototper_2013=round(dcototper_2013, 0.15)
 replace dcototper_2014=round(dcototper_2014, 0.15)
 replace dcototper_2015=round(dcototper_2015, 0.15)
+replace dcototper_2016=round(dcototper_2016, 0.15)
+replace dcototper_2017=round(dcototper_2017, 0.15)
+replace dcototper_2018=round(dcototper_2018, 0.15)
+replace surv1yrtot_2018=round(surv1yrtot_2018, 0.15)
+replace surv1yrtot_2017=round(surv1yrtot_2017, 0.15)
+replace surv1yrtot_2016=round(surv1yrtot_2016, 0.15)
 replace surv1yrtot_2015=round(surv1yrtot_2015, 0.15)
 replace surv1yrtot_2014=round(surv1yrtot_2014, 0.15)
 replace surv1yrtot_2013=round(surv1yrtot_2013, 0.15)
+replace surv3yrtot_2018=round(surv3yrtot_2018, 0.15)
+replace surv3yrtot_2017=round(surv3yrtot_2017, 0.15)
+replace surv3yrtot_2016=round(surv3yrtot_2016, 0.15)
 replace surv3yrtot_2015=round(surv3yrtot_2015, 0.15)
 replace surv3yrtot_2014=round(surv3yrtot_2014, 0.15)
 replace surv3yrtot_2013=round(surv3yrtot_2013, 0.15)
+replace surv5yrtot_2016=round(surv5yrtot_2016, 0.15)
+replace surv5yrtot_2015=round(surv5yrtot_2015, 0.15)
 replace surv5yrtot_2014=round(surv5yrtot_2014, 0.15)
 replace surv5yrtot_2013=round(surv5yrtot_2013, 0.15)
-format dcototper_2013 dcototper_2014 dcototper_2015 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv5yrtot_2014 surv5yrtot_2013 %2.1f
+format dcototper_2013 dcototper_2014 dcototper_2015 dcototper_2016 dcototper_2017 dcototper_2018 surv1yrtot_2018 surv1yrtot_2017 surv1yrtot_2016 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv3yrtot_2018 surv3yrtot_2017 surv3yrtot_2016 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv5yrtot_2016 surv5yrtot_2015 surv5yrtot_2014 surv5yrtot_2013 %2.1f
 
 *-------------------------------------------------------------------------------
 
 drop tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv1yr_* surv3yr_* surv5yr_*
-order id title tumtot_2015 tumtot_2014 tumtot_2013 tumtotper_2015 tumtotper_2014 tumtotper_2013 pttot_2015 pttot_2014 pttot_2013 asirtot_2015 asirtot_2014 asirtot_2013 dcotot_2015 dcotot_2014 dcotot_2013 dcototper_2015 dcototper_2014 dcototper_2013 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv5yrtot_2015 surv5yrtot_2014 surv5yrtot_2013
+order id title tumtot_2018 tumtot_2017 tumtot_2016 tumtot_2015 tumtot_2014 tumtot_2013 tumtotper_2018 tumtotper_2017 tumtotper_2016 tumtotper_2015 tumtotper_2014 tumtotper_2013 pttot_2018 pttot_2017 pttot_2016 pttot_2015 pttot_2014 pttot_2013 asirtot_2018 asirtot_2017 asirtot_2016 asirtot_2015 asirtot_2014 asirtot_2013 dcotot_2018 dcotot_2017 dcotot_2016 dcotot_2015 dcotot_2014 dcotot_2013 dcototper_2018 dcototper_2017 dcototper_2016 dcototper_2015 dcototper_2014 dcototper_2013 surv1yrtot_2018 surv1yrtot_2017 surv1yrtot_2016 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv3yrtot_2018 surv3yrtot_2017 surv3yrtot_2016 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv5yrtot_2016 surv5yrtot_2015 surv5yrtot_2014 surv5yrtot_2013
 
 replace title=1 if id==1
 replace title=2 if id==2
@@ -374,25 +442,40 @@ replace title=9 if id==9
 replace title=10 if id==10
 
 drop if id>10
+rename tumtot_2018 results_2018
+rename tumtot_2017 results_2017
+rename tumtot_2016 results_2016
 rename tumtot_2015 results_2015
 rename tumtot_2014 results_2014
 rename tumtot_2013 results_2013
 
-format tumtotper_2013 tumtotper_2014 tumtotper_2015 %04.2f
+format tumtotper_2013 tumtotper_2014 tumtotper_2015 tumtotper_2016 tumtotper_2017 tumtotper_2018 %04.2f
+replace results_2018=tumtotper_2018 if id==3
+replace results_2017=tumtotper_2017 if id==3
+replace results_2016=tumtotper_2016 if id==3
 replace results_2015=tumtotper_2015 if id==3
 replace results_2014=tumtotper_2014 if id==3
 replace results_2013=tumtotper_2013 if id==3
 replace results_2013=round(results_2013, 0.01) if id==3
 replace results_2014=round(results_2014, 0.01) if id==3
 replace results_2015=round(results_2015, 0.01) if id==3
+replace results_2016=round(results_2016, 0.01) if id==3
+replace results_2017=round(results_2017, 0.01) if id==3
+replace results_2018=round(results_2018, 0.01) if id==3
 drop tumtotper_*
 
+replace results_2018=pttot_2018 if id==4
+replace results_2017=pttot_2017 if id==4
+replace results_2016=pttot_2016 if id==4
 replace results_2015=pttot_2015 if id==4
 replace results_2014=pttot_2014 if id==4
 replace results_2013=pttot_2013 if id==4
 drop pttot_*
 
 format asirtot_* %04.2f
+replace results_2018=asirtot_2018 if id==5
+replace results_2017=asirtot_2017 if id==5
+replace results_2016=asirtot_2016 if id==5
 replace results_2015=asirtot_2015 if id==5
 replace results_2014=asirtot_2014 if id==5
 replace results_2013=asirtot_2013 if id==5
@@ -400,30 +483,48 @@ replace results_2013=asirtot_2013 if id==5
 //replace results_2014=204.80 if id==5
 drop asirtot_*
 
+replace results_2018=dcotot_2018 if id==6
+replace results_2017=dcotot_2017 if id==6
+replace results_2016=dcotot_2016 if id==6
 replace results_2015=dcotot_2015 if id==6
 replace results_2014=dcotot_2014 if id==6
 replace results_2013=dcotot_2013 if id==6
 drop dcotot_*
 
+replace results_2018=dcototper_2018 if id==7
+replace results_2017=dcototper_2017 if id==7
+replace results_2016=dcototper_2016 if id==7
 replace results_2015=dcototper_2015 if id==7
 replace results_2014=dcototper_2014 if id==7
 replace results_2013=dcototper_2013 if id==7
 drop dcototper_*
 
+replace results_2018=surv1yrtot_2018 if id==8
+replace results_2017=surv1yrtot_2017 if id==8
+replace results_2016=surv1yrtot_2016 if id==8
 replace results_2015=surv1yrtot_2015 if id==8
 replace results_2014=surv1yrtot_2014 if id==8
 replace results_2013=surv1yrtot_2013 if id==8
 
+replace results_2018=surv3yrtot_2018 if id==9
+replace results_2017=surv3yrtot_2017 if id==9
+replace results_2016=surv3yrtot_2016 if id==9
 replace results_2015=surv3yrtot_2015 if id==9
 replace results_2014=surv3yrtot_2014 if id==9
 replace results_2013=surv3yrtot_2013 if id==9
 
+replace results_2018=surv5yrtot_2018 if id==10
+replace results_2017=surv5yrtot_2017 if id==10
+replace results_2016=surv5yrtot_2016 if id==10
 replace results_2015=surv5yrtot_2015 if id==10
 replace results_2014=surv5yrtot_2014 if id==10
 replace results_2013=surv5yrtot_2013 if id==10
 
 drop surv1yrtot_* surv3yrtot_* surv5yrtot_*
 
+replace results_2018=2018 if id==1
+replace results_2017=2017 if id==1
+replace results_2016=2016 if id==1
 replace results_2015=2015 if id==1
 replace results_2014=2014 if id==1
 replace results_2013=2013 if id==1
@@ -443,11 +544,11 @@ putdocx paragraph, style(Title)
 putdocx text ("CANCER 2018 Annual Report: Stata Results"), bold
 putdocx textblock begin
 Date Prepared: 10-MAY-2022.
-Date Updated: 24-AUG-2022.
+Date Updated: 25-AUG-2022.
 Prepared by: JC using Stata v17.0
-CanReg5 v5.43 (incidence) data release date: 21-May-2021.
+CanReg5 v5.43 (incidence) data release date: 18-July-2022.
 REDCap v12.3.3 (death) data release date: 03-Aug-2022.
-Generated using Dofile: 30_report cancer.do
+Generated using Dofile: 30b_report cancer_ANNUALRPT.do
 putdocx textblock end
 putdocx paragraph, halign(center)
 putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2018 (Population=286,640), 2016 (Population=285,798), 2017 (Population=286,229), 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294))"), bold font(Helvetica,10,"blue")
@@ -458,44 +559,44 @@ putdocx image "`datapath'\version09\1-input\standards.png", width(6.64) height(6
 putdocx paragraph
 putdocx text ("Methods"), bold
 putdocx textblock begin
-(1) No.(tumours): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version09\3-output\2013_2014_2015_cancer_nonsurvival")
+(1) No.(tumours): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified")
 putdocx textblock end
 putdocx textblock begin
-(2) % of population: WPP population for 2013, 2014, 2015, 2016, 2017 and 2018 (see p_117\2018AnnualReportV02 branch\0_population.do)
+(2) % of population: WPP population for 2013, 2014, 2015, 2016, 2017 and 2018 (see p_117\2016-2018AnnualReport branch\0_population.do)
 putdocx textblock end
 putdocx textblock begin
-(3) No.(patients): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version09\3-output\2013_2014_2015_cancer_nonsurvival")
+(3) No.(patients): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: patient; dataset used: "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified")
 putdocx textblock end
 putdocx textblock begin
-(4) ASIR: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; stata command distrate used with pop_wpp_2015-10, pop_wpp_2014-10, pop_wpp_2013-10 for 2015,2014,2013 cancer incidence, respectively, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version09\2-working\pop_wpp_2015-10;pop_wpp_2014-10;pop_wpp_2013-10"; cancer dataset used: "`datapath'\version09\2-working\2013_2014_2015_cancer_numbers")
+(4) ASIR: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; stata command distrate used with pop_wpp_2018-5,pop_wpp_2017-5,pop_wpp_2016-5,pop_wpp_2015-5, pop_wpp_2014-5, pop_wpp_2013-5 for 2013-2018 cancer incidence and world population dataset: who2000_5; (population datasets used: "`datapath'\version09\2-working\pop_wpp_2018-5;pop_wpp_2017-5;pop_wpp_2016-5;pop_wpp_2015-5;pop_wpp_2014-5;pop_wpp_2013-5"; cancer dataset used: "`datapath'\version09\2-working\2013-2018_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
 (5) Site Order: These tables show where the order of 2018 top 10 sites in 2013-2018, respectively; site order datasets used: "`datapath'\version09\2-working\siteorder_2018; siteorder_2017; siteorder_2016; siteorder_2015; siteorder_2014; siteorder_2013")
 putdocx textblock end
 putdocx textblock begin
-(6) ASIR by sex: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; unk/missing ages were included in the median age group; stata command distrate used with pop_wpp_2015-10 for 2015 cancer incidence, ONLY, and world population dataset: who2000_10-2; (population datasets used: "`datapath'\version09\2-working\pop_wpp_2015-10"; cancer dataset used: "`datapath'\version09\2-working\2013_2014_2015_cancer_numbers")
+(6) ASIR by sex: Includes standardized case definition, i.e. includes unk residents, IARC non-reportable MPs but excludes non-malignant tumours; unk/missing ages were included in the median age group; stata command distrate used with pop_wpp_2018-5 for 2018; pop_wpp_2017-5 for 2017 pop_wpp_2016-5 for 2016 cancer incidence, ONLY, and world population dataset: who2000_5; (population datasets used: "`datapath'\version09\2-working\pop_wpp_2018-5;pop_wpp_2017-5;pop_wpp_2016-5"; cancer dataset used: "`datapath'\version09\2-working\2013-2018_cancer_numbers")
 putdocx textblock end
 putdocx textblock begin
 (7) Population text files (WPP): saved in: "`datapath'\version09\2-working\WPP_population by sex_yyyy"
 putdocx textblock end
 putdocx textblock begin
-(8) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019; re-checked on 10-May-2022 (totals remain the same).
+(8) Population files (WPP): generated from "https://population.un.org/wpp/Download/Standard/Population/" on 27-Nov-2019; re-checked on 10-May-2022 (totals remain the same); 2021 wpp pop generated on 24-Aug-2022.
 putdocx textblock end
 putdocx textblock begin
-(9) No.(DCOs): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs. (variable used: basis. dataset used: "`datapath'\version09\3-output\2013_2014_2015_cancer_nonsurvival")
+(9) No.(DCOs): Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs. (variable used: basis. dataset used: "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified")
 putdocx textblock end
 putdocx textblock begin
-(10) % of tumours: Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version09\3-output\2013_2014_2015_cancer_nonsurvival")
+(10) % of tumours: Includes standardized case definition, i.e. includes unk residents, non-malignant tumours, IARC non-reportable MPs (variable used: basis; dataset used: "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified")
 putdocx textblock end
 putdocx textblock begin
-(11) 1-yr, 3-yr, 5-yr (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2013, surv5yr_2014; dataset used: "`datapath'\version09\3-output\2013_2014_2015_cancer_survival")
+(11) 1-yr, 3-yr, 5-yr (%): Excludes dco, unk slc, age 100+, multiple primaries, ineligible case definition, non-residents, REMOVE IF NO unk sex, non-malignant tumours, IARC non-reportable MPs (variable used: surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2013, surv5yr_2014; dataset used: "`datapath'\version09\3-output\2013-2018_cancer_survival_deidentified")
 putdocx textblock end
 putdocx textblock begin
 putdocx textblock begin
-(12) MIRs: For the incidence dataset, the 2015 annual report incidence dataset was used to organize the data into a format to perform the M:I analysis (cancer dataset used: "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_identifiable"; Note: 2008 cases were ultimately excluded)
+(12) MIRs: For the incidence dataset, the 2013-2018 annual report incidence dataset was used to organize the data into a format to perform the M:I analysis (cancer dataset used: "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_identifiable"; Note: 2008 cases were ultimately excluded)
 putdocx textblock end
 putdocx textblock begin
-(13) MIRs: For the mortality dataset, the 2013, 2014 and 2015 annual report mortality datasets were used to organize the data into a format to perform the M:I analysis (cancer dataset used: (2016) "`datapath'\version09\3-output\2016_prep mort_identifiable"; (2017) "`datapath'\version09\3-output\2017_prep mort_identifiable"; (2018) "`datapath'\version09\3-output\2018_prep mort_identifiable").
+(13) MIRs: For the mortality dataset, the 2016, 2017 and 2018 annual report mortality datasets were used to organize the data into a format to perform the M:I analysis (cancer dataset used: (2016) "`datapath'\version09\3-output\2016_prep mort_identifiable"; (2017) "`datapath'\version09\3-output\2017_prep mort_identifiable"; (2018) "`datapath'\version09\3-output\2018_prep mort_identifiable").
 putdocx textblock end
 putdocx textblock begin
 (14) MIRs: All the incidence and mortality datasets were checked to ensure the site variable, sitecr5db, was not missing and site codes were assigned if it was missing in the dataset.
@@ -545,7 +646,7 @@ putdocx clear
 restore
 
 clear
-/*
+
 ** Output for above ASIRs
 preserve
 use "`datapath'\version09\2-working\ASIRs", clear
@@ -579,12 +680,14 @@ putdocx table tbl1(1,8), bold shading(lightgray)
 putdocx table tbl1(1,9), bold shading(lightgray)
 putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
-*/
+
 
 
 **********
@@ -870,100 +973,106 @@ putdocx clear
 restore
 
 clear
+
+** Output for top10 by sex
+preserve
+use "`datapath'\version09\2-working\2018_top10_sex", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *    Top 10 by SEX: 2018   *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Number of cases for 2018 Top 10 cancers by Sex: 2018"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2018"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 by sex
+preserve
+use "`datapath'\version09\2-working\2017_top10_sex", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *    Top 10 by SEX: 2017   *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Number of cases for 2017 Top 10 cancers by Sex: 2017"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2017 Top 10 - 2017"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 by sex
+preserve
+use "`datapath'\version09\2-working\2016_top10_sex", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *    Top 10 by SEX: 2016   *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Number of cases for 2016 Top 10 cancers by Sex: 2016"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2016 Top 10 - 2016"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
 /*
-** Output for top10 by sex
-preserve
-use "`datapath'\version09\2-working\2015_top10_sex", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *    Top 10 by SEX: 2015   *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Number of cases for 2015 Top 10 cancers by Sex: 2015"), bold
-putdocx paragraph, halign(center)
-putdocx text ("2015 Top 10 - 2015"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
-putdocx clear
-restore
-
-clear
-
-** Output for top10 by sex
-preserve
-use "`datapath'\version09\2-working\2014_top10_sex", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *    Top 10 by SEX: 2014   *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Number of cases for 2015 Top 10 cancers by Sex: 2014"), bold
-putdocx paragraph, halign(center)
-putdocx text ("2015 Top 10 - 2014"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
-putdocx clear
-restore
-
-clear
-
-** Output for top10 by sex
-preserve
-use "`datapath'\version09\2-working\2013_top10_sex", clear
-
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *    Top 10 by SEX: 2013   *
-				****************************
-
-putdocx clear
-putdocx begin
-putdocx pagebreak
-
-// Create a paragraph
-putdocx paragraph, style(Heading1)
-putdocx text ("Number of cases for 2015 Top 10 cancers by Sex: 2013"), bold
-putdocx paragraph, halign(center)
-putdocx text ("2015 Top 10 - 2013"), bold font(Helvetica,14,"blue")
-putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
-putdocx clear
-restore
-
-clear
-
 ** Output for above ASIRs by sex
 preserve
 use "`datapath'\version09\2-working\ASIRs_female", clear
@@ -1036,6 +1145,127 @@ putdocx clear
 restore
 
 clear
+*/
+
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version09\2-working\2018_top10_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*       by sex: 2018       *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2018"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2018"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2018_top10_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version09\2-working\2017_top10_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*       by sex: 2017       *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2017"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2017"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2017_top10_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version09\2-working\2016_top10_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*       by sex: 2016       *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2016"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2016"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Note"), bold
+putdocx textblock begin
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2016_top10_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
 
 ** Output for top10 age-specific rates by sex
 preserve
@@ -1054,9 +1284,9 @@ putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific rates for 2015 Top 10 cancers by Sex: 2015"), bold
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2015"), bold
 putdocx paragraph, halign(center)
-putdocx text ("2015 Top 10 - 2015"), bold font(Helvetica,14,"blue")
+putdocx text ("2018 Top 10 - 2015"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
@@ -1069,7 +1299,9 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1092,9 +1324,9 @@ putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific rates for 2015 Top 10 cancers by Sex: 2014"), bold
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2014"), bold
 putdocx paragraph, halign(center)
-putdocx text ("2015 Top 10 - 2014"), bold font(Helvetica,14,"blue")
+putdocx text ("2018 Top 10 - 2014"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
@@ -1107,7 +1339,9 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1130,9 +1364,9 @@ putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific rates for 2015 Top 10 cancers by Sex: 2013"), bold
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2013"), bold
 putdocx paragraph, halign(center)
-putdocx text ("2015 Top 10 - 2013"), bold font(Helvetica,14,"blue")
+putdocx text ("2018 Top 10 - 2013"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
@@ -1145,65 +1379,13 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
-
-** JC 03mar20: neither of the below reports will be used in the 2015 annual report so code has been disabled
-** JC 15oct20: NS decided to include ASMRs on 14-OCT-2020.
-				****************************
-				*	   MS WORD REPORT      *
-				* ANNUAL REPORT STATISTICS *
-                *      ASMRs - BSS         *
-				****************************
-
-** Output for above ASIRs comparison using BSS vs WPP populations
-use "`datapath'\version09\2-working\ASMRs", clear
-//format asmr %04.2f
-//format percentage %04.1f
-sort cancer_site year asmr
-
-preserve
-putdocx clear
-putdocx begin, footer(foot1)
-putdocx pagebreak
-putdocx paragraph, tofooter(foot1)
-putdocx text ("Page ")
-putdocx pagenumber
-putdocx paragraph, style(Title)
-putdocx text ("CANCER 2015 Annual Report: ASMRs"), bold
-putdocx paragraph, halign(center)
-putdocx text ("Table 10. Top 10 Cancer Mortality Statistics for BNR-Cancer, 2015 (Population=276,633)"), bold font(Helvetica,10,"blue")
-putdocx textblock begin
-Date Prepared: 15-Oct-2020.
-Prepared by: JC using Stata & Redcap data release date: 14-Nov-2019. 
-Generated using Dofile: 25_analysis mort.do
-putdocx textblock end
-putdocx paragraph
-putdocx text ("Methods"), bold
-putdocx textblock begin
-(1) No.(tumours): Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (dataset used: "`datapath'\version09\3-output\2015_prep mort")
-putdocx textblock end
-putdocx textblock begin
-(2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using barbados population: pop_bss_2015-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\3-output\2015 prep mort")
-putdocx textblock end
-//putdocx pagebreak
-putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
-putdocx table tbl1(1,1), bold shading(lightgray)
-putdocx table tbl1(1,2), bold shading(lightgray)
-putdocx table tbl1(1,3), bold shading(lightgray)
-putdocx table tbl1(1,4), bold shading(lightgray)
-putdocx table tbl1(1,5), bold shading(lightgray)
-putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx table tbl1(1,7), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
-putdocx clear
-
-save "`datapath'\version09\3-output\2013_2014_2015_summstats" ,replace
-restore
-*/
 
 
 ****************
@@ -1246,6 +1428,9 @@ putdocx textblock begin
 putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2021-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\3-output\2021_prep mort_deidentified")
+putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
 putdocx textblock end
 //putdocx pagebreak
 putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
@@ -1381,6 +1566,9 @@ putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2020-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\3-output\2020_prep mort_deidentified")
 putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
+putdocx textblock end
 //putdocx pagebreak
 putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1514,6 +1702,9 @@ putdocx textblock begin
 putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2019-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\3-output\2019_prep mort_deidentified")
+putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
 putdocx textblock end
 //putdocx pagebreak
 putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
@@ -1649,6 +1840,9 @@ putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2018-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\3-output\2018 prep mort_deidentified")
 putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
+putdocx textblock end
 //putdocx pagebreak
 putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1782,6 +1976,9 @@ putdocx textblock begin
 putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2017-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\3-output\2017_prep mort_deidentified")
+putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
 putdocx textblock end
 //putdocx pagebreak
 putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
@@ -1917,6 +2114,9 @@ putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2016-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\3-output\2016_prep mort_deidentified")
 putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
+putdocx textblock end
 //putdocx pagebreak
 putdocx table tbl1 = data(cancer_site year number percent asmr ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -2050,6 +2250,9 @@ putdocx textblock begin
 putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2016-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\1-input\2015_prep mort")
+putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Note"), bold
@@ -2190,6 +2393,9 @@ putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2016-10 and world population dataset: who2000_10-2; cancer dataset used: "`datapath'\version09\1-input\2014_cancer_mort_dc")
 putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
+putdocx textblock end
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
@@ -2328,6 +2534,9 @@ putdocx textblock end
 putdocx textblock begin
 (2) ASMR: Excludes ineligible case definition, non-malignant tumours, IARC non-reportable MPs (distrate using WPP population: pop_wpp_2013-10 and world population dataset: who2000_10-2; cancer death dataset used: "`datapath'\version09\1-input\2013_cancer_for_MR_only")
 putdocx textblock end
+putdocx textblock begin
+(3) ASMR: Includes reportable cancer terms on both parts of the CODs so does not only take into account underlying COD so numbers and rates are an overestimation.
+putdocx textblock end
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
@@ -2356,7 +2565,7 @@ use "`datapath'\version09\2-working\2013_top10mort_age_rates", clear
 				*	   MS WORD REPORT      *
 				* ANNUAL REPORT STATISTICS *
                 * Top 10 age-specific rate *
-				*      MORTALITY: 2016     *
+				*      MORTALITY: 2013     *
 				****************************
 
 putdocx clear

@@ -50,11 +50,14 @@ cls
 ** Load the dataset
 use "`datapath'\version09\2-working\2013-2018_cancer_numbers", clear
 
-****************************************************************************** 2018 ****************************************************************************************
+**********
+** 2018 **
+**********
 drop if dxyr!=2018 // deleted
 
-count //949
+count //960
 
+tab beh ,m //all malignant
 
 tab siteiarc ,m
 labelbook siteiarc_lab
@@ -150,7 +153,6 @@ restore
 ** Next, IRs for invasive tumours only
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
@@ -213,7 +215,6 @@ restore
 ** Next, IRs for invasive tumours FEMALE only
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	drop if sex==2 //477 deleted
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -273,7 +274,6 @@ restore
 ** Next, IRs for invasive tumours MALE only
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	drop if sex==1 //472 deleted
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -338,7 +338,6 @@ tab pop_wpp age5 if siteiarc==39 //male
 
 preserve
 	drop if age5==. //0 deleted
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==39 // prostate only
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -418,7 +417,6 @@ tab pop_wpp age5 if siteiarc==39 //male
 
 preserve
 	drop if age5==. //0 deleted
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==39 // prostate only
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -499,7 +497,6 @@ tab pop_wpp age5  if siteiarc==29 & sex==2 //male
 //JC 19may2022: remove male breast cancers so rate calculated only based on female pop
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==29 //200 breast only 
 	drop if sex==2 //1 deleted
 	//excluded the 1 male as it would be potential confidential breach if reported separately
@@ -575,7 +572,6 @@ tab pop_wpp age5  if siteiarc==29 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==29 //200 breast only 
 	drop if sex==2 //1 deleted
 	//excluded the 1 male as it would be potential confidential breach if reported separately
@@ -651,7 +647,6 @@ tab pop_wpp age5  if siteiarc==13 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==13
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -746,7 +741,6 @@ restore
 ** COLON - female only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==13
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -842,7 +836,6 @@ restore
 ** COLON - male only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==13
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -941,7 +934,6 @@ tab pop_wpp age5 if siteiarc==33
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==33 // corpus uteri only
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1027,7 +1019,6 @@ restore
 ** CORPUS UTERI - for female top 5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==33 // corpus uteri only
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1116,7 +1107,6 @@ tab pop_wpp age5 if siteiarc==55 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==55
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1231,7 +1221,6 @@ restore
 ** MULTIPLE MYELOMA - female only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==55
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1348,7 +1337,6 @@ restore
 ** MULTIPLE MYELOMA - male only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==55
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1469,7 +1457,6 @@ tab pop_wpp age5  if siteiarc==18 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==18
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1591,7 +1578,6 @@ restore
 ** PANCREAS - female only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==18
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1719,7 +1705,6 @@ tab pop_wpp age5  if siteiarc==14 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==14
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1835,7 +1820,6 @@ restore
 ** RECTUM - female only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==14
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -1931,7 +1915,6 @@ restore
 ** RECTUM - male only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==14
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -2051,7 +2034,6 @@ tab pop_wpp age5 if siteiarc==21 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==21
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -2172,7 +2154,6 @@ restore
 ** LUNG - male only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==21
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -2298,7 +2279,6 @@ tab pop_wpp age5  if siteiarc==53 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==53
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -2416,7 +2396,6 @@ tab pop_wpp age5  if siteiarc==11 & sex==2 //male
 
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==11
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
@@ -2532,7 +2511,6 @@ restore
 ** STOMACH - male only for top5 table
 preserve
 	drop if age5==.
-	drop if beh!=3 //0 deleted
 	keep if siteiarc==11
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
