@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      25-AUG-2022
+    // 	date last modified      26-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report.
@@ -1387,6 +1387,302 @@ restore
 
 clear
 
+
+*********************
+** 2013-2021 ASMRs **
+*********************
+** JC 26aug2022: Create excel output of death absolute numbers and ASMRs for 2013-2021 and check with NS + SF if they would prefer exel outputs in conjunction with the Word outputs
+preserve
+** Create a 2013-2021 ASMR dataset
+use "`datapath'\version09\2-working\ASMRs_wpp_2021", clear
+replace year=9
+append using "`datapath'\version09\2-working\ASMRs_wpp_2020"
+replace year=8 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2019"
+replace year=7 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
+replace year=6 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
+replace year=5 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2016"
+replace year=4 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+replace year=3 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2014"
+replace year=2 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2013"
+replace year=1 if year<2
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order cancer_site year number percent asmr ci_lower ci_upper
+
+save "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,replace
+
+** Create Sheet1 with Totals
+keep if cancer_site==1
+
+local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Totals, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Totals) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with AllSites
+keep if cancer_site!=1
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(AllSites, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(AllSites) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==2
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Prostate, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Prostate) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==3
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Breast, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Breast) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==4
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Colon, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Colon) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==5
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Lung, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Lung) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==6
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Pancreas, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Pancreas) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==7
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(MM, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(MM) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==8
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(NHL, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(NHL) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==9
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Rectum, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Rectum) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==10
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(CorpusUteri, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(CorpusUteri) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
+
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create Sheet2 with Prostate
+keep if cancer_site==11
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Stomach, replace) 
+
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Stomach) modify
+putexcel A1:G1, bold
+//putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel save
+
+restore
 
 ****************
 ** 2021 ASMRs **

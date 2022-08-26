@@ -218,19 +218,19 @@ replace siteiarc=8 if siteiarc==33
 replace siteiarc=9 if siteiarc==14
 replace siteiarc=10 if siteiarc==11
 replace siteiarc=11 if siteiarc==53
-rename siteiarc cancer_siteiarc
+rename siteiarc cancer_site
 gen year=1
 rename count number
 	expand 2 in 1
-	replace cancer_siteiarc=1 in 11
+	replace cancer_site=1 in 11
 	replace number=651 in 11
 	replace percentage=100 in 11
 
-label define cancer_siteiarc_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "lung" 6 "pancreas" 7 "multiple myeloma" 8 "corpus uteri" 9 "rectum" 10 "stomach" 11 "non-hodgkin lymphoma" ,modify
-label values cancer_siteiarc cancer_siteiarc_lab
+label define cancer_site_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "lung" 6 "pancreas" 7 "multiple myeloma" 8 "corpus uteri" 9 "rectum" 10 "stomach" 11 "non-hodgkin lymphoma" ,modify
+label values cancer_site cancer_site_lab
 label define year_lab 1 "2014" ,modify
 label values year year_lab
-sort cancer_siteiarc
+sort cancer_site
 gen rpt_id = _n
 save "`datapath'\version09\2-working\ASMRs_wpp_2014" ,replace
 restore
@@ -305,10 +305,10 @@ sort siteiarc age_10 sex
 
 format mortrate %04.2f
 gen year=2014
-rename siteiarc cancer_siteiarc
+rename siteiarc cancer_site
 rename mortrate age_specific_rate
 drop pfu case pop_wpp
-order year cancer_siteiarc sex age_10 age_specific_rate
+order year cancer_site sex age_10 age_specific_rate
 save "`datapath'\version09\2-working\2014_top10mort_age+sex_rates" ,replace
 restore
 
@@ -326,10 +326,10 @@ sort siteiarc age_10
 
 format mortrate %04.2f
 gen year=2014
-rename siteiarc cancer_siteiarc
+rename siteiarc cancer_site
 rename mortrate age_specific_rate
 drop pfu case pop_wpp
-order year cancer_siteiarc age_10 age_specific_rate
+order year cancer_site age_10 age_specific_rate
 save "`datapath'\version09\2-working\2014_top10mort_age_rates" ,replace
 restore
 
