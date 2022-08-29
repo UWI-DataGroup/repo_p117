@@ -1,15 +1,16 @@
 cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          30b_report cancer_ANNUALRPT.do
+    //  algorithm name          30b_report cancer_EXCEL.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      18-AUG-2022
+    //  date first created      26-AUG-2022
     // 	date last modified      26-AUG-2022
-    //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
+    //  algorithm task          Preparing 2013-2018 cancer datasets for reporting in Excel
     //  status                  In progress
-    //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report.
-    //  methods                 Use putdocx and Stata memory to produce tables and figures
+    //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
+	//							that allows the report writer to directly create graphs from the data.
+    //  methods                 Use putexcel and Stata memory to produce data tables and figures
 
     ** General algorithm set-up
     version 17.0
@@ -32,7 +33,7 @@ cls
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\30b_report cancer_ANNUALRPT.smcl", replace // error r(603)
+    log using "`logpath'\30b_report cancer_EXCEL.smcl", replace
 ** HEADER -----------------------------------------------------
 
 
