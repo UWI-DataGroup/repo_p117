@@ -654,7 +654,7 @@ putdocx textblock end
 putdocx textblock begin
 (17) MIRs: Based on the above review, the deaths that were captured either at casefinding or abstraction were removed from the deaths totals and the MIRs were re-calculated. Note: missed eligible cases were not removed but were sent to BNR-C DAs to abstract for inclusion in the next annual report.
 putdocx textblock end
-//putdocx pagebreak
+putdocx pagebreak
 
 putdocx table tbl1 = data(title results_2018 results_2017 results_2016 results_2015 results_2014 results_2013), halign(center)
 putdocx table tbl1(1,1), bold shading(lightgray)
