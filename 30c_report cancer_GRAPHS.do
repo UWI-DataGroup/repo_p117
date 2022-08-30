@@ -116,7 +116,7 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 	       	/// axis1 = LSH y-axis
 			/// axis2 = RHS y-axis
 			ylab(0(10)80, axis(1) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
-	       	ytitle("Number of events", axis(1) size(large) margin(r=3)) 
+	       	ytitle("Number of cases", axis(1) size(large) margin(r=3)) 
 			ymtick(0(5)65)
 			
 	       	ylab(0(500)2000, axis(2) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
@@ -126,8 +126,8 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 			/// Legend information
 			legend(size(medlarge) nobox position(11) colf cols(2)
 			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2 3 4)
-			lab(1 "Number of events (men)") 
-			lab(2 "Number of events (women)")
+			lab(1 "Number of cases (men)") 
+			lab(2 "Number of cases (women)")
 			lab(3 "Incidence per 100,000 (men)") 
 			lab(4 "Incidence per 100,000 (women)")
 			);
@@ -206,7 +206,7 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 	       	/// axis1 = LSH y-axis
 			/// axis2 = RHS y-axis
 			ylab(0(10)80, axis(1) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
-	       	ytitle("Number of events", axis(1) size(large) margin(r=3)) 
+	       	ytitle("Number of cases", axis(1) size(large) margin(r=3)) 
 			ymtick(0(5)65)
 			
 	       	ylab(0(500)2000, axis(2) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
@@ -216,8 +216,8 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 			/// Legend information
 			legend(size(medlarge) nobox position(11) colf cols(2)
 			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2 3 4)
-			lab(1 "Number of events (men)") 
-			lab(2 "Number of events (women)")
+			lab(1 "Number of cases (men)") 
+			lab(2 "Number of cases (women)")
 			lab(3 "Incidence per 100,000 (men)") 
 			lab(4 "Incidence per 100,000 (women)")
 			);
@@ -296,7 +296,7 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 	       	/// axis1 = LSH y-axis
 			/// axis2 = RHS y-axis
 			ylab(0(10)80, axis(1) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
-	       	ytitle("Number of events", axis(1) size(large) margin(r=3)) 
+	       	ytitle("Number of cases", axis(1) size(large) margin(r=3)) 
 			ymtick(0(5)65)
 			
 	       	ylab(0(500)2000, axis(2) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
@@ -306,8 +306,8 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 			/// Legend information
 			legend(size(medlarge) nobox position(11) colf cols(2)
 			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2 3 4)
-			lab(1 "Number of events (men)") 
-			lab(2 "Number of events (women)")
+			lab(1 "Number of cases (men)") 
+			lab(2 "Number of cases (women)")
 			lab(3 "Incidence per 100,000 (men)") 
 			lab(4 "Incidence per 100,000 (women)")
 			);
@@ -386,7 +386,7 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 	       	/// axis1 = LSH y-axis
 			/// axis2 = RHS y-axis
 			ylab(0(10)80, axis(1) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
-	       	ytitle("Number of events", axis(1) size(large) margin(r=3)) 
+	       	ytitle("Number of cases", axis(1) size(large) margin(r=3)) 
 			ymtick(0(5)65)
 			
 	       	ylab(0(500)2000, axis(2) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
@@ -396,8 +396,8 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 			/// Legend information
 			legend(size(medlarge) nobox position(11) colf cols(2)
 			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2 3 4)
-			lab(1 "Number of events (men)") 
-			lab(2 "Number of events (women)")
+			lab(1 "Number of cases (men)") 
+			lab(2 "Number of cases (women)")
 			lab(3 "Incidence per 100,000 (men)") 
 			lab(4 "Incidence per 100,000 (women)")
 			);
@@ -476,7 +476,7 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 	       	/// axis1 = LSH y-axis
 			/// axis2 = RHS y-axis
 			ylab(0(10)80, axis(1) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
-	       	ytitle("Number of events", axis(1) size(large) margin(r=3)) 
+	       	ytitle("Number of cases", axis(1) size(large) margin(r=3)) 
 			ymtick(0(5)65)
 			
 	       	ylab(0(500)2000, axis(2) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
@@ -486,8 +486,8 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 			/// Legend information
 			legend(size(medlarge) nobox position(11) colf cols(2)
 			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2 3 4)
-			lab(1 "Number of events (men)") 
-			lab(2 "Number of events (women)")
+			lab(1 "Number of cases (men)") 
+			lab(2 "Number of cases (women)")
 			lab(3 "Incidence per 100,000 (men)") 
 			lab(4 "Incidence per 100,000 (women)")
 			);
@@ -566,7 +566,7 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 	       	/// axis1 = LSH y-axis
 			/// axis2 = RHS y-axis
 			ylab(0(10)80, axis(1) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
-	       	ytitle("Number of events", axis(1) size(large) margin(r=3)) 
+	       	ytitle("Number of cases", axis(1) size(large) margin(r=3)) 
 			ymtick(0(5)65)
 			
 	       	ylab(0(500)2000, axis(2) labs(large) nogrid glc(gs12) angle(0) format(%9.0f))
@@ -576,8 +576,8 @@ graph twoway 	(bar case ageg if sex==2, yaxis(1) col(blue*1.5) barw(0.5) )
 			/// Legend information
 			legend(size(medlarge) nobox position(11) colf cols(2)
 			region(color(gs16) ic(gs16) ilw(thin) lw(thin)) order(1 2 3 4)
-			lab(1 "Number of events (men)") 
-			lab(2 "Number of events (women)")
+			lab(1 "Number of cases (men)") 
+			lab(2 "Number of cases (women)")
 			lab(3 "Incidence per 100,000 (men)") 
 			lab(4 "Incidence per 100,000 (women)")
 			);
