@@ -105,6 +105,8 @@ list pid sex age5 if _merge==2 ,nolabel
 list pid sex age5 if age5==5 & sex==2
 replace case=0 if age5==5 & sex==2 //1 change
 
+** JC 30aug2022: create ds for generating age + gender stratified graphs NS requested (same as CVD 2020 annual rpt)
+save "`datapath'\version09\2-working\2015_cancer_dataset_popn", replace
 
 ** SF requested by email on 16-Oct-2020 age and sex specific rates for top 10 cancers
 /*

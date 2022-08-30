@@ -3998,3 +3998,112 @@ local listdate = string( d(`c(current_date)'), "%dCYND" )
 putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV08_`listdate'.docx" ,append
 putdocx clear
 restore
+
+				********************************
+				*	     MS WORD REPORT        *
+				*   ANNUAL REPORT STATISTICS   *
+                *  Age + Gender Stratified IRs *
+				*	   GRAPHS (2013-2018)      *
+				********************************
+
+** NS requested same graphs as CVD 2020 annual report
+** 2018 **
+preserve
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Graphs"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Age + Gender Stratified (Dofile: 30c_report cancer_GRAPHS.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2018 (N=960)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+
+putdocx image "`datapath'\version09\3-output\2018_age-sex graph_cancer.png", width(5.5) height(2.0)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV08_`listdate'.docx", append
+putdocx clear
+restore
+
+** 2017 **
+preserve
+putdocx clear
+putdocx begin
+
+putdocx paragraph, halign(center)
+putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2017 (N=977)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+
+putdocx image "`datapath'\version09\3-output\2017_age-sex graph_cancer.png", width(5.5) height(2.0)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV08_`listdate'.docx", append
+putdocx clear
+restore
+
+** 2016 **
+preserve
+putdocx clear
+putdocx begin
+
+putdocx paragraph, halign(center)
+putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2016 (N=1,070)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+
+putdocx image "`datapath'\version09\3-output\2016_age-sex graph_cancer.png", width(5.5) height(2.0)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV08_`listdate'.docx", append
+putdocx clear
+restore
+
+** 2015 **
+preserve
+putdocx clear
+putdocx begin
+
+putdocx paragraph, halign(center)
+putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2015 (N=1,092)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+
+putdocx image "`datapath'\version09\3-output\2015_age-sex graph_cancer.png", width(5.5) height(2.0)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV08_`listdate'.docx", append
+putdocx clear
+restore
+
+** 2014 **
+preserve
+putdocx clear
+putdocx begin
+
+putdocx paragraph, halign(center)
+putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2014 (N=884)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+
+putdocx image "`datapath'\version09\3-output\2014_age-sex graph_cancer.png", width(5.5) height(2.0)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV08_`listdate'.docx", append
+putdocx clear
+restore
+
+** 2013 **
+preserve
+putdocx clear
+putdocx begin
+
+putdocx paragraph, halign(center)
+putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2013 (N=884)"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+
+putdocx image "`datapath'\version09\3-output\2013_age-sex graph_cancer.png", width(5.5) height(2.0)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV08_`listdate'.docx", append
+putdocx clear
+restore
