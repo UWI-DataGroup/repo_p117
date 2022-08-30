@@ -131,7 +131,7 @@ rename siteiarc cancer_site
 rename incirate age_specific_rate
 drop pfu case pop_wpp
 order year cancer_site sex age5 age_specific_rate
-save "`datapath'\version09\2-working\2014_top10_age+sex_rates" ,replace
+save "`datapath'\version09\2-working\2014_2018top10_age+sex_rates" ,replace
 restore
 
 ** Check for missing age as these would need to be added to the median group for that site when assessing ASIRs to prevent creating an outlier
@@ -212,7 +212,7 @@ label define year_lab 1 "2018" 2 "2017" 3 "2016" 4 "2015" 5 "2014" 6 "2013" ,mod
 label values year year_lab
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -325,12 +325,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=2 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -422,12 +422,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=3 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -584,12 +584,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=4 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -700,12 +700,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=5 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -909,12 +909,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=6 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -1134,12 +1134,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=7 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -1359,12 +1359,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=8 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -1582,12 +1582,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=9 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -1813,12 +1813,12 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=10 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore
 
 
@@ -2051,10 +2051,10 @@ replace ci_upper=round(ci_upper,0.01)
 gen percent=number/884*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASIRs" 
+append using "`datapath'\version09\2-working\2018ASIRs_2014" 
 replace cancer_site=11 if cancer_site==.
 replace year=5 if year==.
 order cancer_site number percent asir ci_lower ci_upper
 sort cancer_site number
-save "`datapath'\version09\2-working\ASIRs" ,replace
+save "`datapath'\version09\2-working\2018ASIRs_2014" ,replace
 restore

@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      26-AUG-2022
+    // 	date last modified      29-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -158,7 +158,7 @@ egen surv5yr_2014_censor=count(surv5yr_2014) if surv5yr_2014==0
 egen surv5yr_2014_dead=count(surv5yr_2014) if surv5yr_2014==1
 egen surv5yr_2013_censor=count(surv5yr_2013) if surv5yr_2013==0
 egen surv5yr_2013_dead=count(surv5yr_2013) if surv5yr_2013==1
-drop surv5yr_2013 surv5yr_2014 surv5yr_2015
+drop surv5yr_2013 surv5yr_2014 surv5yr_2015 surv5yr_2016
 gen surv5yr_2013=surv5yr_2013_censor/pttotsurv_2013*100
 gen surv5yr_2014=surv5yr_2014_censor/pttotsurv_2014*100
 gen surv5yr_2015=surv5yr_2015_censor/pttotsurv_2015*100
@@ -206,7 +206,7 @@ gen id=_n
 keep id tumourtot_* tumourtotper_* patienttot_* dco_* dcoper_* asir_* surv*yr_*
 gen title=1 if id==1
 order id title
-label define title_lab 1 "Year" 2 "No.registrations(tumours)" 3 "% of entire population" 4 "No.registrations(patients)" 5 "Age-standardized Incidence Rate (ASIR) per 100,000" 6 "No.registered by death certificate only" 7 "% of tumours registered" 8 "1-year survival (%)" 9 "3-year survival (%)" 10 "5-year survival (%)" ,modify
+label define title_lab 1 "Year" 2 "No.registrations(tumours)" 3 "% of entire population" 4 "No.registrations(patients)" 5 "Age-standardized Incidence Rate (ASIR) per 100,000" 6 "No.registered by death certificate only" 7 "% of tumours registered as DCOs" 8 "1-year survival (%)" 9 "3-year survival (%)" 10 "5-year survival (%)" ,modify
 label values title title_lab
 label var title "Title"
 
@@ -258,8 +258,6 @@ replace title=9 if surv3yr_2016!=.
 replace title=9 if surv3yr_2015!=.
 replace title=9 if surv3yr_2014!=.
 replace title=9 if surv3yr_2013!=.
-replace title=10 if surv5yr_2018!=.
-replace title=10 if surv5yr_2017!=.
 replace title=10 if surv5yr_2016!=.
 replace title=10 if surv5yr_2015!=.
 replace title=10 if surv5yr_2014!=.
@@ -270,17 +268,29 @@ replace title=10 if surv5yr_2013!=.
 tab title ,m //some titles got replaced so add in new obs
 ** % of entire population needs to be added in
 //list id tumourtotper_2013 if tumourtotper_2013!=.
-expand=2 in 333, gen (tumtotper_2013)
+expand=2 in 340, gen (tumtotper_2013)
 replace id=9001 if tumtotper_2013==1
 replace title=3 if tumtotper_2013!=0
 //list id tumourtotper_2014 if tumourtotper_2014!=.
-expand=2 in 14, gen (tumtotper_2014)
+expand=2 in 444, gen (tumtotper_2014)
 replace id=9002 if tumtotper_2014==1
 replace title=3 if tumtotper_2014!=0
 //list id tumourtotper_2015 if tumourtotper_2015!=.
-expand=2 in 15, gen (tumtotper_2015) // Note to change the in input
+expand=2 in 304, gen (tumtotper_2015) // Note to change the in input
 replace id=9003 if tumtotper_2015==1
 replace title=3 if tumtotper_2015!=0
+//list id tumourtotper_2016 if tumourtotper_2016!=.
+expand=2 in 213, gen (tumtotper_2016) // Note to change the in input
+replace id=9004 if tumtotper_2016==1
+replace title=3 if tumtotper_2016!=0
+//list id tumourtotper_2017 if tumourtotper_2017!=.
+expand=2 in 806, gen (tumtotper_2017) // Note to change the in input
+replace id=9005 if tumtotper_2017==1
+replace title=3 if tumtotper_2017!=0
+//list id tumourtotper_2018 if tumourtotper_2018!=.
+expand=2 in 497, gen (tumtotper_2018) // Note to change the in input
+replace id=9006 if tumtotper_2018==1
+replace title=3 if tumtotper_2018!=0
 
 /*
 ** Add in ASIR observations
@@ -303,32 +313,56 @@ replace title=6 if asir_2008!=0
 
 ** No.registered by death certificate only needs to be added in
 //list id dco_2013 if dco_2013!=.
-expand=2 in 226, gen (dcotot_2013)
-replace id=9005 if dcotot_2013==1
+expand=2 in 1514, gen (dcotot_2013)
+replace id=9007 if dcotot_2013==1
 replace title=6 if dcotot_2013!=0
 //list id dco_2014 if dco_2014!=.
-expand=2 in 16, gen (dcotot_2014)
-replace id=9006 if dcotot_2014==1
+expand=2 in 1880, gen (dcotot_2014)
+replace id=9008 if dcotot_2014==1
 replace title=6 if dcotot_2014!=0
 //list id dco_2015 if dco_2015!=.
-expand=2 in 2295, gen (dcotot_2015) // Note check the in input
-replace id=9007 if dcotot_2015==1
+expand=2 in 2856, gen (dcotot_2015) // Note check the in input
+replace id=9009 if dcotot_2015==1
 replace title=6 if dcotot_2015!=0
+//list id dco_2016 if dco_2016!=.
+expand=2 in 4325, gen (dcotot_2016) // Note check the in input
+replace id=9010 if dcotot_2016==1
+replace title=6 if dcotot_2016!=0
+//list id dco_2017 if dco_2017!=.
+expand=2 in 5161, gen (dcotot_2017) // Note check the in input
+replace id=9011 if dcotot_2017==1
+replace title=6 if dcotot_2017!=0
+//list id dco_2018 if dco_2018!=.
+expand=2 in 6017, gen (dcotot_2018) // Note check the in input
+replace id=9012 if dcotot_2018==1
+replace title=6 if dcotot_2018!=0
 
 
 ** No.registrations(tumours) needs to be added in
 //list id tumourtot_2013 if tumourtot_2013!=.
-expand=2 in 100, gen (tumtot_2013)
-replace id=9008 if tumtot_2013==1
+expand=2 in 1031, gen (tumtot_2013)
+replace id=9013 if tumtot_2013==1
 replace title=2 if tumtot_2013!=0
 //list id tumourtot_2014 if tumourtot_2014!=.
-expand=2 in 791, gen (tumtot_2014)
-replace id=9009 if tumtot_2014==1
+expand=2 in 2342, gen (tumtot_2014)
+replace id=9014 if tumtot_2014==1
 replace title=2 if tumtot_2014!=0
 //list id tumourtot_2015 if tumourtot_2015!=.
-expand=2 in 1136, gen (tumtot_2015) // Note to change the in input
-replace id=9010 if tumtot_2015==1
+expand=2 in 2576, gen (tumtot_2015) // Note to change the in input
+replace id=9015 if tumtot_2015==1
 replace title=2 if tumtot_2015!=0
+//list id tumourtot_2016 if tumourtot_2016!=.
+expand=2 in 4324, gen (tumtot_2016) // Note to change the in input
+replace id=9016 if tumtot_2016==1
+replace title=2 if tumtot_2016!=0
+//list id tumourtot_2017 if tumourtot_2017!=.
+expand=2 in 5069, gen (tumtot_2017) // Note to change the in input
+replace id=9017 if tumtot_2017==1
+replace title=2 if tumtot_2017!=0
+//list id tumourtot_2018 if tumourtot_2018!=.
+expand=2 in 5700, gen (tumtot_2018) // Note to change the in input
+replace id=9018 if tumtot_2018==1
+replace title=2 if tumtot_2018!=0
 
 drop tumtotper_* dcotot_* tumtot_*
 
@@ -393,8 +427,8 @@ egen surv3yrtot_2015=max(surv3yr_2015)
 egen surv3yrtot_2014=max(surv3yr_2014)
 egen surv3yrtot_2013=max(surv3yr_2013)
 
-egen surv5yrtot_2018=max(surv5yr_2018)
-egen surv5yrtot_2017=max(surv5yr_2017)
+//egen surv5yrtot_2018=max(surv5yr_2018)
+//egen surv5yrtot_2017=max(surv5yr_2017)
 egen surv5yrtot_2016=max(surv5yr_2016)
 egen surv5yrtot_2015=max(surv5yr_2015)
 egen surv5yrtot_2014=max(surv5yr_2014)
@@ -442,7 +476,11 @@ replace title=8 if id==8
 replace title=9 if id==9
 replace title=10 if id==10
 
-drop if id>10
+sort title
+
+contract title tumtot_2018 tumtot_2017 tumtot_2016 tumtot_2015 tumtot_2014 tumtot_2013 tumtotper_2018 tumtotper_2017 tumtotper_2016 tumtotper_2015 tumtotper_2014 tumtotper_2013 pttot_2018 pttot_2017 pttot_2016 pttot_2015 pttot_2014 pttot_2013 asirtot_2018 asirtot_2017 asirtot_2016 asirtot_2015 asirtot_2014 asirtot_2013 dcotot_2018 dcotot_2017 dcotot_2016 dcotot_2015 dcotot_2014 dcotot_2013 dcototper_2018 dcototper_2017 dcototper_2016 dcototper_2015 dcototper_2014 dcototper_2013 surv1yrtot_2018 surv1yrtot_2017 surv1yrtot_2016 surv1yrtot_2015 surv1yrtot_2014 surv1yrtot_2013 surv3yrtot_2018 surv3yrtot_2017 surv3yrtot_2016 surv3yrtot_2015 surv3yrtot_2014 surv3yrtot_2013 surv5yrtot_2016 surv5yrtot_2015 surv5yrtot_2014 surv5yrtot_2013
+
+//drop if id>10
 rename tumtot_2018 results_2018
 rename tumtot_2017 results_2017
 rename tumtot_2016 results_2016
@@ -451,85 +489,90 @@ rename tumtot_2014 results_2014
 rename tumtot_2013 results_2013
 
 format tumtotper_2013 tumtotper_2014 tumtotper_2015 tumtotper_2016 tumtotper_2017 tumtotper_2018 %04.2f
-replace results_2018=tumtotper_2018 if id==3
-replace results_2017=tumtotper_2017 if id==3
-replace results_2016=tumtotper_2016 if id==3
-replace results_2015=tumtotper_2015 if id==3
-replace results_2014=tumtotper_2014 if id==3
-replace results_2013=tumtotper_2013 if id==3
-replace results_2013=round(results_2013, 0.01) if id==3
-replace results_2014=round(results_2014, 0.01) if id==3
-replace results_2015=round(results_2015, 0.01) if id==3
-replace results_2016=round(results_2016, 0.01) if id==3
-replace results_2017=round(results_2017, 0.01) if id==3
-replace results_2018=round(results_2018, 0.01) if id==3
+replace results_2018=tumtotper_2018 if title==3
+replace results_2017=tumtotper_2017 if title==3
+replace results_2016=tumtotper_2016 if title==3
+replace results_2015=tumtotper_2015 if title==3
+replace results_2014=tumtotper_2014 if title==3
+replace results_2013=tumtotper_2013 if title==3
+replace results_2013=round(results_2013, 0.01) if title==3
+replace results_2014=round(results_2014, 0.01) if title==3
+replace results_2015=round(results_2015, 0.01) if title==3
+replace results_2016=round(results_2016, 0.01) if title==3
+replace results_2017=round(results_2017, 0.01) if title==3
+replace results_2018=round(results_2018, 0.01) if title==3
 drop tumtotper_*
 
-replace results_2018=pttot_2018 if id==4
-replace results_2017=pttot_2017 if id==4
-replace results_2016=pttot_2016 if id==4
-replace results_2015=pttot_2015 if id==4
-replace results_2014=pttot_2014 if id==4
-replace results_2013=pttot_2013 if id==4
+replace results_2018=pttot_2018 if title==4
+replace results_2017=pttot_2017 if title==4
+replace results_2016=pttot_2016 if title==4
+replace results_2015=pttot_2015 if title==4
+replace results_2014=pttot_2014 if title==4
+replace results_2013=pttot_2013 if title==4
 drop pttot_*
 
 format asirtot_* %04.2f
-replace results_2018=asirtot_2018 if id==5
-replace results_2017=asirtot_2017 if id==5
-replace results_2016=asirtot_2016 if id==5
-replace results_2015=asirtot_2015 if id==5
-replace results_2014=asirtot_2014 if id==5
-replace results_2013=asirtot_2013 if id==5
+replace results_2018=asirtot_2018 if title==5
+replace results_2017=asirtot_2017 if title==5
+replace results_2016=asirtot_2016 if title==5
+replace results_2015=asirtot_2015 if title==5
+replace results_2014=asirtot_2014 if title==5
+replace results_2013=asirtot_2013 if title==5
 //if id==5 format results_* %04.2f
 //replace results_2014=204.80 if id==5
 drop asirtot_*
 
-replace results_2018=dcotot_2018 if id==6
-replace results_2017=dcotot_2017 if id==6
-replace results_2016=dcotot_2016 if id==6
-replace results_2015=dcotot_2015 if id==6
-replace results_2014=dcotot_2014 if id==6
-replace results_2013=dcotot_2013 if id==6
+replace results_2018=dcotot_2018 if title==6
+replace results_2017=dcotot_2017 if title==6
+replace results_2016=dcotot_2016 if title==6
+replace results_2015=dcotot_2015 if title==6
+replace results_2014=dcotot_2014 if title==6
+replace results_2013=dcotot_2013 if title==6
 drop dcotot_*
 
-replace results_2018=dcototper_2018 if id==7
-replace results_2017=dcototper_2017 if id==7
-replace results_2016=dcototper_2016 if id==7
-replace results_2015=dcototper_2015 if id==7
-replace results_2014=dcototper_2014 if id==7
-replace results_2013=dcototper_2013 if id==7
+replace results_2018=dcototper_2018 if title==7
+replace results_2017=dcototper_2017 if title==7
+replace results_2016=dcototper_2016 if title==7
+replace results_2015=dcototper_2015 if title==7
+replace results_2014=dcototper_2014 if title==7
+replace results_2013=dcototper_2013 if title==7
 drop dcototper_*
 
-replace results_2018=surv1yrtot_2018 if id==8
-replace results_2017=surv1yrtot_2017 if id==8
-replace results_2016=surv1yrtot_2016 if id==8
-replace results_2015=surv1yrtot_2015 if id==8
-replace results_2014=surv1yrtot_2014 if id==8
-replace results_2013=surv1yrtot_2013 if id==8
+replace results_2018=surv1yrtot_2018 if title==8
+replace results_2017=surv1yrtot_2017 if title==8
+replace results_2016=surv1yrtot_2016 if title==8
+replace results_2015=surv1yrtot_2015 if title==8
+replace results_2014=surv1yrtot_2014 if title==8
+replace results_2013=surv1yrtot_2013 if title==8
 
-replace results_2018=surv3yrtot_2018 if id==9
-replace results_2017=surv3yrtot_2017 if id==9
-replace results_2016=surv3yrtot_2016 if id==9
-replace results_2015=surv3yrtot_2015 if id==9
-replace results_2014=surv3yrtot_2014 if id==9
-replace results_2013=surv3yrtot_2013 if id==9
+replace results_2018=surv3yrtot_2018 if title==9
+replace results_2017=surv3yrtot_2017 if title==9
+replace results_2016=surv3yrtot_2016 if title==9
+replace results_2015=surv3yrtot_2015 if title==9
+replace results_2014=surv3yrtot_2014 if title==9
+replace results_2013=surv3yrtot_2013 if title==9
 
-replace results_2018=surv5yrtot_2018 if id==10
-replace results_2017=surv5yrtot_2017 if id==10
-replace results_2016=surv5yrtot_2016 if id==10
-replace results_2015=surv5yrtot_2015 if id==10
-replace results_2014=surv5yrtot_2014 if id==10
-replace results_2013=surv5yrtot_2013 if id==10
+//replace results_2018=surv5yrtot_2018 if id==10
+//replace results_2017=surv5yrtot_2017 if id==10
+replace results_2016=surv5yrtot_2016 if title==10
+replace results_2015=surv5yrtot_2015 if title==10
+replace results_2014=surv5yrtot_2014 if title==10
+replace results_2013=surv5yrtot_2013 if title==10
 
 drop surv1yrtot_* surv3yrtot_* surv5yrtot_*
 
-replace results_2018=2018 if id==1
-replace results_2017=2017 if id==1
-replace results_2016=2016 if id==1
-replace results_2015=2015 if id==1
-replace results_2014=2014 if id==1
-replace results_2013=2013 if id==1
-*/
+replace results_2018=2018 if title==1
+replace results_2017=2017 if title==1
+replace results_2016=2016 if title==1
+replace results_2015=2015 if title==1
+replace results_2014=2014 if title==1
+replace results_2013=2013 if title==1
+
+replace results_2018 = . if title==10
+replace results_2017 = . if title==10
+drop _freq
+save "`datapath'\version09\2-working\2013-2018_summstats" ,replace
+
 //JC 10may2022: only 2018 ASMRs and ASIRs initially done
 preserve
 				****************************
@@ -542,17 +585,17 @@ putdocx paragraph, tofooter(foot1)
 putdocx text ("Page ")
 putdocx pagenumber
 putdocx paragraph, style(Title)
-putdocx text ("CANCER 2018 Annual Report: Stata Results"), bold
+putdocx text ("CANCER 2016-2018 Annual Report: Stata Results"), bold
 putdocx textblock begin
-Date Prepared: 10-MAY-2022.
-Date Updated: 25-AUG-2022.
+Date Prepared: 25-AUG-2022.
+Date Updated: 29-AUG-2022.
 Prepared by: JC using Stata v17.0
 CanReg5 v5.43 (incidence) data release date: 18-July-2022.
 REDCap v12.3.3 (death) data release date: 03-Aug-2022.
-Generated using Dofile: 30b_report cancer_ANNUALRPT.do
+Generated using Dofile: 30a_report cancer_WORD.do
 putdocx textblock end
 putdocx paragraph, halign(center)
-putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2018 (Population=286,640), 2016 (Population=285,798), 2017 (Population=286,229), 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294))"), bold font(Helvetica,10,"blue")
+putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2018 (Population=286,640), 2017 (Population=286,229), 2016 (Population=285,798), 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294))"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 putdocx text ("Standards"), bold
 putdocx paragraph, halign(center)
@@ -612,13 +655,15 @@ putdocx textblock begin
 (17) MIRs: Based on the above review, the deaths that were captured either at casefinding or abstraction were removed from the deaths totals and the MIRs were re-calculated. Note: missed eligible cases were not removed but were sent to BNR-C DAs to abstract for inclusion in the next annual report.
 putdocx textblock end
 //putdocx pagebreak
-/*
-putdocx table tbl1 = data(title results_2015 results_2014 results_2013), halign(center)
+
+putdocx table tbl1 = data(title results_2018 results_2017 results_2016 results_2015 results_2014 results_2013), halign(center)
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+putdocx table tbl1(1,7), bold shading(lightgray)
 putdocx table tbl1(3,2), nformat(%04.2f)
 putdocx table tbl1(3,3), nformat(%04.2f)
 putdocx table tbl1(3,4), nformat(%04.2f)
@@ -638,9 +683,9 @@ putdocx table tbl1(10,2), nformat(%2.1f)
 putdocx table tbl1(10,3), nformat(%2.1f)
 putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
-*/
+
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", replace
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", replace
 putdocx clear
 
 //save "`datapath'\version09\3-output\2013-2015_2018summstats" ,replace
@@ -683,7 +728,7 @@ putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -731,7 +776,7 @@ putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -778,7 +823,7 @@ putdocx table tbl1(12,.), bold shading("yellow")
 putdocx table tbl1(13,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -825,7 +870,7 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(14,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -872,7 +917,7 @@ putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -921,7 +966,7 @@ putdocx table tbl1(13,.), bold shading("yellow")
 //putdocx table tbl1(17,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -969,7 +1014,7 @@ putdocx table tbl1(14,.), bold shading("yellow")
 //putdocx table tbl1(15,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1002,7 +1047,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1035,7 +1080,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1068,15 +1113,18 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
-/*
+
+**********
+** 2018 **
+**********
 ** Output for above ASIRs by sex
 preserve
-use "`datapath'\version09\2-working\ASIRs_female", clear
+use "`datapath'\version09\2-working\ASIRs_2018_female", clear
 format asir %04.2f
 sort cancer_site asir
 
@@ -1092,11 +1140,11 @@ putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
-putdocx text ("ASIRs"), bold
+putdocx text ("ASIRs: 2018"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx text ("Basis (# tumours/n=960)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1105,7 +1153,9 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1113,7 +1163,7 @@ clear
 
 ** Output for above ASIRs by sex
 preserve
-use "`datapath'\version09\2-working\ASIRs_male", clear
+use "`datapath'\version09\2-working\ASIRs_2018_male", clear
 format asir %04.2f
 sort cancer_site asir
 
@@ -1128,11 +1178,11 @@ putdocx begin
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
-putdocx text ("ASIRs"), bold
+putdocx text ("ASIRs: 2018"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx text ("Basis (# tumours/n=960)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1141,13 +1191,178 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
-*/
 
+**********
+** 2017 **
+**********
+** Output for above ASIRs by sex
+preserve
+use "`datapath'\version09\2-working\ASIRs_2017_female", clear
+format asir %04.2f
+sort cancer_site asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASIRs - FEMALE     *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("ASIRs: 2017"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above ASIRs by sex
+preserve
+use "`datapath'\version09\2-working\ASIRs_2017_male", clear
+format asir %04.2f
+sort cancer_site asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASIRs - MALE       *
+				****************************
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("ASIRs: 2017"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+**********
+** 2016 **
+**********
+** Output for above ASIRs by sex
+preserve
+use "`datapath'\version09\2-working\ASIRs_2016_female", clear
+format asir %04.2f
+sort cancer_site asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASIRs - FEMALE     *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("ASIRs: 2016"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for above ASIRs by sex
+preserve
+use "`datapath'\version09\2-working\ASIRs_2016_male", clear
+format asir %04.2f
+sort cancer_site asir
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *       ASIRs - MALE       *
+				****************************
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("ASIRs: 2016"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Basis (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+putdocx table tbl1(1,6), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+
+**********
+** 2018 **
+**********
 ** Output for top10 age-specific rates by sex
 preserve
 use "`datapath'\version09\2-working\2018_top10_age+sex_rates", clear
@@ -1174,7 +1389,7 @@ putdocx textblock begin
 Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2018_top10_age+sex_rates")
 putdocx textblock end
 putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -1182,7 +1397,54 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+
+**********
+** 2017 **
+**********
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version09\2-working\2017_2018top10_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*       by sex: 2017       *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2017"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2017"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Notes"), bold
+putdocx textblock begin
+(1) Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2017_2018top10_age+sex_rates")
+putdocx textblock end
+putdocx textblock begin
+(2) Based on 2018 top 10 cases (dataset used: "`datapath'\version09\2-working\2017_2018top10_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1205,16 +1467,19 @@ putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2017"), bold
+putdocx text ("Age-specific rates for 2017 Top 10 cancers by Sex: 2017"), bold
 putdocx paragraph, halign(center)
-putdocx text ("2018 Top 10 - 2017"), bold font(Helvetica,14,"blue")
+putdocx text ("2017 Top 10 - 2017"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx text ("Note"), bold
+putdocx text ("Notes"), bold
 putdocx textblock begin
-Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2017_top10_age+sex_rates")
+(1) Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2017_top10_age+sex_rates")
+putdocx textblock end
+putdocx textblock begin
+(2) Based on 2017 top 10 cases (dataset used: "`datapath'\version09\2-working\2017_top10_age+sex_rates")
 putdocx textblock end
 putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -1222,7 +1487,54 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+
+**********
+** 2016 **
+**********
+** Output for top10 age-specific rates by sex
+preserve
+use "`datapath'\version09\2-working\2016_2018top10_age+sex_rates", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                * Top 10 age-specific rate *
+				*       by sex: 2016       *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2016"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2018 Top 10 - 2016"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx text ("Notes"), bold
+putdocx textblock begin
+(1) Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2016_2018top10_age+sex_rates")
+putdocx textblock end
+putdocx textblock begin
+(2) Based on 2018 top 10 cases (dataset used: "`datapath'\version09\2-working\2016_2018top10_age+sex_rates")
+putdocx textblock end
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+putdocx table tbl1(1,5), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1245,16 +1557,19 @@ putdocx pagebreak
 
 // Create a paragraph
 putdocx paragraph, style(Heading1)
-putdocx text ("Age-specific rates for 2018 Top 10 cancers by Sex: 2016"), bold
+putdocx text ("Age-specific rates for 2016 Top 10 cancers by Sex: 2016"), bold
 putdocx paragraph, halign(center)
-putdocx text ("2018 Top 10 - 2016"), bold font(Helvetica,14,"blue")
+putdocx text ("2016 Top 10 - 2016"), bold font(Helvetica,14,"blue")
 putdocx paragraph
-putdocx text ("Note"), bold
+putdocx text ("Notes"), bold
 putdocx textblock begin
-Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2016_top10_age+sex_rates")
+(1) Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2016_top10_age+sex_rates")
+putdocx textblock end
+putdocx textblock begin
+(2) Based on 2016 top 10 cases (dataset used: "`datapath'\version09\2-working\2016_top10_age+sex_rates")
 putdocx textblock end
 putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -1262,15 +1577,19 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
 
+
+**********
+** 2015 **
+**********
 ** Output for top10 age-specific rates by sex
 preserve
-use "`datapath'\version09\2-working\2015_top10_age+sex_rates", clear
+use "`datapath'\version09\2-working\2015_2018top10_age+sex_rates", clear
 
 				****************************
 				*	   MS WORD REPORT      *
@@ -1291,10 +1610,10 @@ putdocx text ("2018 Top 10 - 2015"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
-Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2015_top10_age+sex_rates")
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2015_2018top10_age+sex_rates")
 putdocx textblock end
 putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -1302,15 +1621,19 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
 
+
+**********
+** 2014 **
+**********
 ** Output for top10 age-specific rates by sex
 preserve
-use "`datapath'\version09\2-working\2014_top10_age+sex_rates", clear
+use "`datapath'\version09\2-working\2014_2018top10_age+sex_rates", clear
 
 				****************************
 				*	   MS WORD REPORT      *
@@ -1331,10 +1654,10 @@ putdocx text ("2018 Top 10 - 2014"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
-Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2014_top10_age+sex_rates")
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2014_2018top10_age+sex_rates")
 putdocx textblock end
 putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -1342,15 +1665,19 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
 
+
+**********
+** 2013 **
+**********
 ** Output for top10 age-specific rates by sex
 preserve
-use "`datapath'\version09\2-working\2013_top10_age+sex_rates", clear
+use "`datapath'\version09\2-working\2013_2018top10_age+sex_rates", clear
 
 				****************************
 				*	   MS WORD REPORT      *
@@ -1371,10 +1698,10 @@ putdocx text ("2018 Top 10 - 2013"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx text ("Note"), bold
 putdocx textblock begin
-Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2013_top10_age+sex_rates")
+Excludes age groups and sex with no cases (dataset used: "`datapath'\version09\2-working\2013_2018top10_age+sex_rates")
 putdocx textblock end
 putdocx paragraph
-putdocx table tbl1 = data(year cancer_site sex age_10 age_specific_rate), halign(center) varnames
+putdocx table tbl1 = data(year cancer_site sex age5 age_specific_rate), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
 putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
@@ -1382,13 +1709,14 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
 clear
 
 
+/*
 *********************
 ** 2013-2021 ASMRs **
 *********************
@@ -1427,9 +1755,9 @@ save "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,replace
 keep if cancer_site==1
 
 local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Totals, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Totals, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Totals) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Totals) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1449,9 +1777,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site!=1
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(AllSites, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(AllSites, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(AllSites) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(AllSites) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1471,9 +1799,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==2
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Prostate, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Prostate, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Prostate) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Prostate) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1493,9 +1821,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==3
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Breast, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Breast, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Breast) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Breast) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1515,9 +1843,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==4
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Colon, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Colon, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Colon) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Colon) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1537,9 +1865,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==5
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Lung, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Lung, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Lung) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Lung) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1559,9 +1887,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==6
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Pancreas, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Pancreas, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Pancreas) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Pancreas) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1581,9 +1909,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==7
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(MM, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(MM, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(MM) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(MM) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1603,9 +1931,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==8
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(NHL, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(NHL, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(NHL) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(NHL) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1625,9 +1953,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==9
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Rectum, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Rectum, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Rectum) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Rectum) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1647,9 +1975,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==10
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(CorpusUteri, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(CorpusUteri, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(CorpusUteri) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(CorpusUteri) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1669,9 +1997,9 @@ use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 keep if cancer_site==11
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", firstrow(variables) sheet(Stomach, replace) 
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", firstrow(variables) sheet(Stomach, replace) 
 
-putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.xlsx", sheet(Stomach) modify
+putexcel set "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.xlsx", sheet(Stomach) modify
 putexcel A1:G1, bold
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
 putexcel A1 = "Year"
@@ -1684,7 +2012,7 @@ putexcel G1 = "CI_upper"
 putexcel save
 
 restore
-
+*/
 ****************
 ** 2021 ASMRs **
 ****************
@@ -1740,7 +2068,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1777,7 +2105,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1817,7 +2145,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1877,7 +2205,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1914,7 +2242,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1954,7 +2282,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2014,7 +2342,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2051,7 +2379,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2091,7 +2419,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2151,7 +2479,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2188,7 +2516,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2228,7 +2556,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2288,7 +2616,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2325,7 +2653,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2365,7 +2693,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2425,7 +2753,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2462,7 +2790,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2502,7 +2830,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2567,7 +2895,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2604,7 +2932,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2644,7 +2972,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2709,7 +3037,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2746,7 +3074,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2786,7 +3114,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2850,7 +3178,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2887,7 +3215,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2927,14 +3255,14 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 
-/*
+
 ** Output for cases by PARISH
 clear
-use "`datapath'\version09\2-working\2013_2014_2015_cancer_numbers", clear
+use "`datapath'\version09\2-working\2013-2018_cancer_numbers", clear
 				*******************************
 				*	     MS WORD REPORT       *
 				*   ANNUAL REPORT STATISTICS  *
@@ -2954,7 +3282,7 @@ putdocx begin
 putdocx paragraph, style(Heading1)
 putdocx text ("Cases by Parish"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (# tumours/n=2,750)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (# tumours/n=5,867)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename parish Parish
 rename count Total_Records
@@ -2963,12 +3291,13 @@ putdocx table tbl_parish = data("Parish Total_Records Percent"), varnames  ///
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_parish(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 
-save "`datapath'\version09\2-working\2013-2015_cases_parish.dta" ,replace
-label data "BNR-Cancer 2013-2015 Cases by Parish"
-notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+save "`datapath'\version09\2-working\2013-2018_cases_parish.dta" ,replace
+label data "BNR-Cancer 2013-2018 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
 restore
 
 
@@ -2985,11 +3314,17 @@ putdocx pagebreak
 putdocx paragraph, style(Heading1)
 putdocx text ("Cases by Parish + Year"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (2013: # tumours/n=859)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (2013: # tumours/n=884)"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (2014: # tumours/n=861)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (2014: # tumours/n=884)"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (2015: # tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (2015: # tumours/n=1,092)"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (2016: # tumours/n=1,070)"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (2017: # tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (2018: # tumours/n=960)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename parish Parish
 rename dxyr Year
@@ -2999,12 +3334,13 @@ putdocx table tbl_year = data("Parish Year Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_year(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 
-save "`datapath'\version09\2-working\2013-2015_cases_parish+dxyr.dta" ,replace
-label data "BNR-Cancer 2013-2015 Cases by Parish"
-notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+save "`datapath'\version09\2-working\2013-2018_cases_parish+dxyr.dta" ,replace
+label data "BNR-Cancer 2013-2018 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
 restore
 
 
@@ -3021,7 +3357,7 @@ putdocx pagebreak
 putdocx paragraph, style(Heading1)
 putdocx text ("Cases by Parish + Site"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (# tumours/n=2,750)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (# tumours/n=5,867)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename parish Parish
 rename siteiarc Site
@@ -3031,12 +3367,13 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 
-save "`datapath'\version09\2-working\2013-2015_cases_parish+site.dta" ,replace
-label data "BNR-Cancer 2013-2015 Cases by Parish"
-notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+save "`datapath'\version09\2-working\2013-2018_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2013-2018 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
 restore
 
 
@@ -3053,7 +3390,7 @@ putdocx begin
 putdocx paragraph, style(Heading1)
 putdocx text ("Cases by Parish + Site: 2013"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (# tumours/n=859)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (# tumours/n=884)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename parish Parish
 rename siteiarc Site
@@ -3063,12 +3400,13 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2013_cases_parish+site.dta" ,replace
 label data "BNR-Cancer 2013 Cases by Parish"
-notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
 restore
 
 ** All cases by parish + site (2014)
@@ -3085,7 +3423,7 @@ putdocx pagebreak
 putdocx paragraph, style(Heading1)
 putdocx text ("Cases by Parish + Site: 2014"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (# tumours/n=861)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (# tumours/n=884)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename parish Parish
 rename siteiarc Site
@@ -3095,12 +3433,13 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2014_cases_parish+site.dta" ,replace
 label data "BNR-Cancer 2014 Cases by Parish"
-notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
 restore
 
 ** All cases by parish + site (2015)
@@ -3117,7 +3456,7 @@ putdocx pagebreak
 putdocx paragraph, style(Heading1)
 putdocx text ("Cases by Parish + Site: 2015"), bold
 putdocx paragraph, halign(center)
-putdocx text ("Cases by Parish (# tumours/n=1,030)"), bold font(Helvetica,14,"blue")
+putdocx text ("Cases by Parish (# tumours/n=1,092)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 rename parish Parish
 rename siteiarc Site
@@ -3127,17 +3466,115 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
         border(start, nil) border(insideV, nil) border(end, nil)
 putdocx table tbl_site(1,.), bold
 
-putdocx save "`datapath'\version09\3-output\2021-08-12_annual_report_stats.docx", append
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2015_cases_parish+site.dta" ,replace
 label data "BNR-Cancer 2015 Cases by Parish"
-notes _dta :These data prepared for Natasha Sobers - 2015 annual report
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
 restore
 
-*/
+** All cases by parish + site (2016)
+preserve
+drop if dxyr!=2016
+tab siteiarc parish
+contract siteiarc parish, freq(count) percent(percentage)
 
+putdocx clear
+putdocx begin
 
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Site: 2016"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=1,070)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename siteiarc Site
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+
+save "`datapath'\version09\2-working\2016_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2016 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
+restore
+
+** All cases by parish + site (2017)
+preserve
+drop if dxyr!=2017
+tab siteiarc parish
+contract siteiarc parish, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Site: 2017"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename siteiarc Site
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+
+save "`datapath'\version09\2-working\2017_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2017 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
+restore
+
+** All cases by parish + site (2018)
+preserve
+drop if dxyr!=2018
+tab siteiarc parish
+contract siteiarc parish, freq(count) percent(percentage)
+
+putdocx clear
+putdocx begin
+
+// Create a paragraph
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Cases by Parish + Site: 2018"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Cases by Parish (# tumours/n=960)"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+rename parish Parish
+rename siteiarc Site
+rename count Total_Records
+rename percentage Percent
+putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  ///
+        border(start, nil) border(insideV, nil) border(end, nil)
+putdocx table tbl_site(1,.), bold
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
+putdocx clear
+
+save "`datapath'\version09\2-working\2018_cases_parish+site.dta" ,replace
+label data "BNR-Cancer 2018 Cases by Parish"
+notes _dta :These data prepared for Natasha Sobers - 2016-2018 annual report
+restore
+
+STOP
 
 				****************************
 				* 	    MS WORD REPORT     *
@@ -3177,7 +3614,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 				*******************************
@@ -3210,7 +3647,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx", append
 putdocx clear
 restore
 				*******************************
@@ -3249,7 +3686,7 @@ putdocx image "`datapath'\version09\2-working\ResidentStatusByYear.png", width(1
 putdocx paragraph
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx" ,append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx" ,append
 putdocx clear
 restore
 
@@ -3287,7 +3724,7 @@ putdocx image "`datapath'\version09\2-working\BODbyYear.png", width(17.94) heigh
 putdocx paragraph
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx" ,append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx" ,append
 putdocx clear
 restore
 
@@ -3350,5 +3787,5 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV06_`listdate'.docx" ,append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV07_`listdate'.docx" ,append
 putdocx clear
