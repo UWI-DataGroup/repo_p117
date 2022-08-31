@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-AUG-2022
-    // 	date last modified      30-AUG-2022
+    // 	date last modified      31-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting in Excel
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -59,6 +59,12 @@ putexcel D1 = "Results_2016"
 putexcel E1 = "Results_2015"
 putexcel F1 = "Results_2014"
 putexcel G1 = "Results_2013"
+putexcel (B4:G4), rownames nformat(number_d2)
+putexcel (B6:G6), rownames nformat(number_d2)
+putexcel (B8:G8), nformat("0.0")
+putexcel (B9:G9), nformat("0.0")
+putexcel (B10:G10), nformat("0.0")
+putexcel (B11:G11), nformat("0.0")
 putexcel save
 restore
 
@@ -85,6 +91,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASIR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D67), nformat("0.0")
+putexcel (E2:E67), nformat("0.0")
+putexcel (F2:F67), nformat("0.0")
+putexcel (G2:G67), nformat("0.0")
 putexcel save
 restore
 
@@ -109,6 +119,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASIR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D7), nformat("0.0")
+putexcel (E2:E7), nformat("0.0")
+putexcel (F2:F7), nformat("0.0")
+putexcel (G2:G7), nformat("0.0")
 putexcel save
 restore
 
@@ -133,6 +147,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASIR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D7), nformat("0.0")
+putexcel (E2:E7), nformat("0.0")
+putexcel (F2:F7), nformat("0.0")
+putexcel (G2:G7), nformat("0.0")
 putexcel save
 restore
 
@@ -157,6 +175,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASIR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D7), nformat("0.0")
+putexcel (E2:E7), nformat("0.0")
+putexcel (F2:F7), nformat("0.0")
+putexcel (G2:G7), nformat("0.0")
 putexcel save
 restore
 
@@ -181,6 +203,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASIR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D7), nformat("0.0")
+putexcel (E2:E7), nformat("0.0")
+putexcel (F2:F7), nformat("0.0")
+putexcel (G2:G7), nformat("0.0")
 putexcel save
 restore
 
@@ -205,6 +231,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASIR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D7), nformat("0.0")
+putexcel (E2:E7), nformat("0.0")
+putexcel (F2:F7), nformat("0.0")
+putexcel (G2:G7), nformat("0.0")
 putexcel save
 restore
 
@@ -229,6 +259,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASIR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D8), nformat("0.0")
+putexcel (E2:E8), nformat("0.0")
+putexcel (F2:F8), nformat("0.0")
+putexcel (G2:G8), nformat("0.0")
 putexcel save
 restore
 
@@ -263,6 +297,7 @@ putexcel (A8:D8), bold fpat(solid, yellow)
 putexcel (A9:D9), bold fpat(solid, yellow)
 putexcel (A10:D10), bold fpat(solid, yellow)
 putexcel (A11:D11), bold fpat(solid, yellow)
+putexcel (D2:D21), nformat("0.0")
 putexcel save
 restore
 
@@ -292,6 +327,7 @@ putexcel (A8:D8), bold fpat(solid, yellow)
 putexcel (A9:D9), bold fpat(solid, yellow)
 putexcel (A12:D12), bold fpat(solid, yellow)
 putexcel (A13:D13), bold fpat(solid, yellow)
+putexcel (D2:D21), nformat("0.0")
 putexcel save
 restore
 
@@ -321,6 +357,7 @@ putexcel (A8:D8), bold fpat(solid, yellow)
 putexcel (A9:D9), bold fpat(solid, yellow)
 putexcel (A10:D10), bold fpat(solid, yellow)
 putexcel (A14:D14), bold fpat(solid, yellow)
+putexcel (D2:D21), nformat("0.0")
 putexcel save
 restore
 
@@ -350,6 +387,7 @@ putexcel (A8:D8), bold fpat(solid, yellow)
 putexcel (A9:D9), bold fpat(solid, yellow)
 putexcel (A10:D10), bold fpat(solid, yellow)
 putexcel (A11:D11), bold fpat(solid, yellow)
+putexcel (D2:D21), nformat("0.0")
 putexcel save
 restore
 
@@ -379,6 +417,7 @@ putexcel (A8:D8), bold fpat(solid, yellow)
 putexcel (A10:D10), bold fpat(solid, yellow)
 putexcel (A11:D11), bold fpat(solid, yellow)
 putexcel (A13:D13), bold fpat(solid, yellow)
+putexcel (D2:D21), nformat("0.0")
 putexcel save
 restore
 
@@ -408,6 +447,7 @@ putexcel (A9:D9), bold fpat(solid, yellow)
 putexcel (A10:D10), bold fpat(solid, yellow)
 putexcel (A12:D12), bold fpat(solid, yellow)
 putexcel (A13:D13), bold fpat(solid, yellow)
+putexcel (D2:D21), nformat("0.0")
 putexcel save
 restore
 
@@ -497,6 +537,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E140), nformat("0.0")
 putexcel save
 restore
 
@@ -516,6 +557,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E139), nformat("0.0")
 putexcel save
 restore
 
@@ -535,6 +577,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E137), nformat("0.0")
 putexcel save
 restore
 
@@ -554,6 +597,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E146), nformat("0.0")
 putexcel save
 restore
 
@@ -573,6 +617,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E136), nformat("0.0")
 putexcel save
 restore
 
@@ -592,6 +637,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E141), nformat("0.0")
 putexcel save
 restore
 
@@ -620,6 +666,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E133), nformat("0.0")
 putexcel save
 restore
 
@@ -639,6 +686,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E135), nformat("0.0")
 putexcel save
 restore
 
@@ -695,6 +743,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -717,6 +769,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D91), nformat("0.0")
+putexcel (E2:E91), nformat("0.0")
+putexcel (F2:F91), nformat("0.0")
+putexcel (G2:G91), nformat("0.0")
 putexcel save
 
 restore
@@ -739,6 +795,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -761,6 +821,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -783,6 +847,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -805,6 +873,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -827,6 +899,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -849,6 +925,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -871,6 +951,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -893,6 +977,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -915,6 +1003,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -937,6 +1029,10 @@ putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
 putexcel F1 = "CI_lower"
 putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
 putexcel save
 
 restore
@@ -958,13 +1054,13 @@ local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_t
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2021, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2021) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D59), nformat("0.0")
 putexcel save
 restore
 
@@ -977,13 +1073,13 @@ use "`datapath'\version09\2-working\2020_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2020, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2020) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D55), nformat("0.0")
 putexcel save
 restore
 
@@ -996,13 +1092,13 @@ use "`datapath'\version09\2-working\2019_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2019, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2019) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D56), nformat("0.0")
 putexcel save
 restore
 
@@ -1015,13 +1111,13 @@ use "`datapath'\version09\2-working\2018_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2018, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2018) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D56), nformat("0.0")
 putexcel save
 restore
 
@@ -1034,13 +1130,13 @@ use "`datapath'\version09\2-working\2017_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2017, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2017) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D57), nformat("0.0")
 putexcel save
 restore
 
@@ -1053,13 +1149,13 @@ use "`datapath'\version09\2-working\2016_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2016, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2016) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D54), nformat("0.0")
 putexcel save
 restore
 
@@ -1072,13 +1168,13 @@ use "`datapath'\version09\2-working\2015_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2015, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2015) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D58), nformat("0.0")
 putexcel save
 restore
 
@@ -1091,13 +1187,13 @@ use "`datapath'\version09\2-working\2014_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2014, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2014) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D59), nformat("0.0")
 putexcel save
 restore
 
@@ -1110,13 +1206,13 @@ use "`datapath'\version09\2-working\2013_top10mort_age_rates", clear
 export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2013, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2013) modify
-putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
-putexcel E1 = "AgeSpecificRate"
+putexcel C1 = "Age10Group"
+putexcel D1 = "AgeSpecificRate"
+putexcel (D2:D64), nformat("0.0")
 putexcel save
 restore
 
@@ -1146,6 +1242,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E92), nformat("0.0")
 putexcel save
 restore
 
@@ -1165,6 +1262,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E82), nformat("0.0")
 putexcel save
 restore
 
@@ -1184,6 +1282,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E86), nformat("0.0")
 putexcel save
 restore
 
@@ -1203,6 +1302,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E83), nformat("0.0")
 putexcel save
 restore
 
@@ -1222,6 +1322,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E81), nformat("0.0")
 putexcel save
 restore
 
@@ -1241,6 +1342,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E77), nformat("0.0")
 putexcel save
 restore
 
@@ -1260,6 +1362,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E84), nformat("0.0")
 putexcel save
 restore
 
@@ -1279,6 +1382,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E86), nformat("0.0")
 putexcel save
 restore
 
@@ -1298,6 +1402,7 @@ putexcel B1 = "Site"
 putexcel C1 = "Sex"
 putexcel D1 = "Age10Group"
 putexcel E1 = "AgeSpecificRate"
+putexcel (E2:E96), nformat("0.0")
 putexcel save
 restore
 
@@ -1323,6 +1428,7 @@ putexcel A1:C1, bold fpat(solid, lightgray)
 putexcel A1 = "Parish"
 putexcel B1 = "Total_Records"
 putexcel C1 = "Percent"
+putexcel (C2:C13), nformat("0.0")
 putexcel save
 restore
 
@@ -1343,6 +1449,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Year"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D70), nformat("0.0")
 putexcel save
 restore
 
@@ -1363,6 +1470,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Site"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D436), nformat("0.0")
 putexcel save
 restore
 
@@ -1383,6 +1491,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Site"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D222), nformat("0.0")
 putexcel save
 restore
 
@@ -1403,6 +1512,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Site"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D233), nformat("0.0")
 putexcel save
 restore
 
@@ -1423,6 +1533,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Site"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D239), nformat("0.0")
 putexcel save
 restore
 
@@ -1443,6 +1554,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Site"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D230), nformat("0.0")
 putexcel save
 restore
 
@@ -1463,6 +1575,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Site"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D209), nformat("0.0")
 putexcel save
 restore
 
@@ -1483,6 +1596,7 @@ putexcel A1 = "Parish"
 putexcel B1 = "Site"
 putexcel C1 = "Total_Records"
 putexcel D1 = "Percent"
+putexcel (D2:D221), nformat("0.0")
 putexcel save
 restore
 
@@ -1510,6 +1624,8 @@ putexcel C1 = "MIR"
 putexcel D1 = "MIR_IARC"
 putexcel E1 = "Cases_Mort"
 putexcel F1 = "Cases_Incid"
+putexcel (C2:C37), nformat("0.00")
+putexcel (D2:D37), nformat("0.0")
 putexcel save
 restore
 
@@ -1539,6 +1655,10 @@ putexcel B1 = "Median_MONTHS"
 putexcel C1 = "Range_lower_MONTHS"
 putexcel D1 = "Range_upper_MONTHS"
 putexcel E1 = "Mean_MONTHS"
+putexcel (B2:B9), nformat("0.0")
+putexcel (C2:C9), nformat("0.0")
+putexcel (D2:D9), nformat("0.0")
+putexcel (E2:E9), nformat("0.0")
 putexcel save
 restore
 
@@ -1646,6 +1766,13 @@ putexcel U1 = "Total_ResidentStatus_2017"
 putexcel V1 = "NonResidents_2018"
 putexcel W1 = "Percent_NonResidents_2018"
 putexcel X1 = "Total_ResidentStatus_2018"
+putexcel (E2:E12), nformat("0.0")
+putexcel (H2:H12), nformat("0.0")
+putexcel (K2:K12), nformat("0.0")
+putexcel (N2:N12), nformat("0.0")
+putexcel (Q2:Q12), nformat("0.0")
+putexcel (T2:T12), nformat("0.0")
+putexcel (W2:W12), nformat("0.0")
 putexcel save
 restore
 
@@ -1702,6 +1829,7 @@ putexcel H1 = "Total_2015"
 putexcel I1 = "Total_2016"
 putexcel J1 = "Total_2017"
 putexcel K1 = "Total_2018"
+putexcel (D2:D57), nformat("0.0")
 putexcel save
 restore
 
@@ -1728,5 +1856,9 @@ putexcel B1 = "Median_WEEKS"
 putexcel C1 = "Range_lower_WEEKS"
 putexcel D1 = "Range_upper_WEEKS"
 putexcel E1 = "Mean_WEEKS"
+putexcel (B2:B16), nformat("0.0")
+putexcel (C2:C16), nformat("0.0")
+putexcel (D2:D16), nformat("0.0")
+putexcel (E2:E16), nformat("0.0")
 putexcel save
 restore
