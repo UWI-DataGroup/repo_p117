@@ -675,7 +675,7 @@ preserve
 use "`datapath'\version09\2-working\2016_top10_age+sex_rates", clear
 
 ** Create Sheet with 2016
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_2016+2017Top10AgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(AgeSpecific_2016, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2016+2017Top10AgeSpecificRates_`listdate'.xlsx", sheet(AgeSpecific_2016) modify
