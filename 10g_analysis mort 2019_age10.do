@@ -1366,56 +1366,70 @@ preserve
 	replace sex=1 in 9
 	replace age_10=1 in 9
 	replace case=0 in 9
-	replace pop_wpp=(24744) in 9
+	replace pop_wpp=(24043) in 9
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=1 in 10
-	replace age_10=2 in 10
+	replace sex=2 in 10
+	replace age_10=1 in 10
 	replace case=0 in 10
-	replace pop_wpp=(18696) in 10
+	replace pop_wpp=(24894) in 10
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 11
-	replace age_10=3 in 11
+	replace age_10=2 in 11
 	replace case=0 in 11
-	replace pop_wpp=(18745) in 11
+	replace pop_wpp=(18537) in 11
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=2 in 12
-	replace age_10=3 in 12
+	replace age_10=2 in 12
 	replace case=0 in 12
-	replace pop_wpp=(18745) in 12
+	replace pop_wpp=(19306) in 12
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 13
-	replace age_10=4 in 13
+	replace age_10=3 in 13
 	replace case=0 in 13
-	replace pop_wpp=(18745) in 13
+	replace pop_wpp=(18544) in 13
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=2 in 14
-	replace age_10=4 in 14
+	replace age_10=3 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18745) in 14
+	replace pop_wpp=(18394) in 14
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 15
-	replace age_10=5 in 15
+	replace age_10=4 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18745) in 15
+	replace pop_wpp=(19508) in 15
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=1 in 16
-	replace age_10=6 in 16
+	replace sex=2 in 16
+	replace age_10=4 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18745) in 16
+	replace pop_wpp=(18620) in 16
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age_10=5 in 17
+	replace case=0 in 17
+	replace pop_wpp=(20927) in 17
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age_10=6 in 18
+	replace case=0 in 18
+	replace pop_wpp=(20640) in 18
 	sort age_10
 	
 	** -distrate is a user written command.
@@ -1432,7 +1446,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   16   239518    6.68      2.80     1.55     5.21     0.90 |
+  |   16   287021    5.57      2.75     1.53     4.79     0.79 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting

@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-AUG-2022
-    // 	date last modified      31-AUG-2022
+    // 	date last modified      01-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting in Excel
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -36,7 +36,7 @@ cls
     log using "`logpath'\30b_report cancer_EXCEL.smcl", replace
 ** HEADER -----------------------------------------------------
 
-/*
+
 *************************
 **  SUMMARY STATISTICS **
 *************************
@@ -689,7 +689,7 @@ putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E135), nformat("0.0")
 putexcel save
 restore
-*/
+
 
 
 
@@ -725,8 +725,8 @@ putexcel (F2:F12), nformat("0.0")
 putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
-preserve
 
+preserve
 ** 2020 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2020", clear
 
@@ -737,7 +737,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2020, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2020) modify
@@ -756,6 +756,7 @@ putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
 
+preserve
 ** 2019 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2019", clear
 
@@ -766,7 +767,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2019, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2019) modify
@@ -785,6 +786,7 @@ putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
 
+preserve
 ** 2018 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2018", clear
 
@@ -795,7 +797,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2018, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2018) modify
@@ -814,6 +816,7 @@ putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
 
+preserve
 ** 2017 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2017", clear
 
@@ -824,7 +827,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2017, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2017) modify
@@ -843,6 +846,7 @@ putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
 
+preserve
 ** 2016 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2016", clear
 
@@ -853,7 +857,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2016, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2016) modify
@@ -872,6 +876,7 @@ putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
 
+preserve
 ** 2015 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2015", clear
 
@@ -882,7 +887,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2015, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2015) modify
@@ -901,6 +906,7 @@ putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
 
+preserve
 ** 2014 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2014", clear
 
@@ -911,7 +917,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2014, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2014) modify
@@ -930,6 +936,7 @@ putexcel (G2:G12), nformat("0.0")
 putexcel save
 restore
 
+preserve
 ** 2013 **
 use "`datapath'\version09\2-working\ASMRs_wpp_2013", clear
 
@@ -940,7 +947,7 @@ drop percentage
 sort cancer_site year asmr
 order year cancer_site number percent asmr ci_lower ci_upper
 
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
 export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2013, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2013) modify
@@ -1018,9 +1025,9 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** All Sites **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 ** Create Sheet2 with AllSites
@@ -1044,9 +1051,9 @@ putexcel (E2:E91), nformat("0.0")
 putexcel (F2:F91), nformat("0.0")
 putexcel (G2:G91), nformat("0.0")
 putexcel save
-
 restore
 
+** Prostate **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 ** Create Sheet2 with Prostate
@@ -1070,12 +1077,11 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** Breast **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
-** Create Sheet2 with Prostate
 keep if cancer_site==3
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
@@ -1096,12 +1102,11 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** Colon **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
-** Create Sheet2 with Prostate
 keep if cancer_site==4
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
@@ -1125,9 +1130,9 @@ putexcel save
 
 restore
 
+** Lung **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
-** Create Sheet2 with Prostate
 keep if cancer_site==5
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
@@ -1151,9 +1156,9 @@ putexcel save
 
 restore
 
+** Pancreas **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
-** Create Sheet2 with Prostate
 keep if cancer_site==6
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
@@ -1174,12 +1179,11 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** MM **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
-** Create Sheet2 with Prostate
 keep if cancer_site==7
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
@@ -1200,12 +1204,11 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** NHL **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
-** Create Sheet2 with Prostate
 keep if cancer_site==8
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
@@ -1226,9 +1229,9 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** Rectum **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 ** Create Sheet2 with Prostate
@@ -1252,12 +1255,11 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** Corpus Uteri **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
-** Create Sheet2 with Prostate
 keep if cancer_site==10
 
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
@@ -1278,9 +1280,9 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
+** Stomach **
 preserve
 use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
 ** Create Sheet2 with Prostate
@@ -1304,7 +1306,6 @@ putexcel (E2:E10), nformat("0.0")
 putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
-
 restore
 
 
@@ -1321,14 +1322,14 @@ use "`datapath'\version09\2-working\2021_top10mort_age_rates", clear
 
 ** Create Sheet with 2021
 local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2021, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2021, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2021) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D59), nformat("0.0")
 putexcel save
@@ -1340,14 +1341,14 @@ use "`datapath'\version09\2-working\2020_top10mort_age_rates", clear
 
 ** Create Sheet with 2020
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2020, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2020, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2020) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D55), nformat("0.0")
 putexcel save
@@ -1359,14 +1360,14 @@ use "`datapath'\version09\2-working\2019_top10mort_age_rates", clear
 
 ** Create Sheet with 2019
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2019, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2019, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2019) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D56), nformat("0.0")
 putexcel save
@@ -1378,14 +1379,14 @@ use "`datapath'\version09\2-working\2018_top10mort_age_rates", clear
 
 ** Create Sheet with 2018
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2018, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2018, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2018) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D56), nformat("0.0")
 putexcel save
@@ -1397,14 +1398,14 @@ use "`datapath'\version09\2-working\2017_top10mort_age_rates", clear
 
 ** Create Sheet with 2017
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2017, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2017, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2017) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D57), nformat("0.0")
 putexcel save
@@ -1416,14 +1417,14 @@ use "`datapath'\version09\2-working\2016_top10mort_age_rates", clear
 
 ** Create Sheet with 2016
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2016, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2016, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2016) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D54), nformat("0.0")
 putexcel save
@@ -1435,14 +1436,14 @@ use "`datapath'\version09\2-working\2015_top10mort_age_rates", clear
 
 ** Create Sheet with 2015
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2015, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2015, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2015) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D58), nformat("0.0")
 putexcel save
@@ -1454,14 +1455,14 @@ use "`datapath'\version09\2-working\2014_top10mort_age_rates", clear
 
 ** Create Sheet with 2014
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2014, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2014, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2014) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D59), nformat("0.0")
 putexcel save
@@ -1473,14 +1474,14 @@ use "`datapath'\version09\2-working\2013_top10mort_age_rates", clear
 
 ** Create Sheet with 2013
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2013, replace) 
+export_excel year cancer_site age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", firstrow(variables) sheet(MortAge_2013, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificRates_`listdate'.xlsx", sheet(MortAge_2013) modify
 putexcel A1:D1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
 putexcel B1 = "Site"
-putexcel C1 = "Age10Group"
+putexcel C1 = "Age5Group"
 putexcel D1 = "AgeSpecificRate"
 putexcel (D2:D64), nformat("0.0")
 putexcel save
@@ -1502,7 +1503,7 @@ use "`datapath'\version09\2-working\2021_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2021
 local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2021, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2021, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2021) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1510,7 +1511,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E92), nformat("0.0")
 putexcel save
@@ -1522,7 +1523,7 @@ use "`datapath'\version09\2-working\2020_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2020
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2020, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2020, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2020) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1530,7 +1531,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E82), nformat("0.0")
 putexcel save
@@ -1542,7 +1543,7 @@ use "`datapath'\version09\2-working\2019_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2019
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2019, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2019, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2019) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1550,7 +1551,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E86), nformat("0.0")
 putexcel save
@@ -1562,7 +1563,7 @@ use "`datapath'\version09\2-working\2018_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2018
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2018, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2018, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2018) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1570,7 +1571,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E83), nformat("0.0")
 putexcel save
@@ -1582,7 +1583,7 @@ use "`datapath'\version09\2-working\2017_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2017
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2017, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2017, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2017) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1590,7 +1591,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E81), nformat("0.0")
 putexcel save
@@ -1602,7 +1603,7 @@ use "`datapath'\version09\2-working\2016_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2016
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2016, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2016, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2016) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1610,7 +1611,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E77), nformat("0.0")
 putexcel save
@@ -1622,7 +1623,7 @@ use "`datapath'\version09\2-working\2015_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2015
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2015, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2015, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2015) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1630,7 +1631,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E84), nformat("0.0")
 putexcel save
@@ -1642,7 +1643,7 @@ use "`datapath'\version09\2-working\2014_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2014
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2014, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2014, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2014) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1650,7 +1651,7 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E86), nformat("0.0")
 putexcel save
@@ -1662,7 +1663,7 @@ use "`datapath'\version09\2-working\2013_top10mort_age+sex_rates", clear
 
 ** Create Sheet with 2013
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site sex age_10 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2013, replace) 
+export_excel year cancer_site sex age5 age_specific_rate using "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", firstrow(variables) sheet(MortAgeSex_2013, replace) 
 
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortAgeSpecificSexRates_`listdate'.xlsx", sheet(MortAgeSex_2013) modify
 putexcel A1:E1, bold fpat(solid, lightgray)
@@ -1670,13 +1671,13 @@ putexcel A1:E1, bold fpat(solid, lightgray)
 putexcel A1 = "Year"
 putexcel B1 = "Site"
 putexcel C1 = "Sex"
-putexcel D1 = "Age10Group"
+putexcel D1 = "Age5Group"
 putexcel E1 = "AgeSpecificRate"
 putexcel (E2:E96), nformat("0.0")
 putexcel save
 restore
 
-STOP
+
 ****************************************
 **  Cases by Parish, by Year, by Site **
 **			(2013-2018)				  **

@@ -811,7 +811,7 @@ preserve
 	replace sex=2 in 18
 	replace age_10=5 in 18
 	replace case=0 in 18
-	replace pop_wpp=(17226) in 18
+	replace pop_wpp=(19347) in 18
 	sort age_10
 	
 	** -distrate is a user written command.
@@ -828,7 +828,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   26   284108    9.15      5.13     3.28     7.78     1.10 |
+  |   26   286229    9.08      5.11     3.28     7.75     1.09 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting

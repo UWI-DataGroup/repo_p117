@@ -1116,56 +1116,56 @@ preserve
 	replace sex=1 in 11
 	replace age_10=1 in 11
 	replace case=0 in 11
-	replace pop_wpp=(24043) in 11
+	replace pop_wpp=(23681) in 11
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=2 in 12
 	replace age_10=1 in 12
 	replace case=0 in 12
-	replace pop_wpp=(24894) in 12
+	replace pop_wpp=(24484) in 12
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 13
 	replace age_10=2 in 13
 	replace case=0 in 13
-	replace pop_wpp=(18537) in 13
+	replace pop_wpp=(18448) in 13
 	sort age_10
 		
 	expand 2 in 1
 	replace sex=2 in 14
 	replace age_10=2 in 14
 	replace case=0 in 14
-	replace pop_wpp=(19306) in 14
+	replace pop_wpp=(19286) in 14
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 15
 	replace age_10=3 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18544) in 15
+	replace pop_wpp=(18488) in 15
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=2 in 16
 	replace age_10=3 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18394) in 16
+	replace pop_wpp=(18422) in 16
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 17
 	replace age_10=4 in 17
 	replace case=0 in 17
-	replace pop_wpp=(19508) in 17
+	replace pop_wpp=(19333) in 17
 	sort age_10
 	
 	expand 2 in 1
 	replace sex=2 in 18
 	replace age_10=4 in 18
 	replace case=0 in 18
-	replace pop_wpp=(18620) in 18
+	replace pop_wpp=(18494) in 18
 	sort age_10
 	
 	** -distrate is a user written command.
@@ -1182,7 +1182,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   22   288581    7.62      3.80     2.32     6.08     0.91 |
+  |   22   287371    7.66      3.80     2.32     6.08     0.91 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1512,7 +1512,7 @@ save "`datapath'\version09\2-working\ASMRs_wpp_2020" ,replace
 restore
 
 
-label data "BNR MORTALITY rates 2019"
+label data "BNR MORTALITY rates 2020"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version09\3-output\2019_analysis mort_wpp" ,replace
+save "`datapath'\version09\3-output\2020_analysis mort_wpp" ,replace
 note: TS This dataset includes patients with multiple eligible cancer causes of death; used WPP population

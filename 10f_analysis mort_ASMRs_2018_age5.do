@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      31-AUG-2022
-    // 	date last modified      31-AUG-2022
+    // 	date last modified      01-SEP-2022
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASMRs
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2018 death data for inclusion in 2016-2018 cancer report.
@@ -151,29 +151,17 @@ restore
 //JC 13jun2022: Above correction not performed - will perform in a separate dofile when using IH's rate calculation method
 merge m:m sex age5 using "`datapath'\version09\2-working\pop_wpp_2018-5"
 /*
-    Result                           # of obs.
     Result                      Number of obs
     -----------------------------------------
-    Not matched                             1
+    Not matched                             8
         from master                         0  (_merge==1)
-        from using                          1  (_merge==2)
-
-    Matched                               659  (_merge==3)
-    -----------------------------------------
-	
-    Result                      Number of obs
-    -----------------------------------------
-    Not matched                             1
-        from master                         0  (_merge==1)
-        from using                          1  (_merge==2)
+        from using                          8  (_merge==2)
 
     Matched                               658  (_merge==3)
     -----------------------------------------
 */
 **drop if _merge==2 //do not drop these age groups as it skews pop_wpp 
-** There is 1 unmatched records (_merge==2) since 2018 data doesn't have any cases of males with age range 25-34
-** age5	site  dup	sex	 pfu	pop_wpp	_merge
-** 25-34	  .     .	male   .	18385	using only (2)
+** There are 8 unmatched records (_merge==2) since 2018 data doesn't have any cases of 0-4 female; 5-9 male; 10-14 female + male; 20-24 female; 25-29 female + male; 30-34 male
 
 tab age5 ,m //none missing
 
@@ -182,9 +170,9 @@ gen pfu=1 // for % year if not whole year collected; not done for cancer
 
 list record_id sex age5 if _merge==2
 list record_id sex age5 if _merge==2 ,nolabel
-STOP
-list record_id sex age5 if age5==3 & sex==2 // age range 0-14 for male: change case=0 for age5=1
-replace case=0 if age5==3 & sex==2 //1 change
+
+list record_id sex age5 if age5==1 & sex==1|age5==2 & sex==2|age5==3 & (sex==1|sex==2)|age5==5 & sex==1|age5==6 & (sex==1|sex==2)|age5==7 & sex==2
+replace case=0 if age5==1 & sex==1|age5==2 & sex==2|age5==3 & (sex==1|sex==2)|age5==5 & sex==1|age5==6 & (sex==1|sex==2)|age5==7 & sex==2 //8 changes
 
 ** SF requested by email & WhatsApp on 07-Jan-2020 age and sex specific rates for top 10 cancers
 /*
@@ -237,9 +225,9 @@ save "`datapath'\version09\2-working\2018_top10mort_age_rates" ,replace
 restore
 
 ** Check for missing age as these would need to be added to the median group for that site when assessing ASMRs to prevent creating an outlier
-count if age==.|age==999 //1
+count if age==.|age==999 //8
 
-list siteiarc age if age==.|age==999 //this is missing age5: 25-34 so no change needed
+list siteiarc age if age==.|age==999 //this is missing age5 so no change needed
 
 tab pop_wpp age5  if sex==1 //female
 tab pop_wpp age5  if sex==2 //male
@@ -275,13 +263,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +-------------------------------------------------------------+
   | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
   |-------------------------------------------------------------|
-  |  659   286640   229.91    129.84   119.59   140.83     5.35 |
-  +-------------------------------------------------------------+
-  
-  +-------------------------------------------------------------+
-  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
-  |-------------------------------------------------------------|
-  |  658   286640   229.56    129.64   119.39   140.62     5.34 |
+  |  658   286640   229.56    128.99   118.78   139.96     5.33 |
   +-------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -329,34 +311,77 @@ preserve
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
-	** now we have to add in the cases and pop_wppns for the missings: M 0-14,15-24,25-34,35-44
-	
-	expand 2 in 1
-	replace sex=2 in 6
-	replace age5=1 in 6
-	replace case=0 in 6
-	replace pop_wpp=(25316)  in 6
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 7
-	replace age5=2 in 7
-	replace case=0 in 7
-	replace pop_wpp=(19294)  in 7
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 8
-	replace age5=3 in 8
-	replace case=0 in 8
-	replace pop_wpp=(18385) in 8
-	sort age5
+	** now we have to add in the cases and pop_wppns for the missings: 
+	** M 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39,40-44,50-54
 	
 	expand 2 in 1
 	replace sex=2 in 9
-	replace age5=4 in 9
+	replace age5=1 in 9
 	replace case=0 in 9
-	replace pop_wpp=(18767) in 9
+	replace pop_wpp=(7690) in 9
+	sort age5	
+	
+	expand 2 in 1
+	replace sex=2 in 10
+	replace age5=2 in 10
+	replace case=0 in 10
+	replace pop_wpp=(8270) in 10
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 11
+	replace age5=3 in 11
+	replace case=0 in 11
+	replace pop_wpp=(9356) in 11
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age5=4 in 12
+	replace case=0 in 12
+	replace pop_wpp=(9771) in 12
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 13
+	replace age5=5 in 13
+	replace case=0 in 13
+	replace pop_wpp=(9523) in 13
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age5=6 in 14
+	replace case=0 in 14
+	replace pop_wpp=(9270) in 14
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age5=7 in 15
+	replace case=0 in 15
+	replace pop_wpp=(9115) in 15
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age5=8 in 16
+	replace case=0 in 16
+	replace pop_wpp=(9285) in 16
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age5=9 in 17
+	replace case=0 in 17
+	replace pop_wpp=(9482) in 17
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age5=11 in 18
+	replace case=0 in 18
+	replace pop_wpp=(9546) in 18
 	sort age5
 			
 	** -distrate is a user written command.
@@ -372,13 +397,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |  135   138525   97.46     51.93    43.33    62.03     4.64 |
-  +------------------------------------------------------------+
-  
-  +------------------------------------------------------------+
-  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
-  |------------------------------------------------------------|
-  |  134   138525   96.73     51.48    42.92    61.53     4.61 |
+  |  134   138525   96.73     51.39    42.83    61.50     4.62 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -431,79 +450,50 @@ preserve
 	sort age sex
 
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** F 0-14,15-24
-	** M 0-14,15-24,25-34,35-44,55-64,65-74,85+
+	** F 0-4,5-9,10-14,15-19,20-24,25-29
 	
 	expand 2 in 1
-	replace sex=1 in 8
-	replace age5=1 in 8
-	replace case=0 in 8
-	replace pop_wpp=(24395) in 8
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 9
-	replace age5=2 in 9
-	replace case=0 in 9
-	replace pop_wpp=(18623) in 9
-	sort age5
-/*
-	expand 2 in 1
-	replace sex=2 in 12
-	replace age5=1 in 12
-	replace case=0 in 12
-	replace pop_wpp=(25316) in 12
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 13
-	replace age5=2 in 13
+	replace sex=1 in 13
+	replace age5=1 in 13
 	replace case=0 in 13
-	replace pop_wpp=(19294) in 13
+	replace pop_wpp=(7411) in 13
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 14
-	replace age5=3 in 14
+	replace sex=1 in 14
+	replace age5=2 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18385) in 14
+	replace pop_wpp=(8034) in 14
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 15
-	replace age5=4 in 15
+	replace sex=1 in 15
+	replace age5=3 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18767) in 15
+	replace pop_wpp=(8950) in 15
 	sort age5
-		
+	
 	expand 2 in 1
-	replace sex=2 in 16
-	replace age5=6 in 16
+	replace sex=1 in 16
+	replace age5=4 in 16
 	replace case=0 in 16
-	replace pop_wpp=(17550) in 16
+	replace pop_wpp=(9278) in 16
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 17
-	replace age5=7 in 17
+	replace sex=1 in 17
+	replace age5=5 in 17
 	replace case=0 in 17
-	replace pop_wpp=(11485) in 17
+	replace pop_wpp=(9345) in 17
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 18
-	replace age5=8 in 18
+	replace sex=1 in 18
+	replace age5=6 in 18
 	replace case=0 in 18
-	replace pop_wpp=(5824) in 18
+	replace pop_wpp=(9286) in 18
 	sort age5
 	
-	expand 2 in 1
-	replace sex=2 in 19
-	replace age5=9 in 19
-	replace case=0 in 19
-	replace pop_wpp=(2624) in 19
-	sort age5
-*/
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
@@ -518,13 +508,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |  102   292464   34.88     21.83    17.59    26.87     2.31 |
-  +------------------------------------------------------------+
-  
-  +------------------------------------------------------------+
-  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
-  |------------------------------------------------------------|
-  |  100   148115   67.52     41.12    33.06    50.73     4.39 |
+  |  100   148115   67.52     41.21    33.13    50.92     4.41 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -574,56 +558,133 @@ preserve
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24,25-34
-	** M 35-44
+	** M&F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39
+	** M   40-44,80-84
 	
 	expand 2 in 1
-	replace sex=1 in 12
-	replace age5=1 in 12
-	replace case=0 in 12
-	replace pop_wpp=(24395) in 12
+	replace sex=1 in 19
+	replace age5=1 in 19
+	replace case=0 in 19
+	replace pop_wpp=(7411) in 19
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 13
-	replace age5=1 in 13
-	replace case=0 in 13
-	replace pop_wpp=(25316) in 13
+	replace sex=1 in 20
+	replace age5=2 in 20
+	replace case=0 in 20
+	replace pop_wpp=(8034) in 20
 	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 14
-	replace age5=2 in 14
-	replace case=0 in 14
-	replace pop_wpp=(18623) in 14
-	sort age5
-
-	expand 2 in 1
-	replace sex=2 in 15
-	replace age5=2 in 15
-	replace case=0 in 15
-	replace pop_wpp=(19294) in 15
+	replace sex=1 in 21
+	replace age5=3 in 21
+	replace case=0 in 21
+	replace pop_wpp=(8950) in 21
 	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 16
-	replace age5=3 in 16
-	replace case=0 in 16
-	replace pop_wpp=(18632) in 16
+	replace sex=1 in 22
+	replace age5=4 in 22
+	replace case=0 in 22
+	replace pop_wpp=(9278) in 22
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 17
-	replace age5=3 in 17
-	replace case=0 in 17
-	replace pop_wpp=(18385) in 17
+	replace sex=1 in 23
+	replace age5=5 in 23
+	replace case=0 in 23
+	replace pop_wpp=(9345) in 23
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 18
-	replace age5=4 in 18
-	replace case=0 in 18
-	replace pop_wpp=(18767) in 18
+	replace sex=1 in 24
+	replace age5=6 in 24
+	replace case=0 in 24
+	replace pop_wpp=(9286) in 24
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 25
+	replace age5=7 in 25
+	replace case=0 in 25
+	replace pop_wpp=(9346) in 25
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 26
+	replace age5=8 in 26
+	replace case=0 in 26
+	replace pop_wpp=(9729) in 26
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 27
+	replace age5=1 in 27
+	replace case=0 in 27
+	replace pop_wpp=(7690) in 27
+	sort age5	
+	
+	expand 2 in 1
+	replace sex=2 in 28
+	replace age5=2 in 28
+	replace case=0 in 28
+	replace pop_wpp=(8270) in 28
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 29
+	replace age5=3 in 29
+	replace case=0 in 29
+	replace pop_wpp=(9356) in 29
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 30
+	replace age5=4 in 30
+	replace case=0 in 30
+	replace pop_wpp=(9771) in 30
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 31
+	replace age5=5 in 31
+	replace case=0 in 31
+	replace pop_wpp=(9523) in 31
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 32
+	replace age5=6 in 32
+	replace case=0 in 32
+	replace pop_wpp=(9270) in 32
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 33
+	replace age5=7 in 33
+	replace case=0 in 33
+	replace pop_wpp=(9115) in 33
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 34
+	replace age5=8 in 34
+	replace case=0 in 34
+	replace pop_wpp=(9285) in 34
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 35
+	replace age5=9 in 35
+	replace case=0 in 35
+	replace pop_wpp=(9482) in 35
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 36
+	replace age5=17 in 36
+	replace case=0 in 36
+	replace pop_wpp=(2471) in 36
 	sort age5
 	
 	** -distrate is a user written command.
@@ -640,7 +701,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   61   286640   21.28     11.24     8.45    14.80     1.56 |
+  |   61   286640   21.28     11.23     8.44    14.81     1.56 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -689,56 +750,133 @@ preserve
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pops for the missings: 
-	** M&F 0-14,15-24,25-34
-	** F 35-44
+	** M&F 0-4,5-9,10-14,15-19,20-24,25-29,30-34
+	** F   35-39,40-44,45-49,60-64
 	
 	expand 2 in 1
-	replace sex=1 in 12
-	replace age5=1 in 12
-	replace case=0 in 12
-	replace pop_wpp=(24395) in 12
+	replace sex=1 in 19
+	replace age5=1 in 19
+	replace case=0 in 19
+	replace pop_wpp=(7411) in 19
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 13
-	replace age5=1 in 13
-	replace case=0 in 13
-	replace pop_wpp=(25316) in 13
+	replace sex=1 in 20
+	replace age5=2 in 20
+	replace case=0 in 20
+	replace pop_wpp=(8034) in 20
 	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 14
-	replace age5=2 in 14
-	replace case=0 in 14
-	replace pop_wpp=(18623) in 14
+	replace sex=1 in 21
+	replace age5=3 in 21
+	replace case=0 in 21
+	replace pop_wpp=(8950) in 21
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 15
-	replace age5=2 in 15
-	replace case=0 in 15
-	replace pop_wpp=(19294) in 15
+	replace sex=1 in 22
+	replace age5=4 in 22
+	replace case=0 in 22
+	replace pop_wpp=(9278) in 22
 	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 16
-	replace age5=3 in 16
-	replace case=0 in 16
-	replace pop_wpp=(18632) in 16
+	replace sex=1 in 23
+	replace age5=5 in 23
+	replace case=0 in 23
+	replace pop_wpp=(9345) in 23
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 17
-	replace age5=3 in 17
-	replace case=0 in 17
-	replace pop_wpp=(18385) in 17
+	replace sex=1 in 24
+	replace age5=6 in 24
+	replace case=0 in 24
+	replace pop_wpp=(9286) in 24
 	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 18
-	replace age5=4 in 18
-	replace case=0 in 18
-	replace pop_wpp=(19702) in 18
+	replace sex=1 in 25
+	replace age5=7 in 25
+	replace case=0 in 25
+	replace pop_wpp=(9346) in 25
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 26
+	replace age5=8 in 26
+	replace case=0 in 26
+	replace pop_wpp=(9729) in 26
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 27
+	replace age5=9 in 27
+	replace case=0 in 27
+	replace pop_wpp=(9973) in 27
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 28
+	replace age5=10 in 28
+	replace case=0 in 28
+	replace pop_wpp=(10527) in 28
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 29
+	replace age5=13 in 29
+	replace case=0 in 29
+	replace pop_wpp=(9458) in 29
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 30
+	replace age5=1 in 30
+	replace case=0 in 30
+	replace pop_wpp=(7690) in 30
+	sort age5	
+	
+	expand 2 in 1
+	replace sex=2 in 31
+	replace age5=2 in 31
+	replace case=0 in 31
+	replace pop_wpp=(8270) in 31
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 32
+	replace age5=3 in 32
+	replace case=0 in 32
+	replace pop_wpp=(9356) in 32
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 33
+	replace age5=4 in 33
+	replace case=0 in 33
+	replace pop_wpp=(9771) in 33
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 34
+	replace age5=5 in 34
+	replace case=0 in 34
+	replace pop_wpp=(9523) in 34
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 35
+	replace age5=6 in 35
+	replace case=0 in 35
+	replace pop_wpp=(9270) in 35
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 36
+	replace age5=7 in 36
+	replace case=0 in 36
+	replace pop_wpp=(9115) in 36
 	sort age5
 	
 	** -distrate is a user written command.
@@ -755,7 +893,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   33   286640   11.51      6.62     4.46     9.59     1.26 |
+  |   33   286640   11.51      6.62     4.46     9.63     1.26 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -803,71 +941,170 @@ preserve
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
-	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24,25-34,35-44
-	** F 45-54
-	
-	expand 2 in 1
-	replace sex=1 in 10
-	replace age5=1 in 10
-	replace case=0 in 10
-	replace pop_wpp=(24395) in 10
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 11
-	replace age5=1 in 11
-	replace case=0 in 11
-	replace pop_wpp=(25316) in 11
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 12
-	replace age5=2 in 12
-	replace case=0 in 12
-	replace pop_wpp=(18623) in 12
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 13
-	replace age5=2 in 13
-	replace case=0 in 13
-	replace pop_wpp=(19294) in 13
-	sort age5
-	
+	** now we have to add in the cases and pop_wppns for the missings:
+	** M&F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39,40-44,45-49
+	** F   50-54,60-64
+	** M   55-59
+
 	expand 2 in 1
 	replace sex=1 in 14
-	replace age5=3 in 14
+	replace age5=1 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18632) in 14
+	replace pop_wpp=(7411) in 14
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 15
-	replace age5=3 in 15
+	replace sex=1 in 15
+	replace age5=2 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18385) in 15
-	sort age5	
+	replace pop_wpp=(8034) in 15
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 16
-	replace age5=4 in 16
+	replace age5=3 in 16
 	replace case=0 in 16
-	replace pop_wpp=(19702) in 16
+	replace pop_wpp=(8950) in 16
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 17
+	replace sex=1 in 17
 	replace age5=4 in 17
 	replace case=0 in 17
-	replace pop_wpp=(18767) in 17
+	replace pop_wpp=(9278) in 17
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 18
 	replace age5=5 in 18
 	replace case=0 in 18
-	replace pop_wpp=(21092) in 18
+	replace pop_wpp=(9345) in 18
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 19
+	replace age5=6 in 19
+	replace case=0 in 19
+	replace pop_wpp=(9286) in 19
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 20
+	replace age5=7 in 20
+	replace case=0 in 20
+	replace pop_wpp=(9346) in 20
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 21
+	replace age5=8 in 21
+	replace case=0 in 21
+	replace pop_wpp=(9729) in 21
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 22
+	replace age5=9 in 22
+	replace case=0 in 22
+	replace pop_wpp=(9973) in 22
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 23
+	replace age5=10 in 23
+	replace case=0 in 23
+	replace pop_wpp=(10527) in 23
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 24
+	replace age5=11 in 24
+	replace case=0 in 24
+	replace pop_wpp=(10565) in 24
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 25
+	replace age5=13 in 25
+	replace case=0 in 25
+	replace pop_wpp=(9458) in 25
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 26
+	replace age5=1 in 26
+	replace case=0 in 26
+	replace pop_wpp=(7690) in 26
+	sort age5	
+	
+	expand 2 in 1
+	replace sex=2 in 27
+	replace age5=2 in 27
+	replace case=0 in 27
+	replace pop_wpp=(8270) in 27
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 28
+	replace age5=3 in 28
+	replace case=0 in 28
+	replace pop_wpp=(9356) in 28
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 29
+	replace age5=4 in 29
+	replace case=0 in 29
+	replace pop_wpp=(9771) in 29
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 30
+	replace age5=5 in 30
+	replace case=0 in 30
+	replace pop_wpp=(9523) in 30
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 31
+	replace age5=6 in 31
+	replace case=0 in 31
+	replace pop_wpp=(9270) in 31
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 32
+	replace age5=7 in 32
+	replace case=0 in 32
+	replace pop_wpp=(9115) in 32
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 33
+	replace age5=8 in 33
+	replace case=0 in 33
+	replace pop_wpp=(9285) in 33
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 34
+	replace age5=9 in 34
+	replace case=0 in 34
+	replace pop_wpp=(9482) in 34
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 35
+	replace age5=10 in 35
+	replace case=0 in 35
+	replace pop_wpp=(9734) in 35
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 36
+	replace age5=12 in 36
+	replace case=0 in 36
+	replace pop_wpp=(9407) in 36
 	sort age5
 	
 	** -distrate is a user written command.
@@ -884,7 +1121,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   32   286640   11.16      5.85     3.95     8.53     1.12 |
+  |   32   286640   11.16      5.80     3.91     8.50     1.12 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -932,58 +1169,163 @@ preserve
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
-	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24,25-34
-	** F 45-54
-	** M 
+	** now we have to add in the cases and pop_wppns for the missings:
+	** M&F  0-4,5-9,10-14,15-19,20-24,25-29,30-34,45-49
+	** F 	35-39,50-54,55-59,65-69
+	** M	40-44,75-79
 	
 	expand 2 in 1
-	replace sex=1 in 12
-	replace age5=1 in 12
-	replace case=0 in 12
-	replace pop_wpp=(24395) in 12
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 13
-	replace age5=1 in 13
-	replace case=0 in 13
-	replace pop_wpp=(25316) in 13
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 14
-	replace age5=2 in 14
-	replace case=0 in 14
-	replace pop_wpp=(18623) in 14
-	sort age5
-		
-	expand 2 in 1
-	replace sex=2 in 15
-	replace age5=2 in 15
+	replace sex=1 in 15
+	replace age5=1 in 15
 	replace case=0 in 15
-	replace pop_wpp=(19294) in 15
+	replace pop_wpp=(7411) in 15
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 16
-	replace age5=3 in 16
+	replace age5=2 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18632) in 16
+	replace pop_wpp=(8034) in 16
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 17
+	replace sex=1 in 17
 	replace age5=3 in 17
 	replace case=0 in 17
-	replace pop_wpp=(18385) in 17
+	replace pop_wpp=(8950) in 17
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 18
-	replace age5=5 in 18
+	replace age5=4 in 18
 	replace case=0 in 18
-	replace pop_wpp=(21092) in 18
+	replace pop_wpp=(9278) in 18
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 19
+	replace age5=5 in 19
+	replace case=0 in 19
+	replace pop_wpp=(9345) in 19
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 20
+	replace age5=6 in 20
+	replace case=0 in 20
+	replace pop_wpp=(9286) in 20
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 21
+	replace age5=7 in 21
+	replace case=0 in 21
+	replace pop_wpp=(9346) in 21
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 22
+	replace age5=8 in 22
+	replace case=0 in 22
+	replace pop_wpp=(9729) in 22
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 23
+	replace age5=10 in 23
+	replace case=0 in 23
+	replace pop_wpp=(10527) in 23
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 24
+	replace age5=11 in 24
+	replace case=0 in 24
+	replace pop_wpp=(10565) in 24
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 25
+	replace age5=12 in 25
+	replace case=0 in 25
+	replace pop_wpp=(10851) in 25
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 26
+	replace age5=14 in 26
+	replace case=0 in 26
+	replace pop_wpp=(7559) in 26
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 27
+	replace age5=1 in 27
+	replace case=0 in 27
+	replace pop_wpp=(7690) in 27
+	sort age5	
+	
+	expand 2 in 1
+	replace sex=2 in 28
+	replace age5=2 in 28
+	replace case=0 in 28
+	replace pop_wpp=(8270) in 28
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 29
+	replace age5=3 in 29
+	replace case=0 in 29
+	replace pop_wpp=(9356) in 29
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 30
+	replace age5=4 in 30
+	replace case=0 in 30
+	replace pop_wpp=(9771) in 30
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 31
+	replace age5=5 in 31
+	replace case=0 in 31
+	replace pop_wpp=(9523) in 31
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 32
+	replace age5=6 in 32
+	replace case=0 in 32
+	replace pop_wpp=(9270) in 32
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 33
+	replace age5=7 in 33
+	replace case=0 in 33
+	replace pop_wpp=(9115) in 33
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 34
+	replace age5=9 in 34
+	replace case=0 in 34
+	replace pop_wpp=(9482) in 34
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 35
+	replace age5=10 in 35
+	replace case=0 in 35
+	replace pop_wpp=(9734) in 35
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 36
+	replace age5=16 in 36
+	replace case=0 in 36
+	replace pop_wpp=(3353) in 36
 	sort age5
 	
 	** -distrate is a user written command.
@@ -1000,7 +1342,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   27   286640    9.42      5.25     3.37     7.94     1.12 |
+  |   27   286640    9.42      5.08     3.26     7.76     1.10 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1048,72 +1390,149 @@ preserve
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
-	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24,25-34
-	** F 45-54,85+
-	** M 25-44
-	
-	expand 2 in 1
-	replace sex=1 in 10
-	replace age5=1 in 10
-	replace case=0 in 10
-	replace pop_wpp=(24395) in 10
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 11
-	replace age5=1 in 11
-	replace case=0 in 11
-	replace pop_wpp=(25316) in 11
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 12
-	replace age5=2 in 12
-	replace case=0 in 12
-	replace pop_wpp=(18623) in 12
-	sort age5
-		
-	expand 2 in 1
-	replace sex=2 in 13
-	replace age5=2 in 13
-	replace case=0 in 13
-	replace pop_wpp=(19294) in 13
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 14
-	replace age5=3 in 14
-	replace case=0 in 14
-	replace pop_wpp=(18632) in 14
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 15
-	replace age5=3 in 15
-	replace case=0 in 15
-	replace pop_wpp=(18385) in 15
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 16
-	replace age5=4 in 16
-	replace case=0 in 16
-	replace pop_wpp=(18767) in 16
-	sort age5
-	
+	** now we have to add in the cases and pop_wppns for the missings:
+	** M&F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39
+	** F   45-49,50-54,85+
+	** M   40-44
+
 	expand 2 in 1
 	replace sex=1 in 17
-	replace age5=5 in 17
+	replace age5=1 in 17
 	replace case=0 in 17
-	replace pop_wpp=(21092) in 17
+	replace pop_wpp=(7411) in 17
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 18
-	replace age5=9 in 18
+	replace age5=2 in 18
 	replace case=0 in 18
-	replace pop_wpp=(4080) in 18
+	replace pop_wpp=(8034) in 18
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 19
+	replace age5=3 in 19
+	replace case=0 in 19
+	replace pop_wpp=(8950) in 19
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 20
+	replace age5=4 in 20
+	replace case=0 in 20
+	replace pop_wpp=(9278) in 20
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 21
+	replace age5=5 in 21
+	replace case=0 in 21
+	replace pop_wpp=(9345) in 21
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 22
+	replace age5=6 in 22
+	replace case=0 in 22
+	replace pop_wpp=(9286) in 22
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 23
+	replace age5=7 in 23
+	replace case=0 in 23
+	replace pop_wpp=(9346) in 23
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 24
+	replace age5=8 in 24
+	replace case=0 in 24
+	replace pop_wpp=(9729) in 24
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 25
+	replace age5=10 in 25
+	replace case=0 in 25
+	replace pop_wpp=(10527) in 25
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 26
+	replace age5=11 in 26
+	replace case=0 in 26
+	replace pop_wpp=(10565) in 26
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 27
+	replace age5=18 in 27
+	replace case=0 in 27
+	replace pop_wpp=(4080) in 27
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 28
+	replace age5=1 in 28
+	replace case=0 in 28
+	replace pop_wpp=(7690) in 28
+	sort age5	
+	
+	expand 2 in 1
+	replace sex=2 in 29
+	replace age5=2 in 29
+	replace case=0 in 29
+	replace pop_wpp=(8270) in 29
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 30
+	replace age5=3 in 30
+	replace case=0 in 30
+	replace pop_wpp=(9356) in 30
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 31
+	replace age5=4 in 31
+	replace case=0 in 31
+	replace pop_wpp=(9771) in 31
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 32
+	replace age5=5 in 32
+	replace case=0 in 32
+	replace pop_wpp=(9523) in 32
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 33
+	replace age5=6 in 33
+	replace case=0 in 33
+	replace pop_wpp=(9270) in 33
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 34
+	replace age5=7 in 34
+	replace case=0 in 34
+	replace pop_wpp=(9115) in 34
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 35
+	replace age5=8 in 35
+	replace case=0 in 35
+	replace pop_wpp=(9285) in 35
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 36
+	replace age5=9 in 36
+	replace case=0 in 36
+	replace pop_wpp=(9482) in 36
 	sort age5
 	
 	** -distrate is a user written command.
@@ -1130,7 +1549,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   26   286640    9.07      5.48     3.52     8.26     1.16 |
+  |   26   286640    9.07      5.36     3.45     8.14     1.14 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1178,41 +1597,90 @@ preserve
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** F 0-14,15-24,25-34,35-44,85+
-	
-	expand 2 in 1
-	replace sex=1 in 5
-	replace age5=1 in 5
-	replace case=0 in 5
-	replace pop_wpp=(24395) in 5
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 6
-	replace age5=2 in 6
-	replace case=0 in 6
-	replace pop_wpp=(18623) in 6
-	sort age5
+	** F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39,40-44,45-49,55-59,85+
 	
 	expand 2 in 1
 	replace sex=1 in 7
-	replace age5=3 in 7
+	replace age5=1 in 7
 	replace case=0 in 7
-	replace pop_wpp=(18632) in 7
+	replace pop_wpp=(7411) in 7
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 8
-	replace age5=4 in 8
+	replace age5=2 in 8
 	replace case=0 in 8
-	replace pop_wpp=(19702) in 8
+	replace pop_wpp=(8034) in 8
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 9
-	replace age5=9 in 9
+	replace age5=3 in 9
 	replace case=0 in 9
-	replace pop_wpp=(4080) in 9
+	replace pop_wpp=(8950) in 9
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 10
+	replace age5=4 in 10
+	replace case=0 in 10
+	replace pop_wpp=(9278) in 10
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age5=5 in 11
+	replace case=0 in 11
+	replace pop_wpp=(9345) in 11
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 12
+	replace age5=6 in 12
+	replace case=0 in 12
+	replace pop_wpp=(9286) in 12
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age5=7 in 13
+	replace case=0 in 13
+	replace pop_wpp=(9346) in 13
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age5=8 in 14
+	replace case=0 in 14
+	replace pop_wpp=(9729) in 14
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age5=9 in 15
+	replace case=0 in 15
+	replace pop_wpp=(9973) in 15
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age5=10 in 16
+	replace case=0 in 16
+	replace pop_wpp=(10527) in 16
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age5=12 in 17
+	replace case=0 in 17
+	replace pop_wpp=(10851) in 17
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age5=18 in 18
+	replace case=0 in 18
+	replace pop_wpp=(4080) in 18
 	sort age5
 	
 	** -distrate is a user written command.
@@ -1229,7 +1697,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   22   148115   14.85      8.54     5.32    13.33     1.95 |
+  |   22   148115   14.85      8.37     5.21    13.18     1.94 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1278,79 +1746,177 @@ preserve
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
-	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24,25-34,35-44
-	** F 45-54
-	** M 75-84
-	
-	expand 2 in 1
-	replace sex=1 in 9
-	replace age5=1 in 9
-	replace case=0 in 9
-	replace pop_wpp=(24395) in 9
-	sort age5
-	
-	expand 2 in 1
-	replace sex=2 in 10
-	replace age5=1 in 10
-	replace case=0 in 10
-	replace pop_wpp=(25316) in 10
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 11
-	replace age5=2 in 11
-	replace case=0 in 11
-	replace pop_wpp=(18623) in 11
-	sort age5
-		
-	expand 2 in 1
-	replace sex=2 in 12
-	replace age5=2 in 12
-	replace case=0 in 12
-	replace pop_wpp=(19294) in 12
-	sort age5
+	** now we have to add in the cases and pop_wppns for the missings:
+	** M&F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39,40-44,45-49
+	** F   50-54
+	** M   55-59,75-79,80-84
 	
 	expand 2 in 1
 	replace sex=1 in 13
-	replace age5=3 in 13
+	replace age5=1 in 13
 	replace case=0 in 13
-	replace pop_wpp=(18632) in 13
+	replace pop_wpp=(7411) in 13
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 14
-	replace age5=3 in 14
+	replace sex=1 in 14
+	replace age5=2 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18385) in 14
+	replace pop_wpp=(8034) in 14
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 15
-	replace age5=4 in 15
+	replace age5=3 in 15
 	replace case=0 in 15
-	replace pop_wpp=(19702) in 15
+	replace pop_wpp=(8950) in 15
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 16
+	replace sex=1 in 16
 	replace age5=4 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18767) in 16
+	replace pop_wpp=(9278) in 16
 	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 17
 	replace age5=5 in 17
 	replace case=0 in 17
-	replace pop_wpp=(21092) in 17
+	replace pop_wpp=(9345) in 17
 	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 18
-	replace age5=8 in 18
+	replace sex=1 in 18
+	replace age5=6 in 18
 	replace case=0 in 18
-	replace pop_wpp=(5824) in 18
+	replace pop_wpp=(9286) in 18
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 19
+	replace age5=7 in 19
+	replace case=0 in 19
+	replace pop_wpp=(9346) in 19
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 20
+	replace age5=8 in 20
+	replace case=0 in 20
+	replace pop_wpp=(9729) in 20
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 21
+	replace age5=9 in 21
+	replace case=0 in 21
+	replace pop_wpp=(9973) in 21
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 22
+	replace age5=10 in 22
+	replace case=0 in 22
+	replace pop_wpp=(10527) in 22
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 23
+	replace age5=11 in 23
+	replace case=0 in 23
+	replace pop_wpp=(10565) in 23
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 24
+	replace age5=1 in 24
+	replace case=0 in 24
+	replace pop_wpp=(7690) in 24
+	sort age5	
+	
+	expand 2 in 1
+	replace sex=2 in 25
+	replace age5=2 in 25
+	replace case=0 in 25
+	replace pop_wpp=(8270) in 25
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 26
+	replace age5=3 in 26
+	replace case=0 in 26
+	replace pop_wpp=(9356) in 26
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 27
+	replace age5=4 in 27
+	replace case=0 in 27
+	replace pop_wpp=(9771) in 27
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 28
+	replace age5=5 in 28
+	replace case=0 in 28
+	replace pop_wpp=(9523) in 28
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 29
+	replace age5=6 in 29
+	replace case=0 in 29
+	replace pop_wpp=(9270) in 29
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 30
+	replace age5=7 in 30
+	replace case=0 in 30
+	replace pop_wpp=(9115) in 30
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 31
+	replace age5=8 in 31
+	replace case=0 in 31
+	replace pop_wpp=(9285) in 31
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 32
+	replace age5=9 in 32
+	replace case=0 in 32
+	replace pop_wpp=(9482) in 32
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 33
+	replace age5=10 in 33
+	replace case=0 in 33
+	replace pop_wpp=(9734) in 33
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 34
+	replace age5=12 in 34
+	replace case=0 in 34
+	replace pop_wpp=(9407) in 34
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 35
+	replace age5=16 in 35
+	replace case=0 in 35
+	replace pop_wpp=(3353) in 35
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 36
+	replace age5=17 in 36
+	replace case=0 in 36
+	replace pop_wpp=(2471) in 36
 	sort age5
 	
 	** -distrate is a user written command.
@@ -1363,10 +1929,10 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
 		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR MULTIPLE MYELOMA (M&F)- STD TO WHO WORLD pop_wppN 
 /*
-  +------------------------------------------------------------+
+ +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   20   286640    6.98      4.00     2.41     6.41     0.97 |
+  |   20   286640    6.98      3.99     2.41     6.44     0.98 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1415,34 +1981,76 @@ preserve
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** F 0-14,15-24,25-34,35-44
-	
-	expand 2 in 1
-	replace sex=1 in 6
-	replace age5=1 in 6
-	replace case=0 in 6
-	replace pop_wpp=(24395) in 6
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 7
-	replace age5=2 in 7
-	replace case=0 in 7
-	replace pop_wpp=(18623) in 7
-	sort age5
-	
-	expand 2 in 1
-	replace sex=1 in 8
-	replace age5=3 in 8
-	replace case=0 in 8
-	replace pop_wpp=(18632) in 8
-	sort age5
+	** F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39,40-44,70-74
 	
 	expand 2 in 1
 	replace sex=1 in 9
-	replace age5=4 in 9
+	replace age5=1 in 9
 	replace case=0 in 9
-	replace pop_wpp=(19702) in 9
+	replace pop_wpp=(7411) in 9
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 10
+	replace age5=2 in 10
+	replace case=0 in 10
+	replace pop_wpp=(8034) in 10
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age5=3 in 11
+	replace case=0 in 11
+	replace pop_wpp=(8950) in 11
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 12
+	replace age5=4 in 12
+	replace case=0 in 12
+	replace pop_wpp=(9278) in 12
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 13
+	replace age5=5 in 13
+	replace case=0 in 13
+	replace pop_wpp=(9345) in 13
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 14
+	replace age5=6 in 14
+	replace case=0 in 14
+	replace pop_wpp=(9286) in 14
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age5=7 in 15
+	replace case=0 in 15
+	replace pop_wpp=(9346) in 15
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 16
+	replace age5=8 in 16
+	replace case=0 in 16
+	replace pop_wpp=(9729) in 16
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 17
+	replace age5=9 in 17
+	replace case=0 in 17
+	replace pop_wpp=(9973) in 17
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 18
+	replace age5=15 in 18
+	replace case=0 in 18
+	replace pop_wpp=(5893) in 18
 	sort age5
 	
 	** -distrate is a user written command.
@@ -1459,7 +2067,7 @@ distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   15   148115   10.13      6.19     3.35    10.73     1.80 |
+  |   15   148115   10.13      6.08     3.30    10.64     1.79 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
