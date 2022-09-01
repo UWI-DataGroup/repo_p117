@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      30-AUG-2022
+    // 	date last modified      31-AUG-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -654,7 +654,7 @@ putdocx textblock end
 putdocx textblock begin
 (17) MIRs: Based on the above review, the deaths that were captured either at casefinding or abstraction were removed from the deaths totals and the MIRs were re-calculated. Note: missed eligible cases were not removed but were sent to BNR-C DAs to abstract for inclusion in the next annual report.
 putdocx textblock end
-putdocx pagebreak
+//putdocx pagebreak
 
 putdocx table tbl1 = data(title results_2018 results_2017 results_2016 results_2015 results_2014 results_2013), halign(center)
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1747,7 +1747,7 @@ putdocx textblock begin
 Date Prepared: 24-Aug-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10i_analysis mort_2021_age10.do
+Generated using Dofile: 10i_analysis mort_ASMRs_2021_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -1884,7 +1884,7 @@ putdocx textblock begin
 Date Prepared: 28-Jun-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10h_analysis mort_2020_age10.do
+Generated using Dofile: 10h_analysis mort_ASMRs_2020_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -2021,7 +2021,7 @@ putdocx textblock begin
 Date Prepared: 28-Jun-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10g_analysis mort_2019_age10.do
+Generated using Dofile: 10g_analysis mort_ASMRs_2019_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -2158,7 +2158,7 @@ putdocx textblock begin
 Date Prepared: 10-May-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10f_analysis mort_2018_age10.do
+Generated using Dofile: 10f_analysis mort_ASMRs_2018_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -2295,7 +2295,7 @@ putdocx textblock begin
 Date Prepared: 18-May-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10e_analysis mort_2017_age10.do
+Generated using Dofile: 10e_analysis mort_ASMRs_2017_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -2432,7 +2432,7 @@ putdocx textblock begin
 Date Prepared: 18-May-2022.
 Prepared by: JC using Stata 
 REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10d_analysis mort_2016_age10.do
+Generated using Dofile: 10d_analysis mort_ASMRs_2016_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -2569,7 +2569,7 @@ putdocx textblock begin
 Date Prepared: 24-Aug-2022.
 Prepared by: JC using Stata 
 //REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10c_analysis mort_2015_age10.do
+Generated using Dofile: 10c_analysis mort_ASMRs_2015_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -2711,7 +2711,7 @@ putdocx textblock begin
 Date Prepared: 24-Aug-2022.
 Prepared by: JC using Stata 
 //REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10b_analysis mort_2014_age10.do
+Generated using Dofile: 10b_analysis mort_ASMRs_2014_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold
@@ -2852,7 +2852,7 @@ putdocx textblock begin
 Date Prepared: 24-Aug-2022.
 Prepared by: JC using Stata 
 //REDCap (death) data release date: 06-May-2022.
-Generated using Dofile: 10f_analysis mort_2013+2014_age10.do
+Generated using Dofile: 10a_analysis mort_ASMRs_2013_age5.do
 putdocx textblock end
 putdocx paragraph
 putdocx text ("Methods"), bold

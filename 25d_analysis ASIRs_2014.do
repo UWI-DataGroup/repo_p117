@@ -444,7 +444,7 @@ preserve
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and popns for the missings: 
-	** M&F 0-4,5-9,10-14,15-19,20-24,25-29,30-34
+	** M&F 0-4,5-9,10-14,15-19,20-24,30-34
 	** F   35-39
 	** M   50-54
 	
@@ -605,7 +605,7 @@ preserve
 	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and popns for the missings: 
-	** F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39,40-44
+	** F 0-4,5-9,10-14,15-19,20-24,25-29,30-34,35-39
 	
 	expand 2 in 1
 	replace sex=1 in 11

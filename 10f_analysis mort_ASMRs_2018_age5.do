@@ -1,17 +1,17 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          10c_analysis mort_2015_age10.do
+    //  algorithm name          10f_analysis mort_ASMRs_2018_age5.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      24-AUG-2022
-    // 	date last modified      24-AUG-2022
+    //  date first created      31-AUG-2022
+    // 	date last modified      31-AUG-2022
     //  algorithm task          Analyzing combined cancer dataset: (1) Numbers (2) ASMRs
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2015 death data for the 2022 BNR-CME webinar & inclusion in 2016-2018 cancer report.
-	//	methods					(1) Using 5-year age groups instead of 10-year (NOT DONE YET!)
+    //  objective               To have one dataset with cleaned and grouped 2018 death data for inclusion in 2016-2018 cancer report.
+	//	methods					(1) Using 5-year age groups instead of 10-year
 	//							(2) Using female population for breast instead of total population
 	//							(3) Using WPP population instead of BSS population
-    
+   	
     ** General algorithm set-up
     version 17.0
     clear all
@@ -33,33 +33,25 @@
 
     ** Close any open log file and open a new log file
     capture log close
-    log using "`logpath'\10c_analysis mort_2015_age10.smcl", replace
+    log using "`logpath'\10f_analysis mort_ASMRs_2018_age5.smcl", replace
 ** HEADER -----------------------------------------------------
 
-****************
-** 2015 ASMRs **
-****************
-
 ** Load the dataset
-/* 
-	JC 24aug2022: When checking SF's presentation for the 2022 BNR CME webinar, NS queried whether 2013-2015 ASMRs had used
-	female pop for breast then I noted that those years used BSS pop instead of WPP so re-calculating 2013-2018 ASMRs 
-	using WPP pop, female pop for breast and 5-year age groups so the methods are standardised with 
-	those for the ASIRs calculations.
-*/
-use "`datapath'\version09\1-input\2015_prep mort", replace
+** JC 22aug2022: mortality analyses was done in p117/version04 for the Globocan comparison requested by NS + the 2022 BNR CME webinar so using the dofiles and ds from that version (version04/3-output)
+use "`datapath'\version09\3-output\2018_prep mort_deidentified", clear
 
+** JC 13jun2022: SF emailed on 02jun2022 with correction to dod year from 2018 to 2019 so re-ran the prep and analysis dofiles for 2018 ASMRs
 
-count // 631 cancer deaths in 2015
-tab age_10 sex ,m
+count // 659; 658 cancer deaths in 2018
+tab age5 sex ,m
 //tab siteiarc ,m
+//labelbook siteiarc_lab
 
 ** proportions for Table 7 using IARC's site groupings
 //tab siteiarc sex ,m
 //tab siteiarc , m
 //tab siteiarc if sex==2 ,m // female
 //tab siteiarc if sex==1 ,m // male
-
 
 ** For annual report - Section 4: Mortality - Table 7a
 ** Below top 10 code added by JC for 2014
@@ -78,46 +70,60 @@ contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
 gsort -count
 drop top10
 /*
-siteiarc	                                count	percentage
-Prostate (C61)	                            104	    24.64
-Colon (C18)	                                75	    17.77
-Breast (C50)	                            64	    15.17
-Stomach (C16)	                            31	    7.35
-Pancreas (C25)	                            29	    6.87
-Lung (incl. trachea and bronchus) (C33-34)	28	    6.64
-Multiple myeloma (C90)	                    27	    6.40
-Corpus uteri (C54)	                        24	    5.69
-Rectum (C19-20)	                            23	    5.45
-Non-Hodgkin lymphoma (C82-86,C96)	        17	    4.03
+siteiarc									count	percentage
+Prostate (C61)								135		28.54
+Breast (C50)								102		21.56
+Colon (C18)									61		12.90
+Lung (incl. trachea and bronchus) (C33-34)	33		6.98
+Pancreas (C25)								32		6.77
+Stomach (C16)								27		5.71
+Rectum (C19-20)								26		5.50
+Corpus uteri (C54)							22		4.65
+Multiple myeloma (C90)						20		4.23
+Ovary (C56)									15		3.17
+
+siteiarc									count	percentage
+Prostate (C61)								134		28.39
+Breast (C50)								102		21.61
+Colon (C18)									 61		12.92
+Lung (incl. trachea and bronchus) (C33-34)	 33		 6.99
+Pancreas (C25)								 32		 6.78
+Stomach (C16)								 27		 5.72
+Rectum (C19-20)								 26		 5.51
+Corpus uteri (C54)							 22		 4.66
+Multiple myeloma (C90)						 20		 4.24
+Ovary (C56)									 15		 3.18
 */
-total count //422
+total count //473; 472
 
 ** JC update: Save these results as a dataset for reporting
 replace siteiarc=2 if siteiarc==39
-replace siteiarc=3 if siteiarc==13
-replace siteiarc=4 if siteiarc==29
-replace siteiarc=5 if siteiarc==11
+replace siteiarc=3 if siteiarc==29
+replace siteiarc=4 if siteiarc==13
+replace siteiarc=5 if siteiarc==21
 replace siteiarc=6 if siteiarc==18
-replace siteiarc=7 if siteiarc==21
-replace siteiarc=8 if siteiarc==55
+replace siteiarc=7 if siteiarc==11
+replace siteiarc=8 if siteiarc==14
 replace siteiarc=9 if siteiarc==33
-replace siteiarc=10 if siteiarc==14
-replace siteiarc=11 if siteiarc==53
+replace siteiarc=10 if siteiarc==55
+replace siteiarc=11 if siteiarc==35
 rename siteiarc cancer_site
-gen year=1
+gen year=6
 rename count number
 	expand 2 in 1
 	replace cancer_site=1 in 11
-	replace number=631 in 11
+	replace number=659 in 11
 	replace percentage=100 in 11
 
-label define cancer_site_lab 1 "all" 2 "prostate" 3 "colon" 4 "female breast" 5 "stomach" 6 "pancreas" 7 "lung" 8 "multiple myeloma" 9 "corpus uteri" 10 "rectum" 11 "non-hodgkin lymphoma" ,modify
+//JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
+//JC 13jun2022: performed above correction
+label define cancer_site_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "lung" 6 "pancreas" 7 "stomach" 8 "rectum" 9 "corpus uteri" 10 "multiple myeloma" 11 "ovary" ,modify
 label values cancer_site cancer_site_lab
-label define year_lab 1 "2015" ,modify
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
 label values year year_lab
 sort cancer_site
 gen rpt_id = _n
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
 ** proportions for Table 1 using IARC's site groupings
@@ -141,113 +147,141 @@ restore
 ********************************************************************
 ** Using WHO World Standard pop_wppulation
 //tab siteiarc ,m
-
-merge m:m sex age_10 using "`datapath'\version09\2-working\pop_wpp_2015-10"
+//JC 19may2022: use age5 population and groupings for distrate per IH's + NS' recommendation
+//JC 13jun2022: Above correction not performed - will perform in a separate dofile when using IH's rate calculation method
+merge m:m sex age5 using "`datapath'\version09\2-working\pop_wpp_2018-5"
 /*
     Result                           # of obs.
+    Result                      Number of obs
     -----------------------------------------
-    not matched                             1
+    Not matched                             1
         from master                         0  (_merge==1)
         from using                          1  (_merge==2)
 
-    matched                               631  (_merge==3)
+    Matched                               659  (_merge==3)
+    -----------------------------------------
+	
+    Result                      Number of obs
+    -----------------------------------------
+    Not matched                             1
+        from master                         0  (_merge==1)
+        from using                          1  (_merge==2)
+
+    Matched                               658  (_merge==3)
     -----------------------------------------
 */
-**drop if _merge==2 //do not drop these age groups as it skews pop_wppulation 
-** There is 1 unmatched records (_merge==2) since 2015 data doesn't have any cases of males with age range 0-14
-** age_10	site  dup	sex	 pfu	age45	age55	pop_wpp	_merge
-** 0-14	  .     .	male   .	0-44	0-54	28028	using only (2)
+**drop if _merge==2 //do not drop these age groups as it skews pop_wpp 
+** There is 1 unmatched records (_merge==2) since 2018 data doesn't have any cases of males with age range 25-34
+** age5	site  dup	sex	 pfu	pop_wpp	_merge
+** 25-34	  .     .	male   .	18385	using only (2)
 
-tab age_10 ,m //none missing
+tab age5 ,m //none missing
 
 gen case=1 if record_id!=. //do not generate case for missing age group 0-14 as it skews case total
 gen pfu=1 // for % year if not whole year collected; not done for cancer
 
-list record_id sex age_10 if _merge==2
-
-list record_id sex age_10 if age_10==1 & sex==2 // age range 0-14 for male: change case=0 for age_10=1
-replace case=0 if age_10==1 & sex==2 //1 change
+list record_id sex age5 if _merge==2
+list record_id sex age5 if _merge==2 ,nolabel
+STOP
+list record_id sex age5 if age5==3 & sex==2 // age range 0-14 for male: change case=0 for age5=1
+replace case=0 if age5==3 & sex==2 //1 change
 
 ** SF requested by email & WhatsApp on 07-Jan-2020 age and sex specific rates for top 10 cancers
 /*
-What is age-specific incidence rate? 
-Age-specific rates provide information on the incidence of a particular event in an age group relative to the total number of people at risk of that event in the same age group.
+What is age-specific motality rate? 
+Age-specific rates provide information on the mortality of a particular event in an age group relative to the total number of people at risk of that event in the same age group.
 
-What is age-standardised incidence rate?
-The age-standardized incidence rate is the summary rate that would have been observed, given the schedule of age-specific rates, in a population with the age composition of some reference population, often called the standard population.
+What is age-standardised moratlity rate?
+The age-standardized mortality rate is the summary rate that would have been observed, given the schedule of age-specific rates, in a population with the age composition of some reference population, often called the standard population.
 */
 ** AGE + SEX
 preserve
-collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex siteiarc)
-gen incirate=case/pop_wpp*100000
-drop if siteiarc!=39 & siteiarc!=13 & siteiarc!=29 & siteiarc!=11 ///
-		& siteiarc!=18 & siteiarc!=21 & siteiarc!=55 ///
-		& siteiarc!=33 & siteiarc!=14 & siteiarc!=53
-//by sex,sort: tab age_10 incirate ,m
-sort siteiarc age_10 sex
-//list incirate age_10 sex
-//list incirate age_10 sex if siteiarc==13
+collapse (sum) case (mean) pop_wpp, by(pfu age5 sex siteiarc)
+gen mortrate=case/pop_wpp*100000
+drop if siteiarc!=39 & siteiarc!=29 & siteiarc!=13 & siteiarc!=21 ///
+		& siteiarc!=18 & siteiarc!=11 & siteiarc!=14 ///
+		& siteiarc!=33 & siteiarc!=55 & siteiarc!=35
+//by sex,sort: tab age5 mortrate ,m
+sort siteiarc age5 sex
+//list mortrate age5 sex
+//list mortrate age5 sex if siteiarc==13
 
-format incirate %04.2f
-gen year=2015
+format mortrate %04.2f
+gen year=2018
 rename siteiarc cancer_site
-rename incirate age_specific_rate
+rename mortrate age_specific_rate
 drop pfu case pop_wpp
-order year cancer_site sex age_10 age_specific_rate
-save "`datapath'\version09\2-working\2015_top10mort_age+sex_rates" ,replace
+order year cancer_site sex age5 age_specific_rate
+save "`datapath'\version09\2-working\2018_top10mort_age+sex_rates" ,replace
 restore
 
 ** AGE
 preserve
-collapse (sum) case (mean) pop_wpp, by(pfu age_10 siteiarc)
-gen incirate=case/pop_wpp*100000
-drop if siteiarc!=39 & siteiarc!=13 & siteiarc!=29 & siteiarc!=11 ///
-		& siteiarc!=18 & siteiarc!=21 & siteiarc!=55 ///
-		& siteiarc!=33 & siteiarc!=14 & siteiarc!=53
-//by sex,sort: tab age_10 incirate ,m
-sort siteiarc age_10
-//list incirate age_10 sex
-//list incirate age_10 sex if siteiarc==13
+collapse (sum) case (mean) pop_wpp, by(pfu age5 siteiarc)
+gen mortrate=case/pop_wpp*100000
+drop if siteiarc!=39 & siteiarc!=29 & siteiarc!=13 & siteiarc!=21 ///
+		& siteiarc!=18 & siteiarc!=11 & siteiarc!=14 ///
+		& siteiarc!=33 & siteiarc!=55 & siteiarc!=35
+//by sex,sort: tab age5 mortrate ,m
+sort siteiarc age5
+//list mortrate age5 sex
+//list mortrate age5 sex if siteiarc==13
 
-format incirate %04.2f
-gen year=2015
+format mortrate %04.2f
+gen year=2018
 rename siteiarc cancer_site
-rename incirate age_specific_rate
+rename mortrate age_specific_rate
 drop pfu case pop_wpp
-order year cancer_site age_10 age_specific_rate
-save "`datapath'\version09\2-working\2015_top10mort_age_rates" ,replace
+order year cancer_site age5 age_specific_rate
+save "`datapath'\version09\2-working\2018_top10mort_age_rates" ,replace
 restore
 
-** Check for missing age as these would need to be added to the median group for that site when assessing ASIRs to prevent creating an outlier
+** Check for missing age as these would need to be added to the median group for that site when assessing ASMRs to prevent creating an outlier
 count if age==.|age==999 //1
 
-list siteiarc age if age==.|age==999 //this is missing age_10: 0-14 so no change needed
+list siteiarc age if age==.|age==999 //this is missing age5: 25-34 so no change needed
 
-tab pop_wpp age_10  if sex==1 //female
-tab pop_wpp age_10  if sex==2 //male
+tab pop_wpp age5  if sex==1 //female
+tab pop_wpp age5  if sex==2 //male
+
+** Need an easier method for referencing population totals by sex instead of using Notepad as age5 has more groupings than using age5 so can create the below ds and save to Notepad
+preserve
+contract sex pop_wpp age5
+gen age5_id=age5
+order sex age5_id age5 pop_wpp
+drop _freq
+sort sex age5_id
+total pop_wpp
+restore
 
 ** Next, MRs for all tumours
-tab pop_wpp age_10
-tab age_10 ,m //none missing
+tab pop_wpp age5
+tab age5 ,m //none missing
 
 preserve
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 		
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR ALL TUMOURS - STD TO WHO WORLD pop_wppN 
 /*
   +-------------------------------------------------------------+
   | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
   |-------------------------------------------------------------|
-  |  631   285327   221.15    126.41   116.22   137.35     5.32 |
+  |  659   286640   229.91    129.84   119.59   140.83     5.35 |
+  +-------------------------------------------------------------+
+  
+  +-------------------------------------------------------------+
+  | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
+  |-------------------------------------------------------------|
+  |  658   286640   229.56    129.64   119.39   140.62     5.34 |
   +-------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -270,12 +304,12 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=1 if cancer_site==.
-replace year=1 if year==.
+replace year=6 if year==.
 gen asmr_id="all" if rpt_id==.
 replace rpt_id=1 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
@@ -283,63 +317,68 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==1 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-
 ** PROSTATE
-tab pop_wpp age_10 if siteiarc==39 //male
+tab pop_wpp age5 if siteiarc==39 //male
 
 preserve
-	drop if age_10==.
+	drop if age5==.
 	keep if siteiarc==39 // 
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: M 0-14,15-24,25-34,35-44
-		
+	
 	expand 2 in 1
 	replace sex=2 in 6
-	replace age_10=1 in 6
+	replace age5=1 in 6
 	replace case=0 in 6
-	replace pop_wpp=(26626)  in 6
-	sort age_10
+	replace pop_wpp=(25316)  in 6
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 7
-	replace age_10=2 in 7
+	replace age5=2 in 7
 	replace case=0 in 7
-	replace pop_wpp=(19111)  in 7
-	sort age_10
+	replace pop_wpp=(19294)  in 7
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 8
-	replace age_10=3 in 8
+	replace age5=3 in 8
 	replace case=0 in 8
-	replace pop_wpp=(18440) in 8
-	sort age_10
+	replace pop_wpp=(18385) in 8
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 9
-	replace age_10=4 in 9
+	replace age5=4 in 9
 	replace case=0 in 9
-	replace pop_wpp=(19218) in 9
-	sort age_10
+	replace pop_wpp=(18767) in 9
+	sort age5
 			
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR PC - STD TO WHO WORLD pop_wppN 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |  104   137548   75.61     41.79    33.93    51.20     4.27 |
+  |  135   138525   97.46     51.93    43.33    62.03     4.64 |
+  +------------------------------------------------------------+
+  
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  134   138525   96.73     51.48    42.92    61.53     4.61 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -361,12 +400,12 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=2 if cancer_site==.
-replace year=1 if year==.
+replace year=6 if year==.
 gen asmr_id="prost" if rpt_id==.
 replace rpt_id=2 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
@@ -374,18 +413,165 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==2 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-** COLON 
-tab pop_wpp age_10 if siteiarc==13 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==13 & sex==2 //male
+** BREAST
+tab pop_wpp age5 if siteiarc==29 & sex==1 //female
+tab pop_wpp age5 if siteiarc==29 & sex==2 //male
 
 preserve
-	drop if age_10==.
+//JC 19may2022: remove male breast cancers so rate calculated only based on female pop
+//JC 13jun2022: above correction performed
+	drop if sex==2
+	drop if age5==.
+	keep if siteiarc==29 // breast only
+	
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
+	sort age sex
+
+	** now we have to add in the cases and pop_wppns for the missings: 
+	** F 0-14,15-24
+	** M 0-14,15-24,25-34,35-44,55-64,65-74,85+
+	
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age5=1 in 8
+	replace case=0 in 8
+	replace pop_wpp=(24395) in 8
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 9
+	replace age5=2 in 9
+	replace case=0 in 9
+	replace pop_wpp=(18623) in 9
+	sort age5
+/*
+	expand 2 in 1
+	replace sex=2 in 12
+	replace age5=1 in 12
+	replace case=0 in 12
+	replace pop_wpp=(25316) in 12
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 13
+	replace age5=2 in 13
+	replace case=0 in 13
+	replace pop_wpp=(19294) in 13
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age5=3 in 14
+	replace case=0 in 14
+	replace pop_wpp=(18385) in 14
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 15
+	replace age5=4 in 15
+	replace case=0 in 15
+	replace pop_wpp=(18767) in 15
+	sort age5
+		
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age5=6 in 16
+	replace case=0 in 16
+	replace pop_wpp=(17550) in 16
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 17
+	replace age5=7 in 17
+	replace case=0 in 17
+	replace pop_wpp=(11485) in 17
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 18
+	replace age5=8 in 18
+	replace case=0 in 18
+	replace pop_wpp=(5824) in 18
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 19
+	replace age5=9 in 19
+	replace case=0 in 19
+	replace pop_wpp=(2624) in 19
+	sort age5
+*/
+	** -distrate is a user written command.
+	** type -search distrate,net- at the Stata prompt to find and install this command
+
+sort age5
+total pop_wpp
+
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR BC (F) - STD TO WHO WORLD pop_wppN 
+
+/*
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  102   292464   34.88     21.83    17.59    26.87     2.31 |
+  +------------------------------------------------------------+
+  
+  +------------------------------------------------------------+
+  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
+  |------------------------------------------------------------|
+  |  100   148115   67.52     41.12    33.06    50.73     4.39 |
+  +------------------------------------------------------------+
+*/
+** JC update: Save these results as a dataset for reporting
+matrix list r(NDeath)
+matrix number = r(NDeath)
+matrix asmr = r(adj)
+matrix ci_lower = r(lb_G)
+matrix ci_upper = r(ub_G)
+svmat number
+svmat asmr
+svmat ci_lower
+svmat ci_upper
+
+collapse number asmr ci_lower ci_upper
+rename number1 number 
+rename asmr1 asmr 
+rename ci_lower1 ci_lower
+rename ci_upper1 ci_upper
+replace asmr=round(asmr,0.01)
+replace ci_lower=round(ci_lower,0.01)
+replace ci_upper=round(ci_upper,0.01)
+gen percent=number/658*100
+replace percent=round(percent,0.01)
+
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
+replace cancer_site=3 if cancer_site==.
+replace year=6 if year==.
+gen asmr_id="fem.breast" if rpt_id==.
+replace rpt_id=3 if rpt_id==.
+bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
+order cancer_site number percent asmr ci_lower ci_upper year
+sort cancer_site asmr
+drop if cancer_site==3 & asmr_id==""
+drop asmr_id
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
+restore
+
+
+** COLON 
+tab pop_wpp age5 if siteiarc==13 & sex==1 //female
+tab pop_wpp age5 if siteiarc==13 & sex==2 //male
+
+preserve
+	drop if age5==.
 	keep if siteiarc==13
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
 	** M&F 0-14,15-24,25-34
@@ -393,68 +579,68 @@ preserve
 	
 	expand 2 in 1
 	replace sex=1 in 12
-	replace age_10=1 in 12
+	replace age5=1 in 12
 	replace case=0 in 12
-	replace pop_wpp=(25537) in 12
-	sort age_10
+	replace pop_wpp=(24395) in 12
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 13
-	replace age_10=1 in 13
+	replace age5=1 in 13
 	replace case=0 in 13
-	replace pop_wpp=(26626) in 13
-	sort age_10
+	replace pop_wpp=(25316) in 13
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 14
-	replace age_10=2 in 14
+	replace age5=2 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18761) in 14
-	sort age_10
+	replace pop_wpp=(18623) in 14
+	sort age5
 
 	expand 2 in 1
 	replace sex=2 in 15
-	replace age_10=2 in 15
+	replace age5=2 in 15
 	replace case=0 in 15
-	replace pop_wpp=(19111) in 15
-	sort age_10
+	replace pop_wpp=(19294) in 15
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 16
-	replace age_10=3 in 16
+	replace age5=3 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18963) in 16
-	sort age_10
+	replace pop_wpp=(18632) in 16
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 17
-	replace age_10=3 in 17
+	replace age5=3 in 17
 	replace case=0 in 17
-	replace pop_wpp=(18440) in 17
-	sort age_10
+	replace pop_wpp=(18385) in 17
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 18
-	replace age_10=4 in 18
+	replace age5=4 in 18
 	replace case=0 in 18
-	replace pop_wpp=(19218) in 18
-	sort age_10
+	replace pop_wpp=(18767) in 18
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR COLON CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   75   285327   26.29     14.65    11.39    18.68     1.80 |
+  |   61   286640   21.28     11.24     8.45    14.80     1.56 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -476,189 +662,100 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
-replace cancer_site=3 if cancer_site==.
-replace year=1 if year==.
-gen asmr_id="colon" if rpt_id==.
-replace rpt_id=3 if rpt_id==.
-bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
-order cancer_site number percent asmr ci_lower ci_upper year
-sort cancer_site asmr
-drop if cancer_site==3 & asmr_id==""
-drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
-restore
-
-** BREAST
-tab pop_wpp age_10 if siteiarc==29 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==29 & sex==2 //male
-
-preserve
-	drop if sex==2
-	drop if age_10==.
-	keep if siteiarc==29 // breast only
-	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
-	sort age sex
-
-	** now we have to add in the cases and pop_wppns for the missings: 
-	** F 0-14,15-24
-	
-	expand 2 in 1
-	replace sex=1 in 8
-	replace age_10=1 in 8
-	replace case=0 in 8
-	replace pop_wpp=(25537) in 8
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=1 in 9
-	replace age_10=2 in 9
-	replace case=0 in 9
-	replace pop_wpp=(18761) in 9
-	sort age_10
-
-	** -distrate is a user written command.
-	** type -search distrate,net- at the Stata prompt to find and install this command
-
-sort age_10
-total pop_wpp
-
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
-** THIS IS FOR BC (F) - STD TO WHO WORLD pop_wppN 
-
-/*
-  +------------------------------------------------------------+
-  | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
-  |------------------------------------------------------------|
-  |   64   147779   43.31     24.80    18.69    32.47     3.40 |
-  +------------------------------------------------------------+
-*/
-** JC update: Save these results as a dataset for reporting
-matrix list r(NDeath)
-matrix number = r(NDeath)
-matrix asmr = r(adj)
-matrix ci_lower = r(lb_G)
-matrix ci_upper = r(ub_G)
-svmat number
-svmat asmr
-svmat ci_lower
-svmat ci_upper
-
-collapse number asmr ci_lower ci_upper
-rename number1 number 
-rename asmr1 asmr 
-rename ci_lower1 ci_lower
-rename ci_upper1 ci_upper
-replace asmr=round(asmr,0.01)
-replace ci_lower=round(ci_lower,0.01)
-replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
-replace percent=round(percent,0.01)
-
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=4 if cancer_site==.
-replace year=1 if year==.
-gen asmr_id="breast" if rpt_id==.
+replace year=6 if year==.
+gen asmr_id="colon" if rpt_id==.
 replace rpt_id=4 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==4 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-** STOMACH
-tab pop_wpp age_10 if siteiarc==11 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==11 & sex==2 //male
+** LUNG
+tab pop_wpp age5 if siteiarc==21 & sex==1 //female
+tab pop_wpp age5 if siteiarc==21 & sex==2 //male
 
 preserve
-	drop if age_10==.
-	keep if siteiarc==11
+	drop if age5==.
+	keep if siteiarc==21
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
-	** now we have to add in the cases and pop_wppns for the missings: 
+	** now we have to add in the cases and pops for the missings: 
 	** M&F 0-14,15-24,25-34
 	** F 35-44
-	** M 45-54
 	
 	expand 2 in 1
-	replace sex=1 in 11
-	replace age_10=1 in 11
-	replace case=0 in 11
-	replace pop_wpp=(25537) in 11
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=2 in 12
-	replace age_10=1 in 12
+	replace sex=1 in 12
+	replace age5=1 in 12
 	replace case=0 in 12
-	replace pop_wpp=(26626) in 12
-	sort age_10
+	replace pop_wpp=(24395) in 12
+	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 13
-	replace age_10=2 in 13
+	replace sex=2 in 13
+	replace age5=1 in 13
 	replace case=0 in 13
-	replace pop_wpp=(18761) in 13
-	sort age_10
-		
+	replace pop_wpp=(25316) in 13
+	sort age5
+	
 	expand 2 in 1
-	replace sex=2 in 14
-	replace age_10=2 in 14
+	replace sex=1 in 14
+	replace age5=2 in 14
 	replace case=0 in 14
-	replace pop_wpp=(19111) in 14
-	sort age_10
+	replace pop_wpp=(18623) in 14
+	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 15
-	replace age_10=3 in 15
+	replace sex=2 in 15
+	replace age5=2 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18963) in 15
-	sort age_10
+	replace pop_wpp=(19294) in 15
+	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 16
-	replace age_10=3 in 16
+	replace sex=1 in 16
+	replace age5=3 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18440) in 16
-	sort age_10
+	replace pop_wpp=(18632) in 16
+	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 17
-	replace age_10=4 in 17
+	replace sex=2 in 17
+	replace age5=3 in 17
 	replace case=0 in 17
-	replace pop_wpp=(20315) in 17
-	sort age_10
+	replace pop_wpp=(18385) in 17
+	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 18
-	replace age_10=5 in 18
+	replace sex=1 in 18
+	replace age5=4 in 18
 	replace case=0 in 18
-	replace pop_wpp=(19492) in 18
-	sort age_10
+	replace pop_wpp=(19702) in 18
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
-** THIS IS FOR STOMACH CANCER (M&F)- STD TO WHO WORLD pop_wppN 
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR LUNG CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   31   285327   10.86      5.54     3.66     8.21     1.11 |
+  |   33   286640   11.51      6.62     4.46     9.59     1.26 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -680,31 +777,31 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=5 if cancer_site==.
-replace year=1 if year==.
-gen asmr_id="stom" if rpt_id==.
+replace year=6 if year==.
+gen asmr_id="lung" if rpt_id==.
 replace rpt_id=5 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==5 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
 ** PANCREAS
-tab pop_wpp age_10 if siteiarc==18 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==18 & sex==2 //male
+tab pop_wpp age5 if siteiarc==18 & sex==1 //female
+tab pop_wpp age5 if siteiarc==18 & sex==2 //male
 
 preserve
-	drop if age_10==.
+	drop if age5==.
 	keep if siteiarc==18
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
 	** M&F 0-14,15-24,25-34,35-44
@@ -712,82 +809,82 @@ preserve
 	
 	expand 2 in 1
 	replace sex=1 in 10
-	replace age_10=1 in 10
+	replace age5=1 in 10
 	replace case=0 in 10
-	replace pop_wpp=(25537) in 10
-	sort age_10
+	replace pop_wpp=(24395) in 10
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 11
-	replace age_10=1 in 11
+	replace age5=1 in 11
 	replace case=0 in 11
-	replace pop_wpp=(26626) in 11
-	sort age_10
+	replace pop_wpp=(25316) in 11
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 12
-	replace age_10=2 in 12
+	replace age5=2 in 12
 	replace case=0 in 12
-	replace pop_wpp=(18761) in 12
-	sort age_10
+	replace pop_wpp=(18623) in 12
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 13
-	replace age_10=2 in 13
+	replace age5=2 in 13
 	replace case=0 in 13
-	replace pop_wpp=(19111) in 13
-	sort age_10
+	replace pop_wpp=(19294) in 13
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 14
-	replace age_10=3 in 14
+	replace age5=3 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18963) in 14
-	sort age_10
+	replace pop_wpp=(18632) in 14
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 15
-	replace age_10=3 in 15
+	replace age5=3 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18440) in 15
-	sort age_10	
+	replace pop_wpp=(18385) in 15
+	sort age5	
 	
 	expand 2 in 1
 	replace sex=1 in 16
-	replace age_10=4 in 16
+	replace age5=4 in 16
 	replace case=0 in 16
-	replace pop_wpp=(20315) in 16
-	sort age_10
+	replace pop_wpp=(19702) in 16
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 17
-	replace age_10=4 in 17
+	replace age5=4 in 17
 	replace case=0 in 17
-	replace pop_wpp=(19218) in 17
-	sort age_10
+	replace pop_wpp=(18767) in 17
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 18
-	replace age_10=5 in 18
+	replace age5=5 in 18
 	replace case=0 in 18
-	replace pop_wpp=(21585) in 18
-	sort age_10
+	replace pop_wpp=(21092) in 18
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR PANCREATIC CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   29   285327   10.16      5.35     3.53     7.97     1.08 |
+  |   32   286640   11.16      5.85     3.95     8.53     1.12 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -809,12 +906,12 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=6 if cancer_site==.
-replace year=1 if year==.
+replace year=6 if year==.
 gen asmr_id="panc" if rpt_id==.
 replace rpt_id=6 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
@@ -822,101 +919,88 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==6 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-** LUNG
-tab pop_wpp age_10 if siteiarc==21 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==21 & sex==2 //male
+** STOMACH
+tab pop_wpp age5 if siteiarc==11 & sex==1 //female
+tab pop_wpp age5 if siteiarc==11 & sex==2 //male
 
 preserve
-	drop if age_10==.
-	keep if siteiarc==21
+	drop if age5==.
+	keep if siteiarc==11
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
-	** now we have to add in the cases and pops for the missings: 
-	** M&F 0-14,15-24,25-34,35-44
+	** now we have to add in the cases and pop_wppns for the missings: 
+	** M&F 0-14,15-24,25-34
 	** F 45-54
-	
-	expand 2 in 1
-	replace sex=1 in 10
-	replace age_10=1 in 10
-	replace case=0 in 10
-	replace pop_wpp=(25537) in 10
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=2 in 11
-	replace age_10=1 in 11
-	replace case=0 in 11
-	replace pop_wpp=(26626) in 11
-	sort age_10
+	** M 
 	
 	expand 2 in 1
 	replace sex=1 in 12
-	replace age_10=2 in 12
+	replace age5=1 in 12
 	replace case=0 in 12
-	replace pop_wpp=(18761) in 12
-	sort age_10
+	replace pop_wpp=(24395) in 12
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 13
-	replace age_10=2 in 13
+	replace age5=1 in 13
 	replace case=0 in 13
-	replace pop_wpp=(19111) in 13
-	sort age_10
+	replace pop_wpp=(25316) in 13
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 14
-	replace age_10=3 in 14
+	replace age5=2 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18963) in 14
-	sort age_10
-	
+	replace pop_wpp=(18623) in 14
+	sort age5
+		
 	expand 2 in 1
 	replace sex=2 in 15
-	replace age_10=3 in 15
+	replace age5=2 in 15
 	replace case=0 in 15
-	replace pop_wpp=(18440) in 15
-	sort age_10
+	replace pop_wpp=(19294) in 15
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 16
-	replace age_10=4 in 16
+	replace age5=3 in 16
 	replace case=0 in 16
-	replace pop_wpp=(20315) in 16
-	sort age_10
+	replace pop_wpp=(18632) in 16
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 17
-	replace age_10=4 in 17
+	replace age5=3 in 17
 	replace case=0 in 17
-	replace pop_wpp=(19218) in 17
-	sort age_10
+	replace pop_wpp=(18385) in 17
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 18
-	replace age_10=5 in 18
+	replace age5=5 in 18
 	replace case=0 in 18
-	replace pop_wpp=(21585) in 18
-	sort age_10
+	replace pop_wpp=(21092) in 18
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
-** THIS IS FOR LUNG CANCER (M&F)- STD TO WHO WORLD pop_wppN 
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR STOMACH CANCER (M&F)- STD TO WHO WORLD pop_wppN 
 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   28   285327    9.81      6.06     3.98     8.96     1.22 |
+  |   27   286640    9.42      5.25     3.37     7.94     1.12 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -938,121 +1022,115 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=7 if cancer_site==.
-replace year=1 if year==.
-gen asmr_id="lung" if rpt_id==.
+replace year=6 if year==.
+gen asmr_id="stom" if rpt_id==.
 replace rpt_id=7 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==7 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-** MULTIPLE MYELOMA
-tab pop_wpp age_10 if siteiarc==55 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==55 & sex==2 //male
+** RECTUM
+tab pop_wpp age5 if siteiarc==14 & sex==1 //female
+tab pop_wpp age5 if siteiarc==14 & sex==2 //male
 
 preserve
-	drop if age_10==.
-	keep if siteiarc==55
+	drop if age5==.
+	keep if siteiarc==14
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24,25-34,35-44
-	** F 45-54
-	** M 85+
+	** M&F 0-14,15-24,25-34
+	** F 45-54,85+
+	** M 25-44
 	
 	expand 2 in 1
-	replace sex=1 in 9
-	replace age_10=1 in 9
-	replace case=0 in 9
-	replace pop_wpp=(25537) in 9
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=2 in 10
-	replace age_10=1 in 10
+	replace sex=1 in 10
+	replace age5=1 in 10
 	replace case=0 in 10
-	replace pop_wpp=(26626) in 10
-	sort age_10
+	replace pop_wpp=(24395) in 10
+	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 11
-	replace age_10=2 in 11
+	replace sex=2 in 11
+	replace age5=1 in 11
 	replace case=0 in 11
-	replace pop_wpp=(18761) in 11
-	sort age_10
+	replace pop_wpp=(25316) in 11
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 12
+	replace age5=2 in 12
+	replace case=0 in 12
+	replace pop_wpp=(18623) in 12
+	sort age5
 		
 	expand 2 in 1
-	replace sex=2 in 12
-	replace age_10=2 in 12
-	replace case=0 in 12
-	replace pop_wpp=(19111) in 12
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=1 in 13
-	replace age_10=3 in 13
+	replace sex=2 in 13
+	replace age5=2 in 13
 	replace case=0 in 13
-	replace pop_wpp=(18963) in 13
-	sort age_10
+	replace pop_wpp=(19294) in 13
+	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 14
-	replace age_10=3 in 14
+	replace sex=1 in 14
+	replace age5=3 in 14
 	replace case=0 in 14
-	replace pop_wpp=(18440) in 14
-	sort age_10
+	replace pop_wpp=(18632) in 14
+	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 15
-	replace age_10=4 in 15
+	replace sex=2 in 15
+	replace age5=3 in 15
 	replace case=0 in 15
-	replace pop_wpp=(20315) in 15
-	sort age_10
+	replace pop_wpp=(18385) in 15
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 16
-	replace age_10=4 in 16
+	replace age5=4 in 16
 	replace case=0 in 16
-	replace pop_wpp=(19218) in 16
-	sort age_10
+	replace pop_wpp=(18767) in 16
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 17
-	replace age_10=5 in 17
+	replace age5=5 in 17
 	replace case=0 in 17
-	replace pop_wpp=(21585) in 17
-	sort age_10
+	replace pop_wpp=(21092) in 17
+	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 18
-	replace age_10=9 in 18
+	replace sex=1 in 18
+	replace age5=9 in 18
 	replace case=0 in 18
-	replace pop_wpp=(2487) in 18
-	sort age_10
+	replace pop_wpp=(4080) in 18
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
-** THIS IS FOR MULTIPLE MYELOMA (M&F)- STD TO WHO WORLD pop_wppN 
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR RECTAL CANCER (M&F)- STD TO WHO WORLD pop_wppN 
+
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   27   285327    9.46      5.55     3.61     8.31     1.15 |
+  |   26   286640    9.07      5.48     3.52     8.26     1.16 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1074,77 +1152,84 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=8 if cancer_site==.
-replace year=1 if year==.
-gen asmr_id="MM" if rpt_id==.
+replace year=6 if year==.
+gen asmr_id="rect" if rpt_id==.
 replace rpt_id=8 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==8 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
 ** CORPUS UTERI
-tab pop_wpp age_10 if siteiarc==33
+tab pop_wpp age5 if siteiarc==33
 
 preserve
-	drop if age_10==.
+	drop if age5==.
 	keep if siteiarc==33
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** F 0-14,15-24,25-34,35-44
+	** F 0-14,15-24,25-34,35-44,85+
+	
+	expand 2 in 1
+	replace sex=1 in 5
+	replace age5=1 in 5
+	replace case=0 in 5
+	replace pop_wpp=(24395) in 5
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 6
-	replace age_10=1 in 6
+	replace age5=2 in 6
 	replace case=0 in 6
-	replace pop_wpp=(25537) in 6
-	sort age_10
+	replace pop_wpp=(18623) in 6
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 7
-	replace age_10=2 in 7
+	replace age5=3 in 7
 	replace case=0 in 7
-	replace pop_wpp=(18761) in 7
-	sort age_10
+	replace pop_wpp=(18632) in 7
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 8
-	replace age_10=3 in 8
+	replace age5=4 in 8
 	replace case=0 in 8
-	replace pop_wpp=(18963) in 8
-	sort age_10
+	replace pop_wpp=(19702) in 8
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 9
-	replace age_10=4 in 9
+	replace age5=9 in 9
 	replace case=0 in 9
-	replace pop_wpp=(20315) in 9
-	sort age_10
+	replace pop_wpp=(4080) in 9
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
 ** THIS IS FOR CORPUS UTERI (WOMEN)- STD TO WHO WORLD pop_wppN 
 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   24   147779   16.24      9.20     5.81    14.16     2.04 |
+  |   22   148115   14.85      8.54     5.32    13.33     1.95 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1166,12 +1251,12 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=9 if cancer_site==.
-replace year=1 if year==.
+replace year=6 if year==.
 gen asmr_id="corpus" if rpt_id==.
 replace rpt_id=9 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
@@ -1179,88 +1264,109 @@ order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==9 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-** RECTUM
-tab pop_wpp age_10 if siteiarc==14 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==14 & sex==2 //male
+
+** MULTIPLE MYELOMA
+tab pop_wpp age5 if siteiarc==55 & sex==1 //female
+tab pop_wpp age5 if siteiarc==55 & sex==2 //male
 
 preserve
-	drop if age_10==.
-	keep if siteiarc==14
+	drop if age5==.
+	keep if siteiarc==55
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24
-	** F 25-34,65-74
+	** M&F 0-14,15-24,25-34,35-44
+	** F 45-54
 	** M 75-84
 	
 	expand 2 in 1
-	replace sex=1 in 12
-	replace age_10=1 in 12
-	replace case=0 in 12
-	replace pop_wpp=(25537) in 12
-	sort age_10
+	replace sex=1 in 9
+	replace age5=1 in 9
+	replace case=0 in 9
+	replace pop_wpp=(24395) in 9
+	sort age5
 	
 	expand 2 in 1
-	replace sex=2 in 13
-	replace age_10=1 in 13
-	replace case=0 in 13
-	replace pop_wpp=(26626) in 13
-	sort age_10
+	replace sex=2 in 10
+	replace age5=1 in 10
+	replace case=0 in 10
+	replace pop_wpp=(25316) in 10
+	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 14
-	replace age_10=2 in 14
-	replace case=0 in 14
-	replace pop_wpp=(18761) in 14
-	sort age_10
+	replace sex=1 in 11
+	replace age5=2 in 11
+	replace case=0 in 11
+	replace pop_wpp=(18623) in 11
+	sort age5
 		
 	expand 2 in 1
-	replace sex=2 in 15
-	replace age_10=2 in 15
-	replace case=0 in 15
-	replace pop_wpp=(19111) in 15
-	sort age_10
+	replace sex=2 in 12
+	replace age5=2 in 12
+	replace case=0 in 12
+	replace pop_wpp=(19294) in 12
+	sort age5
 	
 	expand 2 in 1
-	replace sex=1 in 16
-	replace age_10=3 in 16
+	replace sex=1 in 13
+	replace age5=3 in 13
+	replace case=0 in 13
+	replace pop_wpp=(18632) in 13
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 14
+	replace age5=3 in 14
+	replace case=0 in 14
+	replace pop_wpp=(18385) in 14
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 15
+	replace age5=4 in 15
+	replace case=0 in 15
+	replace pop_wpp=(19702) in 15
+	sort age5
+	
+	expand 2 in 1
+	replace sex=2 in 16
+	replace age5=4 in 16
 	replace case=0 in 16
-	replace pop_wpp=(18963) in 16
-	sort age_10
+	replace pop_wpp=(18767) in 16
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 17
-	replace age_10=7 in 17
+	replace age5=5 in 17
 	replace case=0 in 17
-	replace pop_wpp=(12125) in 17
-	sort age_10
+	replace pop_wpp=(21092) in 17
+	sort age5
 	
 	expand 2 in 1
 	replace sex=2 in 18
-	replace age_10=8 in 18
+	replace age5=8 in 18
 	replace case=0 in 18
-	replace pop_wpp=(5564) in 18
-	sort age_10
+	replace pop_wpp=(5824) in 18
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
-** THIS IS FOR RECTAL CANCER (M&F)- STD TO WHO WORLD pop_wppN 
-
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR MULTIPLE MYELOMA (M&F)- STD TO WHO WORLD pop_wppN 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   23   285327    8.06      5.41     3.30     8.41     1.25 |
+  |   20   286640    6.98      4.00     2.41     6.41     0.97 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1282,122 +1388,78 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=10 if cancer_site==.
-replace year=1 if year==.
-gen asmr_id="rect" if rpt_id==.
+replace year=6 if year==.
+gen asmr_id="MM" if rpt_id==.
 replace rpt_id=10 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
 sort cancer_site asmr
 drop if cancer_site==10 & asmr_id==""
 drop asmr_id
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-** NON-HODGKIN LYMPHOMA
-tab pop_wpp age_10 if siteiarc==53 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==53 & sex==2 //male
+
+** OVARY
+tab pop_wpp age5 if siteiarc==35 & sex==1 //female
 
 preserve
-	drop if age_10==.
-	keep if siteiarc==53
+	drop if age5==.
+	keep if siteiarc==35
 	
-	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
+	collapse (sum) case (mean) pop_wpp, by(pfu age5 sex)
 	sort age sex
 	** now we have to add in the cases and pop_wppns for the missings: 
-	** M&F 0-14,15-24,25-34
-	** F 55-64,65-74,85+
-	** M 75-84
+	** F 0-14,15-24,25-34,35-44
+	
+	expand 2 in 1
+	replace sex=1 in 6
+	replace age5=1 in 6
+	replace case=0 in 6
+	replace pop_wpp=(24395) in 6
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 7
+	replace age5=2 in 7
+	replace case=0 in 7
+	replace pop_wpp=(18623) in 7
+	sort age5
+	
+	expand 2 in 1
+	replace sex=1 in 8
+	replace age5=3 in 8
+	replace case=0 in 8
+	replace pop_wpp=(18632) in 8
+	sort age5
 	
 	expand 2 in 1
 	replace sex=1 in 9
-	replace age_10=1 in 9
+	replace age5=4 in 9
 	replace case=0 in 9
-	replace pop_wpp=(25537) in 9
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=2 in 10
-	replace age_10=1 in 10
-	replace case=0 in 10
-	replace pop_wpp=(26626) in 10
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=1 in 11
-	replace age_10=2 in 11
-	replace case=0 in 11
-	replace pop_wpp=(18761) in 11
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=2 in 12
-	replace age_10=2 in 12
-	replace case=0 in 12
-	replace pop_wpp=(19111) in 12
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=1 in 13
-	replace age_10=3 in 13
-	replace case=0 in 13
-	replace pop_wpp=(18963) in 13
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=2 in 14
-	replace age_10=3 in 14
-	replace case=0 in 14
-	replace pop_wpp=(18440) in 14
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=1 in 15
-	replace age_10=6 in 15
-	replace case=0 in 15
-	replace pop_wpp=(18883) in 15
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=1 in 16
-	replace age_10=7 in 16
-	replace case=0 in 16
-	replace pop_wpp=(12125) in 16
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=2 in 17
-	replace age_10=8 in 17
-	replace case=0 in 17
-	replace pop_wpp=(5564) in 17
-	sort age_10
-	
-	expand 2 in 1
-	replace sex=1 in 18
-	replace age_10=9 in 18
-	replace case=0 in 18
-	replace pop_wpp=(3975) in 18
-	sort age_10
+	replace pop_wpp=(19702) in 9
+	sort age5
 	
 	** -distrate is a user written command.
 	** type -search distrate,net- at the Stata prompt to find and install this command
 
-sort age_10
+sort age5
 total pop_wpp
 
-distrate case pop_wpp using "`datapath'\version09\2-working\who2000_10-2", 	///	
-		         stand(age_10) popstand(pop) mult(100000) format(%8.2f)
-** THIS IS FOR NHL (M&F)- STD TO WHO WORLD pop_wppN 
+distrate case pop_wpp using "`datapath'\version09\2-working\who2000_5", 	///	
+		         stand(age5) popstand(pop) mult(100000) format(%8.2f)
+** THIS IS FOR OVARY (F)- STD TO WHO WORLD pop_wppN 
 
 /*
   +------------------------------------------------------------+
   | case        N   crude   rateadj   lb_gam   ub_gam   se_gam |
   |------------------------------------------------------------|
-  |   17   285327    5.96      4.07     2.31     6.73     1.08 |
+  |   15   148115   10.13      6.19     3.35    10.73     1.80 |
   +------------------------------------------------------------+
 */
 ** JC update: Save these results as a dataset for reporting
@@ -1419,13 +1481,13 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/631*100
+gen percent=number/658*100
 replace percent=round(percent,0.01)
 
-append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
 replace cancer_site=11 if cancer_site==.
-replace year=1 if year==.
-gen asmr_id="NHL" if rpt_id==.
+replace year=6 if year==.
+gen asmr_id="ovary" if rpt_id==.
 replace rpt_id=11 if rpt_id==.
 bysort rpt_id (asmr_id): replace percentage = percentage[_n-1] if missing(percentage)
 order cancer_site number percent asmr ci_lower ci_upper year
@@ -1434,10 +1496,10 @@ drop if cancer_site==11 & asmr_id==""
 drop asmr_id rpt_id
 format asmr %04.2f
 format percentage %04.1f
-save "`datapath'\version09\2-working\ASMRs_wpp_2015" ,replace
+save "`datapath'\version09\2-working\ASMRs_wpp_2018" ,replace
 restore
 
-label data "BNR MORTALITY rates 2015"
+label data "BNR MORTALITY rates 2018"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version09\3-output\2015_analysis mort_wpp" ,replace
+save "`datapath'\version09\3-output\2018_analysis mort_wpp" ,replace
 note: TS This dataset includes patients with multiple eligible cancer causes of death; used WPP population
