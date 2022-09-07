@@ -2283,6 +2283,22 @@ drop asmr_id rpt_id
 format asmr %04.2f
 format percentage %04.1f
 save "`datapath'\version09\2-working\ASMRs_wpp_2016" ,replace
+** JC 07sep2022: Save alternative ds for ASMR Excel output entitled '2018top10ASMRs_2013-2021'
+** For now will not use this code as I would need to add ASMR calculations for all the sites in the top 10 for 2021 and/or top for 2018
+/*
+gen site="all" if cancer_site=="all":cancer_site_lab
+replace site="prostate" if cancer_site=="prostate":cancer_site_lab
+replace site="colon" if cancer_site=="colon":cancer_site_lab
+replace site="female breast" if cancer_site=="female breast":cancer_site_lab
+replace site="lung" if cancer_site=="lung":cancer_site_lab
+replace site="stomach" if cancer_site=="stomach":cancer_site_lab
+replace site="multiple myeloma" if cancer_site=="multiple myeloma":cancer_site_lab
+replace site="pancreas" if cancer_site=="pancreas":cancer_site_lab
+replace site="rectum" if cancer_site=="rectum":cancer_site_lab
+replace site="corpus uteri" if cancer_site=="corpus uteri":cancer_site_lab
+replace site="liver" if cancer_site=="liver":cancer_site_lab
+save "`datapath'\version09\2-working\ASMRs_wpp_excel_2016" ,replace
+*/
 restore
 
 label data "BNR MORTALITY rates 2016"

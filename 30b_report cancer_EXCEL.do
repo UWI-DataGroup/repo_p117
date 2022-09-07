@@ -690,8 +690,8 @@ putexcel (E2:E135), nformat("0.0")
 putexcel save
 restore
 
-
-
+** JC 07sep2022: CANNOT USE BELOW CODE FOR SITES AS SITE CODES/LABELS DIFFER FOR EACH YEAR BASED ON THE TOP 10 FOR THAT YEAR
+/*
 *********************
 ** 2013-2021 ASMRs **
 ** According to    **
@@ -1031,7 +1031,7 @@ putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
 restore
-
+*/
 
 
 
@@ -1042,10 +1042,37 @@ restore
 **************************
 ** JC 26aug2022: Create excel output of death absolute numbers and ASMRs for 2013-2021 and check with NS + SF if they would prefer exel outputs in conjunction with the Word outputs
 
-** 2013-2021 **
 preserve
-use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+** Create a 2013-2021 ASMR dataset (ONLY TO BE USED FOR TOTALS; CANNOT USE FOR SITES AS SITE CODES/LABELS DIFFER FOR EACH YEAR BASED ON THE TOP 10 FOR THAT YEAR)
+use "`datapath'\version09\2-working\ASMRs_wpp_2021", clear
+replace year=9
+append using "`datapath'\version09\2-working\ASMRs_wpp_2020"
+replace year=8 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2019"
+replace year=7 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2018"
+replace year=6 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2017"
+replace year=5 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2016"
+replace year=4 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2015"
+replace year=3 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2014"
+replace year=2 if year<2
+append using "`datapath'\version09\2-working\ASMRs_wpp_2013"
+replace year=1 if year<2
 
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order cancer_site year number percent asmr ci_lower ci_upper
+
+save "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,replace
+
+** 2013-2021 **
 ** Create Sheet1 with Totals
 keep if cancer_site==1
 
