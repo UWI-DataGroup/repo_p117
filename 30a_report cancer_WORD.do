@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      05-SEP-2022
+    // 	date last modified      07-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -588,7 +588,7 @@ putdocx paragraph, style(Title)
 putdocx text ("CANCER 2016-2018 Annual Report: Stata Results"), bold
 putdocx textblock begin
 Date Prepared: 25-AUG-2022.
-Date Updated: 05-SEP-2022.
+Date Updated: 07-SEP-2022.
 Prepared by: JC using Stata v17.0.
 CanReg5 v5.43 (incidence) data release date: 18-July-2022.
 REDCap v12.3.3 (death) data release date: 03-Aug-2022.
@@ -693,7 +693,7 @@ putdocx table tbl1(10,4), nformat(%2.1f)
 putdocx table tbl1(10,5), nformat(%2.1f)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", replace
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", replace
 putdocx clear
 
 //save "`datapath'\version09\3-output\2013-2015_2018summstats" ,replace
@@ -736,7 +736,7 @@ putdocx table tbl1(1,10), bold shading(lightgray)
 putdocx table tbl1(1,11), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -784,7 +784,7 @@ putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -831,7 +831,7 @@ putdocx table tbl1(12,.), bold shading("yellow")
 putdocx table tbl1(13,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -878,7 +878,7 @@ putdocx table tbl1(10,.), bold shading("yellow")
 putdocx table tbl1(14,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -925,7 +925,7 @@ putdocx table tbl1(11,.), bold shading("yellow")
 //putdocx table tbl1(12,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -974,7 +974,7 @@ putdocx table tbl1(13,.), bold shading("yellow")
 //putdocx table tbl1(17,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1022,7 +1022,7 @@ putdocx table tbl1(13,.), bold shading("yellow")
 //putdocx table tbl1(15,.), bold shading("yellow")
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1055,7 +1055,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1088,7 +1088,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1121,7 +1121,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1163,7 +1163,7 @@ putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1201,7 +1201,7 @@ putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1243,7 +1243,7 @@ putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1281,7 +1281,7 @@ putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1323,7 +1323,7 @@ putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1361,7 +1361,7 @@ putdocx table tbl1(1,5), bold shading(lightgray)
 putdocx table tbl1(1,6), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1405,7 +1405,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1452,7 +1452,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1495,7 +1495,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1542,7 +1542,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1585,7 +1585,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1629,7 +1629,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1673,7 +1673,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1717,7 +1717,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1779,7 +1779,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1816,7 +1816,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1856,7 +1856,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1916,7 +1916,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1953,7 +1953,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -1993,7 +1993,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2053,7 +2053,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2090,7 +2090,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2130,7 +2130,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2190,7 +2190,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2227,7 +2227,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2267,7 +2267,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2327,7 +2327,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2364,7 +2364,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2404,7 +2404,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2464,7 +2464,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2501,7 +2501,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2541,7 +2541,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2606,7 +2606,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2643,7 +2643,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2683,7 +2683,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2748,7 +2748,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2785,7 +2785,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2825,7 +2825,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2889,7 +2889,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 putdocx table tbl1(1,7), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2926,7 +2926,7 @@ putdocx table tbl1(1,3), bold shading(lightgray)
 putdocx table tbl1(1,4), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -2966,7 +2966,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -3003,7 +3003,7 @@ putdocx table tbl_parish = data("Parish Total_Records Percent"), varnames  ///
 putdocx table tbl_parish(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2013-2018_cases_parish.dta" ,replace
@@ -3046,7 +3046,7 @@ putdocx table tbl_year = data("Parish Year Total_Records Percent"), varnames  //
 putdocx table tbl_year(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2013-2018_cases_parish+dxyr.dta" ,replace
@@ -3079,7 +3079,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
 putdocx table tbl_site(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2013-2018_cases_parish+site.dta" ,replace
@@ -3112,7 +3112,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
 putdocx table tbl_site(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2013_cases_parish+site.dta" ,replace
@@ -3145,7 +3145,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
 putdocx table tbl_site(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2014_cases_parish+site.dta" ,replace
@@ -3178,7 +3178,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
 putdocx table tbl_site(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2015_cases_parish+site.dta" ,replace
@@ -3211,7 +3211,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
 putdocx table tbl_site(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2016_cases_parish+site.dta" ,replace
@@ -3244,7 +3244,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
 putdocx table tbl_site(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2017_cases_parish+site.dta" ,replace
@@ -3277,7 +3277,7 @@ putdocx table tbl_site = data("Parish Site Total_Records Percent"), varnames  //
 putdocx table tbl_site(1,.), bold
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 
 save "`datapath'\version09\2-working\2018_cases_parish+site.dta" ,replace
@@ -3325,7 +3325,7 @@ putdocx table tbl1(1,6), bold shading(lightgray)
 
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 				*******************************
@@ -3358,7 +3358,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 				*******************************
@@ -3399,7 +3399,7 @@ putdocx image "`datapath'\version09\2-working\ResidentStatusByYear.png", width(1
 putdocx paragraph
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx" ,append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx" ,append
 putdocx clear
 restore
 
@@ -3437,7 +3437,7 @@ putdocx image "`datapath'\version09\2-working\BODbyYear.png", width(17.94) heigh
 putdocx paragraph
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx" ,append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx" ,append
 putdocx clear
 restore
 
@@ -3500,7 +3500,7 @@ putdocx table tbl1(1,2), bold shading(lightgray)
 putdocx table tbl1(1,3), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx" ,append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx" ,append
 putdocx clear
 restore
 
@@ -4003,7 +4003,7 @@ putdocx table tbl1(1,4), bold shading(lightgray)
 putdocx table tbl1(1,5), bold shading(lightgray)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx" ,append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx" ,append
 putdocx clear
 restore
 
@@ -4029,10 +4029,10 @@ putdocx paragraph, halign(center)
 putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2018 (N=960)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 
-putdocx image "`datapath'\version09\3-output\2018_age-sex graph_cancer.png", width(5.5) height(2.0)
+putdocx image "`datapath'\version09\3-output\2018_age-sex graph_nocases_cancer.png", width(5.5) height(2.0)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -4045,10 +4045,10 @@ putdocx paragraph, halign(center)
 putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2017 (N=977)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 
-putdocx image "`datapath'\version09\3-output\2017_age-sex graph_cancer.png", width(5.5) height(2.0)
+putdocx image "`datapath'\version09\3-output\2017_age-sex graph_nocases_cancer.png", width(5.5) height(2.0)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -4061,10 +4061,10 @@ putdocx paragraph, halign(center)
 putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2016 (N=1,070)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 
-putdocx image "`datapath'\version09\3-output\2016_age-sex graph_cancer.png", width(5.5) height(2.0)
+putdocx image "`datapath'\version09\3-output\2016_age-sex graph_nocases_cancer.png", width(5.5) height(2.0)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -4077,10 +4077,10 @@ putdocx paragraph, halign(center)
 putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2015 (N=1,092)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 
-putdocx image "`datapath'\version09\3-output\2015_age-sex graph_cancer.png", width(5.5) height(2.0)
+putdocx image "`datapath'\version09\3-output\2015_age-sex graph_nocases_cancer.png", width(5.5) height(2.0)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -4093,10 +4093,10 @@ putdocx paragraph, halign(center)
 putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2014 (N=884)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 
-putdocx image "`datapath'\version09\3-output\2014_age-sex graph_cancer.png", width(5.5) height(2.0)
+putdocx image "`datapath'\version09\3-output\2014_age-sex graph_nocases_cancer.png", width(5.5) height(2.0)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -4109,10 +4109,10 @@ putdocx paragraph, halign(center)
 putdocx text ("Age and gender stratified incidence rate per 100,000 population of Cancer, Barbados, 2013 (N=884)"), bold font(Helvetica,10,"blue")
 putdocx paragraph
 
-putdocx image "`datapath'\version09\3-output\2013_age-sex graph_cancer.png", width(5.5) height(2.0)
+putdocx image "`datapath'\version09\3-output\2013_age-sex graph_nocases_cancer.png", width(5.5) height(2.0)
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore
 
@@ -4250,6 +4250,6 @@ putdocx text ("Table 10. Notes Seen Table (N=221)"), bold font(Helvetica,10,"blu
 capture tab2docx notesseen
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV10_`listdate'.docx", append
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
 putdocx clear
 restore

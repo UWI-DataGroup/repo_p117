@@ -692,282 +692,6 @@ restore
 
 
 
-
-**************************
-** ASMRs: According to  **
-** Top 10 for each year **
-**   (2013-2021)        **
-**************************
-** JC 26aug2022: Create excel output of death absolute numbers and ASMRs for 2013-2021 and check with NS + SF if they would prefer exel outputs in conjunction with the Word outputs
-preserve
-** 2021 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2021", clear
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2021, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2021) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2020 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2020", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2020, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2020) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2019 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2019", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2019, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2019) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2018 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2018", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2018, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2018) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2017 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2017", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2017, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2017) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2016 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2016", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2016, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2016) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2015 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2015", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2015, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2015) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2014 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2014", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2014, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2014) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-preserve
-** 2013 **
-use "`datapath'\version09\2-working\ASMRs_wpp_2013", clear
-
-label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
-label values year year_lab
-
-drop percentage
-sort cancer_site year asmr
-order year cancer_site number percent asmr ci_lower ci_upper
-
-//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2013, replace) 
-
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2013) modify
-putexcel A1:G1, bold fpat(solid, lightgray)
-putexcel A1 = "Year"
-putexcel B1 = "Site"
-putexcel C1 = "Number"
-putexcel D1 = "Percent"
-putexcel E1 = "ASMR"
-putexcel F1 = "CI_lower"
-putexcel G1 = "CI_upper"
-putexcel (D2:D12), nformat("0.0")
-putexcel (E2:E12), nformat("0.0")
-putexcel (F2:F12), nformat("0.0")
-putexcel (G2:G12), nformat("0.0")
-putexcel save
-restore
-
-
-
 *********************
 ** 2013-2021 ASMRs **
 ** According to    **
@@ -1013,8 +737,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Totals) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1039,8 +763,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(AllSites) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1065,8 +789,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Prostate) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1090,8 +814,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Breast) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1115,8 +839,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Colon) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1141,8 +865,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Lung) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1167,8 +891,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Pancreas) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1192,8 +916,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(MM) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1217,8 +941,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(NHL) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1243,8 +967,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Rectum) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1268,8 +992,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(CorpusUteri) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1294,8 +1018,8 @@ export_excel cancer_site year number percent asmr ci_lower ci_upper using "`data
 putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_2018top10ASMRs_2013-2021_`listdate'.xlsx", sheet(Stomach) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 //putexcel D2:D4, rownames nformat(number_d1) - this causes an error when opening the excel workbook so reformatted cir variable above
-putexcel A1 = "Year"
-putexcel B1 = "Site"
+putexcel A1 = "Site"
+putexcel B1 = "Year"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel E1 = "ASMR"
@@ -1307,6 +1031,320 @@ putexcel (F2:F10), nformat("0.0")
 putexcel (G2:G10), nformat("0.0")
 putexcel save
 restore
+
+
+
+
+**************************
+** ASMRs: According to  **
+** Top 10 for each year **
+**   (2013-2021)        **
+**************************
+** JC 26aug2022: Create excel output of death absolute numbers and ASMRs for 2013-2021 and check with NS + SF if they would prefer exel outputs in conjunction with the Word outputs
+
+** 2013-2021 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013-2021" ,clear
+
+** Create Sheet1 with Totals
+keep if cancer_site==1
+
+local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site year number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(Totals, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(Totals) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Site"
+putexcel B1 = "Year"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D10), nformat("0.0")
+putexcel (E2:E10), nformat("0.0")
+putexcel (F2:F10), nformat("0.0")
+putexcel (G2:G10), nformat("0.0")
+putexcel save
+restore
+
+
+** 2021 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2021", clear
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2021, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2021) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2020 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2020", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2020, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2020) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2019 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2019", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2019, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2019) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2018 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2018", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2018, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2018) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2017 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2017", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2017, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2017) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2016 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2016", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2016, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2016) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2015 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2015", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2015, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2015) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2014 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2014", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2014, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2014) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
+
+** 2013 **
+preserve
+use "`datapath'\version09\2-working\ASMRs_wpp_2013", clear
+
+label define year_lab 1 "2013" 2 "2014" 3 "2015" 4 "2016" 5 "2017" 6 "2018" 7 "2019" 8 "2020" 9 "2021" ,modify
+label values year year_lab
+
+drop percentage
+sort cancer_site year asmr
+order year cancer_site number percent asmr ci_lower ci_upper
+
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site number percent asmr ci_lower ci_upper using "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", firstrow(variables) sheet(2013, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASMRs_2013-2021_`listdate'.xlsx", sheet(2013) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel E1 = "ASMR"
+putexcel F1 = "CI_lower"
+putexcel G1 = "CI_upper"
+putexcel (D2:D12), nformat("0.0")
+putexcel (E2:E12), nformat("0.0")
+putexcel (F2:F12), nformat("0.0")
+putexcel (G2:G12), nformat("0.0")
+putexcel save
+restore
+
 
 
 
