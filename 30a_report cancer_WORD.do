@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      07-SEP-2022
+    // 	date last modified      08-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -1152,7 +1152,7 @@ putdocx text ("ASIRs: 2018"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=960)"), bold font(Helvetica,14,"blue")
+putdocx text ("2018 ASIRs (# tumours/n=960)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1190,7 +1190,7 @@ putdocx text ("ASIRs: 2018"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=960)"), bold font(Helvetica,14,"blue")
+putdocx text ("2018 ASIRs (# tumours/n=960)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1232,7 +1232,7 @@ putdocx text ("ASIRs: 2017"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx text ("2017 ASIRs (# tumours/n=977)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1270,7 +1270,7 @@ putdocx text ("ASIRs: 2017"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=977)"), bold font(Helvetica,14,"blue")
+putdocx text ("2017 ASIRs (# tumours/n=977)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1312,7 +1312,7 @@ putdocx text ("ASIRs: 2016"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - FEMALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
+putdocx text ("2016 ASIRs (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
@@ -1350,7 +1350,7 @@ putdocx text ("ASIRs: 2016"), bold
 putdocx paragraph, halign(center)
 putdocx text ("Top 5 - MALE"), bold font(Helvetica,14,"blue")
 putdocx paragraph, halign(center)
-putdocx text ("Basis (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
+putdocx text ("2016 ASIRs (# tumours/n=1070)"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(cancer_site number percent asir ci_lower ci_upper), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
