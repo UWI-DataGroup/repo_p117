@@ -1631,6 +1631,61 @@ use "`datapath'\version09\2-working\2013-2018_cancer_numbers", clear
 **********
 ** 2015 **
 **********
+
+** Requested by SF on 12-Sep-2022: Numbers of top 10 by sex
+** Below top 10 code added by JC for 2015
+** All sites excl. in-situ, O&U, non-reportable skin cancers
+preserve
+drop if dxyr!=2015 //4775 deleted
+drop if siteiarc>60 //| siteiarc==25 //40 deleted
+tab siteiarc ,m
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag=(_n==1)
+replace tag = sum(tag)
+sum tag , meanonly
+gen top10 = (tag>=(`r(max)'-9))
+sum n if tag==(`r(max)'-9), meanonly
+replace top10 = 1 if n==`r(max)'
+gsort -top10
+tab siteiarc top10 if top10!=0
+tab siteiarc top10 if top10!=0 & sex==1 //female: 416
+tab siteiarc top10 if top10!=0 & sex==2 //male: 389
+contract siteiarc top10 sex if top10!=0, freq(count) percent(percentage)
+summ
+describe
+gsort -count
+drop top10
+/*
+year	cancer_site									number	sex
+2015	Stomach (C16)								 21		female
+2015	Stomach (C16)								 17 	male
+2015	Colon (C18)									 57		female
+2015	Colon (C18)									 61		male
+2015	Rectum (C19-20)								 26		female
+2015	Rectum (C19-20)								 21		male
+2015	Pancreas (C25)								 16		female
+2015	Pancreas (C25)								 12		male
+2015	Lung (incl. trachea and bronchus) (C33-34)	 10		female
+2015	Lung (incl. trachea and bronchus) (C33-34)	 21		male
+2015	Breast (C50)								205		female
+2015	Breast (C50)								  1		male
+2015	Corpus uteri (C54)							 45		female
+2015	Prostate (C61)								235		male
+2015	Non-Hodgkin lymphoma (C82-86,C96)			 14		female
+2015	Non-Hodgkin lymphoma (C82-86,C96)			 12		male
+2015	Multiple myeloma (C90)						 22		female
+2015	Multiple myeloma (C90)						  9		male
+*/
+total count //805
+drop percentage
+gen year=2015
+rename count number
+rename siteiarc cancer_site
+sort cancer_site sex
+order year cancer_site number
+save "`datapath'\version09\2-working\2015_top10_sex" ,replace
+restore
+
 preserve
 drop if dxyr!=2015 //4775 deleted
 count //1092
@@ -1719,6 +1774,61 @@ restore
 **********
 ** 2014 **
 **********
+
+** Requested by SF on 12-Sep-2022: Numbers of top 10 by sex
+** Below top 10 code added by JC for 2014
+** All sites excl. in-situ, O&U, non-reportable skin cancers
+preserve
+drop if dxyr!=2014 //4983 deleted
+drop if siteiarc>60 //| siteiarc==25 //39 deleted
+tab siteiarc ,m
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag=(_n==1)
+replace tag = sum(tag)
+sum tag , meanonly
+gen top10 = (tag>=(`r(max)'-9))
+sum n if tag==(`r(max)'-9), meanonly
+replace top10 = 1 if n==`r(max)'
+gsort -top10
+tab siteiarc top10 if top10!=0
+tab siteiarc top10 if top10!=0 & sex==1 //female: 317
+tab siteiarc top10 if top10!=0 & sex==2 //male: 325
+contract siteiarc top10 sex if top10!=0, freq(count) percent(percentage)
+summ
+describe
+gsort -count
+drop top10
+/*
+year	cancer_site									number	sex
+2014	Stomach (C16)								  7		female
+2014	Stomach (C16)								 14		male
+2014	Colon (C18)									 61		female
+2014	Colon (C18)									 43		male
+2014	Rectum (C19-20)								 13		female
+2014	Rectum (C19-20)								 13		male
+2014	Pancreas (C25)								  8		female
+2014	Pancreas (C25)								 14		male
+2014	Lung (incl. trachea and bronchus) (C33-34)	 13		female
+2014	Lung (incl. trachea and bronchus) (C33-34)	 20		male
+2014	Breast (C50)								152		female
+2014	Breast (C50)								  4		male
+2014	Corpus uteri (C54)							 38		female
+2014	Prostate (C61)								185		male
+2014	Bladder (C67)								 10		female
+2014	Bladder (C67)								 16		male
+2014	Multiple myeloma (C90)						 15		female
+2014	Multiple myeloma (C90)						 16		male
+*/
+total count //642
+drop percentage
+gen year=2014
+rename count number
+rename siteiarc cancer_site
+sort cancer_site sex
+order year cancer_site number
+save "`datapath'\version09\2-working\2014_top10_sex" ,replace
+restore
+
 preserve
 drop if dxyr!=2014 //4983 deleted
 count //884
@@ -1805,6 +1915,60 @@ restore
 **********
 ** 2013 **
 **********
+
+** Requested by SF on 12-Sep-2022: Numbers of top 10 by sex
+** Below top 10 code added by JC for 2014
+** All sites excl. in-situ, O&U, non-reportable skin cancers
+preserve
+drop if dxyr!=2013 //4983 deleted
+drop if siteiarc>60 //| siteiarc==25 //40 deleted
+tab siteiarc ,m
+bysort siteiarc: gen n=_N
+bysort n siteiarc: gen tag=(_n==1)
+replace tag = sum(tag)
+sum tag , meanonly
+gen top10 = (tag>=(`r(max)'-9))
+sum n if tag==(`r(max)'-9), meanonly
+replace top10 = 1 if n==`r(max)'
+gsort -top10
+tab siteiarc top10 if top10!=0
+tab siteiarc top10 if top10!=0 & sex==1 //female: 313
+tab siteiarc top10 if top10!=0 & sex==2 //male: 335
+contract siteiarc top10 sex if top10!=0, freq(count) percent(percentage)
+summ
+describe
+gsort -count
+drop top10
+/*
+year	cancer_site									number	sex
+2013	Colon (C18)									 55		female
+2013	Colon (C18)									 55		male
+2013	Rectum (C19-20)								 19		female
+2013	Rectum (C19-20)								 26		male
+2013	Pancreas (C25)								 11		female
+2013	Pancreas (C25)								 13		male
+2013	Lung (incl. trachea and bronchus) (C33-34)	  6		female
+2013	Lung (incl. trachea and bronchus) (C33-34)	 22		male
+2013	Breast (C50)								135		female
+2013	Breast (C50)								  3		male
+2013	Cervix uteri (C53)							 36		female
+2013	Corpus uteri (C54)							 32		female
+2013	Prostate (C61)								187		male
+2013	Kidney (C64)								  9		female
+2013	Kidney (C64)								 14		male
+2013	Non-Hodgkin lymphoma (C82-86,C96)			 10		female
+2013	Non-Hodgkin lymphoma (C82-86,C96)			 15		male
+*/
+total count //648
+drop percentage
+gen year=2013
+rename count number
+rename siteiarc cancer_site
+sort cancer_site sex
+order year cancer_site number
+save "`datapath'\version09\2-working\2013_top10_sex" ,replace
+restore
+
 preserve
 drop if dxyr!=2013 //4983 deleted
 count //884

@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-AUG-2022
-    // 	date last modified      05-SEP-2022
+    // 	date last modified      12-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting in Excel
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -513,8 +513,61 @@ putexcel D1 = "Number"
 putexcel save
 restore
 
+** 2015 **
+preserve
+use "`datapath'\version09\2-working\2015_top10_sex", clear
 
+** Create Sheet with 2015
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site sex number using "`datapath'\version09\3-output\2016-2018AnnualReport_Top10CasesbySex_`listdate'.xlsx", firstrow(variables) sheet(Top10_2015, replace) 
 
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Top10CasesbySex_`listdate'.xlsx", sheet(Top10_2015) modify
+putexcel A1:D1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Sex"
+putexcel D1 = "Number"
+putexcel save
+restore
+
+** 2014 **
+preserve
+use "`datapath'\version09\2-working\2014_top10_sex", clear
+
+** Create Sheet with 2014
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site sex number using "`datapath'\version09\3-output\2016-2018AnnualReport_Top10CasesbySex_`listdate'.xlsx", firstrow(variables) sheet(Top10_2014, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Top10CasesbySex_`listdate'.xlsx", sheet(Top10_2014) modify
+putexcel A1:D1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Sex"
+putexcel D1 = "Number"
+putexcel save
+restore
+
+** 2013 **
+preserve
+use "`datapath'\version09\2-working\2013_top10_sex", clear
+
+** Create Sheet with 2013
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year cancer_site sex number using "`datapath'\version09\3-output\2016-2018AnnualReport_Top10CasesbySex_`listdate'.xlsx", firstrow(variables) sheet(Top10_2013, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Top10CasesbySex_`listdate'.xlsx", sheet(Top10_2013) modify
+putexcel A1:D1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "Sex"
+putexcel D1 = "Number"
+putexcel save
+restore
+
+stop
 **************************
 **  Age-specific Rates  **
 **  2018 Top 10 by Sex  **

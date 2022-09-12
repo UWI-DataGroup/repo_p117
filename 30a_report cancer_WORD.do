@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      18-AUG-2022
-    // 	date last modified      08-SEP-2022
+    // 	date last modified      12-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -1113,6 +1113,105 @@ putdocx paragraph, style(Heading1)
 putdocx text ("Number of cases for 2016 Top 10 cancers by Sex: 2016"), bold
 putdocx paragraph, halign(center)
 putdocx text ("2016 Top 10 - 2016"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 by sex
+preserve
+use "`datapath'\version09\2-working\2015_top10_sex", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *    Top 10 by SEX: 2015   *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Number of cases for 2018 Top 10 cancers by Sex: 2015"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2015 Top 10 - 2015"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 by sex
+preserve
+use "`datapath'\version09\2-working\2014_top10_sex", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *    Top 10 by SEX: 2014   *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Number of cases for 2014 Top 10 cancers by Sex: 2014"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2014 Top 10 - 2014"), bold font(Helvetica,14,"blue")
+putdocx paragraph
+putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
+putdocx table tbl1(1,1), bold shading(lightgray)
+putdocx table tbl1(1,2), bold shading(lightgray)
+putdocx table tbl1(1,3), bold shading(lightgray)
+putdocx table tbl1(1,4), bold shading(lightgray)
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
+putdocx clear
+restore
+
+clear
+
+** Output for top10 by sex
+preserve
+use "`datapath'\version09\2-working\2013_top10_sex", clear
+
+				****************************
+				*	   MS WORD REPORT      *
+				* ANNUAL REPORT STATISTICS *
+                *    Top 10 by SEX: 2013   *
+				****************************
+
+putdocx clear
+putdocx begin
+putdocx pagebreak
+
+// Create a paragraph
+putdocx paragraph, style(Heading1)
+putdocx text ("Number of cases for 2013 Top 10 cancers by Sex: 2013"), bold
+putdocx paragraph, halign(center)
+putdocx text ("2013 Top 10 - 2013"), bold font(Helvetica,14,"blue")
 putdocx paragraph
 putdocx table tbl1 = data(year cancer_site sex number), halign(center) varnames
 putdocx table tbl1(1,1), bold shading(lightgray)
