@@ -2270,9 +2270,9 @@ order year siteiarc tnmantstage count percentage cumpercent
 
 ** Create Sheet
 local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(TNM, replace) 
+export_excel year siteiarc tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(TNM, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(TNM) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(TNM) modify
 putexcel A1:F1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2297,9 +2297,9 @@ order year siteiarc etnmantstage count percentage cumpercent
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(essTNM, replace) 
+export_excel year siteiarc etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(essTNM, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(essTNM) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(essTNM) modify
 putexcel A1:F1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2324,9 +2324,9 @@ order year siteiarc staging count percentage cumpercent
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(SEERsummary, replace) 
+export_excel year siteiarc staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(SEERsummary, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(SEERsummary) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(SEERsummary) modify
 putexcel A1:F1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2352,9 +2352,9 @@ sort tnmantstage
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc time_alive tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(Time_TNM_alive, replace) 
+export_excel year siteiarc time_alive tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(Time_TNM_alive, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(Time_TNM_alive) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(Time_TNM_alive) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2381,9 +2381,9 @@ sort etnmantstage
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc time_alive etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(Time_essTNM_alive, replace) 
+export_excel year siteiarc time_alive etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(Time_essTNM_alive, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(Time_essTNM_alive) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(Time_essTNM_alive) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2410,9 +2410,9 @@ sort tnmantstage
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc time_dead tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(Time_TNM_dead, replace) 
+export_excel year siteiarc time_dead tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(Time_TNM_dead, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(Time_TNM_dead) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(Time_TNM_dead) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2439,9 +2439,9 @@ sort etnmantstage
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc time_dead etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(Time_essTNM_dead, replace) 
+export_excel year siteiarc time_dead etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(Time_essTNM_dead, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(Time_essTNM_dead) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(Time_essTNM_dead) modify
 putexcel A1:G1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2467,9 +2467,9 @@ order year siteiarc basis count percentage cumpercent
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc basis count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(BOD, replace) 
+export_excel year siteiarc basis count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(BOD, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(BOD) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(BOD) modify
 putexcel A1:F1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2494,9 +2494,9 @@ order year siteiarc staging count percentage cumpercent
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(SEERsumm_ClinBOD, replace) 
+export_excel year siteiarc staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(SEERsumm_ClinBOD, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(SEERsumm_ClinBOD) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(SEERsumm_ClinBOD) modify
 putexcel A1:F1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2521,9 +2521,9 @@ order year siteiarc staging count percentage cumpercent
 
 ** Create Sheet
 //local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
-export_excel year siteiarc staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", firstrow(variables) sheet(SEERsumm_HxPrimBOD, replace) 
+export_excel year siteiarc staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", firstrow(variables) sheet(SEERsumm_HxPrimBOD, replace) 
 
-putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_`listdate'.xlsx", sheet(SEERsumm_HxPrimBOD) modify
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_PROSTATE_`listdate'.xlsx", sheet(SEERsumm_HxPrimBOD) modify
 putexcel A1:F1, bold fpat(solid, lightgray)
 
 putexcel A1 = "Year"
@@ -2534,5 +2534,317 @@ putexcel E1 = "Percentage"
 putexcel F1 = "Cum.Percentage"
 putexcel (E2:E9), nformat("0.00")
 putexcel (F2:F9), nformat("0.00")
+putexcel save
+restore
+
+
+** JC 12sep2022: SF requested via email COLORECTAL staging outputs same as the ones in p117/version08 + VS branch '2022ResearchV01' for colorectal staging
+***************************
+**  2018 STAGING PROFILE **
+**      (Colorectal)	 **
+***************************
+** TNM **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract tnmantstage siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt tnmantstage count percentage cumpercent
+
+** Create Sheet
+local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(TNM, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(TNM) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "TNM"
+putexcel D1 = "Number"
+putexcel E1 = "Percentage"
+putexcel F1 = "Cum.Percentage"
+putexcel (E2:E5), nformat("0.00")
+putexcel (F2:F5), nformat("0.00")
+putexcel save
+restore
+
+** EssTNM **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract etnmantstage siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt etnmantstage count percentage cumpercent
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(essTNM, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(essTNM) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "EssentialTNM"
+putexcel D1 = "Number"
+putexcel E1 = "Percentage"
+putexcel F1 = "Cum.Percentage"
+putexcel (E2:E5), nformat("0.00")
+putexcel (F2:F5), nformat("0.00")
+putexcel save
+restore
+
+** SEER Summary **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract staging siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt staging count percentage cumpercent
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(SEERsummary, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(SEERsummary) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "SEERsummary"
+putexcel D1 = "Number"
+putexcel E1 = "Percentage"
+putexcel F1 = "Cum.Percentage"
+putexcel (E2:E9), nformat("0.00")
+putexcel (F2:F9), nformat("0.00")
+putexcel save
+restore
+
+** Alive Cases: Time bet. Incidence and Last Contact (TNM) **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract time_alive tnmantstage siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt tnmantstage count percentage cumpercent
+sort tnmantstage
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt time_alive tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(Time_TNM_alive, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(Time_TNM_alive) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "AliveCases_Time_bet_incid_lastcon_DAYS"
+putexcel D1 = "TNM"
+putexcel E1 = "Number"
+putexcel F1 = "Percentage"
+putexcel G1 = "Cum.Percentage"
+putexcel (F2:F9), nformat("0.00")
+putexcel (G2:G9), nformat("0.00")
+putexcel save
+restore
+
+** Alive Cases: Time bet. Incidence and Last Contact (essTNM) **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract time_alive etnmantstage siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt etnmantstage count percentage cumpercent
+sort etnmantstage
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt time_alive etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(Time_essTNM_alive, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(Time_essTNM_alive) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "AliveCases_Time_bet_incid_lastcon_DAYS"
+putexcel D1 = "EssentialTNM"
+putexcel E1 = "Number"
+putexcel F1 = "Percentage"
+putexcel G1 = "Cum.Percentage"
+putexcel (F2:F9), nformat("0.00")
+putexcel (G2:G9), nformat("0.00")
+putexcel save
+restore
+
+** Deceased Cases: Time bet. Incidence and Death (TNM) **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract time_dead tnmantstage siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt tnmantstage count percentage cumpercent
+sort tnmantstage
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt time_dead tnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(Time_TNM_dead, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(Time_TNM_dead) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "DeadCases_Time_bet_incid_death_DAYS"
+putexcel D1 = "TNM"
+putexcel E1 = "Number"
+putexcel F1 = "Percentage"
+putexcel G1 = "Cum.Percentage"
+putexcel (F2:F9), nformat("0.00")
+putexcel (G2:G9), nformat("0.00")
+putexcel save
+restore
+
+** Deceased Cases: Time bet. Incidence and Death (essTNM) **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract time_dead etnmantstage siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt etnmantstage count percentage cumpercent
+sort etnmantstage
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt time_dead etnmantstage count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(Time_essTNM_dead, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(Time_essTNM_dead) modify
+putexcel A1:G1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "DeadCases_Time_bet_incid_death_DAYS"
+putexcel D1 = "EssentialTNM"
+putexcel E1 = "Number"
+putexcel F1 = "Percentage"
+putexcel G1 = "Cum.Percentage"
+putexcel (F2:F9), nformat("0.00")
+putexcel (G2:G9), nformat("0.00")
+putexcel save
+restore
+
+** BasisOfDiagnosis **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract basis siterpt dxyr, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt basis count percentage cumpercent
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt basis count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(BOD, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(BOD) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "BasisOfDiagnosis"
+putexcel D1 = "Number"
+putexcel E1 = "Percentage"
+putexcel F1 = "Cum.Percentage"
+putexcel (E2:E6), nformat("0.00")
+putexcel (F2:F6), nformat("0.00")
+putexcel save
+restore
+
+** SEER Summary: Clinical **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract staging siterpt dxyr if basis==1, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt staging count percentage cumpercent
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(SEERsumm_ClinBOD, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(SEERsumm_ClinBOD) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "SEERsummary_ClinicalBOD"
+putexcel D1 = "Number"
+putexcel E1 = "Percentage"
+putexcel F1 = "Cum.Percentage"
+putexcel (E2:E9), nformat("0.00")
+putexcel (F2:F9), nformat("0.00")
+putexcel save
+restore
+
+** SEER Summary: Hx of Primary **
+preserve
+** Load the 2018 COLORECTAL staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+contract staging siterpt dxyr if basis==7, freq(count) percent(percentage) cpercent(cumpercent) nomiss
+rename dxyr year
+order year siterpt staging count percentage cumpercent
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year siterpt staging count percentage cumpercent using "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", firstrow(variables) sheet(SEERsumm_HxPrimBOD, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_Staging_COLORECTAL_`listdate'.xlsx", sheet(SEERsumm_HxPrimBOD) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Site"
+putexcel C1 = "SEERsummary_HxOfPrimBOD"
+putexcel D1 = "Number"
+putexcel E1 = "Percentage"
+putexcel F1 = "Cum.Percentage"
+putexcel (E2:E9), nformat("0.00")
+putexcel (F2:F9), nformat("0.00")
+putexcel save
+restore
+
+
+
+********************
+** Place of Death **
+********************
+** JC 12sep2022: SF used the below code from CME presentation data request (p131/version15) in the 2016-2018 annual rpt so adding to this for reference.
+** LOAD 2008, 2013-2018 cleaned cancer incidence dataset from p117/version09/20d_final clean.do
+preserve
+use "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
+
+contract dxyr pod if slc==2 & patient==1, freq(count) percent(percentage)
+rename count number
+
+** Create Sheet
+local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel dxyr pod number percentage using "`datapath'\version09\3-output\2016-2018AnnualReport_POD_`listdate'.xlsx", firstrow(variables) sheet(PlaceOfDeath, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_POD_`listdate'.xlsx", sheet(PlaceOfDeath) modify
+putexcel A1:D1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "PlaceOfDeath"
+putexcel C1 = "Number"
+putexcel D1 = "Percent"
+putexcel (D2:D57), nformat("0.0")
 putexcel save
 restore

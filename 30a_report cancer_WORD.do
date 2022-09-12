@@ -588,11 +588,14 @@ putdocx paragraph, style(Title)
 putdocx text ("CANCER 2016-2018 Annual Report: Stata Results"), bold
 putdocx textblock begin
 Date Prepared: 25-AUG-2022.
-Date Updated: 07-SEP-2022.
+Date Updated: 12-SEP-2022.
 Prepared by: JC using Stata v17.0.
 CanReg5 v5.43 (incidence) data release date: 18-July-2022.
 REDCap v12.3.3 (death) data release date: 03-Aug-2022.
 Generated using Dofile: 30a_report cancer_WORD.do
+putdocx textblock end
+putdocx textblock begin
+VS Code path: p117/version09/2016-2018AnnualReport branch
 putdocx textblock end
 putdocx paragraph, halign(center)
 putdocx text ("Table 1. Summary Statistics for BNR-Cancer, 2018 (Population=286,640), 2017 (Population=286,229), 2016 (Population=285,798), 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294))"), bold font(Helvetica,10,"blue")
@@ -4347,6 +4350,271 @@ putdocx textblock end
 putdocx paragraph, halign(center)
 putdocx text ("Table 10. Notes Seen Table (N=221)"), bold font(Helvetica,10,"blue")
 capture tab2docx notesseen
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
+putdocx clear
+restore
+
+
+
+** JC 12sep2022: JC emailed SF re outdated colorectal staging info from NAACCR abstract so SF requested via email colorectal staging outputs same as the ones in p117/version08 + VS branch '2022ResearchV01' for colorectal staging but with up-to-date data.
+***************************
+**  2018 STAGING PROFILE **
+**      (colorectal)		 **
+***************************
+preserve
+** Load the 2018 colorectal staging dataset
+use "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified", clear
+
+putdocx clear
+putdocx begin
+
+putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Staging"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Colorectal (Dofile: 25i_analysis staging_2018.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("Methods"), bold
+putdocx textblock begin
+(1) Table 1. 2018 colorectal TNM Anatomical Stage: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified")
+putdocx textblock end
+putdocx textblock begin
+(2) Table 2. 2018 colorectal Essential TNM Anatomical Stage: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified")
+putdocx textblock end
+putdocx textblock begin
+(3) Table 3. 2018 colorectal Summary Stage: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified")
+putdocx textblock end
+putdocx textblock begin
+(4a-4d) Table 4a-4d. 2018 colorectal Time Between Incidence and Last Contact by TNM Anatomical Stage: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command.
+putdocx textblock end
+putdocx textblock begin
+(5a-5d)  Table 5a-5d. 2018 colorectal Time Between Incidence and Last Contact by Essential TNM Anatomical Stage: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command.
+putdocx textblock end
+putdocx textblock begin
+(6a-6d) Table 6a-6d. 2018 colorectal Time Between Incidence and Death by TNM Anatomical Stage: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command.
+putdocx textblock end
+putdocx textblock begin
+(7a-7d)  Table 7a-7d. 2018 colorectal Time Between Incidence and Death by Essential TNM Anatomical Stage: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command.
+putdocx textblock end
+putdocx textblock begin
+(8) Table 8. 2018 colorectal Basis of Diagnosis: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified")
+putdocx textblock end
+putdocx textblock begin
+(9a-9b) Table 9a-9b. 2018 colorectal Summary Stage by Basis of Diagnosis: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified"); 
+Uses Stata user-written command called 'tab2docx' to mimic Stata results when creating a 2-way table using Stata's table command.
+putdocx textblock end
+putdocx textblock begin
+(10) Table 10. 2018 colorectal Notes Seen: Includes standardized case definition, i.e. excludes IARC flag, ineligible case definition, unk residents, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs; Excludes non-2018 cases and all sites except colorectal (C18-C20) (dataset used: "`datapath'\version09\3-output\2018_colorectal_staging_nonsurvival_deidentified"); Used CanReg5 variables notesseen + comments to search for cases where the notes were seen by the DA.
+putdocx textblock end
+
+putdocx pagebreak
+putdocx paragraph, halign(center)
+putdocx text ("Table 1. TNM Anatomical Stage (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx tnmantstage
+putdocx paragraph, halign(center)
+putdocx text ("Table 2. Essential TNM Anatomical Stage (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx etnmantstage
+putdocx paragraph, halign(center)
+putdocx text ("Table 3. SEER Summary Stage (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx staging
+putdocx paragraph, halign(center)
+putdocx text ("Table 4a. Time Between Incidence and Last Contact by TNM Stage I (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if tnmantstage==1
+putdocx paragraph, halign(center)
+putdocx text ("Table 4b. Time Between Incidence and Last Contact by TNM Stage II (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if tnmantstage==2
+putdocx paragraph, halign(center)
+putdocx text ("Table 4c. Time Between Incidence and Last Contact by TNM Stage III (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if tnmantstage==3
+putdocx pagebreak
+putdocx paragraph, halign(center)
+putdocx text ("Table 4d. Time Between Incidence and Last Contact by TNM Stage IV (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if tnmantstage==4
+putdocx paragraph, halign(center)
+putdocx text ("Table 5a. Time Between Incidence and Last Contact by Essential TNM Stage I (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if etnmantstage==1
+putdocx paragraph, halign(center)
+putdocx text ("Table 5b. Time Between Incidence and Last Contact by Essential TNM Stage II (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if etnmantstage==2
+putdocx paragraph, halign(center)
+putdocx text ("Table 5c. Time Between Incidence and Last Contact by Essential TNM Stage III (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if etnmantstage==3
+putdocx paragraph, halign(center)
+putdocx text ("Table 5d. Time Between Incidence and Last Contact by Essential TNM Stage IV (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_alive if etnmantstage==4
+putdocx paragraph, halign(center)
+putdocx text ("Table 6a. Time Between Incidence and Death by TNM Stage I (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if tnmantstage==1
+putdocx paragraph, halign(center)
+putdocx text ("Table 6b. Time Between Incidence and Death by TNM Stage II (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if tnmantstage==2
+putdocx paragraph, halign(center)
+putdocx text ("Table 6c. Time Between Incidence and Death by TNM Stage III (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if tnmantstage==3
+putdocx paragraph, halign(center)
+putdocx text ("Table 6d. Time Between Incidence and Death by TNM Stage IV (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if tnmantstage==4
+putdocx paragraph, halign(center)
+putdocx text ("Table 7a. Time Between Incidence and Death by Essential TNM Stage I (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if etnmantstage==1
+putdocx paragraph, halign(center)
+putdocx text ("Table 7b. Time Between Incidence and Death by Essential TNM Stage II (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if etnmantstage==2
+putdocx paragraph, halign(center)
+putdocx text ("Table 7c. Time Between Incidence and Death by Essential TNM Stage III (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if etnmantstage==3
+putdocx paragraph, halign(center)
+putdocx text ("Table 7d. Time Between Incidence and Death by Essential TNM Stage IV (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx time_dead if etnmantstage==4
+putdocx pagebreak
+putdocx paragraph, halign(center)
+putdocx text ("Table 8. Basis of Diagnosis (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx basis
+putdocx paragraph, halign(center)
+putdocx text ("Table 9a. SEER Summary Stage by Clinical BOD (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx staging if basis==1
+putdocx paragraph, halign(center)
+putdocx text ("Table 9b. SEER Summary Stage by Histology of Primary BOD (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx staging if basis==7
+putdocx paragraph
+putdocx textblock begin
+Note: 2018 used CanReg5 as the Casefinding +Abstracting database and the NotesSeen field was not regularly updated.
+putdocx textblock end
+putdocx paragraph, halign(center)
+putdocx text ("Table 10. Notes Seen Table (N=147)"), bold font(Helvetica,10,"blue")
+capture tab2docx notesseen
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
+putdocx clear
+restore
+
+
+********************
+** Place of Death **
+********************
+** JC 12sep2022: SF used the below code from CME presentation data request (p131/version15) in the 2016-2018 annual rpt so adding to this for reference.
+** LOAD 2008, 2013-2018 cleaned cancer incidence dataset from p117/version09/20d_final clean.do
+use "`datapath'\version09\3-output\2008_2013-2018_cancer_reportable_nonsurvival_deidentified" ,clear
+
+count //6682
+
+preserve
+				****************************
+				*	   MS WORD REPORT      *
+				*  BNR 2022 CME STATISTICS *
+				****************************
+putdocx clear
+putdocx begin, footer(foot1)
+putdocx paragraph, tofooter(foot1)
+putdocx text ("Page ")
+putdocx pagenumber
+putdocx paragraph, style(Title)
+putdocx text ("CANCER 2008, 2013-2018 BNR 2022 CME Presentation: Stata Results"), bold
+putdocx textblock begin
+Date Prepared: 18-AUG-2022. 
+putdocx textblock end
+putdocx textblock begin
+Date Prepared: 25-AUG-2022. 
+putdocx textblock end
+putdocx textblock begin
+Prepared by: JC using Stata v17.0
+putdocx textblock end
+putdocx textblock begin
+CanReg5 v5.43 (incidence) data release date: 21-May-2021.
+putdocx textblock end
+putdocx textblock begin
+REDCap v12.3.3 (death) data release date: 06-May-2022.
+putdocx textblock end
+putdocx textblock begin
+Generated using Dofile: SAForde_CME_Aug2022.do
+putdocx textblock end
+putdocx textblock begin
+Original VS Code path: p131/version15/SAForde_CME_Aug2022 branch
+putdocx textblock end
+putdocx textblock begin
+Current VS Code path: p117/version09/2016-2018AnnualReport branch
+putdocx textblock end
+putdocx paragraph, halign(center)
+putdocx text ("CME Statistics for BNR-Cancer, 2018 (Population=286,640), 2016 (Population=285,798), 2017 (Population=286,229), 2015 (Population=285,327), 2014 (Population=284,825), 2013 (Population=284,294), 2008 (Population=279,946))"), bold font(Helvetica,10,"blue")
+putdocx pagebreak
+
+local listdate = string( d(`c(current_date)'), "%dCYND" )
+putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
+putdocx clear
+restore
+
+
+** SF requested by email 12aug2022 % pts who died at home vs hospital in 2018; since death matching ds doesn't have this categorized but the mortality ds does I'll merge POD from that ds using deathid - merge performed in p117/version15/20d_final clean.do
+tab pod dxyr ,m
+tab slc dxyr ,m
+tab pod dxyr if slc==2 & patient==1
+/*
+  Place of Death from |                                Diagnosis Year
+    National Register |      2008       2013       2014       2015       2016       2017       2018 |     Total
+----------------------+-----------------------------------------------------------------------------+----------
+                  QEH |        21         59         59        163        341        260        244 |     1,147 
+              At Home |        21         39         38        106        187        183        121 |       695 
+   Geriatric Hospital |         2          1          5          0          7          9          9 |        33 
+     Con/Nursing Home |         3          0          2         12         16         19         10 |        62 
+    District Hospital |         0          0          1          0          2          1          1 |         5 
+ Psychiatric Hospital |         0          1          0          2          0          2          0 |         5 
+     Bayview Hospital |         0          0          2          4          8         13          6 |        33 
+Sandy Crest/FMH/Sparm |         0          0          0          1          0          1          1 |         3 
+          Other/Hotel |         1          1          2          8         14         19          9 |        54 
+                   ND |         0          0          0          0          0          0          1 |         1 
+----------------------+-----------------------------------------------------------------------------+----------
+                Total |        48        101        109        296        575        507        402 |     2,038 
+*/
+
+count if pod!=. & slc!=2 //0
+
+count if dxyr==2018 & pod!=. //402
+count if dxyr==2018 & slc==2 //490
+
+preserve
+putdocx clear
+putdocx begin
+
+//putdocx pagebreak
+putdocx paragraph, style(Heading1)
+putdocx text ("Place Of Death, 2008, 2013-2018"), bold
+putdocx paragraph, style(Heading2)
+putdocx text ("Place Of Death (Dofile: SAForde_CME_Aug2022.do / 30a_report cancer_WORD.do)"), bold
+putdocx paragraph, halign(center)
+putdocx text ("% Patients who died at home vs hospital"), bold font(Helvetica,10,"blue")
+putdocx paragraph
+putdocx text ("Below tables use the variables [pod] and [slc]+[patient] to display results for only patients (not tumours, i.e. MPs excluded) that have died. It does not include cases where [pod] is missing.")
+
+putdocx paragraph, halign(center)
+putdocx text ("2008"), bold font(Helvetica,10,"blue")
+tab2docx pod if dxyr==2008 & slc==2 & patient==1
+putdocx paragraph, halign(center)
+putdocx text ("2013"), bold font(Helvetica,10,"blue")
+tab2docx pod if dxyr==2013 & slc==2 & patient==1
+putdocx paragraph, halign(center)
+putdocx text ("2014"), bold font(Helvetica,10,"blue")
+tab2docx pod if dxyr==2014 & slc==2 & patient==1
+//putdocx pagebreak
+putdocx paragraph, halign(center)
+putdocx text ("2015"), bold font(Helvetica,10,"blue")
+tab2docx pod if dxyr==2015 & slc==2 & patient==1
+putdocx paragraph, halign(center)
+putdocx text ("2016"), bold font(Helvetica,10,"blue")
+tab2docx pod if dxyr==2016 & slc==2 & patient==1
+putdocx paragraph, halign(center)
+putdocx text ("2017"), bold font(Helvetica,10,"blue")
+tab2docx pod if dxyr==2017 & slc==2 & patient==1
+//putdocx pagebreak
+putdocx paragraph, halign(center)
+putdocx text ("2018"), bold font(Helvetica,10,"blue")
+tab2docx pod if dxyr==2018 & slc==2 & patient==1
 
 local listdate = string( d(`c(current_date)'), "%dCYND" )
 putdocx save "`datapath'\version09\3-output\Cancer_2016-2018AnnualReportStatsV11_`listdate'.docx", append
