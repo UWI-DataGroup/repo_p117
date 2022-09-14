@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-AUG-2022
-    // 	date last modified      12-SEP-2022
+    // 	date last modified      14-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting in Excel
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -2846,5 +2846,85 @@ putexcel B1 = "PlaceOfDeath"
 putexcel C1 = "Number"
 putexcel D1 = "Percent"
 putexcel (D2:D57), nformat("0.0")
+putexcel save
+restore
+
+
+*************
+**  ASIRs  **
+**  Top15  **
+*************
+** 2018 **
+preserve
+use "`datapath'\version09\2-working\ASIRs_top15_2018" ,clear
+
+** Create Sheet with 2018
+local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site number percent asir ci_range using "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRs_top15_`listdate'.xlsx", firstrow(variables) sheet(2018, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRs_top15_`listdate'.xlsx", sheet(2018) modify
+putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A2:E2, bold fpat(solid, lightgray)
+putexcel A1:E17, border (all)
+
+putexcel A1 = "2018"
+putexcel (A1:E1), merge hcenter vcenter
+putexcel A2 = "Site"
+putexcel B2 = "Number"
+putexcel C2 = "%"
+putexcel D2 = "ASIR"
+putexcel E2 = "95% CI"
+putexcel (C3:C17), nformat("0.0")
+putexcel (D3:D17), nformat("0.0")
+putexcel save
+restore
+
+** 2017 **
+preserve
+use "`datapath'\version09\2-working\ASIRs_top15_2017" ,clear
+
+** Create Sheet with 2017
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site number percent asir ci_range using "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRs_top15_`listdate'.xlsx", firstrow(variables) sheet(2017, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRs_top15_`listdate'.xlsx", sheet(2017) modify
+putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A2:E2, bold fpat(solid, lightgray)
+putexcel A1:E17, border (all)
+
+putexcel A1 = "2017"
+putexcel (A1:E1), merge hcenter vcenter
+putexcel A2 = "Site"
+putexcel B2 = "Number"
+putexcel C2 = "%"
+putexcel D2 = "ASIR"
+putexcel E2 = "95% CI"
+putexcel (C3:C17), nformat("0.0")
+putexcel (D3:D17), nformat("0.0")
+putexcel save
+restore
+
+** 2016 **
+preserve
+use "`datapath'\version09\2-working\ASIRs_top15_2016" ,clear
+
+** Create Sheet with 2016
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel cancer_site number percent asir ci_range using "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRs_top15_`listdate'.xlsx", firstrow(variables) sheet(2016, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRs_top15_`listdate'.xlsx", sheet(2016) modify
+putexcel A1:E1, bold fpat(solid, lightgray)
+putexcel A2:E2, bold fpat(solid, lightgray)
+putexcel A1:E17, border (all)
+
+putexcel A1 = "2016"
+putexcel (A1:E1), merge hcenter vcenter
+putexcel A2 = "Site"
+putexcel B2 = "Number"
+putexcel C2 = "%"
+putexcel D2 = "ASIR"
+putexcel E2 = "95% CI"
+putexcel (C3:C17), nformat("0.0")
+putexcel (D3:D17), nformat("0.0")
 putexcel save
 restore

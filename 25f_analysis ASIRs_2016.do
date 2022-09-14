@@ -234,7 +234,7 @@ gen percent=number/1070*100
 replace percent=round(percent,0.01)
 
  
-//JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
+//JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASIR for breast is calculated using female population
 label define cancer_site_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "corpus uteri" 6 "multiple myeloma" 7 "pancreas" ///
 							 8 "rectum" 9 "lung" 10 "non-hodgkin lymphoma" 11 "stomach" ,modify
 label values cancer_site cancer_site_lab
@@ -2122,7 +2122,7 @@ gen percent=number/1070*100
 replace percent=round(percent,0.01)
 
  
-//JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
+//JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASIR for breast is calculated using female population
 label define cancer_site_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "corpus uteri" 6 "lung" 7 "rectum" ///
 							 8 "multiple myeloma" 9 "stomach" 10 "pancreas" 11 "cervix uteri" ,modify
 label values cancer_site cancer_site_lab
