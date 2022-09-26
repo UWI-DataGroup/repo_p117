@@ -936,6 +936,17 @@ save "`datapath'\version09\3-output\2018_prep mort_ALL" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes all 2018 CODs
 
+** JC 26sep2022: SF requested proportion of cancer deaths of all deaths (comments on ann. rpt from Natalie Greaves)
+preserve
+egen morttot_2018=count(record_id) if dodyear==2018
+contract morttot_*
+drop _freq
+
+append using "`datapath'\version09\2-working\mort_proportions"
+fillmissing mortcan_2016 mortcan_2017 morttot_2016 morttot_2017 morttot_2018
+save "`datapath'\version09\2-working\mort_proportions" ,replace
+restore
+
 *******************
 ** Check for MPs **
 **   in CODs     **
@@ -1622,3 +1633,14 @@ notes _dta :These data prepared from BB national death register & Redcap deathda
 save "`datapath'\version09\3-output\2018_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
+
+** JC 26sep2022: SF requested proportion of cancer deaths of all deaths (comments on ann. rpt from Natalie Greaves)
+preserve
+egen mortcan_2018=count(record_id) if dodyear==2018
+contract mortcan_*
+drop _freq
+
+append using "`datapath'\version09\2-working\mort_proportions"
+fillmissing mortcan_2016 mortcan_2017 mortcan_2018 morttot_2016 morttot_2017 morttot_2018
+save "`datapath'\version09\2-working\mort_proportions" ,replace
+restore

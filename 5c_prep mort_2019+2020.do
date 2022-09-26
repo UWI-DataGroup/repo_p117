@@ -750,6 +750,18 @@ note: TS This dataset is used for the BNR CME 2022 webinar
 note: TS This dataset includes all 2020 CODs
 restore
 
+** JC 26sep2022: SF requested proportion of cancer deaths of all deaths (comments on ann. rpt from Natalie Greaves)
+preserve
+egen morttot_2019=count(record_id) if dodyear==2019
+egen morttot_2020=count(record_id) if dodyear==2020
+contract morttot_*
+drop _freq
+
+append using "`datapath'\version09\2-working\mort_proportions"
+fillmissing morttot_2016 morttot_2017 morttot_2018 morttot_2019 morttot_2020
+save "`datapath'\version09\2-working\mort_proportions" ,replace
+restore
+
 *******************
 ** Check for MPs **
 **   in CODs     **
@@ -1636,4 +1648,16 @@ notes _dta :These data prepared from BB national death register & Redcap deathda
 save "X:/The University of the West Indies/DataGroup - repo_data/data_p131\version16\1-input\2020_prep mort_cancer_deidentified" ,replace
 note: TS This dataset is used for analysis for the BNR CME 2022 webinar
 note: TS This dataset DOES NOT include patients with multiple eligible cancer causes of death
+restore
+
+** JC 26sep2022: SF requested proportion of cancer deaths of all deaths (comments on ann. rpt from Natalie Greaves)
+preserve
+egen mortcan_2019=count(record_id) if dodyear==2019
+egen mortcan_2020=count(record_id) if dodyear==2020
+contract mortcan_*
+drop _freq
+
+append using "`datapath'\version09\2-working\mort_proportions"
+fillmissing mortcan_2016 mortcan_2017 mortcan_2018 mortcan_2019 mortcan_2020 morttot_2016 morttot_2017 morttot_2018 morttot_2019 morttot_2020
+save "`datapath'\version09\2-working\mort_proportions" ,replace
 restore

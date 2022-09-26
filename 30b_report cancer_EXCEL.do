@@ -2929,3 +2929,28 @@ putexcel (C3:C17), nformat("0.0")
 putexcel (D3:D17), nformat("0.0")
 putexcel save
 restore
+
+
+** JC 26sep2022: SF requested proportions of cancer deaths of all deaths as per Natalie Greaves' comment on ann rpt.
+****************************
+**  MORTALITY proportions **
+****************************
+** Load the MORT proportions dataset
+preserve
+use "`datapath'\version09\2-working\mort_proportions" ,clear
+
+** Create Sheet
+local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year mortcan morttot mortper using "`datapath'\version09\3-output\2016-2018AnnualReport_MortProportions_`listdate'.xlsx", firstrow(variables) sheet(Mort%, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_MortProportions_`listdate'.xlsx", sheet(Mort%) modify
+putexcel A1:D1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "Cancer_Deaths"
+putexcel C1 = "Total_Deaths"
+putexcel D1 = "Percentage"
+putexcel (D2:D10), nformat("0.0")
+putexcel save
+restore
+

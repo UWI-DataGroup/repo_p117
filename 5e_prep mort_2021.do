@@ -718,6 +718,48 @@ note: TS This dataset is used for the BNR CME 2022 webinar
 note: TS This dataset includes all 2021 CODs
 restore
 
+** JC 26sep2022: SF requested proportion of cancer deaths of all deaths (comments on ann. rpt from Natalie Greaves)
+preserve
+egen morttot_2021=count(record_id) if dodyear==2021
+contract morttot_*
+drop _freq
+/* Below taken from p141/version07 dofile: 2b_clean all deaths.do
+Note: some of these totals for 2016 onwards slightly differ on final ds due to unduplication and dodyear reassignments
+    Year of |
+      Death |      Freq.     Percent        Cum.
+------------+-----------------------------------
+       2008 |      2,472        6.97        6.97
+       2009 |      2,356        6.65       13.62
+       2010 |      2,303        6.50       20.12
+       2011 |      2,385        6.73       26.84
+       2012 |      2,373        6.69       33.54
+       2013 |      2,410        6.80       40.33
+       2014 |      2,496        7.04       47.38
+       2015 |      2,486        7.01       54.39
+       2016 |      2,489        7.02       61.41
+       2017 |      2,524        7.12       68.53
+       2018 |      2,526        7.13       75.65
+       2019 |      2,786        7.86       83.51
+       2020 |      2,605        7.35       90.86
+       2021 |      3,143        8.87       99.73
+          . |         97        0.27      100.00
+------------+-----------------------------------
+      Total |     35,451      100.00
+*/
+append using "`datapath'\version09\2-working\mort_proportions"
+** Create variables for 2013-2015 manually as mort prep for these years are in a different path structure
+gen morttot_2013=2410
+gen morttot_2014=2496
+gen morttot_2015=2486
+gen mortcan_2013=577 //taken from 10a_analysis mort_ASMRs_2013_age5.do
+gen mortcan_2014=651 //taken from 10b_analysis mort_ASMRs_2014_age5.do
+gen mortcan_2015=631 //taken from 10c_analysis mort_ASMRs_2015_age5.do
+fillmissing morttot_2013 morttot_2014 morttot_2015 morttot_2016 morttot_2017 morttot_2018 morttot_2019 morttot_2020 morttot_2021
+order  morttot_2013 morttot_2014 morttot_2015 morttot_2016 morttot_2017 morttot_2018 morttot_2019 morttot_2020 morttot_2021
+save "`datapath'\version09\2-working\mort_proportions" ,replace
+restore
+
+
 *******************
 ** Check for MPs **
 **   in CODs     **
@@ -1468,4 +1510,69 @@ notes _dta :These data prepared from BB national death register & Redcap deathda
 save "X:/The University of the West Indies/DataGroup - repo_data/data_p131\version16\1-input\2021_prep mort_cancer_deidentified" ,replace
 note: TS This dataset is used for analysis for the BNR CME 2022 webinar
 note: TS This dataset DOES NOT include patients with multiple eligible cancer causes of death
+restore
+
+** JC 26sep2022: SF requested proportion of cancer deaths of all deaths (comments on ann. rpt from Natalie Greaves)
+preserve
+egen mortcan_2021=count(record_id) if dodyear==2021
+contract mortcan_*
+drop _freq
+
+append using "`datapath'\version09\2-working\mort_proportions"
+fillmissing mortcan_2013 mortcan_2014 mortcan_2015 mortcan_2016 mortcan_2017 mortcan_2018 mortcan_2019 mortcan_2020 mortcan_2021 morttot_2013 morttot_2014 morttot_2015 morttot_2016 morttot_2017 morttot_2018 morttot_2019 morttot_2020 morttot_2021
+order  mortcan_2013 mortcan_2014 mortcan_2015 mortcan_2016 mortcan_2017 mortcan_2018 mortcan_2019 mortcan_2020 mortcan_2021 morttot_2013 morttot_2014 morttot_2015 morttot_2016 morttot_2017 morttot_2018 morttot_2019 morttot_2020 morttot_2021
+gen id=_n
+//drop if id>1
+//drop id
+gen mortper_2013=mortcan_2013/morttot_2013*100
+gen mortper_2014=mortcan_2014/morttot_2014*100
+gen mortper_2015=mortcan_2015/morttot_2015*100
+gen mortper_2016=mortcan_2016/morttot_2016*100
+gen mortper_2017=mortcan_2017/morttot_2017*100
+gen mortper_2018=mortcan_2018/morttot_2018*100
+gen mortper_2019=mortcan_2019/morttot_2019*100
+gen mortper_2020=mortcan_2020/morttot_2020*100
+gen mortper_2021=mortcan_2021/morttot_2021*100
+format mortper_2013 mortper_2014 mortper_2015 mortper_2016 mortper_2017 mortper_2018 mortper_2019 mortper_2020 mortper_2021 %2.1f
+fillmissing mortcan_2013 morttot_2013 mortper_2013 mortcan_2014 morttot_2014 mortper_2014 mortcan_2015 morttot_2015 mortper_2015 mortcan_2016 morttot_2016 mortper_2016 mortcan_2017 morttot_2017 mortper_2017 mortcan_2018 morttot_2018 mortper_2018 mortcan_2019 morttot_2019 mortper_2019 mortcan_2020 morttot_2020 mortper_2020 mortcan_2021 morttot_2021 mortper_2021
+gen year=2013 if id==1
+replace year=2014 if id==2
+replace year=2015 if id==3
+replace year=2016 if id==4
+replace year=2017 if id==5
+replace year=2018 if id==6
+replace year=2019 if id==7
+replace year=2020 if id==8
+replace year=2021 if id==9
+drop if year==.
+order id year
+rename mortcan_2013 mortcan
+rename morttot_2013 morttot
+rename mortper_2013 mortper
+replace mortcan=mortcan_2014 if year==2014
+replace morttot=morttot_2014 if year==2014
+replace mortper=mortper_2014 if year==2014
+replace mortcan=mortcan_2015 if year==2015
+replace morttot=morttot_2015 if year==2015
+replace mortper=mortper_2015 if year==2015
+replace mortcan=mortcan_2016 if year==2016
+replace morttot=morttot_2016 if year==2016
+replace mortper=mortper_2016 if year==2016
+replace mortcan=mortcan_2017 if year==2017
+replace morttot=morttot_2017 if year==2017
+replace mortper=mortper_2017 if year==2017
+replace mortcan=mortcan_2018 if year==2018
+replace morttot=morttot_2018 if year==2018
+replace mortper=mortper_2018 if year==2018
+replace mortcan=mortcan_2019 if year==2019
+replace morttot=morttot_2019 if year==2019
+replace mortper=mortper_2019 if year==2019
+replace mortcan=mortcan_2020 if year==2020
+replace morttot=morttot_2020 if year==2020
+replace mortper=mortper_2020 if year==2020
+replace mortcan=mortcan_2021 if year==2021
+replace morttot=morttot_2021 if year==2021
+replace mortper=mortper_2021 if year==2021
+keep year mortcan morttot mortper
+save "`datapath'\version09\2-working\mort_proportions" ,replace
 restore
