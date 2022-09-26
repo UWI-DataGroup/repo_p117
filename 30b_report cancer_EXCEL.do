@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-AUG-2022
-    // 	date last modified      14-SEP-2022
+    // 	date last modified      26-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting in Excel
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -36,7 +36,7 @@ cls
     log using "`logpath'\30b_report cancer_EXCEL.smcl", replace
 ** HEADER -----------------------------------------------------
 
-
+** JC 26sep2022: NS requested this change from old method using tumours as the numerator to using patients for % entire population.
 *************************
 **  SUMMARY STATISTICS **
 *************************
@@ -59,8 +59,9 @@ putexcel D1 = "Results_2016"
 putexcel E1 = "Results_2015"
 putexcel F1 = "Results_2014"
 putexcel G1 = "Results_2013"
-putexcel (B4:G4), rownames nformat(number_d2)
-putexcel (B6:G6), rownames nformat(number_d2)
+putexcel (B5:G5), rownames nformat(number_d2)
+//putexcel (B6:G6), rownames nformat(number_d2) - JC 26sep2022: NS asked if this is reformatted to one decimal place for standardization with rest of the report where ASIRs appear
+putexcel (B6:G6), nformat("0.0")
 putexcel (B8:G8), nformat("0.0")
 putexcel (B9:G9), nformat("0.0")
 putexcel (B10:G10), nformat("0.0")
