@@ -5,7 +5,7 @@ cls
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
     //  date first created      26-AUG-2022
-    // 	date last modified      26-SEP-2022
+    // 	date last modified      27-SEP-2022
     //  algorithm task          Preparing 2013-2018 cancer datasets for reporting in Excel
     //  status                  In progress
     //  objective               To have one dataset with report outputs for 2013-2018 data for 2016-2018 annual report
@@ -2951,6 +2951,64 @@ putexcel B1 = "Cancer_Deaths"
 putexcel C1 = "Total_Deaths"
 putexcel D1 = "Percentage"
 putexcel (D2:D10), nformat("0.0")
+putexcel save
+restore
+
+
+
+** JC 27sep2022: SF requested 2013-2018 ASIRs by sex based on 2018's top5 for males and females.
+*******************
+**  ASIRs by sex **
+**  (2013-2018)  **
+** 2018's top 5  **
+*******************
+** Load the 2013-2018 ASIRs by sex dataset (MALE)
+preserve
+use "`datapath'\version09\2-working\ASIRs_2013-2018_male" ,clear
+
+** Create Sheet
+local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year prostate colon rectum lung multiple_myeloma using "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRsbySex_`listdate'.xlsx", firstrow(variables) sheet(MALES, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRsbySex_`listdate'.xlsx", sheet(MALES) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "prostate"
+putexcel C1 = "colon"
+putexcel D1 = "rectum"
+putexcel E1 = "lung"
+putexcel F1 = "multiple_myeloma"
+putexcel (B2:B7), nformat("0.0")
+putexcel (C2:C7), nformat("0.0")
+putexcel (D2:D7), nformat("0.0")
+putexcel (E2:E7), nformat("0.0")
+putexcel (F2:F7), nformat("0.0")
+putexcel save
+restore
+
+** Load the 2013-2018 ASIRs by sex dataset (FEMALE)
+preserve
+use "`datapath'\version09\2-working\ASIRs_2013-2018_female" ,clear
+
+** Create Sheet
+//local listdate : display %tc_CCYYNNDD_HHMMSS clock(c(current_date) + c(current_time), "DMYhms")
+export_excel year female_breast colon corpus_uteri pancreas multiple_myeloma using "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRsbySex_`listdate'.xlsx", firstrow(variables) sheet(FEMALES, replace) 
+
+putexcel set "`datapath'\version09\3-output\2016-2018AnnualReport_ASIRsbySex_`listdate'.xlsx", sheet(FEMALES) modify
+putexcel A1:F1, bold fpat(solid, lightgray)
+
+putexcel A1 = "Year"
+putexcel B1 = "female_breast"
+putexcel C1 = "colon"
+putexcel D1 = "corpus_uteri"
+putexcel E1 = "pancreas"
+putexcel F1 = "multiple_myeloma"
+putexcel (B2:B7), nformat("0.0")
+putexcel (C2:C7), nformat("0.0")
+putexcel (D2:D7), nformat("0.0")
+putexcel (E2:E7), nformat("0.0")
+putexcel (F2:F7), nformat("0.0")
 putexcel save
 restore
 
