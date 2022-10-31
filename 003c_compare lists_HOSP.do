@@ -3,8 +3,8 @@
     //  algorithm name          003c_compare lists_Hosp#.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      11-JULY-2022
-    // 	date last modified      11-JULY-2022
+    //  date first created      31-OCT-2022
+    // 	date last modified      31-OCT-2022
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -57,7 +57,7 @@
 ** LOAD corrected dataset from dofile 001_flag errors for each list
 use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
 
-count //10,851
+count //11,287
 
 
 ** STEP #3
@@ -67,7 +67,7 @@ drop if hospitalnumber=="" | hospitalnumber=="99" //remove blank/missing Hosp #s
 sort hospitalnumber lastname firstname
 quietly by hospitalnumber :  gen dup = cond(_N==1,0,_n)
 sort hospitalnumber
-count if dup>0 //6
+count if dup>0 //22
 
 
 ** STEP #4 
@@ -81,7 +81,7 @@ gen checked=2
 
 ** STEP #5
 drop if dup==0 //remove all the Hosp# non-duplicates - 6,366 deleted
-count //6
+count //22
 
 
 ** STEP #6
@@ -92,7 +92,7 @@ count //6
 //destring birthdate ,replace
 capture append using "`datapath'\version07\2-working\prevHOSP_dups" ,force
 format str_dadate %tdnn/dd/CCYY
-count //16
+count //28
 
 
 ** STEP #7
@@ -112,7 +112,7 @@ sort hospitalnumber lastname firstname
 */
 //drop if registrynumber!=20130865 & registrynumber!=20141171
 ** Remove previously-checked records
-drop if checked==1 & duppid==0 //10 deleted
+drop if checked==1 & duppid==0 //6 deleted
 //drop if checked==1 //6 deleted these are from 21oct2021 list as CR5db wasn't updated properly from the list before that one
 //drop if registrynumber==20130865 //2 deleted - these were matched to each other and came from the previously-checked list
 //drop if registrynumber==20161021|registrynumber==20150164 //2 deleted - these were matched to each other and came from the previously-checked list
@@ -137,7 +137,7 @@ label var str_no "No."
 
 order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber diagnosisyear checked str_da str_dadate str_action hosplist
 
-count //6
+count //22
 
 ** STEP #10
 ** Save this dataset for export to excel (see dofile 004_export new lists)

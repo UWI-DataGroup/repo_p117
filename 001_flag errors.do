@@ -3,8 +3,8 @@
     //  algorithm name          001_flag errors.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      11-JULY-2022
-    // 	date last modified      11-JULY-2022
+    //  date first created      31-OCT-2022
+    // 	date last modified      31-OCT-2022
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
@@ -68,7 +68,7 @@
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version07\1-input\2022-07-08_MAIN Source+Tumour+Patient_KWG.txt"
+insheet using "`datapath'\version07\1-input\2022-10-28_MAIN Source+Tumour+Patient_KWG.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -85,9 +85,9 @@ drop tumouridsourcetable recordnumber cfdiagnosis labnumber specimen sampletaken
 	 morphology laterality behaviour grade basisofdiagnosis tnmcatstage tnmantstage esstnmcatstage esstnmantstage summarystaging incidencedate consultant ///
 	 iccccode icd10 treatment1 treatment1date treatment2 treatment2date treatment3 treatment3date treatment4 treatment4date treatment5 treatment5date ///
 	 othertreatment1 othertreatment2 notreatment1 notreatment2 ttreviewer personsearch residentstatus statuslastcontact datelastcontact ///
-	 comments ptdataabstractor ptcasefindingdate obsoleteflagpatienttable patientrecordid patientupdatedby patientupdatedate patientrecordstatus ///
+	 comments ptdataabstractor ptcasefindingdate obsoleteflagpatienttable patientupdatedby patientupdatedate patientrecordstatus ///
 	 patientcheckstatus retrievalsource notesseen notesseendate furtherretrievalsource ptreviewer rfalcohol alcoholamount alcoholfreq ///
-	 rfsmoking smokingamount smokingfreq smokingduration smokingdurationfreq
+	 rfsmoking smokingamount smokingfreq smokingduration smokingdurationfreq //patientrecordid
 
 ** STEP #6
 ** Create variables for the excel duplicate lists that the SDA will update and label already exisiting variables that will appear in list
@@ -106,6 +106,28 @@ label var str_da "DA to Take Action"
 label var str_dadate "Date DA Took Action"
 label var str_action "Action Taken"
 
+
+** JC 31oct2022 - incorrectly formatted Reg #s and an incorrect merge of a patient record found so need to temporarily assign correctly formatted Reg #s until KWG is able to correct these in his main db
+generate byte non_numeric_reg = indexnot(registrynumber, "0123456789.-")
+count if non_numeric_reg //15 (8)
+list registrynumber patientrecordid sourcerecordid cr5id if non_numeric_reg
+count if length(registrynumber)<8 //4 (2)
+list registrynumber patientrecordid sourcerecordid cr5id if length(registrynumber)<8
+
+replace registrynumber="20220001" if registrynumber=="2020/064"
+replace registrynumber="20220002" if registrynumber=="2020/177"
+replace registrynumber="20220003" if registrynumber=="2020/178"
+replace registrynumber="20220004" if registrynumber=="2020/398"
+replace registrynumber="20220005" if registrynumber=="2021/082"
+replace registrynumber="20220006" if registrynumber=="2021/090"
+replace registrynumber="20220007" if registrynumber=="2021/092"
+replace registrynumber="20220008" if registrynumber=="2021/101"
+replace registrynumber="20220009" if registrynumber=="" & patientrecordid==2021028901
+replace registrynumber="20220010" if registrynumber=="" & patientrecordid==2021500101
+replace registrynumber="20220011" if registrynumber=="99" & patientrecordid==2020116401
+replace registrynumber="20220012" if registrynumber=="99" & patientrecordid==2020065001
+drop patientrecordid
+destring registrynumber ,replace
 
 ** STEP #7
 ** Remove cases where there are 2 tumours that have already been merged under 1 registry number and/or cases with multiple source records or multiple tumour records
@@ -157,26 +179,26 @@ replace flag7="delete blank record" if lastname==""
 
 ** STEP #11
 ** Check for invalid length NRN
-count if length(nrn)<11 & nrn!="" //20
-list registrynumber firstname lastname nrn birthdate if length(nrn)<11 & nrn!=""
-replace flag3=nrn if length(nrn)<11 & nrn!="" //0 changes
+count if length(nrn)<11 & nrn!="" //5
+list registrynumber stdataabstractor firstname lastname nrn birthdate if length(nrn)<11 & nrn!=""
+replace flag3=nrn if length(nrn)<11 & nrn!="" //5 changes
 
 
 ** STEP #12
 ** Correct NRN errors flagged above for non-specific incorrect NRNs
-replace nrn="999999-9999" if nrn=="99"|nrn=="99999" //4 changes
+replace nrn="999999-9999" if nrn=="99"|nrn=="99999" //1 change
 replace nrn="999999-9999" if nrn=="9999-9999" //0 changes
 //replace nrn="999999-9999" if nrn=="999999"
 gen nrn2 = substr(nrn, 1,6) + "-" + substr(nrn, -4,4) if length(nrn)==10 & !(strmatch(strupper(nrn), "*-*"))
-replace nrn=nrn2 if nrn2!="" //6 changes
+replace nrn=nrn2 if nrn2!="" //1 change
 drop nrn2
 gen nrn2 = nrn + "-9999" if length(nrn)==6
 replace nrn=nrn2 if nrn2!="" //6 changes
 drop nrn2
-replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //1 changes
+replace nrn=subinstr(nrn,"9999999","9999-9999",.) if length(nrn)==9 & regexm(nrn,"9999999") //1 change
 
-replace nrn="" if length(nrn)==1
-replace nrn="" if registrynumber==20210143
+replace nrn="" if length(nrn)==2 //2 changes
+//replace nrn="" if registrynumber==20210143
 /*
 preserve
 clear
@@ -209,11 +231,11 @@ replace flag8=nrn if flag3!="" //0 changes
 gen str8 dob = string(birthdate,"%08.0f")
 rename birthdate birthdate2
 rename dob birthdate
-count if length(birthdate)<8|length(birthdate)>8 //1 - check against electoral list using 'Contains' filter in the Names fields on electoral list
+count if length(birthdate)<8|length(birthdate)>8 //0 - check against electoral list using 'Contains' filter in the Names fields on electoral list
 list registrynumber firstname lastname nrn birthdate if length(birthdate)<8|length(birthdate)>8
-replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //1 change
+replace flag4=birthdate if length(birthdate)<8|length(birthdate)>8 //0 changes
 replace flag4="missing" if birthdate=="" //0 changes
-replace flag4="missing" if registrynumber==20212132 //1 change
+//replace flag4="missing" if registrynumber==20212132 //1 change
 
 
 ** STEP #15
@@ -267,22 +289,27 @@ replace flag9="delete blank record" if registrynumber==20159999 //0 changes
 ** STEP #18
 ** Check for invalid length Hosp#
 generate byte non_numeric_hospnum= indexnot(hospitalnumber, "0123456789.-")
-count if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //83
-list registrynumber firstname lastname hospitalnumber birthdate nrn non_numeric_hospnum if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1
+count if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //5
+list registrynumber stdataabstractor firstname lastname hospitalnumber birthdate nrn non_numeric_hospnum if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1
 count if hospitalnumber=="NYR" //0
-replace flag5=hospitalnumber if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="NYR"|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //83 changes
+replace flag5=hospitalnumber if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="NYR"|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //5 changes
 
-replace nrn=hospitalnumber if registrynumber==20212186 //1 change
-replace flag8=nrn if registrynumber==20212186 //1 change
+
+replace hospitalnumber=subinstr(hospitalnumber,"0","",.) if length(hospitalnumber)>6 & flag5!="" & registrynumber!=20210341 //3 changes
+replace hospitalnumber=subinstr(hospitalnumber,"000","00",.) if registrynumber==20210341 //1 change
+
+//replace nrn=hospitalnumber if registrynumber==20212186 //1 change
+//replace flag8=nrn if registrynumber==20212186 //1 change
 
 ** STEP #19
 ** Correct Hosp# errors using below method as these won't lead to de-identifying the dofile
-replace hospitalnumber="99" if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="NYR"|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //83 changes
+replace hospitalnumber="99" if registrynumber==20210157 //1 change
 
+//replace hospitalnumber="99" if (length(hospitalnumber)==1|length(hospitalnumber)>6|hospitalnumber=="NYR"|hospitalnumber=="9999"|hospitalnumber=="99999"|hospitalnumber=="999999") & !strmatch(strupper(hospitalnumber), "*&*") & !strmatch(strupper(hospitalnumber), "*/*") & non_numeric_hospnum<1 //83 changes
 
 ** STEP #20
 ** Identify corrected Hosp#s in prep for export to excel ERRORS list
-replace flag10=hospitalnumber if flag5!="" //70 changes
+replace flag10=hospitalnumber if flag5!="" //5 changes
 
 
 ** STEP #21
@@ -309,7 +336,7 @@ restore
 ** Remove variables not needed for excel lists
 drop stdataabstractor stsourcedate nftype sourcename doctor doctoraddress recordstatus
 
-count //10,851
+count //11,287
 
 
 ** STEP #24
