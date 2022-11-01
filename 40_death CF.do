@@ -875,3 +875,147 @@ capture export_excel record_id pname sex age nrn coddeath address pod certifier 
 
 capture export_excel record_id pname sex age nrn coddeath address pod certifier certifieraddr dod if cancer==2 using "X:/The University of the West Indies/DataGroup - repo_data/data_p117\version05\3-output\2016DeathCF`listdate'.xlsx", sheet("Non Cancer") firstrow(variables)
 
+***********************************************************************************************************
+** JC 01nov2022: Attempting to update this process now that cancer incidence data collection has caught up with death data collection
+
+** HEADER -----------------------------------------------------
+**  DO-FILE METADATA
+    //  algorithm name          40_death CF.do
+    //  project:                BNR
+    //  analysts:               Jacqueline CAMPBELL
+    //  date first created      01-NOV-2022
+    // 	date last modified      01-NOV-2022
+    //  algorithm task          Prep and format death data using previously-prepared datasets for import into CR5db
+    //  status                  Pending
+    //  objective               To have a dataset with cleaned death data with cancer deaths only for:
+	//							(1) importing into main CanReg5 database by death year and 
+	//							(2) to be used for death trace-back and
+	//							(3) merging with other CR5db records that match.
+	//							Note: this process to occur after deaths prep for ASMR analysis has been completed
+    
+    ** General algorithm set-up
+    version 17.0
+    clear all
+    macro drop _all
+    set more off
+
+    ** Initialising the STATA log and allow automatic page scrolling
+    capture {
+            program drop _all
+    	drop _all
+    	log close
+    	}
+
+    ** Set working directories: this is for DATASET and LOGFILE import and export
+    ** DATASETS to encrypted SharePoint folder
+    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+    ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
+    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
+
+    ** Close any open log file and open a new log file
+    capture log close
+    log using "`logpath'\40_deathcf_2019+2020.smcl", replace
+** HEADER -----------------------------------------------------
+
+******************
+**  ALL YEARS   **
+** Incidence ds **
+******************
+** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from cancer duplicates V06 process (Source_+Tumour+Patient tables)
+insheet using "`datapath'\version07\1-input\2022-10-28_MAIN Source+Tumour+Patient_KWG.txt"
+
+** Format the IDs from the CR5db dataset
+format tumourid %14.0g
+format tumouridsourcetable %14.0g
+format sourcerecordid %16.0g
+
+** JC 31oct2022 - incorrectly formatted Reg #s and an incorrect merge of a patient record found so need to temporarily assign correctly formatted Reg #s until KWG is able to correct these in his main db
+generate byte non_numeric_reg = indexnot(registrynumber, "0123456789.-")
+count if non_numeric_reg //15 (8)
+list registrynumber patientrecordid sourcerecordid cr5id if non_numeric_reg
+count if length(registrynumber)<8 //4 (2)
+list registrynumber patientrecordid sourcerecordid cr5id if length(registrynumber)<8
+
+replace registrynumber="20220001" if registrynumber=="2020/064"
+replace registrynumber="20220002" if registrynumber=="2020/177"
+replace registrynumber="20220003" if registrynumber=="2020/178"
+replace registrynumber="20220004" if registrynumber=="2020/398"
+replace registrynumber="20220005" if registrynumber=="2021/082"
+replace registrynumber="20220006" if registrynumber=="2021/090"
+replace registrynumber="20220007" if registrynumber=="2021/092"
+replace registrynumber="20220008" if registrynumber=="2021/101"
+replace registrynumber="20220009" if registrynumber=="" & patientrecordid==2021028901
+replace registrynumber="20220010" if registrynumber=="" & patientrecordid==2021500101
+replace registrynumber="20220011" if registrynumber=="99" & patientrecordid==2020116401
+replace registrynumber="20220012" if registrynumber=="99" & patientrecordid==2020065001
+drop patientrecordid
+destring registrynumber ,replace
+
+** Remove non-2019 non-2020 cases
+count if diagnosisyear==. //1
+replace diagnosisyear=2021 if registrynumber==20212236
+drop if diagnosisyear!=2019 & diagnosisyear!=2020 //16,746
+count //3945
+
+** Remove hyphen in NRN to match with previous and death datasets
+count if regexm(nrn,"-") //3924
+replace nrn=subinstr(nrn,"-","",.) if regexm(nrn,"-") //3924 changes
+
+** Format variables used in identifying matches
+label var nftype "NFType"
+label define nftype_lab 1 "Hospital" 2 "Polyclinic/Dist.Hosp." 3 "Lab-Path" 4 "Lab-Cyto" 5 "Lab-Haem" 6 "Imaging" ///
+						7 "Private Physician" 8 "Death Certif./Post Mort." 9 "QEH Death Rec Bks" 10 "RT Reg. Bk" ///
+						11 "Haem NF" 12 "Bay View Bk" 13 "Other" 14 "Unknown" 15 "NFs" 16 "Phone Call" ///
+						17 "MEDDATA" 18 "QEH A&E List" , modify
+label values nftype nftype_lab
+
+label var sourcename "SourceName"
+label define sourcename_lab 1 "QEH" 2 "Bay View" 3 "Private Physician" 4 "IPS-ARS" 5 "Death Registry" ///
+							6 "Polyclinic" 7 "BNR Database" 8 "Other" 9 "Unknown" , modify
+label values sourcename sourcename_lab
+
+rename registrynumber pid
+gen incids=1
+save "`datapath'\version09\3-output\deathcf_prep_cr5" ,replace
+
+clear
+
+*****************
+** 2019 + 2020 **
+**  Death ds   **
+*****************
+** Load cancer only identifiable death dataset (created in dofile 5x_prep mort yyyy.do for annual report process)
+use "`datapath'\version09\3-output\2019+2020_prep mort_identifiable" ,clear
+rename * dd_*
+count //1357
+gen deathds=1
+drop if dd_did=="T2" //29 deleted
+rename dd_record_id dd_deathid
+
+append using "`datapath'\version09\3-output\deathcf_prep_cr5"
+
+count //5273
+
+replace nrn=dd_natregno if nrn=="" & dd_natregno!="" //1307
+replace dd_fname=firstname if dd_fname=="" & firstname!="" //3382
+replace dd_lname=lastname if dd_lname=="" & lastname!="" //3382
+
+** Check NRN is correctly formatted in prep for duplicate check
+count if length(nrn)==9 //0
+count if length(nrn)==8 //0
+count if length(nrn)==7 //0
+
+replace nrn="" if nrn=="9999999999" //563
+
+** Identify possible matches using NRN
+preserve
+drop if nrn=="" //remove blank/missing NRNs as these will be flagged as duplicates of each other
+// deleted
+sort nrn 
+quietly by nrn : gen dup = cond(_N==1,0,_n)
+sort nrn dd_lname dd_fname pid dd_deathid 
+count if dup>0 //2996 - review these in Stata's Browse/Edit window
+order pid dd_deathid nftype sourcename nrn dd_fname dd_lname firstname lastname cr5id dd_age age dd_dodyear diagnosisyear dd_coddeath histology
+//check there are no duplicate NRNs in the death ds as then it won't merge in 20d_final clean.do
+//keep if deathds==1 & dup>0 //20,655 deleted
+restore
