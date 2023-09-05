@@ -2,13 +2,13 @@
 **  DO-FILE METADATA
     //  algorithm name          1_prep match.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      02-MAR-2021
-    // 	date last modified      04-MAR-2021
-    //  algorithm task          Matching uncleaned 2018 cancer dataset with REDCap's 2018 deaths
+    //  analysts:               Jacqueline CAMPBELL & Kern ROCKE
+    //  date first created      05-SEPT-2023
+    // 	date last modified      05-SEPT-2023
+    //  algorithm task          Matching uncleaned 2098 cancer dataset with REDCap's 2019 deaths
     //  status                  Completed
-    //  objective               To have a complete list of DCOs for the cancer team to use in trace-back in prep for 2018 cancer report.
-    //  methods                 Merging CR5 2018 dataset with the prepared 2018 death dataset from 10_prep mort.do
+    //  objective               To have a complete list of DCOs for the cancer team to use in trace-back in prep for 2019 cancer report.
+    //  methods                 Merging CR5 2019 dataset with the prepared 2019 death dataset from 10_prep mort.do
 
     ** General algorithm set-up
     version 17.0
@@ -25,13 +25,15 @@
 
     ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+    *local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+	local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted" // Kern encrypted local machine
+
     ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
+    *local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
 
     ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\1_prep match.smcl", replace
+    *capture log close
+    *log using "`logpath'\1_prep match.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ************************************************************************
@@ -59,12 +61,15 @@
 		- FurtherRetrievalSource
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
+ 
+ (3) Install the following command: nsplit
+ 
 */
-import excel using "`datapath'\version04\1-input\2021-03-03_MAIN Source+Tumour+Patient_JC_excel.xlsx", firstrow
-save "`datapath'\version04\2-working\2008-2020_cancer_import_dp" ,replace
+import excel using "`datapath'/version13/1-input/2023_08_29_MAIN Source+Tumor+Patient_KDR_excel.xlsx", firstrow
+save "`datapath'/version13/2-working/2008-2023_cancer_import_dp" ,replace
 
-count //15,544
-
+count //23,869
+cls
 ** Format incidence date to create tumour year
 nsplit IncidenceDate, digits(4 2 2) gen(dotyear dotmonth dotday)
 gen dot=mdy(dotmonth, dotday, dotyear)
@@ -74,14 +79,14 @@ label var dot "IncidenceDate"
 label var dotyear "Incidence year"
 drop IncidenceDate
 
-count //15,544
+count //23,869
 
 ** Renaming CanReg5 variables
 rename Personsearch persearch
 rename PTDataAbstractor ptda
 rename TTDataAbstractor ttda
 rename STDataAbstractor stda
-rename CaseStatus cstatus
+*rename CaseStatus cstatus
 rename RetrievalSource retsource
 rename FurtherRetrievalSource fretsource
 rename NotesSeen notesseen
@@ -163,7 +168,7 @@ Note: When records are merged in CanReg5, the following can take place:
 */
 gen top = topography
 destring topography, replace
-
+/*
 gen str_sourcerecordid=sid2
 gen sourcetotal = substr(str_sourcerecordid,-1,1)
 destring sourcetot, gen (sourcetot)
@@ -180,7 +185,7 @@ gen eid = str_patientidtumourtable + "010" + mpseq2
 
 gen sourceseq = substr(str_sourcerecordid,13,2)
 gen sid = eid + sourceseq
-
+*/
 
 **********************************************************
 ** NAMING & FORMATTING - PATIENT TABLE
@@ -213,7 +218,7 @@ label var ptupdate "Date PT updated"
 generate byte non_numeric_ptda = indexnot(ptda, "0123456789.-")
 count if non_numeric_ptda //2
 //list pid ptda cr5id if non_numeric_ptda
-replace ptda="09" if pid=="20145017"
+replace ptda="09" if pid==20145017
 destring ptda,replace
 count if ptda==. //1
 //list pid ptda cr5id if ptda==.
@@ -232,9 +237,9 @@ drop day month year PTCasefindingDate
 label var ptdoa "PTCasefindingDate"
 
 ** Case Status
-label var cstatus "CaseStatus"
-label define cstatus_lab 0 "CF" 1 "ABS" 2 "Deleted" 3 "Ineligible" 4 "Duplicate" 5 "Pending CD Review", modify
-label values cstatus cstatus_lab
+*label var cstatus "CaseStatus"
+*label define cstatus_lab 0 "CF" 1 "ABS" 2 "Deleted" 3 "Ineligible" 4 "Duplicate" 5 "Pending CD Review", modify
+*label values cstatus cstatus_lab
 
 ** Retrieval Source
 destring retsource, replace
@@ -374,6 +379,7 @@ drop day month year UpdateDate
 label var ttupdate "Date TT updated"
 
 ** TT Data Abstractor
+replace ttda = "1" if ttda=="t1" // error found and corrected
 destring ttda, replace
 label var ttda "TTDataAbstractor"
 label define ttda_lab 1 "JC" 2 "RH" 3 "PM" 4 "WB" 5 "LM" 6 "NE" 7 "TD" 8 "TM" 9 "SAF" 10 "PP" 11 "LC" 12 "AJB" ///
@@ -604,6 +610,11 @@ label var labnum "LabNumber"
 label var specimen "Specimen"
 
 ** Sample Taken Date
+
+*Error found and corrected
+replace SampleTakenDate = "20210603" if SampleTakenDate =="21-0603"
+destring SampleTakenDate, replace
+
 replace SampleTakenDate=20000101 if SampleTakenDate==99999999
 nsplit SampleTakenDate, digits(4 2 2) gen(stdyear stdmonth stdday)
 gen sampledate=mdy(stdmonth, stdday, stdyear)
@@ -685,27 +696,27 @@ label values streviewer streviewer_lab
 ** CanReg5 ID
 label var cr5id "CanReg5 ID"
 
-count //15,544
+count //23,869
 
-save "`datapath'\version04\2-working\2008-2020_cancer_dp" ,replace
-label data "BNR-Cancer prepared 2008-2020 data"
-notes _dta :These data prepared for 2018 pre-cleaning death matching for further retrieval and DCO trace-back (2018 annual report)
-
+save "`datapath'/version13/2-working/2008-2023_cancer_dp" ,replace
+label data "BNR-Cancer prepared 2008-2023 data"
+notes _dta :These data prepared for 2019 pre-cleaning death matching for further retrieval and DCO trace-back (2019 annual report)
+exit
 ** Change name format to match death data
 replace fname=lower(fname)
-replace fname = lower(rtrim(ltrim(itrim(fname)))) //0 changes
+replace fname = lower(rtrim(ltrim(itrim(fname)))) //483 changes
 replace lname=lower(lname)
-replace lname = lower(rtrim(ltrim(itrim(lname)))) //0 changes
+replace lname = lower(rtrim(ltrim(itrim(lname)))) //728 changes
 
 ** Look for matches
 sort lname fname pid
 quietly by lname fname : gen dupname = cond(_N==1,0,_n)
 sort lname fname pid
-count if dupname>0 //10,907
+count if dupname>0 //18,034
 
 order pid fname lname natregno
 drop if dupname>1
-
+exit
 ** Merge 2018 death dataset from 10_prep mort.do
 merge m:1 lname fname natregno using "`datapath'\version04\3-output\2018_deaths_for_matching"
 /*
