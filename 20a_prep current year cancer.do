@@ -2,12 +2,12 @@
 **  DO-FILE METADATA
     //  algorithm name          20a_prep current year cancer.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      25-MAY-2022
-    // 	date last modified      26-MAY-2022
-    //  algorithm task          Formatting and cleaning 2018 cancer dataset
+    //  analysts:               Jacqueline CAMPBELL & Kern ROCKE
+    //  date first created      21-SEPT-2023
+    // 	date last modified      26-SEPT-2023
+    //  algorithm task          Formatting and cleaning 2019 cancer dataset
     //  status                  Completed
-    //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for inclusion in 2018 cancer report.
+    //  objective               To have one dataset with cleaned and grouped 2008, 2013-2018 data for inclusion in 2019 cancer report.
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
 
     ** General algorithm set-up
@@ -25,13 +25,15 @@
 
     ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+    *local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+	local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted" // Kern encrypted local machine
+	
     ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
+    *local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
 
     ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\20a_prep current year cancer.smcl", replace
+    *capture log close
+    *log using "`logpath'/20a_prep current year cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 /*
     The below steps were performed prior to importing data into Stata:
@@ -59,7 +61,7 @@
 			• 5 duplicate registrations		
 		
 		Outputs for this cleaning are saved in the path: 
-			• ...\Sync\Cancer\CanReg5\Backups\Data Cleaning\2022\2022-05-25_Wednesday
+			• .../Sync/Cancer/CanReg5/Backups/Data Cleaning/2022/2022-05-25_Wednesday
 */
 
 ** Import ENTIRE cancer incidence data from CR5db - current year data has been manually reviewed and cleaned using IARCcrgTools:
@@ -76,7 +78,7 @@
 	(9) Under 'File format'section, select 'Tab Separated Values'
 	(10) Click 'Export'
 	(11) Save export with date and initials from CanReg5 XML backup onto:
-		 e.g. `datapath'\version04\1-input\yyyy-mm-dd_MAIN Source+Tumour+Patient_KWG.txt
+		 e.g. `datapath'/version13/1-input/yyyy-mm-dd_MAIN Source+Tumour+Patient_KWG.txt
 */
 /*
  To prepare cancer dataset for import:
@@ -100,9 +102,10 @@
 		- PTReviewer
  (2) import the .xlsx file into Stata and save dataset in Stata
 */
-import excel using "`datapath'\version04\1-input\2022-05-24_MAIN Source+Tumour+Patient_KWG_excel.xlsx", firstrow
+import excel using "`datapath'/version13/1-input/2023_08_29_MAIN Source+Tumor+Patient_KDR_excel.xlsx", firstrow
 
-count //19,174
+count //23,869
+
 /*
 	In order for the cancer team to correct the data in CanReg5 database based on the errors and corrections found and performed 
 	during this Stata cleaning process, a file with the erroneous and corrected data needs to be created.
@@ -314,13 +317,15 @@ label var flag189 "Correction: SmokingDurationFreq"
 ** Cleaning from IARCcrgTools checks above (JC 25may2022: one-time corrections so disable after SDA corrects and new CR5 export is imported into Stata)
 destring flag52 ,replace
 destring flag147 ,replace
-replace flag52=IncidenceDate if RegistryNumber=="20181167"
-replace IncidenceDate=20180215 if RegistryNumber=="20181167"
-replace flag147=IncidenceDate if RegistryNumber=="20181167"
+replace flag52=IncidenceDate if RegistryNumber==20181167
+replace IncidenceDate=20180215 if RegistryNumber==20181167
+replace flag147=IncidenceDate if RegistryNumber==20181167
 
-replace flag40=Topography if RegistryNumber=="20180934"
-replace Topography="449" if RegistryNumber=="20180934"
-replace flag135=Topography if RegistryNumber=="20180934"
+destring flag40, replace
+replace flag40=Topography if RegistryNumber==20180934
+replace Topography=449 if RegistryNumber==20180934
+destring flag135, replace
+replace flag135=Topography if RegistryNumber==20180934
 
 ** Format incidence date to create tumour year
 nsplit IncidenceDate, digits(4 2 2) gen(dotyear dotmonth dotday)
@@ -426,18 +431,21 @@ rename TumourIDSourceTable tumouridsourcetable
 	   that tumour was merged e.g. 20130303 has 2 tumours with different tumourids - 201303030102 and 201407170101.
 */
 
-gen str_sourcerecordid=sid2
+gen str_sourcerecordid = strofreal(sid2, "%15.0f")
 gen sourcetotal = substr(str_sourcerecordid,-1,1)
 destring sourcetot, gen (sourcetot_orig)
 
-gen str_pid2 = pid2
+gen str_pid2 = strofreal(pid2, "%15.0f")
 gen patienttotal = substr(str_pid2,-1,1)
 destring patienttot, gen (patienttot)
 
-gen str_patientidtumourtable=patientidtumourtable
+
 gen mpseq2=mpseq 
 replace mpseq2=1 if mpseq2==0
 tostring mpseq2, replace
+gen str_patientidtumourtable = patientidtumourtable
+tostring str_patientidtumourtable, replace
+replace str_patientidtumourtable = "" if patientidtumourtable == .
 gen eid = str_patientidtumourtable + "010" + mpseq2
 gen sourceseq = substr(str_sourcerecordid,13,2)
 gen sid = eid + sourceseq
@@ -447,6 +455,7 @@ gen sid = eid + sourceseq
 gen tumseq = substr(eid,9,4)
 gen tumsourceseq = tumseq + sourceseq
 replace cr5id="" if cr5id!="" // changes
+
 
 **************
 ** TUMOUR 1 **
@@ -547,6 +556,7 @@ count if dxyr!=. & dotyear!=. & dxyr!=dotyear //47
 list pid eid sid dxyr dotyear dot cr5id if dxyr!=. & dotyear!=. & dxyr!=dotyear //reviewed these in CR5db
 
 ** Corrections for the above CR5db review
+tostring pid, replace format("%15.0f")
 replace flag52=IncidenceDate if pid=="20080563" & cr5id=="T2S1"
 replace IncidenceDate=20080529 if pid=="20080563" & cr5id=="T2S1"
 replace flag147=IncidenceDate if pid=="20080563" & cr5id=="T2S1"
@@ -723,7 +733,7 @@ capture export_excel str_no pid flag1-flag94 if ///
 		|flag71!="" | flag72!="" | flag73!="" | flag74!="" | flag75!="" | flag76!=. | flag77!="" | flag78!="" | flag79!="" | flag80!="" ///
 		|flag81!="" | flag82!="" | flag83!="" | flag84!="" | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
 		|flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
-using "`datapath'\version04\3-output\CancerCleaningALL`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+using "`datapath'/version13/3-output/CancerCleaningALL`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
 capture export_excel str_no pid flag95-flag189 if ///
 		 flag95!="" | flag96!="" | flag97!="" | flag98!="" | flag99!="" | flag100!="" ///
 		 |flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!="" | flag108!="" | flag109!="" | flag110!="" ///
@@ -735,7 +745,7 @@ capture export_excel str_no pid flag95-flag189 if ///
 		 |flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!="" | flag168!="" | flag169!="" | flag170!="" ///
 		 |flag171!=. | flag172!="" | flag173!="" | flag174!="" | flag175!="" | flag176!="" | flag177!="" | flag178!="" | flag179!="" | flag180!="" ///
 		 |flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
-using "`datapath'\version04\3-output\CancerCleaningALL`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+using "`datapath'/version13/3-output/CancerCleaningALL`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
 restore
 */
 
@@ -746,7 +756,7 @@ replace dxyr=2018 if pid=="20181008" & cr5id=="T1S1"
 replace dxyr=2019 if pid=="20190321" & cr5id=="T1S1"
 replace dxyr=2019 if pid=="20190494" & cr5id=="T2S1"
 
-drop if dxyr!=2018 //16,951 deleted
+drop if dxyr!=2019 //16,951 deleted
 
 count //2223
 
@@ -798,6 +808,7 @@ label values ptda ptda_lab
 
 ** Casefinding Date
 ** contains a nonnumeric character so field needs correcting!
+tostring PTCasefindingDate, replace
 generate byte non_numeric_ptdoa = indexnot(PTCasefindingDate, "0123456789.-")
 count if non_numeric_ptdoa //0
 //list pid ptda PTCasefindingDate cr5id if non_numeric_ptdoa
@@ -937,6 +948,7 @@ label values smokedurfreq freq_lab
 
 ** PT Reviewer
 ** contains a nonnumeric character so field needs correcting!
+tostring ptreviewer, replace format("%15.0f")
 generate byte non_numeric_ptrv = indexnot(ptreviewer, "0123456789.-")
 count if non_numeric_ptrv //3
 //list pid ptreviewer cr5id if non_numeric_ptrv
@@ -1994,17 +2006,17 @@ drop Treatment1Date
 label var rx1d "Treatment1 Date"
 
 replace Treatment2Date=20000101 if Treatment2Date==99999999
-nsplit Treatment2Date, digits(4 2 2) gen(rx2year rx2month rx2day)
-gen rx2d=mdy(rx2month, rx2day, rx2year)
-format rx2d %dD_m_CY
-drop Treatment2Date
+if Treatment2Date !=. nsplit Treatment2Date, digits(4 2 2) gen(rx2year rx2month rx2day)
+if Treatment2Date !=. gen rx2d=mdy(rx2month, rx2day, rx2year)
+if Treatment2Date !=. format rx2d %dD_m_CY
+if Treatment2Date ==. rename Treatment2Date rx2d
 label var rx2d "Treatment2 Date"
 
 replace Treatment3Date=20000101 if Treatment3Date==99999999
-nsplit Treatment3Date, digits(4 2 2) gen(rx3year rx3month rx3day)
-gen rx3d=mdy(rx3month, rx3day, rx3year)
-format rx3d %dD_m_CY
-drop Treatment3Date
+if Treatment3Date !=. nsplit Treatment3Date, digits(4 2 2) gen(rx3year rx3month rx3day)
+if Treatment3Date !=. gen rx3d=mdy(rx3month, rx3day, rx3year)
+if Treatment3Date !=. format rx3d %dD_m_CY
+if Treatment3Date ==. rename Treatment3Date rx3d
 label var rx3d "Treatment3 Date"
 
 replace Treatment4Date=20000101 if Treatment4Date==99999999
@@ -2109,6 +2121,7 @@ label var labnum "LabNumber"
 label var specimen "Specimen"
 
 ** Sample Taken Date
+destring SampleTakenDate, replace
 replace SampleTakenDate=20000101 if SampleTakenDate==99999999
 nsplit SampleTakenDate, digits(4 2 2) gen(stdyear stdmonth stdday)
 gen sampledate=mdy(stdmonth, stdday, stdyear)
@@ -2177,6 +2190,7 @@ if DateFirstConsultation ==. rename DateFirstConsultation dfc
 label var dfc "DateFirstConsultation"
 
 ** RT Registration Date
+tostring RTRegDate, replace format("%15.0f")
 generate byte non_numeric_rtdoa = indexnot(RTRegDate, "0123456789.-")
 count if non_numeric_rtdoa //
 //list pid RTRegDate cr5id if non_numeric_rtdoa
@@ -3313,6 +3327,6 @@ order pid fname lname init age sex dob natregno resident slc dlc dod ///
 count //2223
 
 
-** Create dataset to use for 2018 cleaning
-save "`datapath'\version04\2-working\2018_prepped cancer", replace
+** Create dataset to use for 2019 cleaning
+save "`datapath'/version13/2-working/2019_prepped cancer", replace
 

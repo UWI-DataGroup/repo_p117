@@ -2,9 +2,9 @@
 **  DO-FILE METADATA
     //  algorithm name          5a_prep_mort.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      06-MAY-2022
-    // 	date last modified      13-JUN-2022
+    //  analysts:               Jacqueline CAMPBELL & Kern ROCKE
+    //  date first created      18-SEPT-2023
+    // 	date last modified      18-SEPT-2023
     //  algorithm task          Prep and format death data using previously-prepared datasets and REDCap database export
     //  status                  Pending
     //  objective               To have multiple datasets with cleaned death data for:
@@ -26,13 +26,15 @@
 
     ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+    *local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+	local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted" // Kern encrypted local machine
+	
     ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
+    *local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
 
     ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\5_prep_mort.smcl", replace
+    *capture log close
+    *log using "`logpath'/5_prep_mort.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /* 
@@ -40,7 +42,7 @@
 	
 	Unlike previous iterations of this dofile, errors in NRN and names were detected in REDCap 2008-2020 death db.
 	The errors were corrected manually by the DAs using the electoral list.
-	As a result, previously-prepared Stata death matching dataset (`datapath'\version02\2015-2020_deaths_for_matching.dta) contains the erroneous data.
+	As a result, previously-prepared Stata death matching dataset (`datapath'/version02/2015-2020_deaths_for_matching.dta) contains the erroneous data.
 	Before proceeding with the regular death prep, the death matching dataset needs to be corrected.
 	
 	To correct the dataset, the below steps will be taken:
@@ -59,10 +61,12 @@
 ***************
 ** DATA IMPORT  
 ***************
-** LOAD the national registry deaths 2008-2020 excel dataset
-import excel using "`datapath'\version04\1-input\BNRDeathData20082020_DATA_2022-05-06_1222_excel.xlsx" , firstrow case(lower)
+** LOAD the national registry deaths 2008-2023 excel dataset
+use "`datapath'/version13/1-input/BNRDeathData20082023_DATA_2023-09-18_0931_excel", clear
 
-count //32,467
+count //41,124
+duplicates drop nrn, force
+
 
 *******************
 ** DATA FORMATTING  
@@ -94,8 +98,9 @@ drop dodyear
 gen int dodyear=year(dod)
 label var dodyear "Year of Death"
 
-** Remove TF form and years before 2015
-drop if dodyear<2015 //16,795 deleted
+** Remove TF form and years before 2016
+drop if dodyear<2016 //16,795 deleted
+drop if dodyear==2023
 drop if redcap_event_name!="death_data_collect_arm_1" //255 deleted
 count //15,417
 
@@ -107,9 +112,11 @@ format nrn2 %15.0g
 rename nrn2 natregno
 tostring natregno ,replace
 */
+
 gen double natregno = nrn
 format natregno %15.0g
-tostring natregno ,replace
+tostring natregno ,replace force
+replace natregno = "." if length(natregno)==11 // Note to Kern check these NRN numbers
 count if length(natregno)==9 //64
 count if length(natregno)==8 //2
 count if length(natregno)==7 //12
@@ -117,7 +124,7 @@ replace natregno="0" + natregno if length(natregno)==9 //64 changes
 replace natregno="00" + natregno if length(natregno)==8 //2 changes
 replace natregno="000" + natregno if length(natregno)==7 //12 changes
 count if natregno=="." //723
-replace natregno="" if natregno=="." //723 changes
+
 count if natregno!="" & length(natregno)!=10 //0
 count if nrn!=. & natregno=="" //0
 count if nrn!=. & natregno=="" //0
@@ -142,47 +149,57 @@ order record_id rc_pname rc_nrnnd rc_nrn rc_dod rc_dodyear rc_natregno
 
 count //15,416
 
-label data "BNR MORTALITY data 2015-2020: REDCap"
-notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\2-working\2015-2020_deaths_redcap" ,replace
-note: TS Only select data is included in this dataset
+duplicates drop record_id, force
 
+label data "BNR MORTALITY data 2016-2022: REDCap"
+notes _dta :These data prepared from BB national death register & Redcap deathdata database
+save "`datapath'/version13/2-working/2016-2022_deaths_redcap" ,replace
+note: TS Only select data is included in this dataset
 
 **************************
 **     Merging with     ** 
 **	previously-prepared **
-** 	  2015-2020 Deaths  **
+** 	  2016-2022 Deaths  **
 **************************
-use "`datapath'\version04\1-input\2015-2020_deaths_for_matching" ,clear
+use "`datapath'/version13/3-output/2016-2022_deaths_for_matching" ,clear
 
-rename dd6yrs_* dd_*
-rename dob dd_dob
+rename record_id dd_record_id
+*rename deathid dd_record_id
 
-** Remove duplicates found during this process
+*rename dd6yrs_* dd_*
+*rename dob dd_dob
+
+* Remove duplicates found during this process
 drop if dd_record_id==27566 //duplicate of 27600
 drop if dd_record_id==27730 //duplicate of 27634
 drop if dd_record_id==27644 //duplicate of 27642
 replace dd_record_id=34120 if dd_record_id==25341 //record is 34120 in REDCapdb but with NRN of 25341
 
+duplicates drop dd_record_id, force
+
 ** Update corrected NRNs + COD info from above duplicates
 preserve
 clear
-import excel using "`datapath'\version04\2-working\NRNelectoral_20220506.xlsx" , firstrow case(lower)
+import excel using "`datapath'/version13/2-working/NRNelectoral_20220506.xlsx" , firstrow case(lower)
 tostring elec_natregno ,replace
-save "`datapath'\version04\2-working\electoral_nrn" ,replace
+save "`datapath'/version13/2-working/electoral_nrn" ,replace
 restore
 
-merge 1:1 dd_record_id using "`datapath'\version04\2-working\electoral_nrn" ,force
+merge 1:1 dd_record_id using "`datapath'/version13/2-working/electoral_nrn" ,force
+
+
 /*
     Result                      Number of obs
     -----------------------------------------
-    Not matched                        15,411
-        from master                    15,411  (_merge==1)
+    Not matched                        19,423
+        from master                    19,423  (_merge==1)
         from using                          0  (_merge==2)
 
-    Matched                                 2  (_merge==3)
+    Matched                                 3  (_merge==3)
     -----------------------------------------
+
 */
+/*
 format elec_nrn %15.0g
 replace dd_nrn=elec_nrn if _merge==3 //1 change
 replace dd_natregno=elec_natregno if _merge==3 //2 changes
@@ -194,33 +211,36 @@ replace dd_onsetnumcod1c=elec_onsetnumcod1c if _merge==3 //1 change
 replace dd_onsettxtcod1c=elec_onsettxtcod1c if _merge==3 //1 change
 replace dd_coddeath=elec_coddeath if _merge==3 //1 change
 drop elec_* _merge
+*/
 
 ** Add in three 2018 cases from REDCapdb that were missing from previously-prepared dataset
 preserve
 clear
-import excel using "`datapath'\version04\2-working\MissingDeaths_20220506.xlsx" , firstrow case(lower)
+import excel using "`datapath'/version13/2-working/MissingDeaths_20220506.xlsx" , firstrow case(lower)
 destring dd_regnum ,replace
 tostring dd_mname ,replace
 tostring dd_natregno ,replace
-save "`datapath'\version04\2-working\missingdeaths" ,replace
+save "`datapath'/version13/2-working/missingdeaths" ,replace
 restore
 
-append using "`datapath'\version04\2-working\missingdeaths"
-erase "`datapath'\version04\2-working\missingdeaths.dta" //remove datasets to reduce storage space on SharePoint
+append using "`datapath'/version13/2-working/missingdeaths", force
+erase "`datapath'/version13/2-working/missingdeaths.dta" //remove datasets to reduce storage space on SharePoint
 
 replace dd_mname="" if dd_mname=="." //3 changes
 replace dd_cod1d="99" if dd_cod1d=="099" //3 changes
 generate double date_dddoa = clock(dddoa, "YMDhms")
+*rename dddoa date_dddoa
 format date_dddoa %tcCCYY-NN-DD_HH:MM
+*gen dd_dddoa = .
 replace dd_dddoa=date_dddoa if date_dddoa!=.
-drop dddoa date_dddoa
+drop date_dddoa
 
-count //15,416
+count //19,429
 
 
 ** Combine previously-prepared dataset with REDCap dataset
 preserve
-append using "`datapath'\version04\2-working\2015-2020_deaths_redcap"
+append using "`datapath'/version13/2-working/2016-2022_deaths_redcap"
 count //30,832
 
 replace record_id=dd_record_id if record_id==. & dd_record_id!=.
@@ -249,8 +269,11 @@ restore
 
 ** Now that some of the data has been corrected, merge the datasets for a final check
 rename dd_record_id record_id
+drop _merge
+duplicates drop record_id, force
+merge 1:1 record_id using "`datapath'/version13/2-working/2016-2022_deaths_redcap"
 
-merge 1:1 record_id using "`datapath'\version04\2-working\2015-2020_deaths_redcap"
+
 /*
     Result                      Number of obs
     -----------------------------------------
@@ -261,6 +284,7 @@ merge 1:1 record_id using "`datapath'\version04\2-working\2015-2020_deaths_redca
 //list record_id dd_pname rc_pname if _merge==1|_merge==2
 
 ** Correcting NRN ND variable
+*gen rc_nrnnd = nrnnd
 count if dd_nrnnd!=rc_nrnnd //2
 list record_id dd_nrnnd rc_nrnnd dd_nrn rc_nrn if dd_nrnnd!=rc_nrnnd
 replace dd_nrnnd=2 if record_id==26253
@@ -272,18 +296,20 @@ count if dd_nrn!=rc_nrn //10
 replace dd_nrn=rc_nrn if dd_nrn!=rc_nrn & record_id!=28513 //9 changes
 count if rc_nrn!=dd_nrn //1
 replace rc_nrn=dd_nrn if rc_nrn!=dd_nrn //updated 28513 directly in REDCapdb
+*gen rc_natregno = elec_natregno
 count if dd_natregno!=rc_natregno //5,137
 replace dd_natregno=rc_natregno if dd_natregno!=rc_natregno //5,137 changes
 
 ** Correcting Pt Name variable
+*gen rc_pname = pname
 count if rc_pname!=dd_pname //137
 count if dd_pname!=rc_pname //137
 list record_id dd_nrn dd_pname rc_pname if rc_pname!=dd_pname
-gen fixpname=1 if rc_pname!=dd_pname
+*gen fixpname=1 if rc_pname!=dd_pname
 replace dd_pname=rc_pname if rc_pname!=dd_pname //137 changes
 count if dd_pname!=rc_pname //0
 
-** Correcting First, Middle and Last Names variables
+/** Correcting First, Middle and Last Names variables
 gen ptname=dd_pname if fixpname==1
 split ptname, parse(", "" ") gen(name)
 order record_id ptname name1 name2 name3 name4 name5 dd_pname dd_fname dd_mname dd_lname
@@ -311,26 +337,28 @@ replace dd_fname = lower(rtrim(ltrim(itrim(dd_fname)))) if fixpname==1 //137 cha
 replace dd_mname = lower(rtrim(ltrim(itrim(dd_mname)))) if fixpname==1 //34 changes
 replace dd_lname = lower(rtrim(ltrim(itrim(dd_lname)))) if fixpname==1 //137 changes
 drop ptname fixpname name1 name2 name3 name4 name5
-
+*/
 ** JC 13jun2022: SF emailed on 02jun2022 with correction to dod year for below record
 replace dd_dod=d(04jan2019) if record_id==26742 //dod changed from 2018 to 2019
 replace dd_dodyear=2019 if record_id==26742
 
 ** Remove redcap variables
+*gen rc_dod = dod
+*gen rc_dodyear = dodyear
 drop rc_pname rc_nrnnd rc_nrn rc_dod rc_dodyear rc_natregno _merge
-erase "`datapath'\version04\2-working\2015-2020_deaths_redcap.dta"
+erase "`datapath'/version13/2-working/2016-2022_deaths_redcap.dta"
 
-label data "BNR MORTALITY data 2015-2020"
+label data "BNR MORTALITY data 2016-2022"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2015-2020_deaths_for_matching" ,replace
-note: TS This dataset can be used for matching 2015-2020 deaths with incidence data
+save "`datapath'/version13/3-output/2016-2022_deaths_for_matching" ,replace
+note: TS This dataset can be used for matching 2016-2022 deaths with incidence data
 
 *********************
 **     Preparing   **
-** 	  2018 Deaths  **
+** 	  2019 Deaths  **
 **	 for analysis  **
 *********************
-use "`datapath'\version04\3-output\2015-2020_deaths_for_matching" ,clear
+use "`datapath'/version13/3-output/2016-2022_deaths_for_matching" ,clear
 
 count //15,416
 /*
@@ -344,11 +372,12 @@ This dataset preparation differs from the death matching ds in below ways:
 */
 
 ** Remove death data prefix from variable names for this process (only needed when matching death and incidence datasets)
-rename dd_* *
+*rename dd_* *
 
 ** Next we get rid of those who died pre-2017 (there are previously unmatched 2017 cases in dataset)
 ** First ensure dodyear and dod match by performing a quick count check
 tab dodyear ,m
+
 /*
     dodyear |      Freq.     Percent        Cum.
 ------------+-----------------------------------
@@ -377,7 +406,7 @@ gen dodyr=year(dod)
 count if dodyear!=dodyr //0
 drop dodyr
 
-drop if dodyear!=2018 //12,888; 12,889 deleted
+drop if dodyear!=2019 //12,888; 12,889 deleted
 ** Remove Tracking Form info (already previously removed)
 //drop if event==2 //0 deleted
 
@@ -518,7 +547,7 @@ so the field namematch can be used as a guide for checking duplicates
 //label define namematch_lab 1 "deaths only namematch,diff.pt" 2 "no namematch" 3 "cr5 & death namematch,diff.pt" 4 "slc=2/9,not in deathdata", modify
 //label values namematch namematch_lab
 sort lname fname record_id
-quietly by lname fname : gen dupname = cond(_N==1,0,_n)
+*quietly by lname fname : gen dupname = cond(_N==1,0,_n)
 sort lname fname record_id
 count if dupname>0 //38
 /* 
@@ -547,7 +576,7 @@ restore
 
 ** Final check for duplicates by name and dod 
 sort lname fname dod
-quietly by lname fname dod: gen dupdod = cond(_N==1,0,_n)
+*quietly by lname fname dod: gen dupdod = cond(_N==1,0,_n)
 sort lname fname dod record_id
 count if dupdod>0 //0
 list record_id namematch fname lname nrn dod sex age if dupdod>0
@@ -696,6 +725,7 @@ replace cancer=2 if cancer==. //1840 changes
 */
 
 tab cancer ,m
+
 /*
      cancer |
   diagnoses |      Freq.     Percent        Cum.
@@ -821,10 +851,10 @@ tab pod ,m //none missing
 
 ** JC 09may2022: The below was previously done when for 2015 annual report so code disabled
 
-/*
 ** Check NRN
 //format nrn %10.0g
-gen double nrn2=nrn
+gen double nrn2=dd_nrn
+
 format nrn2 %15.0g
 rename nrn2 natregno
 tostring natregno ,replace
@@ -845,21 +875,21 @@ replace natregno=subinstr(natregno,"111","000111",.) if record_id==18870
 replace natregno=subinstr(natregno,"9","09",.) if record_id==18428
 count if natregno!="" & natregno!="." & length(natregno)!=10 //0
 //list record_id fname lname natregno age agetxt if age>100
-*/
 
+/*
 count if natregno=="" & nrn!=. //
 count if natregno=="" //134 - checked against 2021 electoral list
 count if age==. //0
-
+*/
 ** Add missing NRNs flagged above with list of NRNs manually created using electoral list (this ensures dofile remains de-identified)
 preserve
 clear
-import excel using "`datapath'\version04\2-working\MissingNRNs_mort_20220510.xlsx" , firstrow case(lower)
+import excel using "`datapath'/version13/2-working/MissingNRNs_mort_20220510.xlsx" , firstrow case(lower)
 format elec_nrn %15.0g
 replace elec_natregno=subinstr(elec_natregno,"-","",.)
-save "`datapath'\version04\2-working\electoral_missingnrn" ,replace
+save "`datapath'/version13/2-working/electoral_missingnrn" ,replace
 restore
-merge 1:1 record_id using "`datapath'\version04\2-working\electoral_missingnrn" ,force
+merge 1:1 record_id using "`datapath'/version13/2-working/electoral_missingnrn" ,force
 /*
     Result                      Number of obs
     -----------------------------------------
@@ -870,10 +900,11 @@ merge 1:1 record_id using "`datapath'\version04\2-working\electoral_missingnrn" 
     Matched                                 3  (_merge==3)
     -----------------------------------------
 */
+
 replace nrn=elec_nrn if _merge==3 //3 changes
 replace natregno=elec_natregno if _merge==3 //3 changes
 drop elec_* _merge
-erase "`datapath'\version04\2-working\electoral_missingnrn.dta"
+erase "`datapath'/version13/2-working/electoral_missingnrn.dta"
 
 ** Check dob** Creating dob variable as none in national death data
 ** perform data cleaning on the age variable
@@ -907,18 +938,18 @@ gen age2 = (dod - dobcheck)/365.25
 gen ageyrs=int(age2)
 count if tempvarn!=6 & age!=ageyrs //5
 sort record_id
-list record_id fname lname address age ageyrs nrn natregno dob dobcheck dod yr1 if tempvarn!=6 & age!=ageyrs, string(20) //check against electoral list
+list record_id fname lname address age ageyrs dd_nrn natregno dob dobcheck dod yr1 if tempvarn!=6 & age!=ageyrs, string(20) //check against electoral list
 count if dobcheck!=. & dob==. //2,394
 replace dob=dobcheck if dobcheck!=. & dob==. //2,394 changes
 replace age=ageyrs if tempvarn!=6 & age!=ageyrs & record_id==24705|record_id==25061 //2 changes
 drop day month dyear nrnyr yr yr1 year2 nrndob age2 ageyrs tempvarn dobcheck
 
 ** Check age
-gen age2 = (dod - dob)/365.25
+gen age2 = (dod - dd_dob)/365.25
 gen checkage2=int(age2)
 drop age2
-count if dob!=. & dod!=. & age!=checkage2 //3
-list record_id fname lname dod dob age checkage2 if dob!=. & dod!=. & age!=checkage2 //3 correct
+count if dd_dob!=. & dod!=. & age!=checkage2 //3
+list record_id fname lname dod dd_dob age checkage2 if dd_dob!=. & dod!=. & age!=checkage2 //3 correct
 //replace age=checkage2 if dob!=. & dod!=. & age!=checkage2 //0 changes
 drop checkage2
 
@@ -929,11 +960,11 @@ count if dodyear!=year(dod) //0
 //list pid record_id dod dodyear if dodyear!=year(dod)
 replace dodyear=year(dod) if dodyear!=year(dod) //0 changes
 
-label data "BNR MORTALITY data 2018"
+label data "BNR MORTALITY data 2019"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2018_prep mort_ALL" ,replace
+save "`datapath'/version13/3-output/2019_prep mort_ALL" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
-note: TS This dataset includes all 2018 CODs
+note: TS This dataset includes all 2019 CODs
 
 *******************
 ** Check for MPs **
@@ -1117,6 +1148,8 @@ replace icd10="C61" if record_id==25915 //prostate
 replace icd10="C509" if record_id==26418|record_id==26663 //breast
 replace icd10="C220" if record_id==24331|record_id==25171|record_id==25414|record_id==26597|record_id==26849
 
+replace icd10="C22" if (regexm(coddeath,"LIVER")|regexm(coddeath,"HEPAT")) & icd10==""
+
 count if regexm(coddeath,"CHOLANGIO") & icd10=="" //4
 replace icd10="C221" if regexm(coddeath,"CHOLANGIO") & icd10=="" //4 changes
 
@@ -1210,7 +1243,7 @@ count if (regexm(coddeath,"PENIS")|regexm(coddeath,"PENILE")) & icd10=="" //1
 replace icd10="C609" if (regexm(coddeath,"PENIS")|regexm(coddeath,"PENILE")) & icd10=="" //1 change
 
 count if regexm(coddeath,"PROSTATE") & icd10=="" //125
-replace icd10="C61" if regexm(coddeath,"PROSTATE") & icd10=="" //125 changes
+replace icd10="C61" if (regexm(coddeath,"PROSTATE")|regexm(coddeath,"PROSTAT")) & icd10=="" //125 changes
 replace icd10="C920" if record_id==24571 //AML
 replace icd10="C859" if record_id==25914 & did=="T2" //NHL MP
 replace icd10="C719" if record_id==26540 & did=="T2" //brain MP
@@ -1602,13 +1635,14 @@ replace siteicd10=17 if (regexm(icd10,"C81")|regexm(icd10,"C82")|regexm(icd10,"C
 tab siteicd10 ,m //0 missing
 
 drop dupobs* dup_id
+rename dd_dob dob
 	 
 order record_id did fname lname age age5 age_10 sex dob nrn parish dod dodyear cancer siteiarc siteiarchaem pod coddeath
 
 ** Save this death dataset with identifiable data
-label data "BNR MORTALITY data 2018: Identifiable Dataset"
+label data "BNR MORTALITY data 2019: Identifiable Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2018_prep mort_identifiable" ,replace
+save "`datapath'/version13/3-output/2019_prep mort_identifiable" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death
 
@@ -1616,8 +1650,8 @@ note: TS This dataset includes patients with multiple eligible cancer causes of 
 drop fname lname natregno nrn pname mname dob parish regnum address pod placeofdeath certifier certifieraddr
 
 ** Save this death dataset with de-identified data
-label data "BNR MORTALITY data 2018: De-identified Dataset"
+label data "BNR MORTALITY data 2019: De-identified Dataset"
 notes _dta :These data prepared from BB national death register & Redcap deathdata database
-save "`datapath'\version04\3-output\2018_prep mort_deidentified" ,replace
+save "`datapath'/version13/3-output/2019_prep mort_deidentified" ,replace
 note: TS This dataset is used for analysis of age-standardized mortality rates
 note: TS This dataset includes patients with multiple eligible cancer causes of death

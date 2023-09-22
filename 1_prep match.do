@@ -4,7 +4,7 @@
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL & Kern ROCKE
     //  date first created      05-SEPT-2023
-    // 	date last modified      05-SEPT-2023
+    // 	date last modified      18-SEPT-2023
     //  algorithm task          Matching uncleaned 2098 cancer dataset with REDCap's 2019 deaths
     //  status                  Completed
     //  objective               To have a complete list of DCOs for the cancer team to use in trace-back in prep for 2019 cancer report.
@@ -701,7 +701,7 @@ count //23,869
 save "`datapath'/version13/2-working/2008-2023_cancer_dp" ,replace
 label data "BNR-Cancer prepared 2008-2023 data"
 notes _dta :These data prepared for 2019 pre-cleaning death matching for further retrieval and DCO trace-back (2019 annual report)
-exit
+
 ** Change name format to match death data
 replace fname=lower(fname)
 replace fname = lower(rtrim(ltrim(itrim(fname)))) //483 changes
@@ -716,18 +716,20 @@ count if dupname>0 //18,034
 
 order pid fname lname natregno
 drop if dupname>1
-exit
-** Merge 2018 death dataset from 10_prep mort.do
-merge m:1 lname fname natregno using "`datapath'\version04\3-output\2018_deaths_for_matching"
-/*
-    Result                           # of obs.
-    -----------------------------------------
-    not matched                        10,041
-        from master                     8,108  (_merge==1)
-        from using                      1,933  (_merge==2)
 
-    matched                               594  (_merge==3)
+** Merge 2018 death dataset from 10_prep mort.do
+merge m:1 lname fname natregno using "`datapath'/version13/3-output/2019_deaths_for_matching"
+/*
+
+    Result                      Number of obs
     -----------------------------------------
+    Not matched                        13,975
+        from master                    11,757  (_merge==1)
+        from using                      2,218  (_merge==2)
+
+    Matched                               568  (_merge==3)
+    -----------------------------------------
+
 */
 ** Check the merges
 
@@ -798,8 +800,8 @@ replace notdco=1 if pid=="20180774"|pid=="20180802"|pid=="20180725"|pid=="201808
 					//40 changes
 replace dco=. if notdco==1 //31 changes
 
-gen dcotxt="2018 possible DCOs: Check CR5db (all years) if this case definitely has not been previously captured." if dco==1
-gen notdcotxt="2018 not DCOs: (1) Check CR5db (all years) and REDCapdb 2008-2020 db if this is definitely the same patient. (2) Update any CR5db fields based on the death data, e.g. SLC, DLC, NRN, Address, etc. (3) Check for any possible missed merges in CR5db and merge these cases and update the records accordingly." if notdco==1
+gen dcotxt="2019 possible DCOs: Check CR5db (all years) if this case definitely has not been previously captured." if dco==1
+gen notdcotxt="2019 not DCOs: (1) Check CR5db (all years) and REDCapdb 2008-2020 db if this is definitely the same patient. (2) Update any CR5db fields based on the death data, e.g. SLC, DLC, NRN, Address, etc. (3) Check for any possible missed merges in CR5db and merge these cases and update the records accordingly." if notdco==1
 
 ** Create 2 lists for KWG - one for those that are not DCOs but didn't merge so he can check the death fields are correct in CR5db (export natregno slc dlc fields); one for DCOs not found in CR5db
 sort lname fname natregno 

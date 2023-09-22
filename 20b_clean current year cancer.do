@@ -3,10 +3,10 @@ cls
 **  DO-FILE METADATA
     //  algorithm name          20b_clean current year cancer.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      30-MAY-2022
-    // 	date last modified      02-JUN-2022
-    //  algorithm task          Cleaning 2018 cancer dataset
+    //  analysts:               Jacqueline CAMPBELL & Kern ROCKE
+    //  date first created      21-SEPT-2023
+    // 	date last modified      21-SEPT-2023
+    //  algorithm task          Cleaning 2019 cancer dataset
     //  status                  Completed
     //  objective               To have one dataset with cleaned and grouped 2008, 2013-2015 data for PAB 07-Jun-2022.
     //  methods                 Clean and update all years' data using IARCcrgTools Check and Multiple Primary
@@ -26,13 +26,16 @@ cls
 
     ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+    *local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+	local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted" // Kern encrypted local machine
+		
+	
     ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
+    *local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
 
     ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\20b_clean current year cancer.smcl", replace
+    *capture log close
+    *log using "`logpath'/20b_clean current year cancer.smcl", replace
 ** HEADER -----------------------------------------------------
 
 *************************************************
@@ -45,7 +48,9 @@ Note: Checks not always in sequential order due
 */
 *************************************************
 
-use "`datapath'\version04\2-working\2018_prepped cancer", clear
+use "`datapath'/version13/2-working/2019_prepped cancer", clear
+
+ssc install swapval, replace // Adding user written command 
 
 count //2223
 
@@ -474,6 +479,7 @@ replace sex=1 if sex==2 & nrnid!="9999" & regex(substr(natregno,-2,1), "[1,3,5,7
 replace flag168=sex if pid=="20180248"|pid=="20180611" //3 changes
 
 ** Check 34 - possibly invalid (sex=M; site=breast)
+tostring top, replace
 count if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50")) //4 - no changes; all correct
 //list pid fname lname natregno sex top cr5cod cr5id if sex==1 & (regexm(cr5cod, "BREAST") | regexm(top, "^50"))
 
@@ -696,12 +702,12 @@ replace flag132=addr if pid=="20180260"|pid=="20180616"
 
 preserve
 clear
-import excel using "`datapath'\version04\2-working\MissingAddr_20220531.xlsx" , firstrow case(lower)
+import excel using "`datapath'/version04/2-working/MissingAddr_20220531.xlsx" , firstrow case(lower)
 tostring pid, replace
-save "`datapath'\version04\2-working\missing_addr" ,replace
+save "`datapath'/version13/2-working/missing_addr" ,replace
 restore
 
-merge 1:1 pid cr5id using "`datapath'\version04\2-working\missing_addr" ,force
+*merge 1:1 pid cr5id using "`datapath'/version13/2-working/missing_addr" ,force
 /*
     Result                      Number of obs
     -----------------------------------------
@@ -712,10 +718,10 @@ merge 1:1 pid cr5id using "`datapath'\version04\2-working\missing_addr" ,force
     Matched                                 1  (_merge==3)
     -----------------------------------------
 */
-replace addr=meddata_addr if _merge==3 //1 change
-drop meddata_* _merge
-erase "`datapath'\version04\2-working\missing_addr.dta"
-replace flag132=addr if pid=="20182046"
+*replace addr=meddata_addr if _merge==3 //1 change
+*drop meddata_* _merge
+*erase "`datapath'/version13/2-working/missing_addr.dta"
+*replace flag132=addr if pid=="20182046"
 
 **********	
 **	Age **
@@ -2327,8 +2333,8 @@ format flag12 flag13 flag14 flag107 flag108 flag109 %dD_m_CY
 replace flag12=sampledate if pid=="20180175" & cr5id=="T1S1"|pid=="20182043" & cr5id=="T1S1"|pid=="20182246" & cr5id=="T1S1"
 replace flag13=recvdate if pid=="20180175" & cr5id=="T1S1"|pid=="20180470" & cr5id=="T1S1"|pid=="20182043" & cr5id=="T1S1"|pid=="20182246" & cr5id=="T1S1"
 replace flag14=rptdate if pid=="20180175" & cr5id=="T1S1"|pid=="20181219" & cr5id=="T1S1"
-swapval recvdate rptdate if pid=="20180175" & cr5id=="T1S1"
-swapval sampledate recvdate if pid=="20180175" & cr5id=="T1S1"|pid=="20182043" & cr5id=="T1S1"|pid=="20182246" & cr5id=="T1S1"
+*swapval recvdate rptdate if pid=="20180175" & cr5id=="T1S1"
+*swapval sampledate recvdate if pid=="20180175" & cr5id=="T1S1"|pid=="20182043" & cr5id=="T1S1"|pid=="20182246" & cr5id=="T1S1"
 replace recvdate=rptdate if pid=="20180470" & cr5id=="T1S1"
 replace rptdate=d(02jan2019) if pid=="20181219" & cr5id=="T1S1"
 replace flag107=sampledate if pid=="20180175" & cr5id=="T1S1"|pid=="20182043" & cr5id=="T1S1"|pid=="20182246" & cr5id=="T1S1"
@@ -2807,7 +2813,7 @@ replace flag147=dot if pid=="20180002" & regexm(cr5id, "T1")|pid=="20180020" & r
 count if rptcheckcat==9 //29
 //list pid cr5id dot sampledate recvdate rptdate dxyr stda if rptcheckcat==9
 replace flag13=recvdate if pid=="20180602" & cr5id=="T1S1"
-swapval recvdate rptdate if pid=="20180602" & cr5id=="T1S1"
+*swapval recvdate rptdate if pid=="20180602" & cr5id=="T1S1"
 replace flag108=recvdate if pid=="20180602" & cr5id=="T1S1"
 
 replace flag52=dot if pid=="20180119" & regexm(cr5id, "T1")|pid=="20180172" & regexm(cr5id, "T1")|pid=="20180183" & regexm(cr5id, "T1")|pid=="20180219" & regexm(cr5id, "T1")|pid=="20180272" & regexm(cr5id, "T1")|pid=="20180345" & regexm(cr5id, "T1")|pid=="20180350" & regexm(cr5id, "T1")|pid=="20180385" & regexm(cr5id, "T1")|pid=="20180391" & regexm(cr5id, "T1")|pid=="20180456" & regexm(cr5id, "T1")|pid=="20180494" & regexm(cr5id, "T1")|pid=="20180507" & regexm(cr5id, "T1")|pid=="20180598" & regexm(cr5id, "T1")|pid=="20180602" & regexm(cr5id, "T1")|pid=="20182295" & regexm(cr5id, "T1")
@@ -3378,7 +3384,7 @@ capture export_excel str_no pid cr5id flag1-flag94 if ///
 		|flag71!="" | flag72!=. | flag73!=. | flag74!="" | flag75!="" | flag76!="" | flag77!=. | flag78!=. | flag79!=. | flag80!="" ///
 		|flag81!="" | flag82!="" | flag83!="" | flag84!=. | flag85!="" | flag86!="" | flag87!="" | flag88!="" | flag89!="" | flag90!="" ///
 		|flag91!="" | flag92!="" | flag93!="" | flag94!="" ///
-using "`datapath'\version04\3-output\CancerCleaning2018_`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+using "`datapath'/version13/3-output/CancerCleaning2018_`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
 capture export_excel str_no pid cr5id flag95-flag189 if ///
 		 flag95!=. | flag96!="" | flag97!=. | flag98!=. | flag99!="" | flag100!="" ///
 		 |flag101!="" | flag102!="" | flag103!="" | flag104!="" | flag105!="" | flag106!="" | flag107!=. | flag108!=. | flag109!=. | flag110!="" ///
@@ -3390,7 +3396,7 @@ capture export_excel str_no pid cr5id flag95-flag189 if ///
 		 |flag161!="" | flag162!="" | flag163!="" | flag164!="" | flag165!="" | flag166!="" | flag167!=. | flag168!=. | flag169!="" | flag170!="" ///
 		 |flag171!="" | flag172!=. | flag173!=. | flag174!=. | flag175!="" | flag176!="" | flag177!="" | flag178!="" | flag179!=. | flag180!="" ///
 		 |flag181!="" | flag182!="" | flag183!="" | flag184!="" | flag185!="" | flag186!="" | flag187!="" | flag188!="" | flag189!="" ///
-using "`datapath'\version04\3-output\CancerCleaning2018_`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
+using "`datapath'/version13/3-output/CancerCleaning2018_`listdate'.xlsx", sheet("CORRECTIONS") firstrow(varlabels)
 restore
 */
 
@@ -3402,7 +3408,7 @@ restore
 //delete ineligibles (recstatus, resident), dxyr!=2018 etc.
 
 tab dxyr ,m
-drop if dxyr!=2018 //1 deleted - 2017 case
+drop if dxyr!=2019 //1 deleted - 2017 case
 
 *****************************
 ** Identifying & Labelling **
@@ -3411,7 +3417,7 @@ drop if dxyr!=2018 //1 deleted - 2017 case
 *****************************
 
 sort pid cr5id lname fname
-quietly by pid :  gen dupst = cond(_N==1,0,_n)
+ gen dupst = cond(_N==1,0,_n)
 sort pid cr5id
 count if dupst>0 //1845
 sort pid cr5id lname fname
@@ -3460,6 +3466,7 @@ Eligible, Non-reportable(?residency) |         12        0.54       98.79
 -------------------------------------+-----------------------------------
                                Total |      2,223      100.00
 */
+
 replace dupsource=1 if (recstatus==1|recstatus>4) & regexm(cr5id,"S1") //986 confirmed - this is the # eligible non-duplicate tumours
 replace dupsource=2 if (recstatus==1|recstatus>4) & !strmatch(strupper(cr5id), "*S1") //985 - confirmed
 replace dupsource=3 if recstatus==4 & regexm(cr5id,"S1") //102 - duplicate
@@ -3483,7 +3490,7 @@ count if dupsource==1 //986
 /*
 	IARC crg Tools - see output results in the path:
 
-	L:\Sync\Cancer\CanReg5\Backups\Data Cleaning\2022\2022-05-30_Monday\Checked_MP dataset.prn
+	L:/Sync/Cancer/CanReg5/Backups/Data Cleaning/2022/2022-05-30_Monday/Checked_MP dataset.prn
 
 
 	Results of IARC MP Program:
@@ -3589,7 +3596,7 @@ count //2223
 ** Save dataset with source duplicates
 label data "BNR-Cancer data - 2018 PAB Incidence: source duplicates"
 notes _dta :These data prepared from CanReg5 2022-05-24_KWG (BNR-C) database
-save "`datapath'\version08\2-working\2018_cancer_dups" ,replace
+save "`datapath'/version08/2-working/2018_cancer_dups" ,replace
 note: TS This dataset can be used for assessing sources per record
 
 
@@ -3687,7 +3694,7 @@ preserve
 drop if basis!=0
 keep pid fname lname natregno dod cr5cod doctor docaddr certifier
 capture export_excel pid fname lname natregno dod cr5cod doctor docaddr certifier ///
-		using "`datapath'\version04\2-working\DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
+		using "`datapath'/version13/2-working/DCO2015V05.xlsx", sheet("2015 DCOs_cr5data_20210727") firstrow(variables)
 //JC remember to change V01 to V02 when running list a 2nd time!
 restore
 */
@@ -4087,7 +4094,7 @@ count if siteiarc==25 //2 - these are non-melanoma skin cancers but they don't f
 //list pid cr5id primarysite topography top morph morphology icd10 if siteiarc==25
 
 ** Remove reportable-non-2018 dx
-drop if dxyr!=2018 //0 deleted
+drop if dxyr!=2019 //0 deleted
 
 count //
 
@@ -4132,17 +4139,18 @@ tab sex ,m
 count //949
 
 ** Save this corrected dataset with reportable cases and identifiable data
-save "`datapath'\version04\3-output\2018_cancer_nonsurvival_identifiable", replace
-label data "2018 BNR-Cancer identifiable data - Non-survival Identifiable Dataset"
-note: TS This dataset was NOT used for 2018 annual report; it was used for PAB 07-June-2022
+save "`datapath'/version13/3-output/2019_cancer_nonsurvival_identifiable", replace
+label data "2019 BNR-Cancer identifiable data - Non-survival Identifiable Dataset"
+note: TS This dataset was NOT used for 2018 annual report; it was used for PAB 22-SEPT-2023
 note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
 
 
 ** Create corrected dataset with reportable cases but de-identified data
 drop fname lname natregno init dob resident parish recnum cfdx labnum SurgicalNumber specimen clindets cytofinds md consrpt sxfinds physexam imaging duration onsetint certifier dfc streviewer addr birthdate hospnum comments dobyear dobmonth dobday dob_yr dob_year dobchk sname nrnday nrnid dupnrntag
 
-save "`datapath'\version04\3-output\2018_cancer_nonsurvival_deidentified", replace
-label data "2018 BNR-Cancer de-identified data - Non-survival De-identified Dataset"
-note: TS This dataset was NOT used for 2018 annual report; it was used for PAB 07-June-2022
+save "`datapath'/version13/3-output/2019_cancer_nonsurvival_deidentified", replace
+label data "2019 BNR-Cancer de-identified data - Non-survival De-identified Dataset"
+note: TS This dataset was NOT used for 2019 annual report; it was used for PAB 22-SEPT-2023
 note: TS Includes ineligible case definition, non-residents, unk sex, non-malignant tumours, IARC non-reportable MPs - these are removed in dataset used for analysis
 note: TS Excludes identifiable data but contains unique IDs to allow for linking data back to identifiable data
+
