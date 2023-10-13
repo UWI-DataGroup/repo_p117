@@ -1,3 +1,4 @@
+cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
     //  algorithm name          10f_analysis_mort 2021.do
@@ -38,7 +39,8 @@
 ** Load the dataset
 use "`datapath'/version13/3-output/2021_prep mort_deidentified", replace
 
-count // 700 cancer deaths in 2021
+count // 733 cancer deaths in 2021
+
 tab age_10 sex ,m
 tab siteiarc ,m
 labelbook siteiarc_lab
@@ -64,7 +66,7 @@ sum n if tag==(`r(max)'-9), meanonly
 replace top10 = 1 if n==`r(max)'
 tab siteiarc top10 if top10!=0, rowsort
 
-tab siteiarc if top10!=0, sort 
+tab siteiarc if top10!=0, sort nolabel
 
 contract siteiarc top10 if top10!=0, freq(count) percent(percentage)
 gsort -count
@@ -74,45 +76,46 @@ drop top10
 /*
                       IARC CI5-XI sites |      Freq.     Percent        Cum.
 ----------------------------------------+-----------------------------------
-                         Prostate (C61) |        144       27.80       27.80
-                           Breast (C50) |         90       17.37       45.17
-                            Colon (C18) |         89       17.18       62.36
-Lung (incl. trachea and bronchus) (C33- |         37        7.14       69.50
-                         Pancreas (C25) |         34        6.56       76.06
-                 Multiple myeloma (C90) |         32        6.18       82.24
-      Non-Hodgkin lymphoma (C82-86,C96) |         27        5.21       87.45
-                        Rectum (C19-20) |         26        5.02       92.47
-                     Corpus uteri (C54) |         22        4.25       96.72
-                          Stomach (C16) |         17        3.28      100.00
+                         Prostate (C61) |        133       26.60       26.60
+                            Colon (C18) |         90       18.00       44.60
+                           Breast (C50) |         77       15.40       60.00
+Lung (incl. trachea and bronchus) (C33- |         47        9.40       69.40
+                         Pancreas (C25) |         30        6.00       75.40
+                        Rectum (C19-20) |         28        5.60       81.00
+                           Kidney (C64) |         28        5.60       86.60
+                          Stomach (C16) |         23        4.60       91.20
+                     Corpus uteri (C54) |         22        4.40       95.60
+                 Multiple myeloma (C90) |         22        4.40      100.00
 ----------------------------------------+-----------------------------------
-                                  Total |        518      100.00
+                                  Total |        500      100.00
+
 
 */
-total count //518
+total count //500
 
 ** JC update: Save these results as a dataset for reporting
 replace siteiarc=2 if siteiarc==39
-replace siteiarc=3 if siteiarc==29
-replace siteiarc=4 if siteiarc==13
+replace siteiarc=3 if siteiarc==13
+replace siteiarc=4 if siteiarc==29
 replace siteiarc=5 if siteiarc==21
-replace siteiarc=6 if siteiarc==33
-replace siteiarc=7 if siteiarc==18
-replace siteiarc=8 if siteiarc==55
+replace siteiarc=6 if siteiarc==18
+replace siteiarc=7 if siteiarc==14
+replace siteiarc=8 if siteiarc==42
 replace siteiarc=9 if siteiarc==11
-replace siteiarc=10 if siteiarc==14
-replace siteiarc=11 if siteiarc==53
+replace siteiarc=10 if siteiarc==33
+replace siteiarc=11 if siteiarc==55
 rename siteiarc cancer_site
 gen year=1
 rename count number
 
 	expand 2 in 1
 	replace cancer_site=1 in 11
-	replace number=699 in 11
+	replace number=733 in 11
 	replace percentage=100 in 11
 
 //JC 19may2022: rename breast to female breast as drop males in distrate breast section so ASMR for breast is calculated using female population
 //JC 13jun2022: performed above correction
-label define cancer_site_lab 1 "all" 2 "prostate" 3 "female breast" 4 "colon" 5 "lung" 6 "corpus uteri" 7 "pancreas" 8 "multiple myeloma" 9 "stomach" 10 "rectum" 11 "non-hodgkin lymphoma" ,modify
+label define cancer_site_lab 1 "all" 2 "prostate" 3 "colon" 4 "female breast" 5 "lung" 6 "pancreas" 7 "rectum" 8 "kidney" 9 "stomach" 10 "corpus uteri" 11 "multiple myeloma" ,modify
 label values cancer_site cancer_site_lab
 label define year_lab 1 "2021" ,modify
 label values year year_lab
@@ -183,8 +186,8 @@ preserve
 collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex siteiarc)
 gen mortrate=case/pop_wpp*100000
 drop if siteiarc!=39 & siteiarc!=29 & siteiarc!=13 & siteiarc!=21 ///
-		& siteiarc!=33 & siteiarc!=18 & siteiarc!=55 ///
-		& siteiarc!=11 & siteiarc!=14 & siteiarc!=53
+		& siteiarc!=14 & siteiarc!=18 & siteiarc!=42 ///
+		& siteiarc!=11 & siteiarc!=33 & siteiarc!=55
 //by sex,sort: tab age_10 mortrate ,m
 sort siteiarc age_10 sex
 //list mortrate age_10 sex
@@ -204,8 +207,8 @@ preserve
 collapse (sum) case (mean) pop_wpp, by(pfu age_10 siteiarc)
 gen mortrate=case/pop_wpp*100000
 drop if siteiarc!=39 & siteiarc!=29 & siteiarc!=13 & siteiarc!=21 ///
-		& siteiarc!=33 & siteiarc!=18 & siteiarc!=55 ///
-		& siteiarc!=11 & siteiarc!=14 & siteiarc!=53
+		& siteiarc!=14 & siteiarc!=18 & siteiarc!=42 ///
+		& siteiarc!=11 & siteiarc!=33 & siteiarc!=55
 //by sex,sort: tab age_10 mortrate ,m
 sort siteiarc age_10
 //list mortrate age_10 sex
@@ -249,7 +252,7 @@ distrate case pop_wpp using "`datapath'/version13/2-working/who2000_10-2", 	///
    +-------------------------------------------------------------+
   | case        N    crude   rateadj   lb_gam   ub_gam   se_gam |
   |-------------------------------------------------------------|
-  |  699   281207   248.57    146.23   135.32   157.90     5.69 |
+  |  733   281207   248.57    146.23   135.32   157.90     5.69 |
   +-------------------------------------------------------------+
 
 */
@@ -274,7 +277,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -367,7 +370,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -392,6 +395,7 @@ preserve
 //JC 19may2022: remove male breast cancers so rate calculated only based on female pop
 //JC 13jun2022: above correction performed
 	drop if sex==2
+	drop if sex==. 
 	drop if age_10==.
 	keep if siteiarc==29 // breast only
 	
@@ -509,7 +513,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -615,7 +619,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -642,8 +646,16 @@ preserve
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
 	sort age sex
+	
 	** now we have to add in the cases and pops for the missings: 
 	** M&F 0-14,15-24,25-34
+	
+	expand 2 in 1
+	replace sex=1 in 12
+	replace age_10=4 in 12
+	replace case=0 in 12
+	replace pop_wpp=(19333) in 12
+	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 13
@@ -726,7 +738,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -827,7 +839,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -966,7 +978,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -1097,7 +1109,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -1127,6 +1139,13 @@ preserve
 	** now we have to add in the cases and pop_wppns for the missings: 
 	** M&F 0-14,15-24,25-34
 	** F 35-44
+	
+	expand 2 in 1
+	replace sex=2 in 11
+	replace age_10=4 in 11
+	replace case=0 in 11
+	replace pop_wpp=(18494) in 11
+	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 12
@@ -1215,7 +1234,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -1246,13 +1265,6 @@ preserve
 	** M&F 0-14,15-24,25-34
 	** F 45-54,85+
 	** M 35-44
-	
-	expand 2 in 1
-	replace sex=1 in 10
-	replace age_10=1 in 10
-	replace case=0 in 10
-	replace pop_wpp=(23681) in 10
-	sort age_10
 	
 	expand 2 in 1
 	replace sex=2 in 11
@@ -1304,10 +1316,10 @@ preserve
 	sort age_10
 	
 	expand 2 in 1
-	replace sex=2 in 18
-	replace age_10=9 in 18
+	replace sex=1 in 18
+	replace age_10=1 in 18
 	replace case=0 in 18
-	replace pop_wpp=(2664) in 18
+	replace pop_wpp=(23681) in 18
 	sort age_10
 	
 	** -distrate is a user written command.
@@ -1346,7 +1358,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
@@ -1363,13 +1375,13 @@ save "`datapath'/version13/2-working/ASMRs_wpp_2021" ,replace
 restore
 
 
-** NON-HODGKIN LYMPHOMA
-tab pop_wpp age_10 if siteiarc==53 & sex==1 //female
-tab pop_wpp age_10 if siteiarc==53 & sex==2 //male
+** KIDNEY
+tab pop_wpp age_10 if siteiarc==42 & sex==1 //female
+tab pop_wpp age_10 if siteiarc==42 & sex==2 //male
 
 preserve
 	drop if age_10==.
-	keep if siteiarc==53
+	keep if siteiarc==42
 	
 	collapse (sum) case (mean) pop_wpp, by(pfu age_10 sex)
 	sort age sex
@@ -1378,6 +1390,34 @@ preserve
 	** M&F 0-14,15-24
 	** F 25-34
 	** M 35-44
+	
+	expand 2 in 1
+	replace sex=2 in 9
+	replace age_10=4 in 9
+	replace case=0 in 9
+	replace pop_wpp=(18924) in 9
+	sort age_10
+		
+	expand 2 in 1
+	replace sex=2 in 10
+	replace age_10=5 in 10
+	replace case=0 in 10
+	replace pop_wpp=(19347) in 10
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 11
+	replace age_10=5 in 11
+	replace case=0 in 11
+	replace pop_wpp=(20756) in 11
+	sort age_10
+	
+	expand 2 in 1
+	replace sex=1 in 12
+	replace age_10=6 in 12
+	replace case=0 in 12
+	replace pop_wpp=(20932) in 12
+	sort age_10
 	
 	expand 2 in 1
 	replace sex=1 in 13
@@ -1458,7 +1498,7 @@ rename ci_upper1 ci_upper
 replace asmr=round(asmr,0.01)
 replace ci_lower=round(ci_lower,0.01)
 replace ci_upper=round(ci_upper,0.01)
-gen percent=number/699*100
+gen percent=number/733*100
 replace percent=round(percent,0.01)
 
 append using "`datapath'/version13/2-working/ASMRs_wpp_2021"
