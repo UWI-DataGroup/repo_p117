@@ -1084,7 +1084,7 @@ preserve
 drop if year!=2021
 drop year age_10
 collapse (sum) pop_wpp, by(age5 sex)
-label data "UN WPP Population data 2020: 5-year age bands"
+label data "UN WPP Population data 2021: 5-year age bands"
 save "`datapath'/version13/2-working/pop_wpp_2021-5" , replace
 note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
 restore
@@ -1093,7 +1093,7 @@ preserve
 drop if year!=2021
 drop year age5
 collapse (sum) pop_wpp, by(age_10 sex)
-label data "UN WPP Population data 2020: 10-year age bands"
+label data "UN WPP Population data 2021: 10-year age bands"
 save "`datapath'/version13/2-working/pop_wpp_2021-10" , replace
 note: TS This dataset prepared using 2000-2018 census & estimate populations generated from "https://population.un.org/wpp/Download/Standard/Population/" on 10-May-2022.
 restore
