@@ -1,10 +1,10 @@
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
-    //  algorithm name          55_survival.do
+    //  algorithm name          23_survival.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      28-JUL-2021
-    // 	date last modified      08-AUG-2021
+    //  analysts:               Jacqueline CAMPBELL & Kern ROCKE
+    //  date first created      22-OCT-2023
+    // 	date last modified      22-OCT-2023
     //  algorithm task          Creating survival dataset using cleaned, current cancer dataset post death matching
     //  status                  Completed
     //  objective               To have a cleaned and matched survival dataset
@@ -25,13 +25,14 @@
 
     ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+    *local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
+	local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted" // Kern encrypted local machine
     ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
+    *local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
 
     ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\55_survival.smcl", replace
+    *capture log close
+    *log using "`logpath'/55_survival.smcl", replace
 ** HEADER -----------------------------------------------------
 
 * ************************************************************************
@@ -67,7 +68,9 @@ Excluded Criteria:
 * Survival analysis to 1 year, 3 years, 5 years and 10 years
 **************************************************************************
 ** Load the dataset
-use "`datapath'\version02\3-output\2008_2013_2014_2015_iarchub_nonsurvival_reportable", clear
+use "`datapath'/version13/3-output/2008_2013-2018_cancer_reportable_nonsurvival_deidentified", clear
+
+append using "`datapath'/version13/3-output/2019_cancer_nonsurvival_deidentified.dta", force
 
 ** Update dataset to meet IARC standards for calculating survival
 tab patient ,m 
@@ -168,7 +171,7 @@ gen time_10yr=dod-dot if (dod!=. & deceased_10yr==1 & dod<dot+(365.25*10) & dxyr
 ** (1) incidence date to death
 ** (2) incidence date to 31-dec-2020 (death data being included in submission)
 gen time_criccs=dod-dot if dod!=.
-replace time_criccs=d(31dec2020)-dot if dod==.
+replace time_criccs=d(31dec2021)-dot if dod==.
 label var time_criccs "Survival Time in Days"
 
 ** (2) next use 1, 3, 5 yrs as time, if died >1, >3, >5, >10 yrs from incidence
@@ -365,8 +368,37 @@ gen surv3yr_2015=1 if deceased_3yr==1 & dxyr==2015
 replace surv3yr_2015=0 if deceased_3yr==0 & dxyr==2015
 gen surv5yr_2015=1 if deceased_5yr==1 & dxyr==2015
 replace surv5yr_2015=0 if deceased_5yr==0 & dxyr==2015
+
+gen surv1yr_2016=1 if deceased_1yr==1 & dxyr==2016
+replace surv1yr_2016=0 if deceased_1yr==0 & dxyr==2016
+gen surv3yr_2016=1 if deceased_3yr==1 & dxyr==2016
+replace surv3yr_2016=0 if deceased_3yr==0 & dxyr==2016
+gen surv5yr_2016=1 if deceased_5yr==1 & dxyr==2016
+replace surv5yr_2016=0 if deceased_5yr==0 & dxyr==2016
+gen surv1yr_2017=1 if deceased_1yr==1 & dxyr==2017
+replace surv1yr_2017=0 if deceased_1yr==0 & dxyr==2017
+gen surv3yr_2017=1 if deceased_3yr==1 & dxyr==2017
+replace surv3yr_2017=0 if deceased_3yr==0 & dxyr==2017
+gen surv5yr_2017=1 if deceased_5yr==1 & dxyr==2017
+replace surv5yr_2017=0 if deceased_5yr==0 & dxyr==2017
+gen surv1yr_2018=1 if deceased_1yr==1 & dxyr==2018
+replace surv1yr_2018=0 if deceased_1yr==0 & dxyr==2018
+gen surv3yr_2018=1 if deceased_3yr==1 & dxyr==2018
+replace surv3yr_2018=0 if deceased_3yr==0 & dxyr==2018
+gen surv5yr_2018=1 if deceased_5yr==1 & dxyr==2018
+replace surv5yr_2018=0 if deceased_5yr==0 & dxyr==2018
+gen surv1yr_2019=1 if deceased_1yr==1 & dxyr==2019
+replace surv1yr_2019=0 if deceased_1yr==0 & dxyr==2019
+gen surv3yr_2019=1 if deceased_3yr==1 & dxyr==2019
+replace surv3yr_2019=0 if deceased_3yr==0 & dxyr==2019
+gen surv5yr_2019=1 if deceased_5yr==1 & dxyr==2019
+replace surv5yr_2019=0 if deceased_5yr==0 & dxyr==2019
+
+
+
+
 label define surv_lab 0 "censored" 1 "dead", modify
-label values surv1yr_2008 surv3yr_2008 surv5yr_2008 surv10yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv5yr_2014 surv1yr_2015 surv3yr_2015 surv5yr_2015 surv_lab
+label values surv1yr_2008 surv3yr_2008 surv5yr_2008 surv10yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv5yr_2014 surv1yr_2015 surv3yr_2015 surv5yr_2015 surv1yr_2016 surv3yr_2016 surv5yr_2016 surv1yr_2017 surv3yr_2017 surv5yr_2017 surv1yr_2018 surv3yr_2018 surv5yr_2018 surv1yr_2019 surv3yr_2019 surv5yr_2019 surv_lab
 label var surv1yr_2008 "Survival at 1yr - 2008"
 label var surv3yr_2008 "Survival at 3yrs - 2008"
 label var surv5yr_2008 "Survival at 5yrs - 2008"
@@ -380,6 +412,18 @@ label var surv5yr_2014 "Survival at 5yrs - 2014"
 label var surv1yr_2015 "Survival at 1yr - 2015"
 label var surv3yr_2015 "Survival at 3yrs - 2015"
 label var surv5yr_2015 "Survival at 5yrs - 2015"
+label var surv1yr_2016 "Survival at 1yr - 2016"
+label var surv3yr_2016 "Survival at 3yrs - 2016"
+label var surv5yr_2016 "Survival at 5yrs - 2016"
+label var surv1yr_2017 "Survival at 1yr - 2017"
+label var surv3yr_2017 "Survival at 3yrs - 2017"
+label var surv5yr_2017 "Survival at 5yrs - 2017"
+label var surv1yr_2018 "Survival at 1yr - 2018"
+label var surv3yr_2018 "Survival at 3yrs - 2018"
+label var surv5yr_2018 "Survival at 5yrs - 2018"
+label var surv1yr_2019 "Survival at 1yr - 2019"
+label var surv3yr_2019 "Survival at 3yrs - 2019"
+label var surv5yr_2019 "Survival at 5yrs - 2019"
 
 
 tab dxyr ,m
@@ -586,9 +630,177 @@ tab surv1yr_2015 if siteiarc==53 //nhl  1-yr survival
 tab surv3yr_2015 if siteiarc==53 //nhl  3-yr survival
 tab surv5yr_2015 if siteiarc==53 //nhl  5-yr survival
 
+** PROSTATE
+tab surv1yr_2016 if siteiarc==39 //prostate 1-yr survival
+tab surv3yr_2016 if siteiarc==39 //prostate 3-yr survival
+tab surv5yr_2016 if siteiarc==39 //prostate 5-yr survival
+** BREAST
+tab surv1yr_2016 if siteiarc==29 //breast 1-yr survival
+tab surv3yr_2016 if siteiarc==29 //breast 3-yr survival
+tab surv5yr_2016 if siteiarc==29 //breast 5-yr survival
+** COLON
+tab surv1yr_2016 if siteiarc==13 //colon 1-yr survival
+tab surv3yr_2016 if siteiarc==13 //colon 3-yr survival
+tab surv5yr_2016 if siteiarc==13 //colon 5-yr survival
+** CORPUS UTERI
+tab surv1yr_2016 if siteiarc==33 //corpus uteri 1-yr survival
+tab surv3yr_2016 if siteiarc==33 //corpus uteri 3-yr survival
+tab surv5yr_2016 if siteiarc==33 //corpus uteri 5-yr survival
+** RECTUM
+tab surv1yr_2016 if siteiarc==14 //rectum 1-yr survival
+tab surv3yr_2016 if siteiarc==14 //rectum 3-yr survival
+tab surv5yr_2016 if siteiarc==14 //rectum 5-yr survival
+** LUNG
+tab surv1yr_2016 if siteiarc==21 //lung 1-yr survival
+tab surv3yr_2016 if siteiarc==21 //lung 3-yr survival
+tab surv5yr_2016 if siteiarc==21 //lung 5-yr survival
+** CERVIX
+tab surv1yr_2016 if siteiarc==32 //cervix 1-yr survival
+tab surv3yr_2016 if siteiarc==32 //cervix 3-yr survival
+tab surv5yr_2016 if siteiarc==32 //cervix 5-yr survival
+** STOMACH
+tab surv1yr_2016 if siteiarc==11 //stomach 1-yr survival
+tab surv3yr_2016 if siteiarc==11 //stomach 3-yr survival
+tab surv5yr_2016 if siteiarc==11 //stomach 5-yr survival
+** MULTIPLE MYELOMA 
+tab surv1yr_2016 if siteiarc==55 //mm  1-yr survival
+tab surv3yr_2016 if siteiarc==55 //mm  3-yr survival
+tab surv5yr_2016 if siteiarc==55 //mm  5-yr survival
+** NON-HODGKIN LYMPHOMA
+tab surv1yr_2016 if siteiarc==53 //nhl  1-yr survival
+tab surv3yr_2016 if siteiarc==53 //nhl  3-yr survival
+tab surv5yr_2016 if siteiarc==53 //nhl  5-yr survival
+
+** PROSTATE
+tab surv1yr_2017 if siteiarc==39 //prostate 1-yr survival
+tab surv3yr_2017 if siteiarc==39 //prostate 3-yr survival
+tab surv5yr_2017 if siteiarc==39 //prostate 5-yr survival
+** BREAST
+tab surv1yr_2017 if siteiarc==29 //breast 1-yr survival
+tab surv3yr_2017 if siteiarc==29 //breast 3-yr survival
+tab surv5yr_2017 if siteiarc==29 //breast 5-yr survival
+** COLON
+tab surv1yr_2017 if siteiarc==13 //colon 1-yr survival
+tab surv3yr_2017 if siteiarc==13 //colon 3-yr survival
+tab surv5yr_2017 if siteiarc==13 //colon 5-yr survival
+** CORPUS UTERI
+tab surv1yr_2017 if siteiarc==33 //corpus uteri 1-yr survival
+tab surv3yr_2017 if siteiarc==33 //corpus uteri 3-yr survival
+tab surv5yr_2017 if siteiarc==33 //corpus uteri 5-yr survival
+** RECTUM
+tab surv1yr_2017 if siteiarc==14 //rectum 1-yr survival
+tab surv3yr_2017 if siteiarc==14 //rectum 3-yr survival
+tab surv5yr_2017 if siteiarc==14 //rectum 5-yr survival
+** LUNG
+tab surv1yr_2017 if siteiarc==21 //lung 1-yr survival
+tab surv3yr_2017 if siteiarc==21 //lung 3-yr survival
+tab surv5yr_2017 if siteiarc==21 //lung 5-yr survival
+** CERVIX
+tab surv1yr_2017 if siteiarc==32 //cervix 1-yr survival
+tab surv3yr_2017 if siteiarc==32 //cervix 3-yr survival
+tab surv5yr_2017 if siteiarc==32 //cervix 5-yr survival
+** STOMACH
+tab surv1yr_2017 if siteiarc==11 //stomach 1-yr survival
+tab surv3yr_2017 if siteiarc==11 //stomach 3-yr survival
+tab surv5yr_2017 if siteiarc==11 //stomach 5-yr survival
+** MULTIPLE MYELOMA 
+tab surv1yr_2017 if siteiarc==55 //mm  1-yr survival
+tab surv3yr_2017 if siteiarc==55 //mm  3-yr survival
+tab surv5yr_2017 if siteiarc==55 //mm  5-yr survival
+** NON-HODGKIN LYMPHOMA
+tab surv1yr_2017 if siteiarc==53 //nhl  1-yr survival
+tab surv3yr_2017 if siteiarc==53 //nhl  3-yr survival
+tab surv5yr_2017 if siteiarc==53 //nhl  5-yr survival
+
+** PROSTATE
+tab surv1yr_2018 if siteiarc==39 //prostate 1-yr survival
+tab surv3yr_2018 if siteiarc==39 //prostate 3-yr survival
+tab surv5yr_2018 if siteiarc==39 //prostate 5-yr survival
+** BREAST
+tab surv1yr_2018 if siteiarc==29 //breast 1-yr survival
+tab surv3yr_2018 if siteiarc==29 //breast 3-yr survival
+tab surv5yr_2018 if siteiarc==29 //breast 5-yr survival
+** COLON
+tab surv1yr_2018 if siteiarc==13 //colon 1-yr survival
+tab surv3yr_2018 if siteiarc==13 //colon 3-yr survival
+tab surv5yr_2018 if siteiarc==13 //colon 5-yr survival
+** CORPUS UTERI
+tab surv1yr_2018 if siteiarc==33 //corpus uteri 1-yr survival
+tab surv3yr_2018 if siteiarc==33 //corpus uteri 3-yr survival
+tab surv5yr_2018 if siteiarc==33 //corpus uteri 5-yr survival
+** RECTUM
+tab surv1yr_2018 if siteiarc==14 //rectum 1-yr survival
+tab surv3yr_2018 if siteiarc==14 //rectum 3-yr survival
+tab surv5yr_2018 if siteiarc==14 //rectum 5-yr survival
+** LUNG
+tab surv1yr_2018 if siteiarc==21 //lung 1-yr survival
+tab surv3yr_2018 if siteiarc==21 //lung 3-yr survival
+tab surv5yr_2018 if siteiarc==21 //lung 5-yr survival
+** CERVIX
+tab surv1yr_2018 if siteiarc==32 //cervix 1-yr survival
+tab surv3yr_2018 if siteiarc==32 //cervix 3-yr survival
+tab surv5yr_2018 if siteiarc==32 //cervix 5-yr survival
+** STOMACH
+tab surv1yr_2018 if siteiarc==11 //stomach 1-yr survival
+tab surv3yr_2018 if siteiarc==11 //stomach 3-yr survival
+tab surv5yr_2018 if siteiarc==11 //stomach 5-yr survival
+** MULTIPLE MYELOMA 
+tab surv1yr_2018 if siteiarc==55 //mm  1-yr survival
+tab surv3yr_2018 if siteiarc==55 //mm  3-yr survival
+tab surv5yr_2018 if siteiarc==55 //mm  5-yr survival
+** NON-HODGKIN LYMPHOMA
+tab surv1yr_2018 if siteiarc==53 //nhl  1-yr survival
+tab surv3yr_2018 if siteiarc==53 //nhl  3-yr survival
+tab surv5yr_2018 if siteiarc==53 //nhl  5-yr survival
+
+** PROSTATE
+tab surv1yr_2019 if siteiarc==39 //prostate 1-yr survival
+tab surv3yr_2019 if siteiarc==39 //prostate 3-yr survival
+tab surv5yr_2019 if siteiarc==39 //prostate 5-yr survival
+** BREAST
+tab surv1yr_2019 if siteiarc==29 //breast 1-yr survival
+tab surv3yr_2019 if siteiarc==29 //breast 3-yr survival
+tab surv5yr_2019 if siteiarc==29 //breast 5-yr survival
+** COLON
+tab surv1yr_2019 if siteiarc==13 //colon 1-yr survival
+tab surv3yr_2019 if siteiarc==13 //colon 3-yr survival
+tab surv5yr_2019 if siteiarc==13 //colon 5-yr survival
+** CORPUS UTERI
+tab surv1yr_2019 if siteiarc==33 //corpus uteri 1-yr survival
+tab surv3yr_2019 if siteiarc==33 //corpus uteri 3-yr survival
+tab surv5yr_2019 if siteiarc==33 //corpus uteri 5-yr survival
+** RECTUM
+tab surv1yr_2019 if siteiarc==14 //rectum 1-yr survival
+tab surv3yr_2019 if siteiarc==14 //rectum 3-yr survival
+tab surv5yr_2019 if siteiarc==14 //rectum 5-yr survival
+** LUNG
+tab surv1yr_2019 if siteiarc==21 //lung 1-yr survival
+tab surv3yr_2019 if siteiarc==21 //lung 3-yr survival
+tab surv5yr_2019 if siteiarc==21 //lung 5-yr survival
+** CERVIX
+tab surv1yr_2019 if siteiarc==32 //cervix 1-yr survival
+tab surv3yr_2019 if siteiarc==32 //cervix 3-yr survival
+tab surv5yr_2019 if siteiarc==32 //cervix 5-yr survival
+** STOMACH
+tab surv1yr_2019 if siteiarc==11 //stomach 1-yr survival
+tab surv3yr_2019 if siteiarc==11 //stomach 3-yr survival
+tab surv5yr_2019 if siteiarc==11 //stomach 5-yr survival
+** MULTIPLE MYELOMA 
+tab surv1yr_2019 if siteiarc==55 //mm  1-yr survival
+tab surv3yr_2019 if siteiarc==55 //mm  3-yr survival
+tab surv5yr_2019 if siteiarc==55 //mm  5-yr survival
+** NON-HODGKIN LYMPHOMA
+tab surv1yr_2019 if siteiarc==53 //nhl  1-yr survival
+tab surv3yr_2019 if siteiarc==53 //nhl  3-yr survival
+tab surv5yr_2019 if siteiarc==53 //nhl  5-yr survival
+
 
 ** Create patient total variables to use in 30_report cancer.do
 tab patient dxyr ,m
+egen pttotsurv_2019=count(patient) if patient==1 & dxyr==2019
+egen pttotsurv_2018=count(patient) if patient==1 & dxyr==2018
+egen pttotsurv_2017=count(patient) if patient==1 & dxyr==2017
+egen pttotsurv_2016=count(patient) if patient==1 & dxyr==2016
 egen pttotsurv_2015=count(patient) if patient==1 & dxyr==2015
 egen pttotsurv_2014=count(patient) if patient==1 & dxyr==2014
 egen pttotsurv_2013=count(patient) if patient==1 & dxyr==2013
@@ -597,10 +809,10 @@ egen pttotsurv_2008=count(patient) if patient==1 & dxyr==2008
 count //3272
 
 ** Create 2008, 2013-2015 survival dataset
-save "`datapath'\version02\3-output\2008_2013_2014_2015_cancer_survival", replace
-label data "2008 2013 2014 2015 BNR-Cancer analysed data - Survival BNR Reportable Dataset"
-note: TS This dataset was used for 2015 annual report
-note: TS For survival analysis, use variables surv1yr_2008, surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2008, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2008, surv5yr_2013, surv5yr_2014, surv5yr_2015, surv10yr_2008
+save "`datapath'/version13/3-output/2008_2013_2014_2015_2016_2017_2018_2019_cancer_survival", replace
+label data "2008 2013 2014 2015 2016 2017 2018 2019 BNR-Cancer analysed data - Survival BNR Reportable Dataset"
+note: TS This dataset was used for 2019 annual report
+note: TS For survival analysis, use variables surv1yr_2008 surv3yr_2008 surv5yr_2008 surv10yr_2008 surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv5yr_2014 surv1yr_2015 surv3yr_2015 surv5yr_2015 surv1yr_2016 surv3yr_2016 surv5yr_2016 surv10yr_2016 surv1yr_2017 surv3yr_2017 surv5yr_2017 surv1yr_2018 surv3yr_2018 surv5yr_2018 surv1yr_2019 surv3yr_2019 surv5yr_2019 surv10yr_2008
 
 ** Create 2013-2015 survival dataset
 drop if dxyr==2008 //753 deleted
@@ -609,7 +821,7 @@ drop deceased_10yr enddate_10yr time_10yr dod_10yr newenddate_10yr surv1yr_2008 
 
 count //2519
 
-save "`datapath'\version02\3-output\2013_2014_2015_cancer_survival", replace
-label data "2013 2014 2015 BNR-Cancer analysed data - Survival BNR Reportable Dataset"
-note: TS This dataset was used for 2015 annual report
-note: TS For survival analysis, use variables surv1yr_2013, surv1yr_2014, surv1yr_2015, surv3yr_2013, surv3yr_2014, surv3yr_2015, surv5yr_2013, surv5yr_2014, surv5yr_2015
+save "`datapath'/version13/3-output/2013_2014_2015_2016_2017_2018_2019_cancer_survival", replace
+label data "2013 2014 2015 2016 2017 2018 2019 BNR-Cancer analysed data - Survival BNR Reportable Dataset"
+note: TS This dataset was used for 2019 annual report
+note: TS For survival analysis, use variables surv1yr_2013 surv3yr_2013 surv5yr_2013 surv1yr_2014 surv3yr_2014 surv5yr_2014 surv1yr_2015 surv3yr_2015 surv5yr_2015 surv1yr_2016 surv3yr_2016 surv5yr_2016 surv10yr_2016 surv1yr_2017 surv3yr_2017 surv5yr_2017 surv1yr_2018 surv3yr_2018 surv5yr_2018 surv1yr_2019 surv3yr_2019 surv5yr_2019
