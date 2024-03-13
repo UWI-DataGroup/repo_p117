@@ -2,9 +2,9 @@
 **  DO-FILE METADATA
     //  algorithm name          003d_compare lists_NAMES.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JAN-2022
-    // 	date last modified      12-JAN-2022
+    //  analysts:               Jacqueline CAMPBELL and Kern ROCKE
+    //  date first created      13-MAR-2024
+    // 	date last modified      13-MAR-2024
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -12,7 +12,7 @@
 	//								appending the DA's comments to new duplicates list where applicable.
 	//							(2) To have the SOP for this process written into the dofile.
     //  methods                 Importing current CR5db dataset, identifying duplicates and using quietly sort to compare with previously-checked duplicates list
-	//							This dofile is also saved in the path: L:\Sync\Cancer\CanReg5\DA Duplicates
+	//							This dofile is also saved in the path: L:/Sync/Cancer/CanReg5/DA Duplicates
 
     ** General algorithm set-up
     version 16.0
@@ -28,14 +28,9 @@
     	}
 
     ** Set working directories: this is for DATASET and LOGFILE import and export
+  ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
-    ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
-
-    ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\003d_compare lists_NAMES.smcl", replace
+    local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted"
 ** HEADER -----------------------------------------------------
 
 /* 
@@ -55,7 +50,7 @@
 
 ** STEP #2
 ** LOAD corrected dataset from dofile 001_flag errors for each list
-use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
+use "`datapath'/version15/2-working/corrected_cancer_dups.dta" , clear
 
 count //10,300
 
@@ -88,12 +83,12 @@ count //561
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
 //destring birthdate ,replace
-capture append using "`datapath'\version07\2-working\prevNAMES_dups" ,force
+capture append using "`datapath'/version15/2-working/prevNAMES_dups" ,force
 format str_dadate %tdnn/dd/CCYY
 count //327
 /*
 ** ADD IN EXTRA STEP TO CREATE A STATIC NAMES TAB DATASET FROM THIS 20210629 LIST FOR FUTURE MATCHING IN ADDITION TO THE USUAL PREVIOUS LIST DATASET
-capture append using "`datapath'\version07\2-working\29jun21NAMES_dups" ,force
+capture append using "`datapath'/version15/2-working/29jun21NAMES_dups" ,force
 format str_dadate %tdnn/dd/CCYY
 count //1,015
 */
@@ -130,7 +125,7 @@ count //501
 
 
 ** ADD IN EXTRA STEP TO CREATE A STATIC NAMES TAB DATASET FROM THIS 20210629 LIST FOR FUTURE MATCHING IN ADDITION TO THE USUAL PREVIOUS LIST DATASET
-capture append using "`datapath'\version07\2-working\29jun21NAMES_dups" ,force
+capture append using "`datapath'/version15/2-working/29jun21NAMES_dups" ,force
 format str_dadate %tdnn/dd/CCYY
 count //981
 
@@ -138,7 +133,7 @@ drop dupnmpid
 sort lastname firstname registrynumber
 quietly by lastname firstname registrynumber:  gen dupnmpid = cond(_N==1,0,_n)
 count if dupnmpid>0 //908
-order registrynumber lastname firstname checked dupnmpid checked29jun21 str_no str_da str_dadate str_action
+order registrynumber lastname firstname checked dupnmpid str_no str_da str_dadate str_action
 
 count if checked==2 & dupnmpid>0 //454 - so all 29 have a corresponding pid that's from previously-checked list so can no new dups found in this list
 count if checked==1 & duppid==0 //0 - check these in Stata Browse/Edit window: previously-checked and merged cases
@@ -215,5 +210,4 @@ order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber 
 
 ** STEP #10
 ** Save this dataset for export to excel (see dofile 004_export new lists)
-save "`datapath'\version07\3-output\NAMES_dups" ,replace
-
+save "`datapath'/version15/3-output/NAMES_dups" ,replace
