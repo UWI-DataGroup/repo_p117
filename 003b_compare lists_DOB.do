@@ -1,10 +1,11 @@
+cls
 ** HEADER -----------------------------------------------------
 **  DO-FILE METADATA
     //  algorithm name          003b_compare lists_DOB.do
     //  project:                BNR
     //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JAN-2022
-    // 	date last modified      12-JAN-2022
+    //  date first created      13-MAR-2024
+    // 	date last modified      13-MAR-2024
     //  algorithm task          Identifying duplicates and comparing with previously-checked duplicates (see dofile '002_prep prev lists')
     //  status                  Completed
     //  objective               (1) To have a dataset with newly-generated duplicates, comparing these with previously-checked duplicates and
@@ -12,7 +13,7 @@
 	//								appending the DA's comments to new duplicates list where applicable.
 	//							(2) To have the SOP for this process written into the dofile.
     //  methods                 Importing current CR5db dataset, identifying duplicates and using quietly sort to compare with previously-checked duplicates list
-	//							This dofile is also saved in the path: L:\Sync\Cancer\CanReg5\DA Duplicates
+	//							This dofile is also saved in the path: L:/Sync/Cancer/CanReg5/DA Duplicates
 
     ** General algorithm set-up
     version 16.0
@@ -27,15 +28,10 @@
     	log close
     	}
 
-    ** Set working directories: this is for DATASET and LOGFILE import and export
+  ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
-    ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
-
-    ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\003_compare lists_DOB.smcl", replace
+    local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted"
+	
 ** HEADER -----------------------------------------------------
 
 /* 
@@ -55,7 +51,7 @@
 
 ** STEP #2
 ** LOAD corrected dataset from dofile 001_flag errors for each list
-use "`datapath'\version07\2-working\corrected_cancer_dups.dta" , clear
+use "`datapath'/version15/2-working/corrected_cancer_dups.dta" , clear
 
 count //10,300
 
@@ -153,7 +149,7 @@ count //2
 	(2)	Add previously-checked DOB dataset to this newly-generated DOB dataset
 */
 //destring birthdate ,replace
-capture append using "`datapath'\version07\2-working\prevDOB_dups" ,force
+capture append using "`datapath'/version15/2-working/prevDOB_dups" ,force
 format str_dadate %tdnn/dd/CCYY
 count //2
 
@@ -194,5 +190,4 @@ order str_no registrynumber lastname firstname sex nrn birthdate hospitalnumber 
 
 ** STEP #11
 ** Save this dataset for export to excel (see dofile 004_export new lists)
-save "`datapath'\version07\3-output\DOB_dups" ,replace
-
+save "`datapath'/version15/3-output/DOB_dups" ,replace
