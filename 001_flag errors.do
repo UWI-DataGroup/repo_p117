@@ -2,16 +2,16 @@
 **  DO-FILE METADATA
     //  algorithm name          001_flag errors.do
     //  project:                BNR
-    //  analysts:               Jacqueline CAMPBELL
-    //  date first created      12-JAN-2022
-    // 	date last modified      12-JAN-2022
+    //  analysts:               Jacqueline CAMPBELL & Kern ROCKE
+    //  date first created      13-MAR-2024
+    // 	date last modified      13-MAR-2024
     //  algorithm task          Formatting the CanReg5 dataset, identifying, flagging and correcting errors (see dofile '2c_dup cancer')
     //  status                  Completed
     //  objective               (1) To have list of any errors identified during this process so DAs can correct in CR5db.
 	//							(2) To have a corrected dataset for generating new duplicates lists (see dofiles '2b_dup cancer' + '2c_dup cancer')
 	//							(3)	To have the SOP for this process written into the dofile.
     //  methods                 Importing current CR5db dataset and flagging errors.
-	//							This dofile is also saved in the path: L:\Sync\Cancer\CanReg5\DA Duplicates
+	//							This dofile is also saved in the path: L:/Sync/Cancer/CanReg5/DA Duplicates
 
     ** General algorithm set-up
     version 16.0
@@ -28,13 +28,8 @@
 
     ** Set working directories: this is for DATASET and LOGFILE import and export
     ** DATASETS to encrypted SharePoint folder
-    local datapath "X:/The University of the West Indies/DataGroup - repo_data/data_p117"
-    ** LOGFILES to unencrypted OneDrive folder (.gitignore set to IGNORE log files on PUSH to GitHub)
-    local logpath X:/OneDrive - The University of the West Indies/repo_datagroup/repo_p117
+    local datapath "/Volumes/Drive 2/BNR Consultancy/Sync/Sync/DM/Data/BNR-Cancer/data_p117_decrypted"
 
-    ** Close any open log file and open a new log file
-    capture log close
-    log using "`logpath'\001_flag errors.smcl", replace
 ** HEADER -----------------------------------------------------
 
 /* 
@@ -63,12 +58,12 @@
 	(9) Under 'File format'section, select 'Tab Separated Values'
 	(10) Click 'Export'
 	(11) Save export with current date onto:
-		 e.g. `datapath'\version07\1-input\yyyy-mm-dd_MAIN Source+Tumour+Patient_JC.txt
+		 e.g. `datapath'/version15/1-input/yyyy-mm-dd_MAIN Source+Tumour+Patient_JC.txt
 */
 
 ** STEP #3
 ** LOAD and SAVE the SOURCE+TUMOUR+PATIENT dataset from above (Source_+Tumour+Patient tables)
-insheet using "`datapath'\version07\1-input\2022-01-12_MAIN Source+Tumour+Patient_JC.txt"
+insheet using "`datapath'/version15/1-input/2024-03-08_MAIN Soure+Tumor+Patient_KDR.txt"
 
 ** STEP #4
 ** Format the IDs from the CR5db dataset
@@ -85,7 +80,7 @@ drop tumouridsourcetable recordnumber cfdiagnosis labnumber specimen sampletaken
 	 morphology laterality behaviour grade basisofdiagnosis tnmcatstage tnmantstage esstnmcatstage esstnmantstage summarystaging incidencedate consultant ///
 	 iccccode icd10 treatment1 treatment1date treatment2 treatment2date treatment3 treatment3date treatment4 treatment4date treatment5 treatment5date ///
 	 othertreatment1 othertreatment2 notreatment1 notreatment2 ttreviewer personsearch residentstatus statuslastcontact datelastcontact ///
-	 comments ptdataabstractor ptcasefindingdate casestatus obsoleteflagpatienttable patientrecordid patientupdatedby patientupdatedate patientrecordstatus ///
+	 comments ptdataabstractor ptcasefindingdate obsoleteflagpatienttable patientrecordid patientupdatedby patientupdatedate patientrecordstatus ///
 	 patientcheckstatus retrievalsource notesseen notesseendate furtherretrievalsource ptreviewer 
 
 ** STEP #6
@@ -247,11 +242,11 @@ replace flag4=birthdate if regexm(birthdate,"-") //0 changes
 /*
 preserve
 clear
-import excel using "`datapath'\version07\2-working\DOBNRNelectoral_dups.xlsx" , firstrow case(lower)
+import excel using "`datapath'/version15/2-working/DOBNRNelectoral_dups.xlsx" , firstrow case(lower)
 tostring elec_dob ,replace
-save "`datapath'\version07\2-working\electoral_dobnrn_dups" ,replace
+save "`datapath'/version15/2-working/electoral_dobnrn_dups" ,replace
 restore
-merge 1:1 registrynumber using "`datapath'\version07\2-working\electoral_dobnrn_dups" ,force
+merge 1:1 registrynumber using "`datapath'/version15/2-working/electoral_dobnrn_dups" ,force
 /*
     Result                           # of obs.
     -----------------------------------------
@@ -315,7 +310,7 @@ label var str_no "No."
 ** Create excel errors list before deleting incorrect records
 ** Use below code to automate file names using current date
 local listdate = string( d(`c(current_date)'), "%dCYND" )
-capture export_excel str_no registrynumber flag1 flag6 flag2 flag7 flag3 flag8 flag4 flag9 flag5 flag10 str_da str_dadate str_action if flag1!=""|flag2!=""|flag3!=""|flag4!=""|flag5!="" using "`datapath'\version07\3-output\CancerDuplicates`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
+capture export_excel str_no registrynumber flag1 flag6 flag2 flag7 flag3 flag8 flag4 flag9 flag5 flag10 str_da str_dadate str_action if flag1!=""|flag2!=""|flag3!=""|flag4!=""|flag5!="" using "`datapath'/version15/3-output/CancerDuplicates`listdate'.xlsx", sheet("ERRORS") firstrow(varlabels)
 restore
 
 
@@ -333,14 +328,14 @@ count //10,300
 
 ** STEP #30
 ** Save this dataset
-save "`datapath'\version07\2-working\corrected_cancer_dups.dta" ,replace
+save "`datapath'/version15/2-working/corrected_cancer_dups.dta" ,replace
 label data "BNR-Cancer Duplicates"
 notes _dta :These data prepared for SDA to use for identifying duplicates and possible missed merges
 
 /*
 ** STEP #31
 ** Run all of the dofiles from this dofile
-do "`logpath'\002_prep_prev_lists"
+do "`logpath'/002_prep_prev_lists"
 do 003a_compare lists_NRN
 do 003b_compare lists_DOB
 do 003c_compare lists_HOSP
